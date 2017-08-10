@@ -8,7 +8,7 @@
 2.模板可以自定义并根据脚手架的接口完成模板的编写最终形成自己的模板，通过上传完成代码的生成；
 
 3.生成模块化，将框架，技术，信息等模块化显示，选择需要的模块进行生成，完全自定义生成到任何一层，
-  目前实现目标是生成是基于<span style="font-size:14px;font-color:red;">spring+mybatis+dubbo+mysql+redis+memcache+hibernate+swagger</span>进行选择性生成，
+  目前实现目标是生成是基于<H2 style="font-size:14px;font-color:red;">spring+mybatis+dubbo+mysql+redis+memcache+hibernate+swagger</H2>进行选择性生成，
   从mapper，dao，service，ctrl 全部自动化生成，内容包含注释，命名，实体类，query类，基本的增删改查，以及关联查询；
 
 4.根据模型的关系生成1对n，1对1 1对1对n 1对n对1等基本的关联查询关系，并实现条件查询，时间区间查询，分页查询等功能接口功能；

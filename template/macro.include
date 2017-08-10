@@ -1,0 +1,28 @@
+<#-- 将value变成jsp el表达式,主要由于FreeMarker生成表达式不方便 -->
+<#macro jspEl value>${r"${"}${value}}</#macro>
+
+<#-- 生成java构造函数 -->
+<#macro generateConstructor constructor>
+	public ${constructor}(){
+	}
+
+	public ${constructor}(
+	<#list table.compositeIdColumns as column>
+		<#if column.pk>
+			<#if (column_index + 1) == table.compositeIdColumns?size>
+		${column.javaType} ${column.columnNameLower}
+			<#else>
+		${column.javaType} ${column.columnNameLower},
+			</#if>
+		</#if>
+	</#list>		
+	){
+	<#list table.compositeIdColumns as column>
+		<#if column.pk>
+		this.${column.columnNameLower} = ${column.columnNameLower};
+		</#if>
+	</#list>	
+	}
+
+</#macro>
+

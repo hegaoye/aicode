@@ -1,0 +1,4 @@
+//root 项目引入子项目
+include 'core'//核心jar包
+include 'ai'//ai接口
+include 'ai-ui'//ai界面化

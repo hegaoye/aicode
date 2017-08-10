@@ -1,0 +1,17 @@
+import java.util.*;
+
+import javacommon.util.*;
+import javacommon.web.util.*;
+import javacommon.base.*;
+import javacommon.page.*;
+import javacommon.page.impl.*;
+import ${basepackage}.${subpackage}.model.*;
+import ${basepackage}.${subpackage}.dao.*;
+import ${basepackage}.${subpackage}.service.*;
+
+/**
+ * @author badqiu email:badqiu(a)gmail.com
+ * @version 1.0
+ * @since 1.0
+ */
+ 

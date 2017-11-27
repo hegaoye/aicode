@@ -1,0 +1,15 @@
+<component name="libraryTable">
+  <library name="ai-code-libs">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/libs/classes12.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/commons-beanutils.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/commons-io.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/commons-logging-1.0.3.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/freemarker.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/mysql-connector-java-5.0.5-bin.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/sqljdbc.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

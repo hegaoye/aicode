@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<mapper namespace="ProjectTools">
+
+	<resultMap id="rs_base" type="ProjectTools">
+        <result property="id" column="id"/>
+        <result property="projectCode" column="projectCode"/>
+        <result property="toolsCode" column="toolsCode"/>
+	</resultMap>
+
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="ProjectTools.columns">
+		id,projectCode,toolsCode
+	</sql>
+
+	<insert id="ProjectTools.insert" useGeneratedKeys="true" keyProperty="id" parameterType="ProjectTools">
+        INSERT INTO `project_tools` (
+        	id ,
+        	projectCode ,
+        	toolsCode 
+        ) VALUES (
+        	#{id} ,
+        	#{projectCode} ,
+        	#{toolsCode} 
+        )
+		<selectKey keyProperty="id" resultType="long">
+			select LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+
+	<update id="ProjectTools.update" parameterType="ProjectTools">
+        UPDATE `project_tools`
+		<trim prefix="set" suffixOverrides=",">
+			<if test="projectCode!=null and projectCode!=''">
+	        projectCode = #{projectCode} ,
+		    </if>
+			<if test="toolsCode!=null and toolsCode!=''">
+	        toolsCode = #{toolsCode} 
+		    </if>
+		</trim>
+        WHERE
+	        id = #{id} 
+	</update>
+
+    <delete id="ProjectTools.delete">
+        DELETE FROM `project_tools`
+		<include refid="ProjectTools.where"/>
+    </delete>
+
+    <select id="ProjectTools.load" resultMap="rs_base">
+		SELECT <include refid="ProjectTools.columns" />
+		    FROM `project_tools`
+		<include refid="ProjectTools.where"/>
+	</select>
+
+	<sql id="ProjectTools.where">
+		<where>
+			<if test="id!=null and id!=''">
+				AND id = #{id}
+			</if>
+			<if test="projectCode!=null and projectCode!=''">
+				AND projectCode = #{projectCode}
+			</if>
+			<if test="toolsCode!=null and toolsCode!=''">
+				AND toolsCode = #{toolsCode}
+			</if>
+		</where>
+	</sql>
+
+
+
+    <select id="ProjectTools.count" resultType="long">
+        SELECT count(*) FROM `project_tools`
+		<include refid="ProjectTools.where"/>
+    </select>
+
+
+    <select id="ProjectTools.query" resultMap="rs_base">
+    	SELECT <include refid="ProjectTools.columns" />
+	    FROM `project_tools`
+		<include refid="ProjectTools.where"/>
+
+		<if test="sortColumns!=null and sortColumns!=''">
+			ORDER BY ${sortColumns}
+		</if>
+    </select>
+
+
+</mapper>
+

@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<mapper namespace="ProjectMoudles">
+
+	<resultMap id="rs_base" type="ProjectMoudles">
+        <result property="id" column="id"/>
+        <result property="projectCode" column="projectCode"/>
+        <result property="moudleCode" column="moudleCode"/>
+	</resultMap>
+
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="ProjectMoudles.columns">
+		id,projectCode,moudleCode
+	</sql>
+
+	<insert id="ProjectMoudles.insert" useGeneratedKeys="true" keyProperty="id" parameterType="ProjectMoudles">
+        INSERT INTO `project_moudles` (
+        	id ,
+        	projectCode ,
+        	moudleCode 
+        ) VALUES (
+        	#{id} ,
+        	#{projectCode} ,
+        	#{moudleCode} 
+        )
+		<selectKey keyProperty="id" resultType="long">
+			select LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+
+	<update id="ProjectMoudles.update" parameterType="ProjectMoudles">
+        UPDATE `project_moudles`
+		<trim prefix="set" suffixOverrides=",">
+			<if test="projectCode!=null and projectCode!=''">
+	        projectCode = #{projectCode} ,
+		    </if>
+			<if test="moudleCode!=null and moudleCode!=''">
+	        moudleCode = #{moudleCode} 
+		    </if>
+		</trim>
+        WHERE
+	        id = #{id} 
+	</update>
+
+    <delete id="ProjectMoudles.delete">
+        DELETE FROM `project_moudles`
+		<include refid="ProjectMoudles.where"/>
+    </delete>
+
+    <select id="ProjectMoudles.load" resultMap="rs_base">
+		SELECT <include refid="ProjectMoudles.columns" />
+		    FROM `project_moudles`
+		<include refid="ProjectMoudles.where"/>
+	</select>
+
+	<sql id="ProjectMoudles.where">
+		<where>
+			<if test="id!=null and id!=''">
+				AND id = #{id}
+			</if>
+			<if test="projectCode!=null and projectCode!=''">
+				AND projectCode = #{projectCode}
+			</if>
+			<if test="moudleCode!=null and moudleCode!=''">
+				AND moudleCode = #{moudleCode}
+			</if>
+		</where>
+	</sql>
+
+
+
+    <select id="ProjectMoudles.count" resultType="long">
+        SELECT count(*) FROM `project_moudles`
+		<include refid="ProjectMoudles.where"/>
+    </select>
+
+
+    <select id="ProjectMoudles.query" resultMap="rs_base">
+    	SELECT <include refid="ProjectMoudles.columns" />
+	    FROM `project_moudles`
+		<include refid="ProjectMoudles.where"/>
+
+		<if test="sortColumns!=null and sortColumns!=''">
+			ORDER BY ${sortColumns}
+		</if>
+    </select>
+
+
+</mapper>
+

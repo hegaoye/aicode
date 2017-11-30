@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<mapper namespace="FrameworkAttribute">
+
+	<resultMap id="rs_base" type="FrameworkAttribute">
+        <result property="id" column="id"/>
+        <result property="frameworkCode" column="frameworkCode"/>
+        <result property="attribute" column="attribute"/>
+	</resultMap>
+
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="FrameworkAttribute.columns">
+		id,frameworkCode,attribute
+	</sql>
+
+	<insert id="FrameworkAttribute.insert" useGeneratedKeys="true" keyProperty="id" parameterType="FrameworkAttribute">
+        INSERT INTO `framework_attribute` (
+        	id ,
+        	frameworkCode ,
+        	attribute 
+        ) VALUES (
+        	#{id} ,
+        	#{frameworkCode} ,
+        	#{attribute} 
+        )
+		<selectKey keyProperty="id" resultType="long">
+			select LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+
+	<update id="FrameworkAttribute.update" parameterType="FrameworkAttribute">
+        UPDATE `framework_attribute`
+		<trim prefix="set" suffixOverrides=",">
+			<if test="frameworkCode!=null and frameworkCode!=''">
+	        frameworkCode = #{frameworkCode} ,
+		    </if>
+			<if test="attribute!=null and attribute!=''">
+	        attribute = #{attribute} 
+		    </if>
+		</trim>
+        WHERE
+	        id = #{id} 
+	</update>
+
+    <delete id="FrameworkAttribute.delete">
+        DELETE FROM `framework_attribute`
+		<include refid="FrameworkAttribute.where"/>
+    </delete>
+
+    <select id="FrameworkAttribute.load" resultMap="rs_base">
+		SELECT <include refid="FrameworkAttribute.columns" />
+		    FROM `framework_attribute`
+		<include refid="FrameworkAttribute.where"/>
+	</select>
+
+	<sql id="FrameworkAttribute.where">
+		<where>
+			<if test="id!=null and id!=''">
+				AND id = #{id}
+			</if>
+			<if test="frameworkCode!=null and frameworkCode!=''">
+				AND frameworkCode = #{frameworkCode}
+			</if>
+			<if test="attribute!=null and attribute!=''">
+				AND attribute = #{attribute}
+			</if>
+		</where>
+	</sql>
+
+
+
+    <select id="FrameworkAttribute.count" resultType="long">
+        SELECT count(*) FROM `framework_attribute`
+		<include refid="FrameworkAttribute.where"/>
+    </select>
+
+
+    <select id="FrameworkAttribute.query" resultMap="rs_base">
+    	SELECT <include refid="FrameworkAttribute.columns" />
+	    FROM `framework_attribute`
+		<include refid="FrameworkAttribute.where"/>
+
+		<if test="sortColumns!=null and sortColumns!=''">
+			ORDER BY ${sortColumns}
+		</if>
+    </select>
+
+
+</mapper>
+

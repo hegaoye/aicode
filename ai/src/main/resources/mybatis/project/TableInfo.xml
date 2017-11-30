@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<mapper namespace="TableInfo">
+
+	<resultMap id="rs_base" type="TableInfo">
+        <result property="id" column="id"/>
+        <result property="code" column="code"/>
+        <result property="notes" column="notes"/>
+        <result property="type" column="type"/>
+        <result property="columnNumber" column="columnNumber"/>
+	</resultMap>
+
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="TableInfo.columns">
+		id,code,notes,type,columnNumber
+	</sql>
+
+	<insert id="TableInfo.insert" useGeneratedKeys="true" keyProperty="id" parameterType="TableInfo">
+        INSERT INTO `table_info` (
+        	id ,
+        	code ,
+        	notes ,
+        	type ,
+        	columnNumber 
+        ) VALUES (
+        	#{id} ,
+        	#{code} ,
+        	#{notes} ,
+        	#{type} ,
+        	#{columnNumber} 
+        )
+		<selectKey keyProperty="id" resultType="long">
+			select LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+
+	<update id="TableInfo.update" parameterType="TableInfo">
+        UPDATE `table_info`
+		<trim prefix="set" suffixOverrides=",">
+			<if test="notes!=null and notes!=''">
+	        notes = #{notes} ,
+		    </if>
+			<if test="type!=null and type!=''">
+	        type = #{type} ,
+		    </if>
+			<if test="columnNumber!=null and columnNumber!=''">
+	        columnNumber = #{columnNumber} 
+		    </if>
+		</trim>
+        WHERE
+	        id = #{id}  AND 
+	        code = #{code} 
+	</update>
+
+    <delete id="TableInfo.delete">
+        DELETE FROM `table_info`
+		<include refid="TableInfo.where"/>
+    </delete>
+
+    <select id="TableInfo.load" resultMap="rs_base">
+		SELECT <include refid="TableInfo.columns" />
+		    FROM `table_info`
+		<include refid="TableInfo.where"/>
+	</select>
+
+	<sql id="TableInfo.where">
+		<where>
+			<if test="id!=null and id!=''">
+				AND id = #{id}
+			</if>
+			<if test="code!=null and code!=''">
+				AND code = #{code}
+			</if>
+			<if test="notes!=null and notes!=''">
+				AND notes = #{notes}
+			</if>
+			<if test="type!=null and type!=''">
+				AND type = #{type}
+			</if>
+			<if test="columnNumber!=null and columnNumber!=''">
+				AND columnNumber = #{columnNumber}
+			</if>
+		</where>
+	</sql>
+
+
+
+    <select id="TableInfo.count" resultType="long">
+        SELECT count(*) FROM `table_info`
+		<include refid="TableInfo.where"/>
+    </select>
+
+
+    <select id="TableInfo.query" resultMap="rs_base">
+    	SELECT <include refid="TableInfo.columns" />
+	    FROM `table_info`
+		<include refid="TableInfo.where"/>
+
+		<if test="sortColumns!=null and sortColumns!=''">
+			ORDER BY ${sortColumns}
+		</if>
+    </select>
+
+
+</mapper>
+

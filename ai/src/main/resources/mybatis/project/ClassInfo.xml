@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<mapper namespace="ClassInfo">
+
+	<resultMap id="rs_base" type="ClassInfo">
+        <result property="id" column="id"/>
+        <result property="tableCode" column="tableCode"/>
+        <result property="code" column="code"/>
+        <result property="basePackage" column="basePackage"/>
+        <result property="notes" column="notes"/>
+        <result property="className" column="className"/>
+	</resultMap>
+
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="ClassInfo.columns">
+		id,tableCode,code,basePackage,notes,className
+	</sql>
+
+	<insert id="ClassInfo.insert" useGeneratedKeys="true" keyProperty="id" parameterType="ClassInfo">
+        INSERT INTO `class_info` (
+        	id ,
+        	tableCode ,
+        	code ,
+        	basePackage ,
+        	notes ,
+        	className 
+        ) VALUES (
+        	#{id} ,
+        	#{tableCode} ,
+        	#{code} ,
+        	#{basePackage} ,
+        	#{notes} ,
+        	#{className} 
+        )
+		<selectKey keyProperty="id" resultType="long">
+			select LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+
+	<update id="ClassInfo.update" parameterType="ClassInfo">
+        UPDATE `class_info`
+		<trim prefix="set" suffixOverrides=",">
+			<if test="tableCode!=null and tableCode!=''">
+	        tableCode = #{tableCode} ,
+		    </if>
+			<if test="basePackage!=null and basePackage!=''">
+	        basePackage = #{basePackage} ,
+		    </if>
+			<if test="notes!=null and notes!=''">
+	        notes = #{notes} ,
+		    </if>
+			<if test="className!=null and className!=''">
+	        className = #{className} 
+		    </if>
+		</trim>
+        WHERE
+	        id = #{id}  AND 
+	        code = #{code} 
+	</update>
+
+    <delete id="ClassInfo.delete">
+        DELETE FROM `class_info`
+		<include refid="ClassInfo.where"/>
+    </delete>
+
+    <select id="ClassInfo.load" resultMap="rs_base">
+		SELECT <include refid="ClassInfo.columns" />
+		    FROM `class_info`
+		<include refid="ClassInfo.where"/>
+	</select>
+
+	<sql id="ClassInfo.where">
+		<where>
+			<if test="id!=null and id!=''">
+				AND id = #{id}
+			</if>
+			<if test="tableCode!=null and tableCode!=''">
+				AND tableCode = #{tableCode}
+			</if>
+			<if test="code!=null and code!=''">
+				AND code = #{code}
+			</if>
+			<if test="basePackage!=null and basePackage!=''">
+				AND basePackage = #{basePackage}
+			</if>
+			<if test="notes!=null and notes!=''">
+				AND notes = #{notes}
+			</if>
+			<if test="className!=null and className!=''">
+				AND className = #{className}
+			</if>
+		</where>
+	</sql>
+
+
+
+    <select id="ClassInfo.count" resultType="long">
+        SELECT count(*) FROM `class_info`
+		<include refid="ClassInfo.where"/>
+    </select>
+
+
+    <select id="ClassInfo.query" resultMap="rs_base">
+    	SELECT <include refid="ClassInfo.columns" />
+	    FROM `class_info`
+		<include refid="ClassInfo.where"/>
+
+		<if test="sortColumns!=null and sortColumns!=''">
+			ORDER BY ${sortColumns}
+		</if>
+    </select>
+
+
+</mapper>
+

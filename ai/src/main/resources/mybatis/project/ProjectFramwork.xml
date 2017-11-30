@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<mapper namespace="ProjectFramwork">
+
+	<resultMap id="rs_base" type="ProjectFramwork">
+        <result property="id" column="id"/>
+        <result property="frameworkCode" column="frameworkCode"/>
+        <result property="projectCode" column="projectCode"/>
+	</resultMap>
+
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="ProjectFramwork.columns">
+		id,frameworkCode,projectCode
+	</sql>
+
+	<insert id="ProjectFramwork.insert" useGeneratedKeys="true" keyProperty="id" parameterType="ProjectFramwork">
+        INSERT INTO `project_framwork` (
+        	id ,
+        	frameworkCode ,
+        	projectCode 
+        ) VALUES (
+        	#{id} ,
+        	#{frameworkCode} ,
+        	#{projectCode} 
+        )
+		<selectKey keyProperty="id" resultType="long">
+			select LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+
+	<update id="ProjectFramwork.update" parameterType="ProjectFramwork">
+        UPDATE `project_framwork`
+		<trim prefix="set" suffixOverrides=",">
+			<if test="frameworkCode!=null and frameworkCode!=''">
+	        frameworkCode = #{frameworkCode} ,
+		    </if>
+			<if test="projectCode!=null and projectCode!=''">
+	        projectCode = #{projectCode} 
+		    </if>
+		</trim>
+        WHERE
+	        id = #{id} 
+	</update>
+
+    <delete id="ProjectFramwork.delete">
+        DELETE FROM `project_framwork`
+		<include refid="ProjectFramwork.where"/>
+    </delete>
+
+    <select id="ProjectFramwork.load" resultMap="rs_base">
+		SELECT <include refid="ProjectFramwork.columns" />
+		    FROM `project_framwork`
+		<include refid="ProjectFramwork.where"/>
+	</select>
+
+	<sql id="ProjectFramwork.where">
+		<where>
+			<if test="id!=null and id!=''">
+				AND id = #{id}
+			</if>
+			<if test="frameworkCode!=null and frameworkCode!=''">
+				AND frameworkCode = #{frameworkCode}
+			</if>
+			<if test="projectCode!=null and projectCode!=''">
+				AND projectCode = #{projectCode}
+			</if>
+		</where>
+	</sql>
+
+
+
+    <select id="ProjectFramwork.count" resultType="long">
+        SELECT count(*) FROM `project_framwork`
+		<include refid="ProjectFramwork.where"/>
+    </select>
+
+
+    <select id="ProjectFramwork.query" resultMap="rs_base">
+    	SELECT <include refid="ProjectFramwork.columns" />
+	    FROM `project_framwork`
+		<include refid="ProjectFramwork.where"/>
+
+		<if test="sortColumns!=null and sortColumns!=''">
+			ORDER BY ${sortColumns}
+		</if>
+    </select>
+
+
+</mapper>
+

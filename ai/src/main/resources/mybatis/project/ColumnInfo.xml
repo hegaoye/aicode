@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<mapper namespace="ColumnInfo">
+
+	<resultMap id="rs_base" type="ColumnInfo">
+        <result property="id" column="id"/>
+        <result property="tableCode" column="tableCode"/>
+        <result property="code" column="code"/>
+        <result property="name" column="name"/>
+        <result property="type" column="type"/>
+        <result property="notes" column="notes"/>
+        <result property="defaultValue" column="defaultValue"/>
+        <result property="isPrimaryKey" column="isPrimaryKey"/>
+        <result property="isDate" column="isDate"/>
+        <result property="isState" column="isState"/>
+	</resultMap>
+
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="ColumnInfo.columns">
+		id,tableCode,code,name,type,notes,defaultValue,isPrimaryKey,isDate,isState
+	</sql>
+
+	<insert id="ColumnInfo.insert" useGeneratedKeys="true" keyProperty="id" parameterType="ColumnInfo">
+        INSERT INTO `column_info` (
+        	id ,
+        	tableCode ,
+        	code ,
+        	name ,
+        	type ,
+        	notes ,
+        	defaultValue ,
+        	isPrimaryKey ,
+        	isDate ,
+        	isState 
+        ) VALUES (
+        	#{id} ,
+        	#{tableCode} ,
+        	#{code} ,
+        	#{name} ,
+        	#{type} ,
+        	#{notes} ,
+        	#{defaultValue} ,
+        	#{isPrimaryKey} ,
+        	#{isDate} ,
+        	#{isState} 
+        )
+		<selectKey keyProperty="id" resultType="long">
+			select LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+
+	<update id="ColumnInfo.update" parameterType="ColumnInfo">
+        UPDATE `column_info`
+		<trim prefix="set" suffixOverrides=",">
+			<if test="tableCode!=null and tableCode!=''">
+	        tableCode = #{tableCode} ,
+		    </if>
+			<if test="code!=null and code!=''">
+	        code = #{code} ,
+		    </if>
+			<if test="name!=null and name!=''">
+	        name = #{name} ,
+		    </if>
+			<if test="type!=null and type!=''">
+	        type = #{type} ,
+		    </if>
+			<if test="notes!=null and notes!=''">
+	        notes = #{notes} ,
+		    </if>
+			<if test="defaultValue!=null and defaultValue!=''">
+	        defaultValue = #{defaultValue} ,
+		    </if>
+			<if test="isPrimaryKey!=null and isPrimaryKey!=''">
+	        isPrimaryKey = #{isPrimaryKey} ,
+		    </if>
+			<if test="isDate!=null and isDate!=''">
+	        isDate = #{isDate} ,
+		    </if>
+			<if test="isState!=null and isState!=''">
+	        isState = #{isState} 
+		    </if>
+		</trim>
+        WHERE
+	        id = #{id} 
+	</update>
+
+    <delete id="ColumnInfo.delete">
+        DELETE FROM `column_info`
+		<include refid="ColumnInfo.where"/>
+    </delete>
+
+    <select id="ColumnInfo.load" resultMap="rs_base">
+		SELECT <include refid="ColumnInfo.columns" />
+		    FROM `column_info`
+		<include refid="ColumnInfo.where"/>
+	</select>
+
+	<sql id="ColumnInfo.where">
+		<where>
+			<if test="id!=null and id!=''">
+				AND id = #{id}
+			</if>
+			<if test="tableCode!=null and tableCode!=''">
+				AND tableCode = #{tableCode}
+			</if>
+			<if test="code!=null and code!=''">
+				AND code = #{code}
+			</if>
+			<if test="name!=null and name!=''">
+				AND name = #{name}
+			</if>
+			<if test="type!=null and type!=''">
+				AND type = #{type}
+			</if>
+			<if test="notes!=null and notes!=''">
+				AND notes = #{notes}
+			</if>
+			<if test="defaultValue!=null and defaultValue!=''">
+				AND defaultValue = #{defaultValue}
+			</if>
+			<if test="isPrimaryKey!=null and isPrimaryKey!=''">
+				AND isPrimaryKey = #{isPrimaryKey}
+			</if>
+			<if test="isDate!=null and isDate!=''">
+				AND isDate = #{isDate}
+			</if>
+			<if test="isState!=null and isState!=''">
+				AND isState = #{isState}
+			</if>
+		</where>
+	</sql>
+
+
+
+    <select id="ColumnInfo.count" resultType="long">
+        SELECT count(*) FROM `column_info`
+		<include refid="ColumnInfo.where"/>
+    </select>
+
+
+    <select id="ColumnInfo.query" resultMap="rs_base">
+    	SELECT <include refid="ColumnInfo.columns" />
+	    FROM `column_info`
+		<include refid="ColumnInfo.where"/>
+
+		<if test="sortColumns!=null and sortColumns!=''">
+			ORDER BY ${sortColumns}
+		</if>
+    </select>
+
+
+</mapper>
+

@@ -9,6 +9,7 @@ allprojects {
 
     buildscript {
         repositories {
+            mavenCentral()
             maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
         }
         dependencies {
@@ -17,11 +18,14 @@ allprojects {
     }
 
     repositories {
+        mavenCentral()
         maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
     }
 
 
     dependencies {
+        compile "javax.servlet:javax.servlet-api:4.+"
+        compile "javax.servlet.jsp:jsp-api:2.2.1-b03"
         testCompile group: 'junit', name: 'junit', version: '4.11'
     }
 
@@ -67,6 +71,7 @@ ext {
             "ezmorph"                        : 'net.sf.ezmorph:ezmorph:1.0.6',
             "fastjson"                       : 'com.alibaba:fastjson:1.2.32',
             "guava"                          : 'com.google.guava:guava:21.0',
+            "joda-time"                      : 'joda-time:joda-time:2.9.9',
             "httpclient"                     : 'org.apache.httpcomponents:httpclient:4.3.3',
 
             "jackson-core"                   : 'com.fasterxml.jackson.core:jackson-core:2.7.4',
@@ -85,8 +90,9 @@ ext {
             "jtds"                           : 'net.sourceforge.jtds:jtds:1.2.4',
             "junit"                          : 'junit:junit:4.12',
             "jxl"                            : 'net.sourceforge.jexcelapi:jxl:2.6.12',
-            "log4j"                          : 'log4j:log4j:1.2.16',
+//            "log4j"                          : 'log4j:log4j:1.2.16',
             "logback-core"                   : 'ch.qos.logback:logback-core:1.2.3',
+            "logback-ext-spring"             : 'org.logback-extensions:logback-ext-spring:0.1.1',
             "logback-classic"                : 'ch.qos.logback:logback-classic:1.2.3',
             "logback-access"                 : 'ch.qos.logback:logback-access:1.2.3',
             "Memcached-Java-Client"          : 'com.whalin:Memcached-Java-Client:3.0.2',
@@ -94,14 +100,22 @@ ext {
             "netty"                          : 'org.jboss.netty:netty:3.2.2.Final',
             "quartz"                         : 'org.quartz-scheduler:quartz:2.2.1',
             "slf4j-api"                      : 'org.slf4j:slf4j-api:1.7.5',
-            "slf4j-log4j12"                  : 'org.slf4j:slf4j-log4j12:1.7.5',
+//            "slf4j-log4j12"                  : 'org.slf4j:slf4j-log4j12:1.7.5',
+//            "xstream"                        : 'com.thoughtworks.xstream:1.2.0',
+            "lombok"                         : 'org.projectlombok:lombok:1.16.4',
+            "okhttp"                         : 'com.squareup.okhttp3:okhttp:3.4.0-RC1',
+            "logging-interceptor"            : 'com.squareup.okhttp3:logging-interceptor:3.4.0-RC1',
+
             //----------------spring begin--------------
             "spring-aop"                     : 'org.springframework:spring-aop:4.3.8.RELEASE',
             "spring-aspects"                 : 'org.springframework:spring-aspects:4.3.8.RELEASE',
             "spring-beans"                   : 'org.springframework:spring-beans:4.3.8.RELEASE',
             "spring-context"                 : 'org.springframework:spring-context:4.3.8.RELEASE',
+            "spring-context-support"         : 'org.springframework:spring-context-support:4.3.8.RELEASE',
             "spring-core"                    : 'org.springframework:spring-core:4.3.8.RELEASE',
             "spring-expression"              : 'org.springframework:spring-expression:4.3.8.RELEASE',
+            "spring-instrument"              : 'org.springframework:spring-instrument:4.3.8.RELEASE',
+            "spring-instrument-tomcat"       : 'org.springframework:spring-instrument-tomcat:4.3.8.RELEASE',
             "spring-jdbc"                    : 'org.springframework:spring-jdbc:4.3.8.RELEASE',
             "spring-jms"                     : 'org.springframework:spring-jms:4.3.8.RELEASE',
             "spring-orm"                     : 'org.springframework:spring-orm:4.3.8.RELEASE',
@@ -112,6 +126,10 @@ ext {
             "spring-webmvc"                  : 'org.springframework:spring-webmvc:4.3.8.RELEASE',
             "spring-webmvc-portlet"          : 'org.springframework:spring-webmvc-portlet:4.3.8.RELEASE',
             //--------------spring end------------------
+
+            //--------------Testng begin------------------
+            "testng"                         : 'org.testng:testng:6.9.10',
+            //--------------Testng end------------------
 
             //--------------mybatis begin------------------
             "mybatis"                        : 'org.mybatis:mybatis:3.4.2',
@@ -152,18 +170,30 @@ ext {
             "poi-ooxml"                      : 'org.apache.poi:poi-ooxml:3.15',
             //-----------poi 导入/导出 end--------------
 
+            //-----------jwt Nimbus JOSE+JWT  start--------------
+            "java-jwt"                       : 'com.auth0:java-jwt:3.2.0',
+            //-----------jwt Nimbus JOSE+JWT  end--------------
+
+            //-----------jsch ssh start--------------
+            "jsch"                           : 'com.jcraft:jsch:0.1.54',
+            //-----------jsch ssh  end--------------
+
             //-----------swagger start--------------
             "swagger2"                       : 'io.springfox:springfox-swagger2:2.6.1',
             "swagger-ui"                     : 'io.springfox:springfox-swagger-ui:2.6.1',
             "swagger-annotations"            : 'io.swagger:swagger-annotations:1.5.10',
             //-----------swagger end--------------
 
-            //-----------dangdang分布式作业框架 begin-----------
-            "elastic-job-lite-spring"         :'com.dangdang:elastic-job-lite-spring:2.1.4',
-            "elastic-job-common-core"         :'com.dangdang:elastic-job-common-core:2.1.4',
-            "elastic-job-lite-core"           :'com.dangdang:elastic-job-lite-core:2.1.4',
-            "lombok"                          :'org.projectlombok:lombok:1.16.4'
-            //-----------dangdang分布式作业框架 end-----------
+
+            //-----------Quartz begin-----------
+            "quartz"                         : 'org.quartz-scheduler:quartz:2.3.0',
+            "quartz-jobs"                    : 'org.quartz-scheduler:quartz-jobs:2.3.0',
+            //-----------Quartz end-----------
+
+            //-----------Sentry begin-----------
+            "sentry-logback"                 : 'io.sentry:sentry-logback:1.2.2',
+            //-----------Sentry end-----------
+
     ]
 }
 

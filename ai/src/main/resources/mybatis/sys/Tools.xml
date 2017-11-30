@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<mapper namespace="Tools">
+
+	<resultMap id="rs_base" type="Tools">
+        <result property="id" column="id"/>
+        <result property="toolsCategoryCode" column="toolsCategoryCode"/>
+        <result property="code" column="code"/>
+        <result property="name" column="name"/>
+        <result property="path" column="path"/>
+        <result property="description" column="description"/>
+        <result property="state" column="state"/>
+	</resultMap>
+
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="Tools.columns">
+		id,toolsCategoryCode,code,name,path,description,state
+	</sql>
+
+	<insert id="Tools.insert" useGeneratedKeys="true" keyProperty="id" parameterType="Tools">
+        INSERT INTO `tools` (
+        	id ,
+        	toolsCategoryCode ,
+        	code ,
+        	name ,
+        	path ,
+        	description ,
+        	state 
+        ) VALUES (
+        	#{id} ,
+        	#{toolsCategoryCode} ,
+        	#{code} ,
+        	#{name} ,
+        	#{path} ,
+        	#{description} ,
+        	#{state} 
+        )
+		<selectKey keyProperty="id" resultType="long">
+			select LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+
+	<update id="Tools.update" parameterType="Tools">
+        UPDATE `tools`
+		<trim prefix="set" suffixOverrides=",">
+			<if test="toolsCategoryCode!=null and toolsCategoryCode!=''">
+	        toolsCategoryCode = #{toolsCategoryCode} ,
+		    </if>
+			<if test="name!=null and name!=''">
+	        name = #{name} ,
+		    </if>
+			<if test="path!=null and path!=''">
+	        path = #{path} ,
+		    </if>
+			<if test="description!=null and description!=''">
+	        description = #{description} ,
+		    </if>
+			<if test="state!=null and state!=''">
+	        state = #{state} 
+		    </if>
+		</trim>
+        WHERE
+	        id = #{id}  AND 
+	        code = #{code} 
+	</update>
+
+    <delete id="Tools.delete">
+        DELETE FROM `tools`
+		<include refid="Tools.where"/>
+    </delete>
+
+    <select id="Tools.load" resultMap="rs_base">
+		SELECT <include refid="Tools.columns" />
+		    FROM `tools`
+		<include refid="Tools.where"/>
+	</select>
+
+	<sql id="Tools.where">
+		<where>
+			<if test="id!=null and id!=''">
+				AND id = #{id}
+			</if>
+			<if test="toolsCategoryCode!=null and toolsCategoryCode!=''">
+				AND toolsCategoryCode = #{toolsCategoryCode}
+			</if>
+			<if test="code!=null and code!=''">
+				AND code = #{code}
+			</if>
+			<if test="name!=null and name!=''">
+				AND name = #{name}
+			</if>
+			<if test="path!=null and path!=''">
+				AND path = #{path}
+			</if>
+			<if test="description!=null and description!=''">
+				AND description = #{description}
+			</if>
+			<if test="state!=null and state!=''">
+				AND state = #{state}
+			</if>
+		</where>
+	</sql>
+
+
+
+    <select id="Tools.count" resultType="long">
+        SELECT count(*) FROM `tools`
+		<include refid="Tools.where"/>
+    </select>
+
+
+    <select id="Tools.query" resultMap="rs_base">
+    	SELECT <include refid="Tools.columns" />
+	    FROM `tools`
+		<include refid="Tools.where"/>
+
+		<if test="sortColumns!=null and sortColumns!=''">
+			ORDER BY ${sortColumns}
+		</if>
+    </select>
+
+
+</mapper>
+

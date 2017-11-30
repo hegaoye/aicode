@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<mapper namespace="ClassAttributes">
+
+	<resultMap id="rs_base" type="ClassAttributes">
+        <result property="id" column="id"/>
+        <result property="columnCode" column="columnCode"/>
+        <result property="code" column="code"/>
+        <result property="name" column="name"/>
+        <result property="type" column="type"/>
+        <result property="notes" column="notes"/>
+        <result property="isPrimaryKey" column="isPrimaryKey"/>
+        <result property="isDate" column="isDate"/>
+        <result property="isState" column="isState"/>
+	</resultMap>
+
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="ClassAttributes.columns">
+		id,columnCode,code,name,type,notes,isPrimaryKey,isDate,isState
+	</sql>
+
+	<insert id="ClassAttributes.insert" useGeneratedKeys="true" keyProperty="id" parameterType="ClassAttributes">
+        INSERT INTO `class_attributes` (
+        	id ,
+        	columnCode ,
+        	code ,
+        	name ,
+        	type ,
+        	notes ,
+        	isPrimaryKey ,
+        	isDate ,
+        	isState 
+        ) VALUES (
+        	#{id} ,
+        	#{columnCode} ,
+        	#{code} ,
+        	#{name} ,
+        	#{type} ,
+        	#{notes} ,
+        	#{isPrimaryKey} ,
+        	#{isDate} ,
+        	#{isState} 
+        )
+		<selectKey keyProperty="id" resultType="long">
+			select LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+
+	<update id="ClassAttributes.update" parameterType="ClassAttributes">
+        UPDATE `class_attributes`
+		<trim prefix="set" suffixOverrides=",">
+			<if test="columnCode!=null and columnCode!=''">
+	        columnCode = #{columnCode} ,
+		    </if>
+			<if test="name!=null and name!=''">
+	        name = #{name} ,
+		    </if>
+			<if test="type!=null and type!=''">
+	        type = #{type} ,
+		    </if>
+			<if test="notes!=null and notes!=''">
+	        notes = #{notes} ,
+		    </if>
+			<if test="isPrimaryKey!=null and isPrimaryKey!=''">
+	        isPrimaryKey = #{isPrimaryKey} ,
+		    </if>
+			<if test="isDate!=null and isDate!=''">
+	        isDate = #{isDate} ,
+		    </if>
+			<if test="isState!=null and isState!=''">
+	        isState = #{isState} 
+		    </if>
+		</trim>
+        WHERE
+	        id = #{id}  AND 
+	        code = #{code} 
+	</update>
+
+    <delete id="ClassAttributes.delete">
+        DELETE FROM `class_attributes`
+		<include refid="ClassAttributes.where"/>
+    </delete>
+
+    <select id="ClassAttributes.load" resultMap="rs_base">
+		SELECT <include refid="ClassAttributes.columns" />
+		    FROM `class_attributes`
+		<include refid="ClassAttributes.where"/>
+	</select>
+
+	<sql id="ClassAttributes.where">
+		<where>
+			<if test="id!=null and id!=''">
+				AND id = #{id}
+			</if>
+			<if test="columnCode!=null and columnCode!=''">
+				AND columnCode = #{columnCode}
+			</if>
+			<if test="code!=null and code!=''">
+				AND code = #{code}
+			</if>
+			<if test="name!=null and name!=''">
+				AND name = #{name}
+			</if>
+			<if test="type!=null and type!=''">
+				AND type = #{type}
+			</if>
+			<if test="notes!=null and notes!=''">
+				AND notes = #{notes}
+			</if>
+			<if test="isPrimaryKey!=null and isPrimaryKey!=''">
+				AND isPrimaryKey = #{isPrimaryKey}
+			</if>
+			<if test="isDate!=null and isDate!=''">
+				AND isDate = #{isDate}
+			</if>
+			<if test="isState!=null and isState!=''">
+				AND isState = #{isState}
+			</if>
+		</where>
+	</sql>
+
+
+
+    <select id="ClassAttributes.count" resultType="long">
+        SELECT count(*) FROM `class_attributes`
+		<include refid="ClassAttributes.where"/>
+    </select>
+
+
+    <select id="ClassAttributes.query" resultMap="rs_base">
+    	SELECT <include refid="ClassAttributes.columns" />
+	    FROM `class_attributes`
+		<include refid="ClassAttributes.where"/>
+
+		<if test="sortColumns!=null and sortColumns!=''">
+			ORDER BY ${sortColumns}
+		</if>
+    </select>
+
+
+</mapper>
+

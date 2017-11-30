@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<mapper namespace="ClassRelationship">
+
+	<resultMap id="rs_base" type="ClassRelationship">
+        <result property="id" column="id"/>
+        <result property="code" column="code"/>
+        <result property="classCode" column="classCode"/>
+        <result property="classRelationshipCode" column="classRelationshipCode"/>
+        <result property="relationship" column="relationship"/>
+	</resultMap>
+
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="ClassRelationship.columns">
+		id,code,classCode,classRelationshipCode,relationship
+	</sql>
+
+	<insert id="ClassRelationship.insert" useGeneratedKeys="true" keyProperty="id" parameterType="ClassRelationship">
+        INSERT INTO `class_relationship` (
+        	id ,
+        	code ,
+        	classCode ,
+        	classRelationshipCode ,
+        	relationship 
+        ) VALUES (
+        	#{id} ,
+        	#{code} ,
+        	#{classCode} ,
+        	#{classRelationshipCode} ,
+        	#{relationship} 
+        )
+		<selectKey keyProperty="id" resultType="long">
+			select LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+
+	<update id="ClassRelationship.update" parameterType="ClassRelationship">
+        UPDATE `class_relationship`
+		<trim prefix="set" suffixOverrides=",">
+			<if test="classCode!=null and classCode!=''">
+	        classCode = #{classCode} ,
+		    </if>
+			<if test="classRelationshipCode!=null and classRelationshipCode!=''">
+	        classRelationshipCode = #{classRelationshipCode} ,
+		    </if>
+			<if test="relationship!=null and relationship!=''">
+	        relationship = #{relationship} 
+		    </if>
+		</trim>
+        WHERE
+	        id = #{id}  AND 
+	        code = #{code} 
+	</update>
+
+    <delete id="ClassRelationship.delete">
+        DELETE FROM `class_relationship`
+		<include refid="ClassRelationship.where"/>
+    </delete>
+
+    <select id="ClassRelationship.load" resultMap="rs_base">
+		SELECT <include refid="ClassRelationship.columns" />
+		    FROM `class_relationship`
+		<include refid="ClassRelationship.where"/>
+	</select>
+
+	<sql id="ClassRelationship.where">
+		<where>
+			<if test="id!=null and id!=''">
+				AND id = #{id}
+			</if>
+			<if test="code!=null and code!=''">
+				AND code = #{code}
+			</if>
+			<if test="classCode!=null and classCode!=''">
+				AND classCode = #{classCode}
+			</if>
+			<if test="classRelationshipCode!=null and classRelationshipCode!=''">
+				AND classRelationshipCode = #{classRelationshipCode}
+			</if>
+			<if test="relationship!=null and relationship!=''">
+				AND relationship = #{relationship}
+			</if>
+		</where>
+	</sql>
+
+
+
+    <select id="ClassRelationship.count" resultType="long">
+        SELECT count(*) FROM `class_relationship`
+		<include refid="ClassRelationship.where"/>
+    </select>
+
+
+    <select id="ClassRelationship.query" resultMap="rs_base">
+    	SELECT <include refid="ClassRelationship.columns" />
+	    FROM `class_relationship`
+		<include refid="ClassRelationship.where"/>
+
+		<if test="sortColumns!=null and sortColumns!=''">
+			ORDER BY ${sortColumns}
+		</if>
+    </select>
+
+
+</mapper>
+

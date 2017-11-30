@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<mapper namespace="ProjectTables">
+
+	<resultMap id="rs_base" type="ProjectTables">
+        <result property="id" column="id"/>
+        <result property="projectCode" column="projectCode"/>
+        <result property="tableCode" column="tableCode"/>
+	</resultMap>
+
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="ProjectTables.columns">
+		id,projectCode,tableCode
+	</sql>
+
+	<insert id="ProjectTables.insert" useGeneratedKeys="true" keyProperty="id" parameterType="ProjectTables">
+        INSERT INTO `project_tables` (
+        	id ,
+        	projectCode ,
+        	tableCode 
+        ) VALUES (
+        	#{id} ,
+        	#{projectCode} ,
+        	#{tableCode} 
+        )
+		<selectKey keyProperty="id" resultType="long">
+			select LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+
+	<update id="ProjectTables.update" parameterType="ProjectTables">
+        UPDATE `project_tables`
+		<trim prefix="set" suffixOverrides=",">
+			<if test="projectCode!=null and projectCode!=''">
+	        projectCode = #{projectCode} ,
+		    </if>
+			<if test="tableCode!=null and tableCode!=''">
+	        tableCode = #{tableCode} 
+		    </if>
+		</trim>
+        WHERE
+	        id = #{id} 
+	</update>
+
+    <delete id="ProjectTables.delete">
+        DELETE FROM `project_tables`
+		<include refid="ProjectTables.where"/>
+    </delete>
+
+    <select id="ProjectTables.load" resultMap="rs_base">
+		SELECT <include refid="ProjectTables.columns" />
+		    FROM `project_tables`
+		<include refid="ProjectTables.where"/>
+	</select>
+
+	<sql id="ProjectTables.where">
+		<where>
+			<if test="id!=null and id!=''">
+				AND id = #{id}
+			</if>
+			<if test="projectCode!=null and projectCode!=''">
+				AND projectCode = #{projectCode}
+			</if>
+			<if test="tableCode!=null and tableCode!=''">
+				AND tableCode = #{tableCode}
+			</if>
+		</where>
+	</sql>
+
+
+
+    <select id="ProjectTables.count" resultType="long">
+        SELECT count(*) FROM `project_tables`
+		<include refid="ProjectTables.where"/>
+    </select>
+
+
+    <select id="ProjectTables.query" resultMap="rs_base">
+    	SELECT <include refid="ProjectTables.columns" />
+	    FROM `project_tables`
+		<include refid="ProjectTables.where"/>
+
+		<if test="sortColumns!=null and sortColumns!=''">
+			ORDER BY ${sortColumns}
+		</if>
+    </select>
+
+
+</mapper>
+

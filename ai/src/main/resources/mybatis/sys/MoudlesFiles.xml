@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<mapper namespace="MoudlesFiles">
+
+	<resultMap id="rs_base" type="MoudlesFiles">
+        <result property="id" column="id"/>
+        <result property="moudleCode" column="moudleCode"/>
+        <result property="moudleFileCode" column="moudleFileCode"/>
+        <result property="name" column="name"/>
+        <result property="path" column="path"/>
+	</resultMap>
+
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="MoudlesFiles.columns">
+		id,moudleCode,moudleFileCode,name,path
+	</sql>
+
+	<insert id="MoudlesFiles.insert" useGeneratedKeys="true" keyProperty="id" parameterType="MoudlesFiles">
+        INSERT INTO `moudles_files` (
+        	id ,
+        	moudleCode ,
+        	moudleFileCode ,
+        	name ,
+        	path 
+        ) VALUES (
+        	#{id} ,
+        	#{moudleCode} ,
+        	#{moudleFileCode} ,
+        	#{name} ,
+        	#{path} 
+        )
+		<selectKey keyProperty="id" resultType="long">
+			select LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+
+	<update id="MoudlesFiles.update" parameterType="MoudlesFiles">
+        UPDATE `moudles_files`
+		<trim prefix="set" suffixOverrides=",">
+			<if test="moudleCode!=null and moudleCode!=''">
+	        moudleCode = #{moudleCode} ,
+		    </if>
+			<if test="name!=null and name!=''">
+	        name = #{name} ,
+		    </if>
+			<if test="path!=null and path!=''">
+	        path = #{path} 
+		    </if>
+		</trim>
+        WHERE
+	        id = #{id}  AND 
+	        moudleFileCode = #{moudleFileCode} 
+	</update>
+
+    <delete id="MoudlesFiles.delete">
+        DELETE FROM `moudles_files`
+		<include refid="MoudlesFiles.where"/>
+    </delete>
+
+    <select id="MoudlesFiles.load" resultMap="rs_base">
+		SELECT <include refid="MoudlesFiles.columns" />
+		    FROM `moudles_files`
+		<include refid="MoudlesFiles.where"/>
+	</select>
+
+	<sql id="MoudlesFiles.where">
+		<where>
+			<if test="id!=null and id!=''">
+				AND id = #{id}
+			</if>
+			<if test="moudleCode!=null and moudleCode!=''">
+				AND moudleCode = #{moudleCode}
+			</if>
+			<if test="moudleFileCode!=null and moudleFileCode!=''">
+				AND moudleFileCode = #{moudleFileCode}
+			</if>
+			<if test="name!=null and name!=''">
+				AND name = #{name}
+			</if>
+			<if test="path!=null and path!=''">
+				AND path = #{path}
+			</if>
+		</where>
+	</sql>
+
+
+
+    <select id="MoudlesFiles.count" resultType="long">
+        SELECT count(*) FROM `moudles_files`
+		<include refid="MoudlesFiles.where"/>
+    </select>
+
+
+    <select id="MoudlesFiles.query" resultMap="rs_base">
+    	SELECT <include refid="MoudlesFiles.columns" />
+	    FROM `moudles_files`
+		<include refid="MoudlesFiles.where"/>
+
+		<if test="sortColumns!=null and sortColumns!=''">
+			ORDER BY ${sortColumns}
+		</if>
+    </select>
+
+
+</mapper>
+

@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<mapper namespace="Setting">
+
+	<resultMap id="rs_base" type="Setting">
+        <result property="id" column="id"/>
+        <result property="k" column="k"/>
+        <result property="v" column="v"/>
+        <result property="description" column="description"/>
+	</resultMap>
+
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="Setting.columns">
+		id,k,v,description
+	</sql>
+
+	<insert id="Setting.insert" useGeneratedKeys="true" keyProperty="id" parameterType="Setting">
+        INSERT INTO `setting` (
+        	id ,
+        	k ,
+        	v ,
+        	description 
+        ) VALUES (
+        	#{id} ,
+        	#{k} ,
+        	#{v} ,
+        	#{description} 
+        )
+		<selectKey keyProperty="id" resultType="long">
+			select LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+
+	<update id="Setting.update" parameterType="Setting">
+        UPDATE `setting`
+		<trim prefix="set" suffixOverrides=",">
+			<if test="k!=null and k!=''">
+	        k = #{k} ,
+		    </if>
+			<if test="v!=null and v!=''">
+	        v = #{v} ,
+		    </if>
+			<if test="description!=null and description!=''">
+	        description = #{description} 
+		    </if>
+		</trim>
+        WHERE
+	        id = #{id} 
+	</update>
+
+    <delete id="Setting.delete">
+        DELETE FROM `setting`
+		<include refid="Setting.where"/>
+    </delete>
+
+    <select id="Setting.load" resultMap="rs_base">
+		SELECT <include refid="Setting.columns" />
+		    FROM `setting`
+		<include refid="Setting.where"/>
+	</select>
+
+	<sql id="Setting.where">
+		<where>
+			<if test="id!=null and id!=''">
+				AND id = #{id}
+			</if>
+			<if test="k!=null and k!=''">
+				AND k = #{k}
+			</if>
+			<if test="v!=null and v!=''">
+				AND v = #{v}
+			</if>
+			<if test="description!=null and description!=''">
+				AND description = #{description}
+			</if>
+		</where>
+	</sql>
+
+
+
+    <select id="Setting.count" resultType="long">
+        SELECT count(*) FROM `setting`
+		<include refid="Setting.where"/>
+    </select>
+
+
+    <select id="Setting.query" resultMap="rs_base">
+    	SELECT <include refid="Setting.columns" />
+	    FROM `setting`
+		<include refid="Setting.where"/>
+
+		<if test="sortColumns!=null and sortColumns!=''">
+			ORDER BY ${sortColumns}
+		</if>
+    </select>
+
+
+</mapper>
+

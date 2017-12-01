@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<mapper namespace="QrtzCronTriggers">
+
+	<resultMap id="QrtzCronTriggers" type="QrtzCronTriggers">
+        <result property="schedName" column="SCHED_NAME"/>
+        <result property="triggerName" column="TRIGGER_NAME"/>
+        <result property="triggerGroup" column="TRIGGER_GROUP"/>
+        <result property="cronExpression" column="CRON_EXPRESSION"/>
+        <result property="timeZoneId" column="TIME_ZONE_ID"/>
+	</resultMap>
+
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="QrtzCronTriggers.columns">
+	    <![CDATA[
+		SCHED_NAME,TRIGGER_NAME,TRIGGER_GROUP,CRON_EXPRESSION,TIME_ZONE_ID
+	    ]]>
+	</sql>
+
+	<insert id="QrtzCronTriggers.insert" useGeneratedKeys="true" keyProperty="schedName" parameterType="QrtzCronTriggers">
+        INSERT INTO qrtz_cron_triggers (
+        	SCHED_NAME ,
+        	TRIGGER_NAME ,
+        	TRIGGER_GROUP ,
+        	CRON_EXPRESSION ,
+        	TIME_ZONE_ID 
+        ) VALUES (
+        	#{schedName} ,
+        	#{triggerName} ,
+        	#{triggerGroup} ,
+        	#{cronExpression} ,
+        	#{timeZoneId} 
+        )
+		<selectKey keyProperty="id" resultType="long">
+			select LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+
+	<update id="QrtzCronTriggers.update" parameterType="QrtzCronTriggers">
+    <![CDATA[
+        UPDATE qrtz_cron_triggers SET
+	        CRON_EXPRESSION = #{cronExpression} ,
+	        TIME_ZONE_ID = #{timeZoneId} 
+        WHERE 
+	        SCHED_NAME = #{schedName}  AND 
+	        TRIGGER_NAME = #{triggerName}  AND 
+	        TRIGGER_GROUP = #{triggerGroup} 
+    ]]>
+	</update>
+
+    <delete id="QrtzCronTriggers.delete">
+    <![CDATA[
+        DELETE FROM qrtz_cron_triggers WHERE
+        SCHED_NAME = #{id}  AND 
+        TRIGGER_NAME = #{id}  AND 
+        TRIGGER_GROUP = #{id} 
+    ]]>
+    </delete>
+
+    <select id="QrtzCronTriggers.load" resultMap="QrtzCronTriggers">
+		SELECT <include refid="QrtzCronTriggers.columns" />
+	    <![CDATA[
+		    FROM qrtz_cron_triggers 
+	        WHERE 
+		        SCHED_NAME = #{id}  AND 
+		        TRIGGER_NAME = #{id}  AND 
+		        TRIGGER_GROUP = #{id} 
+	    ]]>
+	</select>
+
+	<sql id="QrtzCronTriggers.where">
+		<where>
+	       <if test="@Ognl@isNotEmpty(schedName)">
+				AND SCHED_NAME = #{schedName}
+			</if>
+	       <if test="@Ognl@isNotEmpty(triggerName)">
+				AND TRIGGER_NAME = #{triggerName}
+			</if>
+	       <if test="@Ognl@isNotEmpty(triggerGroup)">
+				AND TRIGGER_GROUP = #{triggerGroup}
+			</if>
+	       <if test="@Ognl@isNotEmpty(cronExpression)">
+				AND CRON_EXPRESSION = #{cronExpression}
+			</if>
+	       <if test="@Ognl@isNotEmpty(timeZoneId)">
+				AND TIME_ZONE_ID = #{timeZoneId}
+			</if>
+		</where>
+	</sql>
+
+
+
+    <select id="QrtzCronTriggers.count" resultType="long">
+        SELECT count(1) FROM qrtz_cron_triggers
+		<include refid="QrtzCronTriggers.where"/>
+    </select>
+
+
+    <select id="QrtzCronTriggers.query" resultMap="QrtzCronTriggers">
+    	SELECT <include refid="QrtzCronTriggers.columns" />
+	    FROM qrtz_cron_triggers
+		<include refid="QrtzCronTriggers.where"/>
+
+		<if test="@Ognl@isNotEmpty(sortColumns)">
+			ORDER BY ${sortColumns}
+		</if>
+    </select>
+
+
+</mapper>
+

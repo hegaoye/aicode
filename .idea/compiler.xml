@@ -5,12 +5,16 @@
       <profile default="true" name="Default" enabled="true" />
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="AI-Code-AI-Code_main" target="1.8" />
+      <module name="AI-Code-AI-Code_test" target="1.8" />
       <module name="AI-Code_main" target="1.8" />
       <module name="AI-Code_test" target="1.8" />
       <module name="ai-ui_main" target="1.8" />
       <module name="ai-ui_test" target="1.8" />
+      <module name="AI_main" target="1.8" />
       <module name="ai_main" target="1.8" />
       <module name="ai_test" target="1.8" />
+      <module name="AI_test" target="1.8" />
       <module name="base-facade_main" target="1.8" />
       <module name="base-facade_test" target="1.8" />
       <module name="base-sv_main" target="1.8" />
@@ -31,6 +35,8 @@
       <module name="support-api_test" target="1.8" />
       <module name="support_main" target="1.8" />
       <module name="support_test" target="1.8" />
+      <module name="task_main" target="1.8" />
+      <module name="task_test" target="1.8" />
       <module name="tutors-api_main" target="1.8" />
       <module name="tutors-api_test" target="1.8" />
       <module name="tutors_main" target="1.8" />

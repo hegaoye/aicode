@@ -1,2 +1,0 @@
-<#assign strutsActionBasePath = "/"+subpackage+"/"+table.className>
-<#assign jspFileBasePath = "/"+subpackage+"/"+table.className>

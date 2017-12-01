@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<mapper namespace="QrtzSchedulerState">
+
+	<resultMap id="QrtzSchedulerState" type="QrtzSchedulerState">
+        <result property="schedName" column="SCHED_NAME"/>
+        <result property="instanceName" column="INSTANCE_NAME"/>
+        <result property="lastCheckinTime" column="LAST_CHECKIN_TIME"/>
+        <result property="checkinInterval" column="CHECKIN_INTERVAL"/>
+	</resultMap>
+
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="QrtzSchedulerState.columns">
+	    <![CDATA[
+		SCHED_NAME,INSTANCE_NAME,LAST_CHECKIN_TIME,CHECKIN_INTERVAL
+	    ]]>
+	</sql>
+
+	<insert id="QrtzSchedulerState.insert" useGeneratedKeys="true" keyProperty="schedName" parameterType="QrtzSchedulerState">
+        INSERT INTO qrtz_scheduler_state (
+        	SCHED_NAME ,
+        	INSTANCE_NAME ,
+        	LAST_CHECKIN_TIME ,
+        	CHECKIN_INTERVAL 
+        ) VALUES (
+        	#{schedName} ,
+        	#{instanceName} ,
+        	#{lastCheckinTime} ,
+        	#{checkinInterval} 
+        )
+		<selectKey keyProperty="id" resultType="long">
+			select LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+
+	<update id="QrtzSchedulerState.update" parameterType="QrtzSchedulerState">
+    <![CDATA[
+        UPDATE qrtz_scheduler_state SET
+	        LAST_CHECKIN_TIME = #{lastCheckinTime} ,
+	        CHECKIN_INTERVAL = #{checkinInterval} 
+        WHERE 
+	        SCHED_NAME = #{schedName}  AND 
+	        INSTANCE_NAME = #{instanceName} 
+    ]]>
+	</update>
+
+    <delete id="QrtzSchedulerState.delete">
+    <![CDATA[
+        DELETE FROM qrtz_scheduler_state WHERE
+        SCHED_NAME = #{id}  AND 
+        INSTANCE_NAME = #{id} 
+    ]]>
+    </delete>
+
+    <select id="QrtzSchedulerState.load" resultMap="QrtzSchedulerState">
+		SELECT <include refid="QrtzSchedulerState.columns" />
+	    <![CDATA[
+		    FROM qrtz_scheduler_state 
+	        WHERE 
+		        SCHED_NAME = #{id}  AND 
+		        INSTANCE_NAME = #{id} 
+	    ]]>
+	</select>
+
+	<sql id="QrtzSchedulerState.where">
+		<where>
+	       <if test="@Ognl@isNotEmpty(schedName)">
+				AND SCHED_NAME = #{schedName}
+			</if>
+	       <if test="@Ognl@isNotEmpty(instanceName)">
+				AND INSTANCE_NAME = #{instanceName}
+			</if>
+	       <if test="@Ognl@isNotEmpty(lastCheckinTime)">
+				AND LAST_CHECKIN_TIME = #{lastCheckinTime}
+			</if>
+	       <if test="@Ognl@isNotEmpty(checkinInterval)">
+				AND CHECKIN_INTERVAL = #{checkinInterval}
+			</if>
+		</where>
+	</sql>
+
+
+
+    <select id="QrtzSchedulerState.count" resultType="long">
+        SELECT count(1) FROM qrtz_scheduler_state
+		<include refid="QrtzSchedulerState.where"/>
+    </select>
+
+
+    <select id="QrtzSchedulerState.query" resultMap="QrtzSchedulerState">
+    	SELECT <include refid="QrtzSchedulerState.columns" />
+	    FROM qrtz_scheduler_state
+		<include refid="QrtzSchedulerState.where"/>
+
+		<if test="@Ognl@isNotEmpty(sortColumns)">
+			ORDER BY ${sortColumns}
+		</if>
+    </select>
+
+
+</mapper>
+

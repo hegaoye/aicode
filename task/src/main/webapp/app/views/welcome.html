@@ -1,0 +1,23 @@
+<h3>
+   <!-- 语言切换 begin-->
+   <div class="pull-right">
+      <div dropdown="" is-open="language.listIsOpen" class="btn-group">
+         <button type="button" dropdown-toggle="" class="btn btn-default">{{language.selected}}
+            <span class="caret"></span>
+         </button>
+         <ul role="menu" class="dropdown-menu dropdown-menu-right animated fadeInUpShort">
+            <li ng-repeat="(localeId, langName) in language.available"><a ng-click="language.set(localeId, $event)">{{langName}}</a>
+            </li>
+         </ul>
+      </div>
+   </div>
+   <!-- 语言切换 end-->
+
+   智能化任务系统
+   <small>智能化任务的管理与查看</small>
+</h3>
+<div class="row">
+   <div class="col-xs-12 text-center">
+      <h2 class="text-thin">欢迎来到智能化任务系统</h2>
+   </div>
+</div>

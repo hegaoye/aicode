@@ -1,0 +1,25 @@
+{
+  "topbar": {
+    "search": {
+      "PLACEHOLDER": "点击回车键..."
+    }
+  },
+  "offsidebar": {
+    "setting": {
+      "SETTINGS": "--系统设置--",
+      "THEMES": "--皮肤设置--",
+      "LAYOUT": "--布局调整--",
+      "layout": {
+        "FIXED": "固定",
+        "BOXED": "居中显示",
+        "RTL": "左右反转"
+      },
+      "ASIDE":"--边缘布局--",
+      "aside":{
+        "COLLAPSED": "导航.折叠",
+        "FLOAT": "导航.浮动",
+        "HOVER": "导航.光标临近"
+      }
+    }
+  }
+}

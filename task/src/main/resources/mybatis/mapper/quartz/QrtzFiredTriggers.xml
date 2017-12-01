@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<mapper namespace="QrtzFiredTriggers">
+
+	<resultMap id="QrtzFiredTriggers" type="QrtzFiredTriggers">
+        <result property="schedName" column="SCHED_NAME"/>
+        <result property="entryId" column="ENTRY_ID"/>
+        <result property="triggerName" column="TRIGGER_NAME"/>
+        <result property="triggerGroup" column="TRIGGER_GROUP"/>
+        <result property="instanceName" column="INSTANCE_NAME"/>
+        <result property="firedTime" column="FIRED_TIME"/>
+        <result property="schedTime" column="SCHED_TIME"/>
+        <result property="priority" column="PRIORITY"/>
+        <result property="state" column="STATE"/>
+        <result property="jobName" column="JOB_NAME"/>
+        <result property="jobGroup" column="JOB_GROUP"/>
+        <result property="isNonconcurrent" column="IS_NONCONCURRENT"/>
+        <result property="requestsRecovery" column="REQUESTS_RECOVERY"/>
+	</resultMap>
+
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="QrtzFiredTriggers.columns">
+	    <![CDATA[
+		SCHED_NAME,ENTRY_ID,TRIGGER_NAME,TRIGGER_GROUP,INSTANCE_NAME,FIRED_TIME,SCHED_TIME,PRIORITY,STATE,JOB_NAME,JOB_GROUP,IS_NONCONCURRENT,REQUESTS_RECOVERY
+	    ]]>
+	</sql>
+
+	<insert id="QrtzFiredTriggers.insert" useGeneratedKeys="true" keyProperty="schedName" parameterType="QrtzFiredTriggers">
+        INSERT INTO qrtz_fired_triggers (
+        	SCHED_NAME ,
+        	ENTRY_ID ,
+        	TRIGGER_NAME ,
+        	TRIGGER_GROUP ,
+        	INSTANCE_NAME ,
+        	FIRED_TIME ,
+        	SCHED_TIME ,
+        	PRIORITY ,
+        	STATE ,
+        	JOB_NAME ,
+        	JOB_GROUP ,
+        	IS_NONCONCURRENT ,
+        	REQUESTS_RECOVERY 
+        ) VALUES (
+        	#{schedName} ,
+        	#{entryId} ,
+        	#{triggerName} ,
+        	#{triggerGroup} ,
+        	#{instanceName} ,
+        	#{firedTime} ,
+        	#{schedTime} ,
+        	#{priority} ,
+        	#{state} ,
+        	#{jobName} ,
+        	#{jobGroup} ,
+        	#{isNonconcurrent} ,
+        	#{requestsRecovery} 
+        )
+		<selectKey keyProperty="id" resultType="long">
+			select LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+
+	<update id="QrtzFiredTriggers.update" parameterType="QrtzFiredTriggers">
+    <![CDATA[
+        UPDATE qrtz_fired_triggers SET
+	        TRIGGER_NAME = #{triggerName} ,
+	        TRIGGER_GROUP = #{triggerGroup} ,
+	        INSTANCE_NAME = #{instanceName} ,
+	        FIRED_TIME = #{firedTime} ,
+	        SCHED_TIME = #{schedTime} ,
+	        PRIORITY = #{priority} ,
+	        STATE = #{state} ,
+	        JOB_NAME = #{jobName} ,
+	        JOB_GROUP = #{jobGroup} ,
+	        IS_NONCONCURRENT = #{isNonconcurrent} ,
+	        REQUESTS_RECOVERY = #{requestsRecovery} 
+        WHERE 
+	        SCHED_NAME = #{schedName}  AND 
+	        ENTRY_ID = #{entryId} 
+    ]]>
+	</update>
+
+    <delete id="QrtzFiredTriggers.delete">
+    <![CDATA[
+        DELETE FROM qrtz_fired_triggers WHERE
+        SCHED_NAME = #{id}  AND 
+        ENTRY_ID = #{id} 
+    ]]>
+    </delete>
+
+    <select id="QrtzFiredTriggers.load" resultMap="QrtzFiredTriggers">
+		SELECT <include refid="QrtzFiredTriggers.columns" />
+	    <![CDATA[
+		    FROM qrtz_fired_triggers 
+	        WHERE 
+		        SCHED_NAME = #{id}  AND 
+		        ENTRY_ID = #{id} 
+	    ]]>
+	</select>
+
+	<sql id="QrtzFiredTriggers.where">
+		<where>
+	       <if test="@Ognl@isNotEmpty(schedName)">
+				AND SCHED_NAME = #{schedName}
+			</if>
+	       <if test="@Ognl@isNotEmpty(entryId)">
+				AND ENTRY_ID = #{entryId}
+			</if>
+	       <if test="@Ognl@isNotEmpty(triggerName)">
+				AND TRIGGER_NAME = #{triggerName}
+			</if>
+	       <if test="@Ognl@isNotEmpty(triggerGroup)">
+				AND TRIGGER_GROUP = #{triggerGroup}
+			</if>
+	       <if test="@Ognl@isNotEmpty(instanceName)">
+				AND INSTANCE_NAME = #{instanceName}
+			</if>
+	       <if test="@Ognl@isNotEmpty(firedTime)">
+				AND FIRED_TIME = #{firedTime}
+			</if>
+	       <if test="@Ognl@isNotEmpty(schedTime)">
+				AND SCHED_TIME = #{schedTime}
+			</if>
+	       <if test="@Ognl@isNotEmpty(priority)">
+				AND PRIORITY = #{priority}
+			</if>
+	       <if test="@Ognl@isNotEmpty(state)">
+				AND STATE = #{state}
+			</if>
+	       <if test="@Ognl@isNotEmpty(jobName)">
+				AND JOB_NAME = #{jobName}
+			</if>
+	       <if test="@Ognl@isNotEmpty(jobGroup)">
+				AND JOB_GROUP = #{jobGroup}
+			</if>
+	       <if test="@Ognl@isNotEmpty(isNonconcurrent)">
+				AND IS_NONCONCURRENT = #{isNonconcurrent}
+			</if>
+	       <if test="@Ognl@isNotEmpty(requestsRecovery)">
+				AND REQUESTS_RECOVERY = #{requestsRecovery}
+			</if>
+		</where>
+	</sql>
+
+
+
+    <select id="QrtzFiredTriggers.count" resultType="long">
+        SELECT count(1) FROM qrtz_fired_triggers
+		<include refid="QrtzFiredTriggers.where"/>
+    </select>
+
+
+    <select id="QrtzFiredTriggers.query" resultMap="QrtzFiredTriggers">
+    	SELECT <include refid="QrtzFiredTriggers.columns" />
+	    FROM qrtz_fired_triggers
+		<include refid="QrtzFiredTriggers.where"/>
+
+		<if test="@Ognl@isNotEmpty(sortColumns)">
+			ORDER BY ${sortColumns}
+		</if>
+    </select>
+
+
+</mapper>
+

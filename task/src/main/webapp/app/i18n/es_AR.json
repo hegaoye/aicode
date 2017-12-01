@@ -1,0 +1,17 @@
+{
+  "topbar": {
+    "search": {
+      "PLACEHOLDER": "Tipea y pulsa enter.."
+    }
+  },
+  "offsidebar": {
+    "setting": {
+      "SETTINGS": "Ajustes",
+      "THEMES": "Temas",
+      "layout": {
+        "FIXED": "Fijo",
+        "COLLAPSED": "Colapsado"
+      }
+    }
+  }
+}

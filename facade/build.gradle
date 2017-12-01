@@ -1,0 +1,10 @@
+apply plugin: 'java'
+
+
+dependencies {
+
+    compile rootProject.ext.dependencies["paypal-rest-api"]
+    compile project(":base-facade")
+    compile rootProject.ext.dependencies["lombok"]
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+}

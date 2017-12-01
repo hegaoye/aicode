@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<mapper namespace="QrtzLocks">
+
+	<resultMap id="QrtzLocks" type="QrtzLocks">
+        <result property="schedName" column="SCHED_NAME"/>
+        <result property="lockName" column="LOCK_NAME"/>
+	</resultMap>
+
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="QrtzLocks.columns">
+	    <![CDATA[
+		SCHED_NAME,LOCK_NAME
+	    ]]>
+	</sql>
+
+	<insert id="QrtzLocks.insert" useGeneratedKeys="true" keyProperty="schedName" parameterType="QrtzLocks">
+        INSERT INTO qrtz_locks (
+        	SCHED_NAME ,
+        	LOCK_NAME 
+        ) VALUES (
+        	#{schedName} ,
+        	#{lockName} 
+        )
+		<selectKey keyProperty="id" resultType="long">
+			select LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+
+	<update id="QrtzLocks.update" parameterType="QrtzLocks">
+    <![CDATA[
+        UPDATE qrtz_locks SET
+        WHERE 
+	        SCHED_NAME = #{schedName}  AND 
+	        LOCK_NAME = #{lockName} 
+    ]]>
+	</update>
+
+    <delete id="QrtzLocks.delete">
+    <![CDATA[
+        DELETE FROM qrtz_locks WHERE
+        SCHED_NAME = #{id}  AND 
+        LOCK_NAME = #{id} 
+    ]]>
+    </delete>
+
+    <select id="QrtzLocks.load" resultMap="QrtzLocks">
+		SELECT <include refid="QrtzLocks.columns" />
+	    <![CDATA[
+		    FROM qrtz_locks 
+	        WHERE 
+		        SCHED_NAME = #{id}  AND 
+		        LOCK_NAME = #{id} 
+	    ]]>
+	</select>
+
+	<sql id="QrtzLocks.where">
+		<where>
+	       <if test="@Ognl@isNotEmpty(schedName)">
+				AND SCHED_NAME = #{schedName}
+			</if>
+	       <if test="@Ognl@isNotEmpty(lockName)">
+				AND LOCK_NAME = #{lockName}
+			</if>
+		</where>
+	</sql>
+
+
+
+    <select id="QrtzLocks.count" resultType="long">
+        SELECT count(1) FROM qrtz_locks
+		<include refid="QrtzLocks.where"/>
+    </select>
+
+
+    <select id="QrtzLocks.query" resultMap="QrtzLocks">
+    	SELECT <include refid="QrtzLocks.columns" />
+	    FROM qrtz_locks
+		<include refid="QrtzLocks.where"/>
+
+		<if test="@Ognl@isNotEmpty(sortColumns)">
+			ORDER BY ${sortColumns}
+		</if>
+    </select>
+
+
+</mapper>
+

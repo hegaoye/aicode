@@ -1,18 +1,135 @@
-# AI-Code
-代码智能化生成框架，平台化管理生产模板，模板根据需要可以上传，并在生成时自己选择，项目提供webUI方式，根据框架模块化管理，需要那些选择后自动生成；提供模板开发接口自由定义自己的模板，最终完成AI+模板=70%的代码量，平台默认携带Spring为核心的框架内容。根据需要可以选择性生成。
+<H4>项目官网</H4></br>
+www.ponddy.com </br>
+www.ponddytutors.com </br>
 
-# 设计理念：
+项目为庞帝的在线教育系统</br>
+两大块:</br>
+<span style="color:green;font-size:20px;">1.预约课程，上课的业务</span></br>
+<span style="color:green;font-size:20px;">2.购买课时，分享课时业务</span></br>
 
-1.生成框架与模板分离，生成代码框架就是脚手架功能，通过读取数据库获得一些基本的生成信息；
+<H4>代码规范说明</H4>
 
-2.模板可以自定义并根据脚手架的接口完成模板的编写最终形成自己的模板，通过上传完成代码的生成；
+1.严格遵守java代码开发规范，驼峰命名法 例如：   xxxXXX  xxx_xxxx  XXXDDDD
 
-3.生成模块化，将框架，技术，信息等模块化显示，选择需要的模块进行生成，完全自定义生成到任何一层，
-  目前实现目标是生成是基于<H2 style="font-size:14px;font-color:red;">spring+mybatis+dubbo+mysql+redis+memcache+hibernate+swagger</H2>进行选择性生成，
-  从mapper，dao，service，ctrl 全部自动化生成，内容包含注释，命名，实体类，query类，基本的增删改查，以及关联查询；
+2.接口类命名XXXSV  接口实现命名XXXXSVImpl
 
-4.根据模型的关系生成<h4>1对n，1对1 1对1对n 1对n对1</h4>等基本的关联查询关系，并实现条件查询，时间区间查询，分页查询等功能接口功能；
+3.控制器类命名XXXCtrl 
 
-5.代码下载，生成后的代码会自动打包成一个项目包供需要的开发者自行下载即可；
+4.注释说明：</br>
 
-6.最终实现AI化代码脚手架，尽可能多的解放双手，实现真正的“码机”系统
+接口定义注释范例 </br>
+
+    /**
+     * 添加用户到组
+     * 1.判断参数
+     * 2.判断组是否有上级
+     * 3.封装数据
+     * 4.记录日志
+     * 5.返回结果
+     *
+     * @param user_id     用户id
+     * @param user_grp_id 组id
+     * @param enable      是否启用 0 否 1是
+     * @return BeanServerReturn
+     * @throws UserGroupException
+     */
+    BeanServerReturn addUserToGroup(Long user_id, Long user_grp_id, int enable) throws UserGroupException;
+
+    /**
+      * 添加用户到组
+      * 1.判断参数
+      * 2.判断组是否有上级
+      * 3.封装数据
+      * 4.记录日志
+      * 5.返回结果
+      *
+      * @param user_id     用户id
+      * @param user_grp_id 组id
+      * @param enable      是否启用 0 否 1是
+      * @return BeanServerReturn
+      * @throws UserGroupException
+      */
+    @Override
+    public BeanServerReturn addUserToGroup(Long user_id, Long user_grp_id, int enable) throws UserGroupException {
+        //1.判断参数
+        if (user_id == null || user_id == 0 || user_grp_id == null || user_grp_id == 0)
+            throw new UserGroupException("缺少参数错误！");
+        BeanServerReturn bsr = new BeanServerReturn();
+        //2.判断组是否有上级
+        Map<String, Object> param = Maps.newHashMap();
+        param.put("userGrpId", user_grp_id);
+        RbacUserUserGroup rbacUserUserGroup = rbacUserUserGroupDao.load(param);
+        //3.封装数据
+        if (rbacUserUserGroup != null) {
+            rbacUserUserGroup.setId(null);
+        } else rbacUserUserGroup = new RbacUserUserGroup();
+        rbacUserUserGroup.setUserId(user_id);
+        rbacUserUserGroup.setUserGrpId(user_grp_id);
+        rbacUserUserGroup.setUtcCreateTime(new Date());
+        rbacUserUserGroup.setUpdateTime(new Date());
+        rbacUserUserGroup.setEnable(enable);
+        rbacUserUserGroupDao.insert(rbacUserUserGroup);
+        if (rbacUserUserGroup.getId() > 0) {
+            bsr.setSuccess(true);
+            bsr.setInfo("加入组成功！");
+        }
+        //TODO 4.记录日志
+        //5.返回结果
+        return bsr;
+    }
+
+    注意注释中的1，2，3，4，5的代码实现步骤描述非常重要,并且代码编写过程中要把注释引入到方法体中按照步骤进行逐步实现,
+    同时注意@param的变量注释
+
+
+
+    控制器层注释规范范例
+
+
+    /**
+      * 添加新的用户组
+      * 1.判断参数
+      * 2.数据封装
+      * 3.保存数据并记录日志
+      * 4.返回保存结果
+      *
+      * @param name   用户组名
+      * @param en     是否可用 0否 1是
+      * @param remark 备注
+      * @return
+      */
+    @RequestMapping("/addusergroup")
+    @ResponseBody
+    public BeanServerReturn addusergroup(String name, int en, String remark) {
+        BeanServerReturn bsr = new BeanServerReturn();
+
+        try {
+            //1.判断参数
+            if (StringUtils.isBlank(name)) throw new UserGroupException("用户组名称为空异常！");
+            //2.数据封装
+            RbacUserGroup rbacUserGroup = new RbacUserGroup();
+            rbacUserGroup.setName(name);
+            rbacUserGroup.setEnable(en);
+            rbacUserGroup.setRemark(remark);
+            rbacUserGroup.setUtcCreateTime(new Date());
+            rbacUserGroup.setUpdateTime(new Date());
+            //3.保存数据
+            userGroupManagerSV.saveOrUpdate(rbacUserGroup);
+            logSV.save(Std.LogTB.GROUP.key, CharFunction.toJSONString(rbacUserGroup) + Std.LogType.ADD);
+            //4.返回保存结果
+            bsr.setSuccess(true);
+            bsr.setInfo("保存成功！");
+        } catch (BaseException e) {
+            e.printStackTrace();
+            bsr.setInfo(e.getMessage());
+        }
+        return bsr;
+    }
+
+
+	 注意注释中的1，2，3，4，5的代码实现步骤描述非常重要,并且代码编写过程中要把注释引入到方法体中按照步骤进行逐步实现,
+	 同时注意@param的变量注释
+
+5.凡是状态，变量影响到过程的，不能写死，需要统一声明，并注释清晰，进行分类管理。
+
+6.上传与业务分离，通过独立上传服务sys-base-web完成上传业务

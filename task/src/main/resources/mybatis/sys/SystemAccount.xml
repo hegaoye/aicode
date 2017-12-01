@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<mapper namespace="SystemAccount">
+
+    <resultMap id="rs_base" type="SystemAccount">
+        <result property="id" column="id"/>
+        <result property="accountCode" column="accountCode"/>
+        <result property="account" column="account"/>
+        <result property="password" column="password"/>
+        <result property="state" column="state"/>
+        <result property="accountLevel" column="accountLevel"/>
+        <result property="createTime" column="createTime"/>
+        <result property="updateTime" column="updateTime"/>
+    </resultMap>
+
+    <!-- 用于select查询公用抽取的列 -->
+    <sql id="SystemAccount.columns">
+		id,accountCode,account,password,state,accountLevel,createTime,updateTime
+	</sql>
+
+    <insert id="SystemAccount.insert" useGeneratedKeys="true" keyProperty="id" parameterType="SystemAccount">
+        INSERT INTO system_account (
+        id ,
+        accountCode ,
+        account ,
+        password ,
+        state ,
+        accountLevel ,
+        createTime ,
+        updateTime
+        ) VALUES (
+        #{id} ,
+        #{accountCode} ,
+        #{account} ,
+        #{password} ,
+        #{state} ,
+        #{accountLevel} ,
+        #{createTime} ,
+        #{updateTime}
+        )
+        <selectKey keyProperty="id" resultType="long">
+            select LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+
+    <update id="SystemAccount.update" parameterType="SystemAccount">
+
+        UPDATE system_account
+
+        <trim prefix="set" suffixOverrides=",">
+            <if test="account!=null and account!=''">
+                account = #{account} ,
+            </if>
+            <if test="password!=null and password!=''">
+                password = #{password} ,
+            </if>
+            <if test="state!=null and state!=''">
+                state = #{state} ,
+            </if>
+            <if test="accountLevel!=null and accountLevel!=''">
+                accountLevel = #{accountLevel} ,
+            </if>
+            <if test="createTime!=null ">
+                createTime = #{createTime} ,
+            </if>
+            <if test="updateTime!=null ">
+                updateTime = #{updateTime}
+            </if>
+        </trim>
+
+        WHERE
+        accountCode = #{accountCode}
+    </update>
+
+    <delete id="SystemAccount.delete">
+        DELETE FROM system_account WHERE
+        accountCode = #{accountCode}
+    </delete>
+
+    <select id="SystemAccount.load" resultMap="rs_base">
+        SELECT * FROM system_account
+        WHERE    accountCode = #{accountCode}
+    </select>
+
+    <sql id="SystemAccount.where">
+        <where>
+            <if test="id!=null and id!=''">
+                AND id = #{id}
+            </if>
+            <if test="accountCode!=null and accountCode!=''">
+                AND accountCode = #{accountCode}
+            </if>
+            <if test="account!=null and account!=''">
+                AND account = #{account}
+            </if>
+            <if test="password!=null and password!=''">
+                AND password = #{password}
+            </if>
+            <if test="state!=null and state!=''">
+                AND state = #{state}
+            </if>
+            <if test="accountLevel!=null and accountLevel!=''">
+                AND accountLevel = #{accountLevel}
+            </if>
+            <if test="createTimeBegin!=null ">
+                AND createTime >= #{createTimeBegin}
+            </if>
+            <if test="createTimeEnd!=null ">
+                AND createTime &lt;= #{createTimeEnd}
+            </if>
+            <if test="updateTimeBegin!=null ">
+                AND updateTime >= #{updateTimeBegin}
+            </if>
+            <if test="updateTimeEnd!=null ">
+                AND updateTime &lt;= #{updateTimeEnd}
+            </if>
+        </where>
+    </sql>
+
+
+    <select id="SystemAccount.count" resultType="long">
+        SELECT count(1) FROM system_account
+        <include refid="SystemAccount.where"/>
+    </select>
+
+
+    <select id="SystemAccount.query" resultMap="rs_base">
+        SELECT
+        <include refid="SystemAccount.columns"/>
+        FROM system_account
+        <include refid="SystemAccount.where"/>
+
+        <if test="sortColumns!=null and sortColumns!=''">
+            ORDER BY ${sortColumns}
+        </if>
+    </select>
+
+
+</mapper>
+

@@ -1,0 +1,21 @@
+// Inline template with sidebar items markup and ng-directives
+script(type='text/ng-template', id="sidebar-renderer.html")
+  span(ng-if="item.heading") {{(item.translate | translate) || item.text}}
+  a(ng-if="!item.heading", ng-href="{{$state.href(item.sref, item.params)}}", title="{{item.text}}")
+    em(class="{{item.icon}}", ng-if="item.icon")
+    .pull-right(ng-if="item.alert", ng-class="item.label || 'label label-success'") {{item.alert}}
+    span {{(item.translate | translate) || item.text}}
+  ul(class="nav sidebar-subnav", ng-if="item.submenu", collapse="isCollapse(pIndex)",  ng-init="addCollapse(pIndex, item)")
+    li.sidebar-subnav-header {{(item.translate | translate) || item.text}}
+    li(ng-repeat='item in item.submenu', ng-include="'sidebar-renderer.html'", ng-class="getMenuItemPropClasses(item)", ng-init="pIndex=(pIndex+'-'+$index); inSubmenu = true", ng-click="toggleCollapse(pIndex)")
+
+// START Sidebar (left)
+.aside-inner
+  nav.sidebar(sidebar="")
+    // START sidebar nav
+    ul.nav
+      // Iterates over all sidebar items
+      li(ng-class="getMenuItemPropClasses(item)", ng-repeat='item in menuItems', ng-init="pIndex = $index", ng-include="'sidebar-renderer.html'", ng-click="toggleCollapse(pIndex, true)")
+    // END sidebar nav
+
+// END Sidebar (left)

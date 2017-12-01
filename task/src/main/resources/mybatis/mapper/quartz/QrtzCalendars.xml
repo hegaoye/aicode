@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<mapper namespace="QrtzCalendars">
+
+	<resultMap id="QrtzCalendars" type="QrtzCalendars">
+        <result property="schedName" column="SCHED_NAME"/>
+        <result property="calendarName" column="CALENDAR_NAME"/>
+        <result property="calendar" column="CALENDAR"/>
+	</resultMap>
+
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="QrtzCalendars.columns">
+	    <![CDATA[
+		SCHED_NAME,CALENDAR_NAME,CALENDAR
+	    ]]>
+	</sql>
+
+	<insert id="QrtzCalendars.insert" useGeneratedKeys="true" keyProperty="schedName" parameterType="QrtzCalendars">
+        INSERT INTO qrtz_calendars (
+        	SCHED_NAME ,
+        	CALENDAR_NAME ,
+        	CALENDAR 
+        ) VALUES (
+        	#{schedName} ,
+        	#{calendarName} ,
+        	#{calendar} 
+        )
+		<selectKey keyProperty="id" resultType="long">
+			select LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+
+	<update id="QrtzCalendars.update" parameterType="QrtzCalendars">
+    <![CDATA[
+        UPDATE qrtz_calendars SET
+	        CALENDAR = #{calendar} 
+        WHERE 
+	        SCHED_NAME = #{schedName}  AND 
+	        CALENDAR_NAME = #{calendarName} 
+    ]]>
+	</update>
+
+    <delete id="QrtzCalendars.delete">
+    <![CDATA[
+        DELETE FROM qrtz_calendars WHERE
+        SCHED_NAME = #{id}  AND 
+        CALENDAR_NAME = #{id} 
+    ]]>
+    </delete>
+
+    <select id="QrtzCalendars.load" resultMap="QrtzCalendars">
+		SELECT <include refid="QrtzCalendars.columns" />
+	    <![CDATA[
+		    FROM qrtz_calendars 
+	        WHERE 
+		        SCHED_NAME = #{id}  AND 
+		        CALENDAR_NAME = #{id} 
+	    ]]>
+	</select>
+
+	<sql id="QrtzCalendars.where">
+		<where>
+	       <if test="@Ognl@isNotEmpty(schedName)">
+				AND SCHED_NAME = #{schedName}
+			</if>
+	       <if test="@Ognl@isNotEmpty(calendarName)">
+				AND CALENDAR_NAME = #{calendarName}
+			</if>
+	       <if test="@Ognl@isNotEmpty(calendar)">
+				AND CALENDAR = #{calendar}
+			</if>
+		</where>
+	</sql>
+
+
+
+    <select id="QrtzCalendars.count" resultType="long">
+        SELECT count(1) FROM qrtz_calendars
+		<include refid="QrtzCalendars.where"/>
+    </select>
+
+
+    <select id="QrtzCalendars.query" resultMap="QrtzCalendars">
+    	SELECT <include refid="QrtzCalendars.columns" />
+	    FROM qrtz_calendars
+		<include refid="QrtzCalendars.where"/>
+
+		<if test="@Ognl@isNotEmpty(sortColumns)">
+			ORDER BY ${sortColumns}
+		</if>
+    </select>
+
+
+</mapper>
+

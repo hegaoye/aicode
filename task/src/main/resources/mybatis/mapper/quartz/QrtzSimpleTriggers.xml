@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<mapper namespace="QrtzSimpleTriggers">
+
+	<resultMap id="QrtzSimpleTriggers" type="QrtzSimpleTriggers">
+        <result property="schedName" column="SCHED_NAME"/>
+        <result property="triggerName" column="TRIGGER_NAME"/>
+        <result property="triggerGroup" column="TRIGGER_GROUP"/>
+        <result property="repeatCount" column="REPEAT_COUNT"/>
+        <result property="repeatInterval" column="REPEAT_INTERVAL"/>
+        <result property="timesTriggered" column="TIMES_TRIGGERED"/>
+	</resultMap>
+
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="QrtzSimpleTriggers.columns">
+	    <![CDATA[
+		SCHED_NAME,TRIGGER_NAME,TRIGGER_GROUP,REPEAT_COUNT,REPEAT_INTERVAL,TIMES_TRIGGERED
+	    ]]>
+	</sql>
+
+	<insert id="QrtzSimpleTriggers.insert" useGeneratedKeys="true" keyProperty="schedName" parameterType="QrtzSimpleTriggers">
+        INSERT INTO qrtz_simple_triggers (
+        	SCHED_NAME ,
+        	TRIGGER_NAME ,
+        	TRIGGER_GROUP ,
+        	REPEAT_COUNT ,
+        	REPEAT_INTERVAL ,
+        	TIMES_TRIGGERED 
+        ) VALUES (
+        	#{schedName} ,
+        	#{triggerName} ,
+        	#{triggerGroup} ,
+        	#{repeatCount} ,
+        	#{repeatInterval} ,
+        	#{timesTriggered} 
+        )
+		<selectKey keyProperty="id" resultType="long">
+			select LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+
+	<update id="QrtzSimpleTriggers.update" parameterType="QrtzSimpleTriggers">
+    <![CDATA[
+        UPDATE qrtz_simple_triggers SET
+	        REPEAT_COUNT = #{repeatCount} ,
+	        REPEAT_INTERVAL = #{repeatInterval} ,
+	        TIMES_TRIGGERED = #{timesTriggered} 
+        WHERE 
+	        SCHED_NAME = #{schedName}  AND 
+	        TRIGGER_NAME = #{triggerName}  AND 
+	        TRIGGER_GROUP = #{triggerGroup} 
+    ]]>
+	</update>
+
+    <delete id="QrtzSimpleTriggers.delete">
+    <![CDATA[
+        DELETE FROM qrtz_simple_triggers WHERE
+        SCHED_NAME = #{id}  AND 
+        TRIGGER_NAME = #{id}  AND 
+        TRIGGER_GROUP = #{id} 
+    ]]>
+    </delete>
+
+    <select id="QrtzSimpleTriggers.load" resultMap="QrtzSimpleTriggers">
+		SELECT <include refid="QrtzSimpleTriggers.columns" />
+	    <![CDATA[
+		    FROM qrtz_simple_triggers 
+	        WHERE 
+		        SCHED_NAME = #{id}  AND 
+		        TRIGGER_NAME = #{id}  AND 
+		        TRIGGER_GROUP = #{id} 
+	    ]]>
+	</select>
+
+	<sql id="QrtzSimpleTriggers.where">
+		<where>
+	       <if test="@Ognl@isNotEmpty(schedName)">
+				AND SCHED_NAME = #{schedName}
+			</if>
+	       <if test="@Ognl@isNotEmpty(triggerName)">
+				AND TRIGGER_NAME = #{triggerName}
+			</if>
+	       <if test="@Ognl@isNotEmpty(triggerGroup)">
+				AND TRIGGER_GROUP = #{triggerGroup}
+			</if>
+	       <if test="@Ognl@isNotEmpty(repeatCount)">
+				AND REPEAT_COUNT = #{repeatCount}
+			</if>
+	       <if test="@Ognl@isNotEmpty(repeatInterval)">
+				AND REPEAT_INTERVAL = #{repeatInterval}
+			</if>
+	       <if test="@Ognl@isNotEmpty(timesTriggered)">
+				AND TIMES_TRIGGERED = #{timesTriggered}
+			</if>
+		</where>
+	</sql>
+
+
+
+    <select id="QrtzSimpleTriggers.count" resultType="long">
+        SELECT count(1) FROM qrtz_simple_triggers
+		<include refid="QrtzSimpleTriggers.where"/>
+    </select>
+
+
+    <select id="QrtzSimpleTriggers.query" resultMap="QrtzSimpleTriggers">
+    	SELECT <include refid="QrtzSimpleTriggers.columns" />
+	    FROM qrtz_simple_triggers
+		<include refid="QrtzSimpleTriggers.where"/>
+
+		<if test="@Ognl@isNotEmpty(sortColumns)">
+			ORDER BY ${sortColumns}
+		</if>
+    </select>
+
+
+</mapper>
+

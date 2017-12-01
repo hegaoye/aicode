@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<mapper namespace="QrtzSimpropTriggers">
+
+	<resultMap id="QrtzSimpropTriggers" type="QrtzSimpropTriggers">
+        <result property="schedName" column="SCHED_NAME"/>
+        <result property="triggerName" column="TRIGGER_NAME"/>
+        <result property="triggerGroup" column="TRIGGER_GROUP"/>
+        <result property="strProp1" column="STR_PROP_1"/>
+        <result property="strProp2" column="STR_PROP_2"/>
+        <result property="strProp3" column="STR_PROP_3"/>
+        <result property="intProp1" column="INT_PROP_1"/>
+        <result property="intProp2" column="INT_PROP_2"/>
+        <result property="longProp1" column="LONG_PROP_1"/>
+        <result property="longProp2" column="LONG_PROP_2"/>
+        <result property="decProp1" column="DEC_PROP_1"/>
+        <result property="decProp2" column="DEC_PROP_2"/>
+        <result property="boolProp1" column="BOOL_PROP_1"/>
+        <result property="boolProp2" column="BOOL_PROP_2"/>
+	</resultMap>
+
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="QrtzSimpropTriggers.columns">
+	    <![CDATA[
+		SCHED_NAME,TRIGGER_NAME,TRIGGER_GROUP,STR_PROP_1,STR_PROP_2,STR_PROP_3,INT_PROP_1,INT_PROP_2,LONG_PROP_1,LONG_PROP_2,DEC_PROP_1,DEC_PROP_2,BOOL_PROP_1,BOOL_PROP_2
+	    ]]>
+	</sql>
+
+	<insert id="QrtzSimpropTriggers.insert" useGeneratedKeys="true" keyProperty="schedName" parameterType="QrtzSimpropTriggers">
+        INSERT INTO qrtz_simprop_triggers (
+        	SCHED_NAME ,
+        	TRIGGER_NAME ,
+        	TRIGGER_GROUP ,
+        	STR_PROP_1 ,
+        	STR_PROP_2 ,
+        	STR_PROP_3 ,
+        	INT_PROP_1 ,
+        	INT_PROP_2 ,
+        	LONG_PROP_1 ,
+        	LONG_PROP_2 ,
+        	DEC_PROP_1 ,
+        	DEC_PROP_2 ,
+        	BOOL_PROP_1 ,
+        	BOOL_PROP_2 
+        ) VALUES (
+        	#{schedName} ,
+        	#{triggerName} ,
+        	#{triggerGroup} ,
+        	#{strProp1} ,
+        	#{strProp2} ,
+        	#{strProp3} ,
+        	#{intProp1} ,
+        	#{intProp2} ,
+        	#{longProp1} ,
+        	#{longProp2} ,
+        	#{decProp1} ,
+        	#{decProp2} ,
+        	#{boolProp1} ,
+        	#{boolProp2} 
+        )
+		<selectKey keyProperty="id" resultType="long">
+			select LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+
+	<update id="QrtzSimpropTriggers.update" parameterType="QrtzSimpropTriggers">
+    <![CDATA[
+        UPDATE qrtz_simprop_triggers SET
+	        STR_PROP_1 = #{strProp1} ,
+	        STR_PROP_2 = #{strProp2} ,
+	        STR_PROP_3 = #{strProp3} ,
+	        INT_PROP_1 = #{intProp1} ,
+	        INT_PROP_2 = #{intProp2} ,
+	        LONG_PROP_1 = #{longProp1} ,
+	        LONG_PROP_2 = #{longProp2} ,
+	        DEC_PROP_1 = #{decProp1} ,
+	        DEC_PROP_2 = #{decProp2} ,
+	        BOOL_PROP_1 = #{boolProp1} ,
+	        BOOL_PROP_2 = #{boolProp2} 
+        WHERE 
+	        SCHED_NAME = #{schedName}  AND 
+	        TRIGGER_NAME = #{triggerName}  AND 
+	        TRIGGER_GROUP = #{triggerGroup} 
+    ]]>
+	</update>
+
+    <delete id="QrtzSimpropTriggers.delete">
+    <![CDATA[
+        DELETE FROM qrtz_simprop_triggers WHERE
+        SCHED_NAME = #{id}  AND 
+        TRIGGER_NAME = #{id}  AND 
+        TRIGGER_GROUP = #{id} 
+    ]]>
+    </delete>
+
+    <select id="QrtzSimpropTriggers.load" resultMap="QrtzSimpropTriggers">
+		SELECT <include refid="QrtzSimpropTriggers.columns" />
+	    <![CDATA[
+		    FROM qrtz_simprop_triggers 
+	        WHERE 
+		        SCHED_NAME = #{id}  AND 
+		        TRIGGER_NAME = #{id}  AND 
+		        TRIGGER_GROUP = #{id} 
+	    ]]>
+	</select>
+
+	<sql id="QrtzSimpropTriggers.where">
+		<where>
+	       <if test="@Ognl@isNotEmpty(schedName)">
+				AND SCHED_NAME = #{schedName}
+			</if>
+	       <if test="@Ognl@isNotEmpty(triggerName)">
+				AND TRIGGER_NAME = #{triggerName}
+			</if>
+	       <if test="@Ognl@isNotEmpty(triggerGroup)">
+				AND TRIGGER_GROUP = #{triggerGroup}
+			</if>
+	       <if test="@Ognl@isNotEmpty(strProp1)">
+				AND STR_PROP_1 = #{strProp1}
+			</if>
+	       <if test="@Ognl@isNotEmpty(strProp2)">
+				AND STR_PROP_2 = #{strProp2}
+			</if>
+	       <if test="@Ognl@isNotEmpty(strProp3)">
+				AND STR_PROP_3 = #{strProp3}
+			</if>
+	       <if test="@Ognl@isNotEmpty(intProp1)">
+				AND INT_PROP_1 = #{intProp1}
+			</if>
+	       <if test="@Ognl@isNotEmpty(intProp2)">
+				AND INT_PROP_2 = #{intProp2}
+			</if>
+	       <if test="@Ognl@isNotEmpty(longProp1)">
+				AND LONG_PROP_1 = #{longProp1}
+			</if>
+	       <if test="@Ognl@isNotEmpty(longProp2)">
+				AND LONG_PROP_2 = #{longProp2}
+			</if>
+	       <if test="@Ognl@isNotEmpty(decProp1)">
+				AND DEC_PROP_1 = #{decProp1}
+			</if>
+	       <if test="@Ognl@isNotEmpty(decProp2)">
+				AND DEC_PROP_2 = #{decProp2}
+			</if>
+	       <if test="@Ognl@isNotEmpty(boolProp1)">
+				AND BOOL_PROP_1 = #{boolProp1}
+			</if>
+	       <if test="@Ognl@isNotEmpty(boolProp2)">
+				AND BOOL_PROP_2 = #{boolProp2}
+			</if>
+		</where>
+	</sql>
+
+
+
+    <select id="QrtzSimpropTriggers.count" resultType="long">
+        SELECT count(1) FROM qrtz_simprop_triggers
+		<include refid="QrtzSimpropTriggers.where"/>
+    </select>
+
+
+    <select id="QrtzSimpropTriggers.query" resultMap="QrtzSimpropTriggers">
+    	SELECT <include refid="QrtzSimpropTriggers.columns" />
+	    FROM qrtz_simprop_triggers
+		<include refid="QrtzSimpropTriggers.where"/>
+
+		<if test="@Ognl@isNotEmpty(sortColumns)">
+			ORDER BY ${sortColumns}
+		</if>
+    </select>
+
+
+</mapper>
+

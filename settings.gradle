@@ -1,2 +1,13 @@
 //root 项目引入子项目
-include 'ai'//ai接口
+//通用模块
+include 'core'//核心jar包
+include 'base-web'//web前端集成的通用jar包
+include 'base-facade'//基础支持接口定义jar包
+
+//接口服务项目
+include 'base-sv'//mybatis基础支撑包，mybatis全项目集成
+include 'facade'//接口定义包
+
+//task 作业项目
+include 'AI' //作業調度項目
+include 'task' //作業調度項目

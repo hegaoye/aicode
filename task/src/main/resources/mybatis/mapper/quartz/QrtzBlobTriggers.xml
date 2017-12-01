@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<mapper namespace="QrtzBlobTriggers">
+
+	<resultMap id="QrtzBlobTriggers" type="QrtzBlobTriggers">
+        <result property="schedName" column="SCHED_NAME"/>
+        <result property="triggerName" column="TRIGGER_NAME"/>
+        <result property="triggerGroup" column="TRIGGER_GROUP"/>
+        <result property="blobData" column="BLOB_DATA"/>
+	</resultMap>
+
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="QrtzBlobTriggers.columns">
+	    <![CDATA[
+		SCHED_NAME,TRIGGER_NAME,TRIGGER_GROUP,BLOB_DATA
+	    ]]>
+	</sql>
+
+	<insert id="QrtzBlobTriggers.insert" useGeneratedKeys="true" keyProperty="schedName" parameterType="QrtzBlobTriggers">
+        INSERT INTO qrtz_blob_triggers (
+        	SCHED_NAME ,
+        	TRIGGER_NAME ,
+        	TRIGGER_GROUP ,
+        	BLOB_DATA 
+        ) VALUES (
+        	#{schedName} ,
+        	#{triggerName} ,
+        	#{triggerGroup} ,
+        	#{blobData} 
+        )
+		<selectKey keyProperty="id" resultType="long">
+			select LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+
+	<update id="QrtzBlobTriggers.update" parameterType="QrtzBlobTriggers">
+    <![CDATA[
+        UPDATE qrtz_blob_triggers SET
+	        BLOB_DATA = #{blobData} 
+        WHERE 
+	        SCHED_NAME = #{schedName}  AND 
+	        TRIGGER_NAME = #{triggerName}  AND 
+	        TRIGGER_GROUP = #{triggerGroup} 
+    ]]>
+	</update>
+
+    <delete id="QrtzBlobTriggers.delete">
+    <![CDATA[
+        DELETE FROM qrtz_blob_triggers WHERE
+        SCHED_NAME = #{id}  AND 
+        TRIGGER_NAME = #{id}  AND 
+        TRIGGER_GROUP = #{id} 
+    ]]>
+    </delete>
+
+    <select id="QrtzBlobTriggers.load" resultMap="QrtzBlobTriggers">
+		SELECT <include refid="QrtzBlobTriggers.columns" />
+	    <![CDATA[
+		    FROM qrtz_blob_triggers 
+	        WHERE 
+		        SCHED_NAME = #{id}  AND 
+		        TRIGGER_NAME = #{id}  AND 
+		        TRIGGER_GROUP = #{id} 
+	    ]]>
+	</select>
+
+	<sql id="QrtzBlobTriggers.where">
+		<where>
+	       <if test="@Ognl@isNotEmpty(schedName)">
+				AND SCHED_NAME = #{schedName}
+			</if>
+	       <if test="@Ognl@isNotEmpty(triggerName)">
+				AND TRIGGER_NAME = #{triggerName}
+			</if>
+	       <if test="@Ognl@isNotEmpty(triggerGroup)">
+				AND TRIGGER_GROUP = #{triggerGroup}
+			</if>
+	       <if test="@Ognl@isNotEmpty(blobData)">
+				AND BLOB_DATA = #{blobData}
+			</if>
+		</where>
+	</sql>
+
+
+
+    <select id="QrtzBlobTriggers.count" resultType="long">
+        SELECT count(1) FROM qrtz_blob_triggers
+		<include refid="QrtzBlobTriggers.where"/>
+    </select>
+
+
+    <select id="QrtzBlobTriggers.query" resultMap="QrtzBlobTriggers">
+    	SELECT <include refid="QrtzBlobTriggers.columns" />
+	    FROM qrtz_blob_triggers
+		<include refid="QrtzBlobTriggers.where"/>
+
+		<if test="@Ognl@isNotEmpty(sortColumns)">
+			ORDER BY ${sortColumns}
+		</if>
+    </select>
+
+
+</mapper>
+

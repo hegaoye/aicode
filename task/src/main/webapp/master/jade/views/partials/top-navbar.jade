@@ -1,0 +1,47 @@
+// START Top Navbar
+nav.navbar.topnavbar(role='navigation')
+    // START navbar header
+    .navbar-header
+      a.navbar-brand(href='#/') 
+        .brand-logo 
+          img.img-responsive(src="app/img/logo.png", alt="App Logo")
+        .brand-logo-collapsed 
+          img.img-responsive(src="app/img/logo-single.png", alt="App Logo")
+    // END navbar header
+
+    // START Nav wrapper
+    .nav-wrapper
+      // START Left navbar
+      ul.nav.navbar-nav
+        li
+          // Button used to collapse the left sidebar. Only visible on tablet and desktops
+          a(ng-click="app.layout.isCollapsed = !app.layout.isCollapsed").hidden-xs
+            em.fa.fa-navicon
+          // Button to show/hide the sidebar on mobile. Visible on mobile only.
+          a(toggle-state="aside-toggled", no-persist).visible-xs.sidebar-toggle
+            em.fa.fa-navicon
+      // END Left navbar
+
+      // START Right Navbar
+      ul.nav.navbar-nav.navbar-right
+        // Search icon
+        li
+          a(search-open="")
+            em.icon-magnifier
+        // START Offsidebar button
+        li
+          a(toggle-state="offsidebar-open", no-persist)
+            em.icon-notebook
+        // END Offsidebar menu
+      // END Right Navbar
+    // END Nav wrapper
+    
+    // START Search form
+    form.navbar-form(role='search', action="search.html")
+      .form-group.has-feedback
+        input.form-control(type='text', placeholder="{{ 'topbar.search.PLACEHOLDER' | translate }}")
+        .fa.fa-times.form-control-feedback(search-dismiss)
+      button.hidden.btn.btn-default(type='submit') Submit
+    // END Search form
+
+// END Top Navbar

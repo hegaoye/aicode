@@ -1,6 +1,6 @@
 /*
  * Powered By [lixin]
- * 代码脚手架工具生成 [rapid-framework]
+ *
  */
 
 package com.rzhkj.project.entity;

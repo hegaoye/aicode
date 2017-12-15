@@ -1,0 +1,104 @@
+/*
+ *  Copyright (c) 2017. 郑州仁中和科技有限公司.保留所有权利.
+ *                        http://www.rzhkj.com/
+ *       郑州仁中和科技有限公司保留所有代码著作权.如有任何疑问请访问官方网站与我们联系.
+ *       代码只针对特定客户使用，不得在未经允许或授权的情况下对外传播扩散.恶意传播者，法律后果自行承担.
+ *       本代码仅用于龐帝業務系统.目.
+ */
+
+
+package com.rzhkj.logging.entity;
+
+import com.rzhkj.core.base.BaseEntity;
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang.builder.ToStringStyle;
+
+public class LoggingEventProperty extends BaseEntity implements java.io.Serializable {
+    private static final long serialVersionUID = 5454155825314635342L;
+
+    //alias
+    public static final String TABLE_ALIAS = "LoggingEventProperty";
+    public static final String ALIAS_EVENT_ID = "eventId";
+    public static final String ALIAS_MAPPED_KEY = "mappedKey";
+    public static final String ALIAS_MAPPED_VALUE = "mappedValue";
+
+    //date formats
+
+    //可以直接使用: @Length(max=50,message="用户名长度不能大于50")显示错误消息
+    private Long eventId;//数据库字段:event_id  属性显示:eventId
+    private String mappedKey;//数据库字段:mapped_key  属性显示:mappedKey
+    private String mappedValue;//数据库字段:mapped_value  属性显示:mappedValue
+
+    public LoggingEventProperty() {
+    }
+
+    public LoggingEventProperty(
+            Long eventId,
+            String mappedKey
+    ) {
+        this.eventId = eventId;
+        this.mappedKey = mappedKey;
+    }
+
+    public void setEventId(Long value) {
+        this.eventId = value;
+    }
+
+    public Long getEventId() {
+        return this.eventId;
+    }
+
+    public void setMappedKey(String value) {
+        this.mappedKey = value;
+    }
+
+    public String getMappedKey() {
+        return this.mappedKey;
+    }
+
+    public void setMappedValue(String value) {
+        this.mappedValue = value;
+    }
+
+    public String getMappedValue() {
+        return this.mappedValue;
+    }
+
+    private LoggingEvent loggingEvent;
+
+    public void setLoggingEvent(LoggingEvent loggingEvent) {
+        this.loggingEvent = loggingEvent;
+    }
+
+    public LoggingEvent getLoggingEvent() {
+        return loggingEvent;
+    }
+
+    public String toString() {
+        return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
+                .append("EventId", getEventId())
+                .append("MappedKey", getMappedKey())
+                .append("MappedValue", getMappedValue())
+                .toString();
+    }
+
+    public int hashCode() {
+        return new HashCodeBuilder()
+                .append(getEventId())
+                .append(getMappedKey())
+                .toHashCode();
+    }
+
+    public boolean equals(Object obj) {
+        if (obj instanceof LoggingEventProperty == false) return false;
+        if (this == obj) return true;
+        LoggingEventProperty other = (LoggingEventProperty) obj;
+        return new EqualsBuilder()
+                .append(getEventId(), other.getEventId())
+                .append(getMappedKey(), other.getMappedKey())
+                .isEquals();
+    }
+}
+

@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 
 <!-- 不使用namespace的话sql搜索定位会比较方便 -->
 <mapper namespace="Project">
 
-	<resultMap id="rs_base" type="Project">
+    <resultMap id="rs_base" type="Project">
         <result property="id" column="id"/>
         <result property="code" column="code"/>
         <result property="name" column="name"/>
@@ -24,199 +24,212 @@
         <result property="isRepository" column="isRepository"/>
         <result property="createTime" column="createTime"/>
         <result property="updateTime" column="updateTime"/>
-	</resultMap>
+    </resultMap>
 
-	<!-- 用于select查询公用抽取的列 -->
-	<sql id="Project.columns">
+    <!--查询表信息关联信息-->
+    <resultMap id="rs_base_all" type="Project" extends="rs_base">
+        <collection property="projectClassList" column="{projectCode=code}" select="ProjectClass.query"/>
+        <collection property="projectFilesList" column="{projectCode=code}" select="ProjectFiles.query"/>
+        <collection property="projectFramworkList" column="{projectCode=code}" select="ProjectFramwork.query"/>
+        <collection property="projectJobList" column="{projectCode=code}" select="ProjectJob.query"/>
+        <collection property="projectMoudlesList" column="{projectCode=code}" select="ProjectMoudles.query"/>
+        <collection property="projectTablesList" column="{projectCode=code}" select="ProjectTables.query"/>
+        <collection property="projectToolsList" column="{projectCode=code}" select="ProjectTools.query"/>
+        <collection property="projectRepositoryAccountList" column="{projectCode=code}" select="ProjectRepositoryAccount.query"/>
+    </resultMap>
+
+    <!-- 用于select查询公用抽取的列 -->
+    <sql id="Project.columns">
 		id,code,name,description,englishName,databaseType,language,state,copyright,author,phone,basePackage,sqlFile,downloadUrl,isRepository,createTime,updateTime
 	</sql>
 
-	<insert id="Project.insert" useGeneratedKeys="true" keyProperty="id" parameterType="Project">
+    <insert id="Project.insert" useGeneratedKeys="true" keyProperty="id" parameterType="Project">
         INSERT INTO `project` (
-        	id ,
-        	code ,
-        	name ,
-        	description ,
-        	englishName ,
-        	databaseType ,
-        	language ,
-        	state ,
-        	copyright ,
-        	author ,
-        	phone ,
-        	basePackage ,
-        	sqlFile ,
-        	downloadUrl ,
-        	isRepository ,
-        	createTime ,
-        	updateTime 
+        id ,
+        code ,
+        name ,
+        description ,
+        englishName ,
+        databaseType ,
+        language ,
+        state ,
+        copyright ,
+        author ,
+        phone ,
+        basePackage ,
+        sqlFile ,
+        downloadUrl ,
+        isRepository ,
+        createTime ,
+        updateTime
         ) VALUES (
-        	#{id} ,
-        	#{code} ,
-        	#{name} ,
-        	#{description} ,
-        	#{englishName} ,
-        	#{databaseType} ,
-        	#{language} ,
-        	#{state} ,
-        	#{copyright} ,
-        	#{author} ,
-        	#{phone} ,
-        	#{basePackage} ,
-        	#{sqlFile} ,
-        	#{downloadUrl} ,
-        	#{isRepository} ,
-        	#{createTime} ,
-        	#{updateTime} 
+        #{id} ,
+        #{code} ,
+        #{name} ,
+        #{description} ,
+        #{englishName} ,
+        #{databaseType} ,
+        #{language} ,
+        #{state} ,
+        #{copyright} ,
+        #{author} ,
+        #{phone} ,
+        #{basePackage} ,
+        #{sqlFile} ,
+        #{downloadUrl} ,
+        #{isRepository} ,
+        #{createTime} ,
+        #{updateTime}
         )
-		<selectKey keyProperty="id" resultType="long">
-			select LAST_INSERT_ID()
-		</selectKey>
-	</insert>
+        <selectKey keyProperty="id" resultType="long">
+            select LAST_INSERT_ID()
+        </selectKey>
+    </insert>
 
-	<update id="Project.update" parameterType="Project">
+    <update id="Project.update" parameterType="Project">
         UPDATE `project`
-		<trim prefix="set" suffixOverrides=",">
-			<if test="name!=null and name!=''">
-	        name = #{name} ,
-		    </if>
-			<if test="description!=null and description!=''">
-	        description = #{description} ,
-		    </if>
-			<if test="englishName!=null and englishName!=''">
-	        englishName = #{englishName} ,
-		    </if>
-			<if test="databaseType!=null and databaseType!=''">
-	        databaseType = #{databaseType} ,
-		    </if>
-			<if test="language!=null and language!=''">
-	        language = #{language} ,
-		    </if>
-			<if test="state!=null and state!=''">
-	        state = #{state} ,
-		    </if>
-			<if test="copyright!=null and copyright!=''">
-	        copyright = #{copyright} ,
-		    </if>
-			<if test="author!=null and author!=''">
-	        author = #{author} ,
-		    </if>
-			<if test="phone!=null and phone!=''">
-	        phone = #{phone} ,
-		    </if>
-			<if test="basePackage!=null and basePackage!=''">
-	        basePackage = #{basePackage} ,
-		    </if>
-			<if test="sqlFile!=null and sqlFile!=''">
-	        sqlFile = #{sqlFile} ,
-		    </if>
-			<if test="downloadUrl!=null and downloadUrl!=''">
-	        downloadUrl = #{downloadUrl} ,
-		    </if>
-			<if test="isRepository!=null and isRepository!=''">
-	        isRepository = #{isRepository} ,
-		    </if>
-			<if test="createTime!=null and createTime!=''">
-	        createTime = #{createTime} ,
-		    </if>
-			<if test="updateTime!=null and updateTime!=''">
-	        updateTime = #{updateTime} 
-		    </if>
-		</trim>
+        <trim prefix="set" suffixOverrides=",">
+            <if test="name!=null and name!=''">
+                name = #{name} ,
+            </if>
+            <if test="description!=null and description!=''">
+                description = #{description} ,
+            </if>
+            <if test="englishName!=null and englishName!=''">
+                englishName = #{englishName} ,
+            </if>
+            <if test="databaseType!=null and databaseType!=''">
+                databaseType = #{databaseType} ,
+            </if>
+            <if test="language!=null and language!=''">
+                language = #{language} ,
+            </if>
+            <if test="state!=null and state!=''">
+                state = #{state} ,
+            </if>
+            <if test="copyright!=null and copyright!=''">
+                copyright = #{copyright} ,
+            </if>
+            <if test="author!=null and author!=''">
+                author = #{author} ,
+            </if>
+            <if test="phone!=null and phone!=''">
+                phone = #{phone} ,
+            </if>
+            <if test="basePackage!=null and basePackage!=''">
+                basePackage = #{basePackage} ,
+            </if>
+            <if test="sqlFile!=null and sqlFile!=''">
+                sqlFile = #{sqlFile} ,
+            </if>
+            <if test="downloadUrl!=null and downloadUrl!=''">
+                downloadUrl = #{downloadUrl} ,
+            </if>
+            <if test="isRepository!=null and isRepository!=''">
+                isRepository = #{isRepository} ,
+            </if>
+            <if test="createTime!=null and createTime!=''">
+                createTime = #{createTime} ,
+            </if>
+            <if test="updateTime!=null and updateTime!=''">
+                updateTime = #{updateTime}
+            </if>
+        </trim>
         WHERE
-	        id = #{id}  AND 
-	        code = #{code} 
-	</update>
+        id = #{id} AND
+        code = #{code}
+    </update>
 
     <delete id="Project.delete">
         DELETE FROM `project`
-		<include refid="Project.where"/>
+        <include refid="Project.where"/>
     </delete>
 
-    <select id="Project.load" resultMap="rs_base">
-		SELECT <include refid="Project.columns" />
-		    FROM `project`
-		<include refid="Project.where"/>
-	</select>
+    <select id="Project.load" resultMap="rs_base_all">
+        SELECT
+        <include refid="Project.columns"/>
+        FROM `project`
+        <include refid="Project.where"/>
+    </select>
 
-	<sql id="Project.where">
-		<where>
-			<if test="id!=null and id!=''">
-				AND id = #{id}
-			</if>
-			<if test="code!=null and code!=''">
-				AND code = #{code}
-			</if>
-			<if test="name!=null and name!=''">
-				AND name = #{name}
-			</if>
-			<if test="description!=null and description!=''">
-				AND description = #{description}
-			</if>
-			<if test="englishName!=null and englishName!=''">
-				AND englishName = #{englishName}
-			</if>
-			<if test="databaseType!=null and databaseType!=''">
-				AND databaseType = #{databaseType}
-			</if>
-			<if test="language!=null and language!=''">
-				AND language = #{language}
-			</if>
-			<if test="state!=null and state!=''">
-				AND state = #{state}
-			</if>
-			<if test="copyright!=null and copyright!=''">
-				AND copyright = #{copyright}
-			</if>
-			<if test="author!=null and author!=''">
-				AND author = #{author}
-			</if>
-			<if test="phone!=null and phone!=''">
-				AND phone = #{phone}
-			</if>
-			<if test="basePackage!=null and basePackage!=''">
-				AND basePackage = #{basePackage}
-			</if>
-			<if test="sqlFile!=null and sqlFile!=''">
-				AND sqlFile = #{sqlFile}
-			</if>
-			<if test="downloadUrl!=null and downloadUrl!=''">
-				AND downloadUrl = #{downloadUrl}
-			</if>
-			<if test="isRepository!=null and isRepository!=''">
-				AND isRepository = #{isRepository}
-			</if>
-			<if test="createTimeBegin!=null and createTimeBegin!=''">
-				AND createTime >= #{createTimeBegin}
-		   </if>
-			<if test="createTimeEnd!=null and createTimeEnd!=''">
-				AND createTime &lt;= #{createTimeEnd}
-		   </if>
-			<if test="updateTimeBegin!=null and updateTimeBegin!=''">
-				AND updateTime >= #{updateTimeBegin}
-		   </if>
-			<if test="updateTimeEnd!=null and updateTimeEnd!=''">
-				AND updateTime &lt;= #{updateTimeEnd}
-		   </if>
-		</where>
-	</sql>
-
+    <sql id="Project.where">
+        <where>
+            <if test="id!=null and id!=''">
+                AND id = #{id}
+            </if>
+            <if test="code!=null and code!=''">
+                AND code = #{code}
+            </if>
+            <if test="name!=null and name!=''">
+                AND name = #{name}
+            </if>
+            <if test="description!=null and description!=''">
+                AND description = #{description}
+            </if>
+            <if test="englishName!=null and englishName!=''">
+                AND englishName = #{englishName}
+            </if>
+            <if test="databaseType!=null and databaseType!=''">
+                AND databaseType = #{databaseType}
+            </if>
+            <if test="language!=null and language!=''">
+                AND language = #{language}
+            </if>
+            <if test="state!=null and state!=''">
+                AND state = #{state}
+            </if>
+            <if test="copyright!=null and copyright!=''">
+                AND copyright = #{copyright}
+            </if>
+            <if test="author!=null and author!=''">
+                AND author = #{author}
+            </if>
+            <if test="phone!=null and phone!=''">
+                AND phone = #{phone}
+            </if>
+            <if test="basePackage!=null and basePackage!=''">
+                AND basePackage = #{basePackage}
+            </if>
+            <if test="sqlFile!=null and sqlFile!=''">
+                AND sqlFile = #{sqlFile}
+            </if>
+            <if test="downloadUrl!=null and downloadUrl!=''">
+                AND downloadUrl = #{downloadUrl}
+            </if>
+            <if test="isRepository!=null and isRepository!=''">
+                AND isRepository = #{isRepository}
+            </if>
+            <if test="createTimeBegin!=null and createTimeBegin!=''">
+                AND createTime >= #{createTimeBegin}
+            </if>
+            <if test="createTimeEnd!=null and createTimeEnd!=''">
+                AND createTime &lt;= #{createTimeEnd}
+            </if>
+            <if test="updateTimeBegin!=null and updateTimeBegin!=''">
+                AND updateTime >= #{updateTimeBegin}
+            </if>
+            <if test="updateTimeEnd!=null and updateTimeEnd!=''">
+                AND updateTime &lt;= #{updateTimeEnd}
+            </if>
+        </where>
+    </sql>
 
 
     <select id="Project.count" resultType="long">
         SELECT count(*) FROM `project`
-		<include refid="Project.where"/>
+        <include refid="Project.where"/>
     </select>
 
 
-    <select id="Project.query" resultMap="rs_base">
-    	SELECT <include refid="Project.columns" />
-	    FROM `project`
-		<include refid="Project.where"/>
+    <select id="Project.query" resultMap="rs_base_all">
+        SELECT
+        <include refid="Project.columns"/>
+        FROM `project`
+        <include refid="Project.where"/>
 
-		<if test="sortColumns!=null and sortColumns!=''">
-			ORDER BY ${sortColumns}
-		</if>
+        <if test="sortColumns!=null and sortColumns!=''">
+            ORDER BY ${sortColumns}
+        </if>
     </select>
 
 

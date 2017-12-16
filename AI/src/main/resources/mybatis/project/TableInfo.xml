@@ -14,6 +14,12 @@
         <result property="columnNumber" column="columnNumber"/>
 	</resultMap>
 
+
+	<!--查询表信息关联信息-->
+	<resultMap id="rs_base_all" type="TableInfo" extends="rs_base">
+		<collection property="columnInfos" column="{tableCode=code}" select="ClassInfo.query"/>
+	</resultMap>
+
 	<!-- 用于select查询公用抽取的列 -->
 	<sql id="TableInfo.columns">
 		id,code,notes,name,columnNumber
@@ -52,8 +58,7 @@
 		    </if>
 		</trim>
         WHERE
-	        id = #{id}  AND 
-	        code = #{code} 
+	        code = #{code}
 	</update>
 
     <delete id="TableInfo.delete">
@@ -61,7 +66,7 @@
 		<include refid="TableInfo.where"/>
     </delete>
 
-    <select id="TableInfo.load" resultMap="rs_base">
+    <select id="TableInfo.load" resultMap="rs_base_all">
 		SELECT <include refid="TableInfo.columns" />
 		    FROM `table_info`
 		<include refid="TableInfo.where"/>
@@ -95,7 +100,7 @@
     </select>
 
 
-    <select id="TableInfo.query" resultMap="rs_base">
+    <select id="TableInfo.query" resultMap="rs_base_all">
     	SELECT <include refid="TableInfo.columns" />
 	    FROM `table_info`
 		<include refid="TableInfo.where"/>

@@ -8,9 +8,11 @@ package com.rzhkj.project.entity;
 import com.rzhkj.core.base.BaseEntity;
 import lombok.Data;
 
+import java.util.List;
+
 
 /**
- * @author lixin hegaoye@qq.com
+ * @author lixin hegaoye@qq.com¡
  * @version 1.0
  * @since 1.0
  */
@@ -27,6 +29,18 @@ public class ClassInfo extends BaseEntity implements java.io.Serializable {
     private String notes;//数据库字段:notes  属性显示:类注释
     private String className;//数据库字段:className  属性显示:类名
 
+    private TableInfo tableInfo;//表信息
+    private List<ClassAttributes> classAttributes;//one to many
 
+    public ClassInfo() {
+    }
+
+    public ClassInfo(String tableCode, String code, String basePackage, String notes, String className) {
+        this.tableCode = tableCode;
+        this.code = code;
+        this.basePackage = basePackage;
+        this.notes = notes;
+        this.className = className;
+    }
 }
 

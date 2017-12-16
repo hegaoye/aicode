@@ -33,7 +33,7 @@ public class ColumnInfo extends BaseEntity implements java.io.Serializable {
     public ColumnInfo() {
     }
 
-    public ColumnInfo(String tableCode, String code, String name, String type, String notes, String defaultValue, String isPrimaryKey, String isDate, String isState) {
+    public ColumnInfo(String tableCode, String code, String name, String type, String notes, String defaultValue, String isPrimaryKey) {
         this.tableCode = tableCode;
         this.code = code;
         this.name = name;
@@ -44,5 +44,7 @@ public class ColumnInfo extends BaseEntity implements java.io.Serializable {
         this.isDate = isDate;
         this.isState = isState;
     }
+
+
 }
 

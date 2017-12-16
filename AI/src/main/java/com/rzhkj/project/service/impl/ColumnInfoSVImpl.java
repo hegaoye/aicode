@@ -106,8 +106,7 @@ public class ColumnInfoSVImpl extends BaseMybatisSVImpl<ColumnInfo, Long> implem
             columnList.forEach(column -> {
                 columnInfos.add(new ColumnInfo(tableInfo.getCode(), String.valueOf(uidGenerator.getUID()),
                         column.getColumnName(), column.getDataType(), column.getColumnComment(), column.getColumnDefault(),
-                        column.getColumnKey().equalsIgnoreCase("PRI") ? YNEnum.Y.name() : YNEnum.N.name(),
-                        YNEnum.N.name(), YNEnum.N.name()));
+                        column.getColumnKey().equalsIgnoreCase("PRI") ? YNEnum.Y.name() : YNEnum.N.name()));
             });
             columnInfoDAO.batchInsert(columnInfos);
 

@@ -8,6 +8,8 @@ package com.rzhkj.project.entity;
 import com.rzhkj.core.base.BaseEntity;
 import lombok.Data;
 
+import java.util.List;
+
 
 /**
  * @author lixin hegaoye@qq.com
@@ -38,5 +40,13 @@ public class Project extends BaseEntity implements java.io.Serializable {
     private java.util.Date createTime;//数据库字段:createTime  属性显示:创建时间
     private java.util.Date updateTime;//数据库字段:updateTime  属性显示:更新时间
 
+    private List<ProjectClass> projectClassList;
+    private List<ProjectFiles> projectFilesList;
+    private List<ProjectFramwork> projectFramworkList;
+    private List<ProjectJob> projectJobList;
+    private List<ProjectMoudles> projectMoudlesList;
+    private List<ProjectTables> projectTablesList;
+    private List<ProjectTools> projectToolsList;
+    private List<ProjectRepositoryAccount> projectRepositoryAccountList;
 }
 

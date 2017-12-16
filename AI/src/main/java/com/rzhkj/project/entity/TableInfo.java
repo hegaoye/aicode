@@ -8,6 +8,8 @@ package com.rzhkj.project.entity;
 import com.rzhkj.core.base.BaseEntity;
 import lombok.Data;
 
+import java.util.List;
+
 
 /**
  * @author lixin hegaoye@qq.com
@@ -23,6 +25,9 @@ public class TableInfo extends BaseEntity implements java.io.Serializable {
     private String name;//数据库字段:name  属性显示:表名
     private String notes;//数据库字段:notes  属性显示:表注释
     private Integer columnNumber;//数据库字段:columnNumber  属性显示:表字段数
+
+
+    private List<ColumnInfo> columnInfos;//one to many
 
     public TableInfo() {
     }

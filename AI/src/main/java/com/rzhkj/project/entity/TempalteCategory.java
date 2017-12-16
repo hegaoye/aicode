@@ -8,6 +8,8 @@ package com.rzhkj.project.entity;
 import com.rzhkj.core.base.BaseEntity;
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * @author lixin hegaoye@qq.com
  * @version 1.0
@@ -22,5 +24,9 @@ public class TempalteCategory extends BaseEntity implements java.io.Serializable
     private String code;//数据库字段:code  属性显示:类型编码
     private String name;//数据库字段:name  属性显示:类型名
     private String description;//数据库字段:description  属性显示:类型说明
+
+    private List<Templates> templatesList;
+
+
 }
 

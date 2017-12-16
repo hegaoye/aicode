@@ -14,6 +14,11 @@
         <result property="state" column="state"/>
 	</resultMap>
 
+	<!--查询表信息关联信息-->
+	<resultMap id="rs_base_all" type="ToolsCategory" extends="rs_base">
+		<collection property="toolsList" column="{toolsCategoryCode=code}" select="Tools.query"/>
+	</resultMap>
+
 	<!-- 用于select查询公用抽取的列 -->
 	<sql id="ToolsCategory.columns">
 		id,code,name,description,state
@@ -61,7 +66,7 @@
 		<include refid="ToolsCategory.where"/>
     </delete>
 
-    <select id="ToolsCategory.load" resultMap="rs_base">
+    <select id="ToolsCategory.load" resultMap="rs_base_all">
 		SELECT <include refid="ToolsCategory.columns" />
 		    FROM `tools_category`
 		<include refid="ToolsCategory.where"/>
@@ -95,7 +100,7 @@
     </select>
 
 
-    <select id="ToolsCategory.query" resultMap="rs_base">
+    <select id="ToolsCategory.query" resultMap="rs_base_all">
     	SELECT <include refid="ToolsCategory.columns" />
 	    FROM `tools_category`
 		<include refid="ToolsCategory.where"/>

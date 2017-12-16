@@ -15,6 +15,12 @@
         <result property="state" column="state"/>
 	</resultMap>
 
+
+	<!--查询表信息关联信息-->
+	<resultMap id="rs_base_all" type="ProjectJob" extends="rs_base">
+		<collection property="projectJobLogsList" column="{code=code}" select="ProjectJobLogs.query"/>
+	</resultMap>
+
 	<!-- 用于select查询公用抽取的列 -->
 	<sql id="ProjectJob.columns">
 		id,code,name,description,number,state
@@ -67,7 +73,7 @@
 		<include refid="ProjectJob.where"/>
     </delete>
 
-    <select id="ProjectJob.load" resultMap="rs_base">
+    <select id="ProjectJob.load" resultMap="rs_base_all">
 		SELECT <include refid="ProjectJob.columns" />
 		    FROM `project_job`
 		<include refid="ProjectJob.where"/>
@@ -104,7 +110,7 @@
     </select>
 
 
-    <select id="ProjectJob.query" resultMap="rs_base">
+    <select id="ProjectJob.query" resultMap="rs_base_all">
     	SELECT <include refid="ProjectJob.columns" />
 	    FROM `project_job`
 		<include refid="ProjectJob.where"/>

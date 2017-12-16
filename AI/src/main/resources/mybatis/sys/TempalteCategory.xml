@@ -13,6 +13,11 @@
         <result property="description" column="description"/>
 	</resultMap>
 
+	<!--查询表信息关联信息-->
+	<resultMap id="rs_base_all" type="TempalteCategory" extends="rs_base">
+		<collection property="templatesList" column="{tempalteCategorycode=code}" select="Templates.query"/>
+	</resultMap>
+
 	<!-- 用于select查询公用抽取的列 -->
 	<sql id="TempalteCategory.columns">
 		id,code,name,description
@@ -55,7 +60,7 @@
 		<include refid="TempalteCategory.where"/>
     </delete>
 
-    <select id="TempalteCategory.load" resultMap="rs_base">
+    <select id="TempalteCategory.load" resultMap="rs_base_all">
 		SELECT <include refid="TempalteCategory.columns" />
 		    FROM `tempalte_category`
 		<include refid="TempalteCategory.where"/>
@@ -86,7 +91,7 @@
     </select>
 
 
-    <select id="TempalteCategory.query" resultMap="rs_base">
+    <select id="TempalteCategory.query" resultMap="rs_base_all">
     	SELECT <include refid="TempalteCategory.columns" />
 	    FROM `tempalte_category`
 		<include refid="TempalteCategory.where"/>

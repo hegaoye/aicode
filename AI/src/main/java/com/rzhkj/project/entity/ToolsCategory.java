@@ -9,6 +9,8 @@ package com.rzhkj.project.entity;
 import com.rzhkj.core.base.BaseEntity;
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * @author lixin hegaoye@qq.com
  * @version 1.0
@@ -23,5 +25,7 @@ public class ToolsCategory extends BaseEntity implements java.io.Serializable {
     private String name;//数据库字段:name  属性显示:类型名
     private String description;//数据库字段:description  属性显示:类型说明
     private String state;//数据库字段:state  属性显示:状态：停用[Disenable]，启用[Enable]
+
+    private List<Tools> toolsList;
 }
 

@@ -30,5 +30,19 @@ public class ColumnInfo extends BaseEntity implements java.io.Serializable {
     private String isDate;//数据库字段:isDate  属性显示:是否是时间类型
     private String isState;//数据库字段:isState  属性显示:是否是状态
 
+    public ColumnInfo() {
+    }
+
+    public ColumnInfo(String tableCode, String code, String name, String type, String notes, String defaultValue, String isPrimaryKey, String isDate, String isState) {
+        this.tableCode = tableCode;
+        this.code = code;
+        this.name = name;
+        this.type = type;
+        this.notes = notes;
+        this.defaultValue = defaultValue;
+        this.isPrimaryKey = isPrimaryKey;
+        this.isDate = isDate;
+        this.isState = isState;
+    }
 }
 

@@ -20,7 +20,7 @@ public class ExceptionHandler implements HandlerExceptionResolver {
         if (e instanceof BaseException) {
             errorMsg = e.getMessage();
         } else {
-            errorMsg = BaseException.PonddyException.Server_Error.toString();
+            errorMsg = BaseException.BaseExceptionEnum.Server_Error.toString();
         }
         try {
             response.setHeader("serverError", "ex");   //系统错误

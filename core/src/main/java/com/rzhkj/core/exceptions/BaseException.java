@@ -21,12 +21,12 @@ import java.io.Serializable;
 public class BaseException extends RuntimeException implements Serializable {
     private final static Logger logger = LoggerFactory.getLogger(BaseException.class);
 
-    public BaseException(PonddyException exceptionMessage) {
+    public BaseException(BaseExceptionEnum exceptionMessage) {
         super(exceptionMessage.toString());
         logger.error("系统发生异常[{}]", exceptionMessage.toString());
     }
 
-    public BaseException(PonddyException exceptionMessage, Object... params) {
+    public BaseException(BaseExceptionEnum exceptionMessage, Object... params) {
         super(exceptionMessage.toString());
         logger.error("系统发生异常[{}],参数为[{}]", exceptionMessage.toString(), JSON.toJSONString(params));
     }
@@ -44,7 +44,7 @@ public class BaseException extends RuntimeException implements Serializable {
 
 
     /*异常信息定义*/
-    public enum PonddyException {
+    public enum BaseExceptionEnum {
 
         //-----------------系统异常定义 [9000~9499]--------------------------
         Server_Error(9999, "Server Error"),
@@ -66,51 +66,8 @@ public class BaseException extends RuntimeException implements Serializable {
 
         //-----------------notify异常定义[9900~9888]--------------------------
         No_OpenId_Error(9900, "There is no tutor's openId error."),
-        No_TimeZone_Error(9901, "Tutor's timezone not setting error."),
+        No_TimeZone_Error(9901, "Tutor's timezone not setting error.");
 
-        //-----------------学生异常定义[1000~1999]--------------------------
-        Student_Exists(1000, "There is already exists"),
-        Student_Not_Exists(1001, "There is no student"),
-
-
-        //-----------------老师异常定义[2000~2999]--------------------------
-        Tutor_Not_Exist(2000, "There is no Tutor"),
-        Tutor_Add_Failed(2001, "Add the Tutor failed"),
-        Tutor_Not_Be_Active(2002, "Tutor state have to be Actice"),
-        Tutor_Wechat_Binded(2003, "The wechat already exists"),
-
-        //-----------------助教异常定义[3000~3999]--------------------------
-        Assistant_Not_Exist(3001, "Course does not exist"),
-
-
-        //-----------------课程,课表,课堂异常定义[4000~4999]--------------------------
-        Book_Unavailable(4000, "Course can not book"),
-        Classroom_Started(4001, "The Lesson already started"),
-        Course_Hour_Not_Enough(4002, "There is not Enough course hours"),
-        Over_Booking_Time(4003, "It's over the reservation time"),
-        Over_Allow_Cancel_Time(4004, "Timeout cannot be canceled"),
-        Classroom_Not_Exist(4005, "The Lesson does not exist"),
-        Classroom_Exist(4006, "The Lesson  exist"),
-        Not_Enough_Course_Hour(4010, "There is no enough lessons"),
-        Course_Exist(4006, already_exist("Course")),
-        Course_Add_Failed(4007, add_failed("Course")),
-        Course_Not_Exist(4011, not_exist("Course")),
-        Booked_Error(4012, "Course Timetable has booked"),
-        Confirmed_Error(4013, "The Lesson already Confirmed"),
-
-        //-----------------商品异常定义[6000~6999]--------------------------
-        Goods_Not_Exist(6000, not_exist("Goods")),
-
-        Goods_Exists(6001, already_exist("Goods")),
-
-        Goods_Aadd_Failed(6002, add_failed("Goods")),
-
-        //-----------------通知异常定义[7000~7999]--------------------------
-        //-----------------订单异常定义[8000~8999]--------------------------
-        Order_Not_Exist(8000, not_exist("Order")),
-        Order_Add_Failed(8001, add_failed("Order")),
-        Order_Payment_Failed(8002, "payment order failed"),
-        Order_Payment_Execute_Failed(8003, "payment execute failed");
 
         public int code;//错误编码
         public String error;//错误信息
@@ -130,7 +87,7 @@ public class BaseException extends RuntimeException implements Serializable {
             return "add " + arg + " failed";
         }
 
-        PonddyException(int code, String error) {
+        BaseExceptionEnum(int code, String error) {
             this.code = code;
             this.error = error;
         }
@@ -140,8 +97,5 @@ public class BaseException extends RuntimeException implements Serializable {
             return "{code:" + code + ", error:\"" + error + "\"}";
         }
 
-        public static void main(String[] args) {
-            System.out.println(PonddyException.Order_Not_Exist.toString());
-        }
     }
 }

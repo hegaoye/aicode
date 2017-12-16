@@ -1,6 +1,7 @@
 package com.rzhkj.base.core.model.java;
 
-import cn.org.rapid_framework.generator.util.typemapping.ActionScriptDataTypesUtils;
+
+import com.rzhkj.base.core.typemapping.ActionScriptDataTypesUtils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;

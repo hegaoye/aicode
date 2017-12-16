@@ -14,20 +14,20 @@ package com.rzhkj.core.exceptions;
  * @author lixin 2017-08-03 17:46
  */
 
-public class SettingException extends BaseException {
-    public SettingException(BaseExceptionEnum exceptionMessage) {
+public class ColumnInfoException extends BaseException {
+    public ColumnInfoException(BaseExceptionEnum exceptionMessage) {
         super(exceptionMessage);
     }
 
-    public SettingException(BaseExceptionEnum exceptionMessage, Object... params) {
+    public ColumnInfoException(BaseExceptionEnum exceptionMessage, Object... params) {
         super(exceptionMessage, params);
     }
 
-    public SettingException(String message) {
+    public ColumnInfoException(String message) {
         super(message);
     }
 
-    public SettingException(String message, Throwable cause) {
+    public ColumnInfoException(String message, Throwable cause) {
         super(message, cause);
     }
 }

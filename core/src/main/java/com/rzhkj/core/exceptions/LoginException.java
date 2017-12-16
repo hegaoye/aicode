@@ -13,11 +13,11 @@ package com.rzhkj.core.exceptions;
  */
 public class LoginException extends BaseException {
 
-    public LoginException(PonddyException exceptionMessage) {
+    public LoginException(BaseExceptionEnum exceptionMessage) {
         super(exceptionMessage);
     }
 
-    public LoginException(PonddyException exceptionMessage, Object... params) {
+    public LoginException(BaseExceptionEnum exceptionMessage, Object... params) {
         super(exceptionMessage, params);
     }
 

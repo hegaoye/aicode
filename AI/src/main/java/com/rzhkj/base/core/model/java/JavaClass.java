@@ -1,9 +1,10 @@
 package com.rzhkj.base.core.model.java;
 
-import cn.org.rapid_framework.generator.util.StringHelper;
-import cn.org.rapid_framework.generator.util.typemapping.ActionScriptDataTypesUtils;
-import cn.org.rapid_framework.generator.util.typemapping.JavaImport;
-import cn.org.rapid_framework.generator.util.typemapping.JavaPrimitiveTypeMapping;
+
+import com.rzhkj.base.core.StringHelper;
+import com.rzhkj.base.core.typemapping.ActionScriptDataTypesUtils;
+import com.rzhkj.base.core.typemapping.JavaImport;
+import com.rzhkj.base.core.typemapping.JavaPrimitiveTypeMapping;
 
 import java.beans.BeanInfo;
 import java.beans.Introspector;

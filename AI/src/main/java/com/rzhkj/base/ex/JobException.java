@@ -19,11 +19,11 @@ import com.rzhkj.core.exceptions.BaseException;
 public class JobException extends BaseException {
 
 
-    public JobException(PonddyException exceptionMessage) {
+    public JobException(BaseExceptionEnum exceptionMessage) {
         super(exceptionMessage);
     }
 
-    public JobException(PonddyException exceptionMessage, Object... params) {
+    public JobException(BaseExceptionEnum exceptionMessage, Object... params) {
         super(exceptionMessage, params);
     }
 

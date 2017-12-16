@@ -8,6 +8,8 @@ package com.rzhkj.project.entity;
 import com.rzhkj.core.base.BaseEntity;
 import lombok.Data;
 
+import java.util.Date;
+
 
 /**
  * @author lixin hegaoye@qq.com
@@ -25,6 +27,14 @@ public class ProjectJobLogs extends BaseEntity implements java.io.Serializable {
     private String info;//数据库字段:info  属性显示:执行信息
     private java.util.Date createTime;//数据库字段:createTime  属性显示:执行时间
 
+    public ProjectJobLogs() {
+    }
 
+    public ProjectJobLogs(String code, String result, String info, Date createTime) {
+        this.code = code;
+        this.result = result;
+        this.info = info;
+        this.createTime = createTime;
+    }
 }
 

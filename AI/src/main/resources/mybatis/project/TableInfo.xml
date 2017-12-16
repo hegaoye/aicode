@@ -10,13 +10,13 @@
         <result property="id" column="id"/>
         <result property="code" column="code"/>
         <result property="notes" column="notes"/>
-        <result property="type" column="type"/>
+        <result property="name" column="name"/>
         <result property="columnNumber" column="columnNumber"/>
 	</resultMap>
 
 	<!-- 用于select查询公用抽取的列 -->
 	<sql id="TableInfo.columns">
-		id,code,notes,type,columnNumber
+		id,code,notes,name,columnNumber
 	</sql>
 
 	<insert id="TableInfo.insert" useGeneratedKeys="true" keyProperty="id" parameterType="TableInfo">
@@ -24,13 +24,13 @@
         	id ,
         	code ,
         	notes ,
-        	type ,
+        	name ,
         	columnNumber 
         ) VALUES (
         	#{id} ,
         	#{code} ,
         	#{notes} ,
-        	#{type} ,
+        	#{name} ,
         	#{columnNumber} 
         )
 		<selectKey keyProperty="id" resultType="long">
@@ -44,8 +44,8 @@
 			<if test="notes!=null and notes!=''">
 	        notes = #{notes} ,
 		    </if>
-			<if test="type!=null and type!=''">
-	        type = #{type} ,
+			<if test="name!=null and name!=''">
+	        name = #{name} ,
 		    </if>
 			<if test="columnNumber!=null and columnNumber!=''">
 	        columnNumber = #{columnNumber} 
@@ -78,8 +78,8 @@
 			<if test="notes!=null and notes!=''">
 				AND notes = #{notes}
 			</if>
-			<if test="type!=null and type!=''">
-				AND type = #{type}
+			<if test="name!=null and name!=''">
+				AND name = #{name}
 			</if>
 			<if test="columnNumber!=null and columnNumber!=''">
 				AND columnNumber = #{columnNumber}

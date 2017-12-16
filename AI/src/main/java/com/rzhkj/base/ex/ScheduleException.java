@@ -17,11 +17,11 @@ import com.rzhkj.core.exceptions.BaseException;
  *         公寓方异常
  */
 public class ScheduleException extends BaseException {
-    public ScheduleException(PonddyException exceptionMessage) {
+    public ScheduleException(BaseExceptionEnum exceptionMessage) {
         super(exceptionMessage);
     }
 
-    public ScheduleException(PonddyException exceptionMessage, Object... params) {
+    public ScheduleException(BaseExceptionEnum exceptionMessage, Object... params) {
         super(exceptionMessage, params);
     }
 

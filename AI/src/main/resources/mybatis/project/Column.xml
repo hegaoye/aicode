@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<mapper namespace="Column">
+
+    <resultMap id="rs_base" type="Column">
+        <result property="columnName" column="column_name"/>
+        <result property="columnDefault" column="column_default"/>
+        <result property="isNullable" column="is_nullable"/>
+        <result property="dataType" column="data_type"/>
+        <result property="columnKey" column="column_key"/>
+        <result property="extra" column="extra"/>
+        <result property="columnComment" column="column_comment"/>
+    </resultMap>
+
+    <select id="Column.query" resultMap="rs_base">
+       select COLUMN_NAME,COLUMN_DEFAULT,IS_NULLABLE,DATA_TYPE,COLUMN_KEY,EXTRA,COLUMN_COMMENT
+       from information_schema.columns
+       where table_schema=#{database}
+       and table_name=#{tableName}
+    </select>
+</mapper>
+

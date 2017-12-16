@@ -15,6 +15,11 @@
         <result property="state" column="state"/>
 	</resultMap>
 
+	<!--查询表信息关联信息-->
+	<resultMap id="rs_base_all" type="Moudles" extends="rs_base">
+		<collection property="moudlesFilesList" column="{moudleCode=code}" select="MoudlesFiles.query"/>
+	</resultMap>
+
 	<!-- 用于select查询公用抽取的列 -->
 	<sql id="Moudles.columns">
 		id,code,name,path,description,state
@@ -67,7 +72,7 @@
 		<include refid="Moudles.where"/>
     </delete>
 
-    <select id="Moudles.load" resultMap="rs_base">
+    <select id="Moudles.load" resultMap="rs_base_all">
 		SELECT <include refid="Moudles.columns" />
 		    FROM `moudles`
 		<include refid="Moudles.where"/>
@@ -104,7 +109,7 @@
     </select>
 
 
-    <select id="Moudles.query" resultMap="rs_base">
+    <select id="Moudles.query" resultMap="rs_base_all">
     	SELECT <include refid="Moudles.columns" />
 	    FROM `moudles`
 		<include refid="Moudles.where"/>

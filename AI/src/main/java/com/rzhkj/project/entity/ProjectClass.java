@@ -22,5 +22,7 @@ public class ProjectClass extends BaseEntity implements java.io.Serializable {
     private String projectCode;//数据库字段:projectCode  属性显示:项目编码
     private String classCode;//数据库字段:classCode  属性显示:类编码
 
+    private ClassInfo classInfo;
+
 }
 

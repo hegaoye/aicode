@@ -12,6 +12,11 @@
         <result property="tableCode" column="tableCode"/>
 	</resultMap>
 
+	<!--查询表信息关联信息-->
+	<resultMap id="rs_base_all" type="ProjectTables" extends="rs_base">
+		<association property="tableInfo" column="{code=tableCode}" select="TableInfo.load"/>
+	</resultMap>
+
 	<!-- 用于select查询公用抽取的列 -->
 	<sql id="ProjectTables.columns">
 		id,projectCode,tableCode
@@ -51,7 +56,7 @@
 		<include refid="ProjectTables.where"/>
     </delete>
 
-    <select id="ProjectTables.load" resultMap="rs_base">
+    <select id="ProjectTables.load" resultMap="rs_base_all">
 		SELECT <include refid="ProjectTables.columns" />
 		    FROM `project_tables`
 		<include refid="ProjectTables.where"/>
@@ -79,7 +84,7 @@
     </select>
 
 
-    <select id="ProjectTables.query" resultMap="rs_base">
+    <select id="ProjectTables.query" resultMap="rs_base_all">
     	SELECT <include refid="ProjectTables.columns" />
 	    FROM `project_tables`
 		<include refid="ProjectTables.where"/>

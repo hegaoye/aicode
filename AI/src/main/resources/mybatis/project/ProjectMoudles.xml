@@ -12,6 +12,12 @@
         <result property="moudleCode" column="moudleCode"/>
 	</resultMap>
 
+
+	<!--查询表信息关联信息-->
+	<resultMap id="rs_base_all" type="ProjectMoudles" extends="rs_base">
+		<association property="moudles" column="{code=moudleCode}" select="Moudles.load"/>
+	</resultMap>
+
 	<!-- 用于select查询公用抽取的列 -->
 	<sql id="ProjectMoudles.columns">
 		id,projectCode,moudleCode
@@ -51,7 +57,7 @@
 		<include refid="ProjectMoudles.where"/>
     </delete>
 
-    <select id="ProjectMoudles.load" resultMap="rs_base">
+    <select id="ProjectMoudles.load" resultMap="rs_base_all">
 		SELECT <include refid="ProjectMoudles.columns" />
 		    FROM `project_moudles`
 		<include refid="ProjectMoudles.where"/>
@@ -79,7 +85,7 @@
     </select>
 
 
-    <select id="ProjectMoudles.query" resultMap="rs_base">
+    <select id="ProjectMoudles.query" resultMap="rs_base_all">
     	SELECT <include refid="ProjectMoudles.columns" />
 	    FROM `project_moudles`
 		<include refid="ProjectMoudles.where"/>

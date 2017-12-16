@@ -22,5 +22,7 @@ public class ProjectFramwork extends BaseEntity implements java.io.Serializable 
     private Long id;//数据库字段:id  属性显示:id
     private String frameworkCode;//数据库字段:frameworkCode  属性显示:技术编码
     private String projectCode;//数据库字段:projectCode  属性显示:项目编码
+
+    private Frameworks frameworks;
 }
 

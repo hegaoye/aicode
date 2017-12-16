@@ -22,5 +22,7 @@ public class ProjectMoudles extends BaseEntity implements java.io.Serializable {
     private Long id;//数据库字段:id  属性显示:id
     private String projectCode;//数据库字段:projectCode  属性显示:项目编码
     private String moudleCode;//数据库字段:moudleCode  属性显示:模块编码
+
+    private  Moudles moudles;
 }
 

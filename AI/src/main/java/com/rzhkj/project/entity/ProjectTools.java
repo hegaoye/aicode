@@ -24,6 +24,7 @@ public class ProjectTools extends BaseEntity implements java.io.Serializable {
     private String projectCode;//数据库字段:projectCode  属性显示:项目编码
     private String toolsCode;//数据库字段:toolsCode  属性显示:工具编码
 
+    private Tools tools;
 
 }
 

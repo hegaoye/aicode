@@ -21,5 +21,7 @@ public class ProjectTables extends BaseEntity implements java.io.Serializable {
     private Long id;//数据库字段:id  属性显示:id
     private String projectCode;//数据库字段:projectCode  属性显示:项目编码
     private String tableCode;//数据库字段:tableCode  属性显示:表编码
+
+    private TableInfo tableInfo;
 }
 

@@ -35,7 +35,8 @@
         <collection property="projectMoudlesList" column="{projectCode=code}" select="ProjectMoudles.query"/>
         <collection property="projectTablesList" column="{projectCode=code}" select="ProjectTables.query"/>
         <collection property="projectToolsList" column="{projectCode=code}" select="ProjectTools.query"/>
-        <collection property="projectRepositoryAccountList" column="{projectCode=code}" select="ProjectRepositoryAccount.query"/>
+        <collection property="projectRepositoryAccountList" column="{projectCode=code}"
+                    select="ProjectRepositoryAccount.query"/>
     </resultMap>
 
     <!-- 用于select查询公用抽取的列 -->
@@ -226,10 +227,7 @@
         <include refid="Project.columns"/>
         FROM `project`
         <include refid="Project.where"/>
-
-        <if test="sortColumns!=null and sortColumns!=''">
-            ORDER BY ${sortColumns}
-        </if>
+        ORDER BY createTime DESC
     </select>
 
 

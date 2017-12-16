@@ -73,14 +73,22 @@ public interface BaseMybatisSV<E, PK extends Serializable> {
     @Transactional(readOnly = true)
     Page<E> getList(Page<E> page) throws BaseException;
 
+    /**
+     * 统计数据条数
+     *
+     * @param map 任意参数
+     * @return int
+     * @throws BaseException
+     */
+    int count(Map<String, Object> map) throws BaseException;
+
 
     /**
-     * @author 立坤 更新于2017.07.21
-     * @remark 根据条件查询
-     *
      * @param map
      * @return
      * @throws BaseException
+     * @author 立坤 更新于2017.07.21
+     * @remark 根据条件查询
      */
     @Transactional(readOnly = true)
     List<E> queryList(Map<String, Object> map) throws BaseException;
@@ -96,7 +104,6 @@ public interface BaseMybatisSV<E, PK extends Serializable> {
     void saveOrUpdate(E entity) throws BaseException;
 
 
-
     /**
      * 根据id进行删除数据
      *
@@ -107,11 +114,10 @@ public interface BaseMybatisSV<E, PK extends Serializable> {
     void deleteById(PK id) throws BaseException;
 
     /**
-     * @author 立坤 更新于2017.07.21
-     * @remark 批量删除信息
-     *
      * @param ids
      * @throws BaseException
+     * @author 立坤 更新于2017.07.21
+     * @remark 批量删除信息
      */
     @Transactional(readOnly = true)
     void deleteByIds(List<Long> ids) throws BaseException;

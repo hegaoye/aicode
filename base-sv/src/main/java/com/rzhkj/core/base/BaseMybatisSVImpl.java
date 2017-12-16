@@ -93,6 +93,17 @@ public abstract class BaseMybatisSVImpl<E, PK extends Serializable> implements B
         return page;
     }
 
+    /**
+     * 统计数据条数
+     *
+     * @param map 任意参数
+     * @return int
+     * @throws BaseException
+     */
+    @Override
+    public int count(Map<String, Object> map) throws BaseException {
+        return getBaseMybatisDAO().count(map);
+    }
 
     /**
      * 根据条件查询

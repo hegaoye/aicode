@@ -41,8 +41,8 @@ public class ProjectCtrl extends BaseCtrl {
     /**
      * 查询一个详情信息
      *
-     * @param projectCode 项目编码
-     * @return 分页对象
+     * @param code 项目编码
+     * @return BeanRet
      */
     @ApiOperation(value = "查询一个详情信息", notes = "查询一个详情信息")
     @ApiImplicitParams({
@@ -50,18 +50,18 @@ public class ProjectCtrl extends BaseCtrl {
     })
     @GetMapping(value = "/load")
     @ResponseBody
-    public BeanRet load(String projectCode) {
+    public BeanRet load(String code) {
         try {
-            Assert.hasText(projectCode, BaseException.BaseExceptionEnum.Empty_Param.toString());
+            Assert.hasText(code, BaseException.BaseExceptionEnum.Empty_Param.toString());
             Map<String, Object> map = new HashedMap();
-            map.put("projectCode", projectCode);
+            map.put("code", code);
             Project project = projectSV.load(map);
             logger.info(JSON.toJSONString(project));
             return BeanRet.create(true, "查询一个详情信息", project);
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e.getMessage());
-            return BeanRet.create(e.getMessage());
+            return BeanRet.create("未查到需要的内容");
         }
     }
 
@@ -90,7 +90,7 @@ public class ProjectCtrl extends BaseCtrl {
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e.getMessage());
-            return BeanRet.create(e.getMessage());
+            return BeanRet.create("未查到需要的内容");
         }
     }
 

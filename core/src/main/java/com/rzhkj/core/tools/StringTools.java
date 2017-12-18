@@ -224,15 +224,20 @@ public class StringTools {
     /**
      * 判断字符串不为空
      *
-     * @param str
+     * @param strs
      * @return boolean
      */
-    public static boolean isNotEmpty(String str) {
-        boolean flag = true;
-        if (str == null) {
-            flag = false;
-        } else if (str.trim().length() < 1) {
-            flag = false;
+    public static boolean isNotEmpty(String... strs) {
+        if (strs == null || strs.length == 0) {
+            return false;
+        }
+        boolean flag = false;
+        for (String str : strs) {
+            if (com.alibaba.dubbo.common.utils.StringUtils.isNotEmpty(str)) {
+                flag = true;
+            } else {
+                flag = false;
+            }
         }
         return flag;
     }
@@ -240,11 +245,11 @@ public class StringTools {
     /**
      * 判断字符串为空
      *
-     * @param str
+     * @param strs
      * @return boolean
      */
-    public static boolean isEmpty(String str) {
-        return !isNotEmpty(str);
+    public static boolean isEmpty(String... strs) {
+        return !isNotEmpty(strs);
     }
 
 

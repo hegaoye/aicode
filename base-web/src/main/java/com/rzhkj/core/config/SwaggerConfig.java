@@ -27,7 +27,7 @@ public class SwaggerConfig {
         return new Docket(DocumentationType.SWAGGER_2)
                 .apiInfo(apiInfo())
                 .select()
-                .apis(RequestHandlerSelectors.basePackage("com.ponddy"))//controller路径
+                .apis(RequestHandlerSelectors.basePackage("com.rzhkj"))//controller路径
                 .paths(PathSelectors.any())
                 .build()
                 .ignoredParameterTypes(ApiIgnore.class);
@@ -35,10 +35,10 @@ public class SwaggerConfig {
 
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
-                .title("庞帝中国 RESTful APIs")
-                .description("郑州仁中和科技有限公司保留所有代码著作权.如有任何疑问请访问官方网站与我们联系.代码只针对特定客户使用，不得在未经允许或授权的情况下对外传播扩散.恶意传播者，法律后果自行承担.本代码仅用于龐帝業務系统.请访问  http://tutors.ponddy.com/")
-                .contact(new Contact("郑州仁中和科技有限公司","http://www.rzhkj.com/","hegaoye@qq.com"))
-                .termsOfServiceUrl("http://tutors.ponddy.com/")
+                .title("AI-Code RESTful APIs")
+                .description("郑州仁中和科技有限公司保留所有代码著作权.如有任何疑问请访问官方网站与我们联系.请访问  http://www.rzhkj.com/")
+                .contact(new Contact("郑州仁中和科技有限公司", "http://www.rzhkj.com/", "hegaoye@qq.com"))
+                .termsOfServiceUrl("http://www.rzhkj.com/")
                 .version("1.0")
                 .build();
     }

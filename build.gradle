@@ -193,9 +193,6 @@ ext {
             "sentry-logback"                 : 'io.sentry:sentry-logback:1.2.2',
             //-----------Sentry end-----------
 
-            //-----------Paypal begin-----------
-            "paypal-rest-api"                : 'com.paypal.sdk:rest-api-sdk:+'
-            //-----------Paypal end-----------
     ]
 }
 

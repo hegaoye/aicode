@@ -14,10 +14,7 @@ import io.swagger.annotations.ApiOperation;
 import org.apache.commons.collections.map.HashedMap;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.Assert;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.annotation.Resource;
@@ -31,6 +28,7 @@ import java.util.Map;
  * 3.创建任务
  * 4.修改任务
  * 5.删除任务
+ * 6.执行任务
  *
  * @author lixin
  */
@@ -138,7 +136,7 @@ public class ProjectJobCtrl extends BaseCtrl {
             @ApiImplicitParam(name = "state", value = "任务状态", paramType = "query"),
             @ApiImplicitParam(name = "description", value = "任务描述", paramType = "query")
     })
-    @PostMapping("/modify")
+    @PutMapping("/modify")
     @ResponseBody
     public BeanRet modify(@ApiIgnore ProjectJob projectJob) {
         try {
@@ -167,7 +165,7 @@ public class ProjectJobCtrl extends BaseCtrl {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "code", value = "项目编码", required = true, paramType = "query"),
     })
-    @PostMapping("/delete")
+    @DeleteMapping("/delete")
     @ResponseBody
     public BeanRet delete(String code) {
         try {
@@ -182,5 +180,29 @@ public class ProjectJobCtrl extends BaseCtrl {
         }
     }
 
+
+    /**
+     * 执行任务
+     *
+     * @param code 任务编码
+     * @return BeanRet
+     */
+    @ApiOperation(value = "执行任务", notes = "执行任务")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "code", value = "任务编码", paramType = "query")
+    })
+    @GetMapping(value = "/execute")
+    @ResponseBody
+    public BeanRet execute(String code) {
+        try {
+            Assert.hasText(code, BaseException.BaseExceptionEnum.Empty_Param.toString());
+            projectJobSV.execute(code);
+            return BeanRet.create(true, "执行任务成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error(e.getMessage());
+            return BeanRet.create("执行任务失败");
+        }
+    }
 
 }

@@ -10,6 +10,7 @@ import com.rzhkj.core.exceptions.BaseException;
 import com.rzhkj.core.exceptions.ProjectException;
 import com.rzhkj.core.tools.ConfigUtil;
 import com.rzhkj.core.tools.JSON;
+import com.rzhkj.core.tools.StringTools;
 import com.rzhkj.project.dao.ProjectDAO;
 import com.rzhkj.project.dao.ProjectJobLogsDAO;
 import com.rzhkj.project.entity.Project;
@@ -49,19 +50,19 @@ public class ProjectSVImpl extends BaseMybatisSVImpl<Project, Long> implements P
      * 2.创建数据库
      * 3.记录任务日志
      *
-     * @param projectCode 项目信息
+     * @param code 项目信息
      * @return true/false
      */
     @Override
-    public boolean createDatabase(String projectCode) {
+    public boolean createDatabase(String code) {
         //1.判断必要参数
-        if (projectCode == null) {
+        if (code == null) {
             logger.error(BaseException.BaseExceptionEnum.Empty_Param.toString());
             throw new ProjectException(BaseException.BaseExceptionEnum.Empty_Param);
         }
 
         Map<String, Object> map = Maps.newHashMap();
-        map.put("projectCode", projectCode);
+        map.put("code", code);
         Project project = projectDAO.load(map);
         if (project == null) {
             logger.error(BaseException.BaseExceptionEnum.Result_Not_Exist.toString());
@@ -138,5 +139,40 @@ public class ProjectSVImpl extends BaseMybatisSVImpl<Project, Long> implements P
         //3.保存
         logger.info("创建项目 ===> " + JSON.toJSONString(project));
         super.save(project);
+    }
+
+
+    /**
+     * 删除项目
+     * 1.判断项目是否存在
+     * 2.删除项目
+     *
+     * @param code 项目编码
+     */
+    @Override
+    public void delete(String code) {
+        if (StringTools.isEmpty(code)) {
+            logger.error(BaseException.BaseExceptionEnum.Empty_Param.toString());
+            throw new ProjectException(BaseException.BaseExceptionEnum.Empty_Param);
+        }
+
+        //1.判断项目是否存在
+        Map<String, Object> map = Maps.newHashMap();
+        map.put("code", code);
+        Project project = projectDAO.load(map);
+
+        //2.删除项目
+        project.setState(ProjectStateEnum.Delete.name());
+        projectDAO.update(project);
+    }
+
+    /**
+     * 执行脚本
+     *
+     * @param code 项目编码
+     */
+    @Override
+    public void execute(String code) {
+        this.createDatabase(code);
     }
 }

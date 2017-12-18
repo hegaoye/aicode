@@ -29,7 +29,7 @@ public class Project extends BaseEntity implements java.io.Serializable {
     private String englishName;//数据库字段:englishName  属性显示:项目英文名
     private String databaseType;//数据库字段:databaseType  属性显示:数据库类型:Mysql,Oracle
     private String language;//数据库字段:language  属性显示:项目语言:Java,Python,Js
-    private String state;//数据库字段:state  属性显示:项目状态：停用[Disenable]，启用[Enable]
+    private String state;//数据库字段:state  属性显示:项目状态：停用[Disenable]，启用[Enable]，删除[Delete]
     private String copyright;//数据库字段:copyright  属性显示:项目版权文字信息
     private String author;//数据库字段:author  属性显示:作者
     private String phone;//数据库字段:phone  属性显示:联系方式

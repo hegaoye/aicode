@@ -6,14 +6,16 @@
 package com.rzhkj.project.entity;
 
 /**
- * 项目状态：停用[Disenable]，启用[Enable]
+ * 项目状态：停用[Disenable]，启用[Enable],删除[Delete]
  *
  * @author lixin hegaoye@qq.com
  * @version 1.0
  * @since 1.0
  */
 public enum ProjectStateEnum implements java.io.Serializable {
-    Enable("Enable"), Disenable("停用");
+    Enable("Enable"),
+    Disenable("停用"),
+    Delete("Delete");
     public String val;
 
     ProjectStateEnum(String val) {

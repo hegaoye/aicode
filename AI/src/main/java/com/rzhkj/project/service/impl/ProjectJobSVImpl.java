@@ -98,4 +98,28 @@ public class ProjectJobSVImpl extends BaseMybatisSVImpl<ProjectJob, Long> implem
         projectJobLogsDAO.delete(code);
 
     }
+
+    /**
+     * 执行任务
+     * 1.判断任务是否存在
+     * 2.获取类信息
+     * 3.获取模板信息
+     * 4.获取工具信息
+     * 5.获取技术信息
+     * 6.获取第三方模块信息
+     * 7.获取版本控制管理信息
+     *
+     * @param code 任务编码
+     */
+    @Override
+    public void execute(String code) {
+        //1.判断任务是否存在
+        //2.获取类信息
+        //3.获取模板信息
+        //4.获取工具信息
+        //5.获取技术信息
+        //6.获取第三方模块信息
+        //7.获取版本控制管理信息
+
+    }
 }

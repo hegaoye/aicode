@@ -13,10 +13,7 @@ import io.swagger.annotations.ApiOperation;
 import org.apache.commons.collections.map.HashedMap;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.Assert;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.annotation.Resource;
@@ -28,6 +25,9 @@ import java.util.Map;
  * 1.查询一个详情信息
  * 2.查询项目信息集合
  * 3.创建项目
+ * 4.修改项目
+ * 5.删除项目
+ * 6.执行脚本
  *
  * @author lixin
  */
@@ -131,6 +131,90 @@ public class ProjectCtrl extends BaseCtrl {
             e.printStackTrace();
             logger.error(e.getMessage());
             return BeanRet.create(false, "创建项目失败");
+        }
+    }
+
+
+    /**
+     * 修改项目
+     *
+     * @return BeanRet
+     */
+    @ApiOperation(value = "修改项目", notes = "修改项目")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "code", value = "项目编码", required = true, paramType = "query"),
+            @ApiImplicitParam(name = "name", value = "项目名 最长128个汉字", paramType = "query"),
+            @ApiImplicitParam(name = "englishName", value = "项目英文名 （项目数据库名） 最长256个英文字符", paramType = "query"),
+            @ApiImplicitParam(name = "description", value = "项目描述 最长256个汉字", paramType = "query"),
+            @ApiImplicitParam(name = "databaseType", value = "数据库类型:Mysql,Oracle...", paramType = "query"),
+            @ApiImplicitParam(name = "language", value = "项目语言:Java,Python,Js...", paramType = "query"),
+            @ApiImplicitParam(name = "copyright", value = "项目版权文字信息", paramType = "query"),
+            @ApiImplicitParam(name = "author", value = "作者", paramType = "query"),
+            @ApiImplicitParam(name = "phone", value = "联系方式", paramType = "query"),
+            @ApiImplicitParam(name = "state", value = "项目状态", paramType = "query"),
+            @ApiImplicitParam(name = "basePackage", value = "项目基础包名", paramType = "query")
+    })
+    @PutMapping("/modify")
+    @ResponseBody
+    public BeanRet modify(@ApiIgnore Project project) {
+        try {
+            Assert.hasText(project.getCode(), BaseException.BaseExceptionEnum.Empty_Param.toString());
+
+            projectSV.saveOrUpdate(project);
+            return BeanRet.create(true, "修改项目成功", project);
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error(e.getMessage());
+            return BeanRet.create(false, "修改项目失败");
+        }
+    }
+
+    /**
+     * 删除项目
+     *
+     * @return BeanRet
+     */
+    @ApiOperation(value = "删除项目", notes = "删除项目")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "code", value = "项目编码", required = true, paramType = "query")
+    })
+    @PutMapping("/delete")
+    @ResponseBody
+    public BeanRet delete(String code) {
+        try {
+            Assert.hasText(code, BaseException.BaseExceptionEnum.Empty_Param.toString());
+
+            projectSV.delete(code);
+            return BeanRet.create(true, "修改项目成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error(e.getMessage());
+            return BeanRet.create(false, "修改项目失败");
+        }
+    }
+
+
+    /**
+     * 执行脚本
+     *
+     * @return BeanRet
+     */
+    @ApiOperation(value = "执行脚本", notes = "执行脚本")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "code", value = "项目编码", required = true, paramType = "query")
+    })
+    @PutMapping("/execute")
+    @ResponseBody
+    public BeanRet execute(String code) {
+        try {
+            Assert.hasText(code, BaseException.BaseExceptionEnum.Empty_Param.toString());
+
+            projectSV.execute(code);
+            return BeanRet.create(true, "执行脚本成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error(e.getMessage());
+            return BeanRet.create(false, "执行脚本失败");
         }
     }
 

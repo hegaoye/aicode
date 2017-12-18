@@ -9,16 +9,19 @@ import com.rzhkj.core.base.BaseMybatisSVImpl;
 import com.rzhkj.core.exceptions.BaseException;
 import com.rzhkj.core.exceptions.ProjectException;
 import com.rzhkj.core.tools.ConfigUtil;
+import com.rzhkj.core.tools.JSON;
 import com.rzhkj.project.dao.ProjectDAO;
 import com.rzhkj.project.dao.ProjectJobLogsDAO;
 import com.rzhkj.project.entity.Project;
 import com.rzhkj.project.entity.ProjectJobLogs;
+import com.rzhkj.project.entity.ProjectStateEnum;
 import com.rzhkj.project.service.ProjectSV;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.io.FileNotFoundException;
+import java.util.Date;
 import java.util.Map;
 
 
@@ -97,5 +100,43 @@ public class ProjectSVImpl extends BaseMybatisSVImpl<Project, Long> implements P
         ProjectJobLogs projectJobLogs = new ProjectJobLogs();
         projectJobLogsDAO.insert(projectJobLogs);
         return true;
+    }
+
+    /**
+     * 创建项目
+     * 1.判断必传参数
+     * 2.设定默认参数
+     * 3.保存
+     *
+     * @param project 实体
+     * @throws BaseException
+     */
+    @Override
+    public void build(Project project) {
+        //1.判断必传参数
+        if (project == null
+                || StringUtils.isBlank(project.getName())
+                || StringUtils.isBlank(project.getEnglishName())
+                || StringUtils.isBlank(project.getPhone())
+                || StringUtils.isBlank(project.getAuthor())
+                || StringUtils.isBlank(project.getCopyright())
+                || StringUtils.isBlank(project.getDatabaseType())
+                || StringUtils.isBlank(project.getDescription())
+                || StringUtils.isBlank(project.getLanguage())
+                || StringUtils.isBlank(project.getBasePackage())
+                ) {
+            logger.error(BaseException.BaseExceptionEnum.Empty_Param.toString());
+            throw new ProjectException(BaseException.BaseExceptionEnum.Empty_Param);
+        }
+
+        //2.设定默认参数
+        project.setCode(String.valueOf(uidGenerator.getUID()));
+        project.setState(ProjectStateEnum.Enable.name());
+        project.setCreateTime(new Date());
+        project.setUpdateTime(new Date());
+
+        //3.保存
+        logger.info("创建项目 ===> " + JSON.toJSONString(project));
+        super.save(project);
     }
 }

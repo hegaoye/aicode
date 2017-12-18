@@ -14,7 +14,6 @@ import com.rzhkj.core.base.BaseMybatisSVImpl;
 import com.rzhkj.core.enums.YNEnum;
 import com.rzhkj.core.exceptions.BaseException;
 import com.rzhkj.core.exceptions.ColumnInfoException;
-import com.rzhkj.core.exceptions.ProjectException;
 import com.rzhkj.project.dao.ColumnDAO;
 import com.rzhkj.project.dao.ColumnInfoDAO;
 import com.rzhkj.project.dao.ProjectDAO;

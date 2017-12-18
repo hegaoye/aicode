@@ -18,4 +18,11 @@ public interface ProjectSV extends BaseMybatisSV<Project, Long> {
      * @return true/false
      */
     boolean createDatabase(String projectCode);
+
+    /**
+     * 创建项目
+     *
+     * @param project 项目对象
+     */
+    void build(Project project);
 }

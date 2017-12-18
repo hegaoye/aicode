@@ -14,6 +14,7 @@ import org.apache.commons.collections.map.HashedMap;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import springfox.documentation.annotations.ApiIgnore;
@@ -26,6 +27,7 @@ import java.util.Map;
  * 项目管理控制器
  * 1.查询一个详情信息
  * 2.查询项目信息集合
+ * 3.创建项目
  *
  * @author lixin
  */
@@ -91,5 +93,46 @@ public class ProjectCtrl extends BaseCtrl {
             return BeanRet.create(e.getMessage());
         }
     }
+
+    /**
+     * 创建项目
+     *
+     * @return BeanRet
+     */
+    @ApiOperation(value = "创建项目", notes = "创建项目")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "name", value = "项目名 最长128个汉字", required = true, paramType = "query"),
+            @ApiImplicitParam(name = "englishName", value = "项目英文名 （项目数据库名） 最长256个英文字符", required = true, paramType = "query"),
+            @ApiImplicitParam(name = "description", value = "项目描述 最长256个汉字", required = true, paramType = "query"),
+            @ApiImplicitParam(name = "databaseType", value = "数据库类型:Mysql,Oracle...", required = true, paramType = "query"),
+            @ApiImplicitParam(name = "language", value = "项目语言:Java,Python,Js...", required = true, paramType = "query"),
+            @ApiImplicitParam(name = "copyright", value = "项目版权文字信息", required = true, paramType = "query"),
+            @ApiImplicitParam(name = "author", value = "作者", required = true, paramType = "query"),
+            @ApiImplicitParam(name = "phone", value = "联系方式", required = true, paramType = "query"),
+            @ApiImplicitParam(name = "basePackage", value = "项目基础包名", required = true, paramType = "query")
+    })
+    @PostMapping("/build")
+    @ResponseBody
+    public BeanRet build(@ApiIgnore Project project) {
+        try {
+            Assert.hasText(project.getName(), BaseException.BaseExceptionEnum.Empty_Param.toString());
+            Assert.hasText(project.getEnglishName(), BaseException.BaseExceptionEnum.Empty_Param.toString());
+            Assert.hasText(project.getAuthor(), BaseException.BaseExceptionEnum.Empty_Param.toString());
+            Assert.hasText(project.getBasePackage(), BaseException.BaseExceptionEnum.Empty_Param.toString());
+            Assert.hasText(project.getCopyright(), BaseException.BaseExceptionEnum.Empty_Param.toString());
+            Assert.hasText(project.getDatabaseType(), BaseException.BaseExceptionEnum.Empty_Param.toString());
+            Assert.hasText(project.getDescription(), BaseException.BaseExceptionEnum.Empty_Param.toString());
+            Assert.hasText(project.getPhone(), BaseException.BaseExceptionEnum.Empty_Param.toString());
+            Assert.hasText(project.getLanguage(), BaseException.BaseExceptionEnum.Empty_Param.toString());
+
+            projectSV.build(project);
+            return BeanRet.create(true, "创建项目成功", project);
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error(e.getMessage());
+            return BeanRet.create(false, "创建项目失败");
+        }
+    }
+
 
 }

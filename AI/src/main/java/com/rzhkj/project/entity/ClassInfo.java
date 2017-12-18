@@ -42,5 +42,7 @@ public class ClassInfo extends BaseEntity implements java.io.Serializable {
         this.notes = notes;
         this.className = className;
     }
+
+
 }
 

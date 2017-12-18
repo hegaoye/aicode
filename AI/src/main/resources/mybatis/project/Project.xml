@@ -22,6 +22,8 @@
         <result property="sqlFile" column="sqlFile"/>
         <result property="downloadUrl" column="downloadUrl"/>
         <result property="isRepository" column="isRepository"/>
+        <result property="isParseTable" column="isParseTable"/>
+        <result property="isParseClass" column="isParseClass"/>
         <result property="createTime" column="createTime"/>
         <result property="updateTime" column="updateTime"/>
     </resultMap>
@@ -40,7 +42,7 @@
 
     <!-- 用于select查询公用抽取的列 -->
     <sql id="Project.columns">
-		id,code,name,description,englishName,databaseType,language,state,copyright,author,phone,basePackage,sqlFile,downloadUrl,isRepository,createTime,updateTime
+		id,code,name,description,englishName,databaseType,language,state,copyright,author,phone,basePackage,sqlFile,downloadUrl,isRepository,isParseTable,isParseClass,createTime,updateTime
 	</sql>
 
     <insert id="Project.insert" useGeneratedKeys="true" keyProperty="id" parameterType="Project">
@@ -60,6 +62,8 @@
         sqlFile ,
         downloadUrl ,
         isRepository ,
+        isParseTable ,
+        isParseClass ,
         createTime ,
         updateTime
         ) VALUES (
@@ -78,6 +82,8 @@
         #{sqlFile} ,
         #{downloadUrl} ,
         #{isRepository} ,
+        #{isParseTable} ,
+        #{isParseClass} ,
         #{createTime} ,
         #{updateTime}
         )
@@ -127,6 +133,12 @@
             </if>
             <if test="isRepository!=null and isRepository!=''">
                 isRepository = #{isRepository} ,
+            </if>
+            <if test="isParseTable!=null and isParseTable!=''">
+                isParseTable = #{isParseTable} ,
+            </if>
+            <if test="isParseClass!=null and isParseClass!=''">
+                isParseClass = #{isParseClass} ,
             </if>
             <if test="createTime!=null and createTime!=''">
                 createTime = #{createTime} ,
@@ -198,6 +210,12 @@
             </if>
             <if test="isRepository!=null and isRepository!=''">
                 AND isRepository = #{isRepository}
+            </if>
+            <if test="isParseTable!=null and isParseTable!=''">
+                AND isParseTable = #{isParseTable}
+            </if>
+            <if test="isParseClass!=null and isParseClass!=''">
+                AND isParseClass = #{isParseClass}
             </if>
             <if test="createTimeBegin!=null and createTimeBegin!=''">
                 AND createTime >= #{createTimeBegin}

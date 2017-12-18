@@ -24,5 +24,12 @@ public class ProjectClass extends BaseEntity implements java.io.Serializable {
 
     private ClassInfo classInfo;
 
+    public ProjectClass() {
+    }
+
+    public ProjectClass(String projectCode, String classCode) {
+        this.projectCode = projectCode;
+        this.classCode = classCode;
+    }
 }
 

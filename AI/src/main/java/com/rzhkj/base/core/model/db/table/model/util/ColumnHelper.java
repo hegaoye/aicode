@@ -37,7 +37,7 @@ public class ColumnHelper {
             result += String.format("@Length(max=%s)", c.getSize());
         }
         if (DatabaseDataTypesUtils.isIntegerNumber(c.getJavaType())) {
-            String javaType = DatabaseDataTypesUtils.getPreferredJavaType(c.getSqlType(), c.getSize(), c.getDecimalDigits());
+            String javaType = DatabaseDataTypesUtils.getPreferredJavaType(c.getSqlType() + "", c.getSize(), c.getDecimalDigits());
             if (javaType.toLowerCase().indexOf("short") >= 0) {
                 result += " @Max(" + Short.MAX_VALUE + ")";
             } else if (javaType.toLowerCase().indexOf("byte") >= 0) {

@@ -13,6 +13,12 @@ import java.util.regex.Pattern;
  */
 public class StringHelper {
 
+
+    public static void main(String[] args) {
+        System.out.println(toJavaClassName("he_gao_ye"));
+        System.out.println(toJavaVariableName("JavaMethod_param_Pp"));
+    }
+
     public static String removeCrlf(String str) {
         if (str == null) {
             return null;
@@ -243,6 +249,12 @@ public class StringHelper {
         return uncapitalize(toJavaClassName(str));
     }
 
+    /**
+     * 转换为java类格式
+     *
+     * @param str 字符串，默认是tableName  以"_" 分割转化
+     * @return String
+     */
     public static String toJavaClassName(String str) {
         return makeAllWordFirstLetterUpperCase(StringHelper.toUnderscoreName(str));
     }

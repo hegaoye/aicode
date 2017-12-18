@@ -37,6 +37,8 @@ public class Project extends BaseEntity implements java.io.Serializable {
     private String sql;//数据库字段:sql  属性显示:数据库脚本文件地址
     private String downloadUrl;//数据库字段:downloadUrl  属性显示:项目下载地址
     private String isRepository;//数据库字段:isRepository  属性显示:是否仓库管理
+    private String isParseTable;//数据库字段:isParseTable  属性显示:是否已经解析表
+    private String isParseClass;//数据库字段:isParseClass  属性显示:是否已经解析类
     private java.util.Date createTime;//数据库字段:createTime  属性显示:创建时间
     private java.util.Date updateTime;//数据库字段:updateTime  属性显示:更新时间
 

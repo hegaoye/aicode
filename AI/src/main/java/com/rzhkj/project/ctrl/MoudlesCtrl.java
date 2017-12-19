@@ -34,7 +34,7 @@ import java.util.Map;
  * @author lixin
  */
 @Controller
-@RequestMapping("/template")
+@RequestMapping("/moudles")
 @Api(value = "第三方模块控制器", description = "第三方模块控制器")
 public class MoudlesCtrl extends BaseCtrl {
 

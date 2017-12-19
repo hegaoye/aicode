@@ -56,7 +56,7 @@ public class SettingCtrl extends BaseUploadCtrl {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "k", value = "键", required = true, paramType = "query")
     })
-    @GetMapping("/loadset")
+    @GetMapping("/load")
     @ResponseBody
     public BeanRet loadSetting(String k) {
         try {
@@ -86,7 +86,7 @@ public class SettingCtrl extends BaseUploadCtrl {
             @ApiImplicitParam(name = "v", value = "值", required = true, paramType = "query"),
             @ApiImplicitParam(name = "summary", value = "说明", paramType = "query")
     })
-    @PostMapping("/modifyset")
+    @PostMapping("/modify")
     @ResponseBody
     public BeanRet modifySetting(@ApiIgnore Setting setting) {
         try {
@@ -107,7 +107,7 @@ public class SettingCtrl extends BaseUploadCtrl {
      * @return
      */
     @ApiOperation(value = "查询所有设置参数")
-    @GetMapping(value = "/settings")
+    @GetMapping(value = "/list")
     @ResponseBody
     public BeanRet settingList() {
         try {
@@ -118,23 +118,4 @@ public class SettingCtrl extends BaseUploadCtrl {
         }
     }
 
-
-    /**
-     * 查询所有设置参数
-     *
-     * @return
-     */
-    @ApiOperation(value = "查询所有设置参数")
-    @GetMapping(value = "/setting/custom/upperlimit")
-    @ResponseBody
-    public BeanRet settingCustomUpperlimit() {
-        try {
-            Map<String, Object> map = Maps.newHashMap();
-            map.put("k", Setting.Key.Custom_Upper_Limit.name());
-            Setting setting = settingSV.load(map);
-            return BeanRet.create(true, "", setting.getV());
-        } catch (Exception e) {
-            return BeanRet.create(e.getMessage());
-        }
-    }
 }

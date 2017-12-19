@@ -5,8 +5,8 @@ import com.rzhkj.core.base.BaseCtrl;
 import com.rzhkj.core.entity.BeanRet;
 import com.rzhkj.core.entity.Page;
 import com.rzhkj.core.exceptions.BaseException;
-import com.rzhkj.project.entity.TempalteCategory;
-import com.rzhkj.project.service.TempalteCategorySV;
+import com.rzhkj.project.entity.ToolsCategory;
+import com.rzhkj.project.service.ToolsCategorySV;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -22,7 +22,7 @@ import java.util.Map;
 
 
 /**
- * 模板分类控制器
+ * 工具分类控制器
  * 1.查询一个详情信息
  * 2.查询信息集合
  * 3.添加
@@ -32,12 +32,12 @@ import java.util.Map;
  * @author lixin
  */
 @Controller
-@RequestMapping("/template/category")
-@Api(value = "模板分类控制器", description = "模板分类控制器")
-public class TemplateCategoryCtrl extends BaseCtrl {
+@RequestMapping("/tools/category")
+@Api(value = "工具分类控制器", description = "工具分类控制器")
+public class ToolsCategoryCtrl extends BaseCtrl {
 
     @Resource
-    private TempalteCategorySV tempalteCategorySV;
+    private ToolsCategorySV toolsCategorySV;
 
     /**
      * 查询一个详情信息
@@ -57,10 +57,10 @@ public class TemplateCategoryCtrl extends BaseCtrl {
 
             Map<String, Object> map = new HashedMap();
             map.put("code", code);
-            TempalteCategory tempalteCategory = tempalteCategorySV.load(map);
+            ToolsCategory toolsCategory = toolsCategorySV.load(map);
 
-            logger.info(JSON.toJSONString(tempalteCategory));
-            return BeanRet.create(true, "查询一个详情信息", tempalteCategory);
+            logger.info(JSON.toJSONString(toolsCategory));
+            return BeanRet.create(true, "查询一个详情信息", toolsCategory);
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e.getMessage());
@@ -81,12 +81,12 @@ public class TemplateCategoryCtrl extends BaseCtrl {
     })
     @GetMapping(value = "/list")
     @ResponseBody
-    public BeanRet list(@ApiIgnore Page<TempalteCategory> page) {
+    public BeanRet list(@ApiIgnore Page<ToolsCategory> page) {
         try {
             Assert.notNull(page, BaseException.BaseExceptionEnum.Empty_Param.toString());
 
-            page = tempalteCategorySV.getList(page);
-            int count = tempalteCategorySV.count(new HashedMap());
+            page = toolsCategorySV.getList(page);
+            int count = toolsCategorySV.count(new HashedMap());
             page.setTotalRow(count);
 
             logger.info(JSON.toJSONString(page));
@@ -110,13 +110,13 @@ public class TemplateCategoryCtrl extends BaseCtrl {
     })
     @PostMapping("/build")
     @ResponseBody
-    public BeanRet build(@ApiIgnore TempalteCategory tempalteCategory) {
+    public BeanRet build(@ApiIgnore ToolsCategory toolsCategory) {
         try {
-            Assert.hasText(tempalteCategory.getName(), BaseException.BaseExceptionEnum.Empty_Param.toString());
-            Assert.hasText(tempalteCategory.getDescription(), BaseException.BaseExceptionEnum.Empty_Param.toString());
+            Assert.hasText(toolsCategory.getName(), BaseException.BaseExceptionEnum.Empty_Param.toString());
+            Assert.hasText(toolsCategory.getDescription(), BaseException.BaseExceptionEnum.Empty_Param.toString());
 
-            tempalteCategorySV.save(tempalteCategory);
-            return BeanRet.create(true, "添加分类成功", tempalteCategory);
+            toolsCategorySV.save(toolsCategory);
+            return BeanRet.create(true, "添加分类成功", toolsCategory);
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e.getMessage());
@@ -137,12 +137,12 @@ public class TemplateCategoryCtrl extends BaseCtrl {
     })
     @PostMapping("/modify")
     @ResponseBody
-    public BeanRet modify(@ApiIgnore TempalteCategory tempalteCategory) {
+    public BeanRet modify(@ApiIgnore ToolsCategory toolsCategory) {
         try {
-            Assert.hasText(tempalteCategory.getCode(), BaseException.BaseExceptionEnum.Empty_Param.toString());
+            Assert.hasText(toolsCategory.getCode(), BaseException.BaseExceptionEnum.Empty_Param.toString());
 
-            tempalteCategorySV.saveOrUpdate(tempalteCategory);
-            return BeanRet.create(true, "修改分类成功", tempalteCategory);
+            toolsCategorySV.saveOrUpdate(toolsCategory);
+            return BeanRet.create(true, "修改分类成功", toolsCategory);
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e.getMessage());
@@ -166,7 +166,7 @@ public class TemplateCategoryCtrl extends BaseCtrl {
         try {
             Assert.hasText(code, BaseException.BaseExceptionEnum.Empty_Param.toString());
 
-            tempalteCategorySV.delete(code);
+            toolsCategorySV.delete(code);
             return BeanRet.create(true, "删除成功");
         } catch (Exception e) {
             e.printStackTrace();

@@ -170,7 +170,7 @@ public class ProjectRepositoryAccountCtrl extends BaseCtrl {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "code", value = "版本管理编码", required = true, paramType = "query")
     })
-    @PutMapping("/delete")
+    @DeleteMapping("/delete")
     @ResponseBody
     public BeanRet delete(String code) {
         try {

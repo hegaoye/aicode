@@ -8,6 +8,7 @@ import com.rzhkj.core.exceptions.BaseException;
 import com.rzhkj.core.tools.StringTools;
 import com.rzhkj.project.entity.ProjectJob;
 import com.rzhkj.project.service.ProjectJobSV;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
@@ -34,6 +35,7 @@ import java.util.Map;
  */
 @Controller
 @RequestMapping("/project/job")
+@Api(value = "项目任务管理控制器", description = "项目任务管理控制器")
 public class ProjectJobCtrl extends BaseCtrl {
 
     @Resource

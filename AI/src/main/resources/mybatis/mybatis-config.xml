@@ -9,6 +9,7 @@
     </settings>
     <typeAliases>
         <package name="com.rzhkj.project.entity"/>
+        <package name="com.rzhkj.setting.entity"/>
     </typeAliases>
 
     <plugins>

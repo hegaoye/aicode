@@ -7,6 +7,7 @@ import com.rzhkj.core.entity.Page;
 import com.rzhkj.core.exceptions.BaseException;
 import com.rzhkj.project.entity.ProjectMoudles;
 import com.rzhkj.project.service.ProjectMoudlesSV;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
@@ -31,6 +32,7 @@ import java.util.Map;
  */
 @Controller
 @RequestMapping("/project/mouldles")
+@Api(value = "模块管理控制器", description = "模块管理控制器")
 public class ProjectMoudlesCtrl extends BaseCtrl {
 
     @Resource

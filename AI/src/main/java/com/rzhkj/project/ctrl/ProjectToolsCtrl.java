@@ -9,6 +9,7 @@ import com.rzhkj.project.entity.ProjectRepositoryAccount;
 import com.rzhkj.project.entity.ProjectTools;
 import com.rzhkj.project.service.ProjectRepositoryAccountSV;
 import com.rzhkj.project.service.ProjectToolsSV;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
@@ -33,6 +34,7 @@ import java.util.Map;
  */
 @Controller
 @RequestMapping("/project/tools")
+@Api(value = "项目工具管理控制器", description = "项目工具管理控制器")
 public class ProjectToolsCtrl extends BaseCtrl {
 
     @Resource

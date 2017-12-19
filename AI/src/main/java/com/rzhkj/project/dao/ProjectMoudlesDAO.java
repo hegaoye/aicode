@@ -12,7 +12,14 @@ import org.springframework.stereotype.Repository;
 
 
 @Repository
-public class ProjectMoudlesDAO extends BaseMybatisDAOImpl<ProjectMoudles,Long> {
+public class ProjectMoudlesDAO extends BaseMybatisDAOImpl<ProjectMoudles, Long> {
 
-
+    /**
+     * 删除
+     *
+     * @param projectMoudles 项目选择的模块
+     */
+    public void delete(ProjectMoudles projectMoudles) {
+        getSqlSession().delete(sqlmapNamespace + ".delete", projectMoudles);
+    }
 }

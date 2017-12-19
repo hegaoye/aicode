@@ -33,7 +33,7 @@ import java.util.Map;
  * @author lixin
  */
 @Controller
-@RequestMapping("/job")
+@RequestMapping("/project/job")
 public class ProjectJobCtrl extends BaseCtrl {
 
     @Resource

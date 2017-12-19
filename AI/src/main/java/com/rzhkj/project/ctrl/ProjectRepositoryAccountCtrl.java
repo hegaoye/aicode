@@ -31,7 +31,7 @@ import java.util.Map;
  * @author lixin
  */
 @Controller
-@RequestMapping("/repository")
+@RequestMapping("/project/repository")
 public class ProjectRepositoryAccountCtrl extends BaseCtrl {
 
     @Resource
@@ -74,7 +74,7 @@ public class ProjectRepositoryAccountCtrl extends BaseCtrl {
      */
     @ApiOperation(value = "查询信息集合 按照时间顺序倒叙排序", notes = "查询信息集合 按照时间顺序倒叙排序")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "projectCode", value = "项目编码",paramType = "query"),
+            @ApiImplicitParam(name = "projectCode", value = "项目编码", paramType = "query"),
             @ApiImplicitParam(name = "curPage", value = "当前页", required = true, paramType = "query"),
             @ApiImplicitParam(name = "pageSize", value = "分页大小", required = true, paramType = "query")
     })

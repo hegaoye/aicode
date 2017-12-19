@@ -46,7 +46,7 @@ public class ProjectCtrl extends BaseCtrl {
      */
     @ApiOperation(value = "查询一个详情信息", notes = "查询一个详情信息")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "projectCode", value = "项目编码", paramType = "query")
+            @ApiImplicitParam(name = "code", value = "项目编码", paramType = "query")
     })
     @GetMapping(value = "/load")
     @ResponseBody

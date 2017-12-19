@@ -64,8 +64,7 @@
 		    </if>
 		</trim>
         WHERE
-	        id = #{id}  AND 
-	        code = #{code} 
+	        code = #{code}
 	</update>
 
     <delete id="ProjectJob.delete">

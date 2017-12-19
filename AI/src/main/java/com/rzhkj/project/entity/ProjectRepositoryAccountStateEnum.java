@@ -13,9 +13,9 @@ package com.rzhkj.project.entity;
  * @since 1.0
  */
 public enum ProjectRepositoryAccountStateEnum implements java.io.Serializable {
-    Enable("Enable"),
+    Enable("启用"),
     Disenable("停用"),
-    Delete("Delete");
+    Delete("删除");
     public String val;
 
     ProjectRepositoryAccountStateEnum(String val) {

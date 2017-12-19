@@ -12,13 +12,13 @@ package com.rzhkj.project.entity;
  * @version 1.0
  * @since 1.0
  */
-public enum ProjectStateEnum implements java.io.Serializable {
+public enum TemplatesStateEnum implements java.io.Serializable {
     Enable("启用"),
     Disenable("停用"),
     Delete("删除");
     public String val;
 
-    ProjectStateEnum(String val) {
+    TemplatesStateEnum(String val) {
         this.val = val;
     }
 
@@ -28,8 +28,8 @@ public enum ProjectStateEnum implements java.io.Serializable {
      * @param stateName
      * @return
      */
-    public static ProjectStateEnum getEnum(String stateName) {
-        for (ProjectStateEnum projectStateEnum : ProjectStateEnum.values()) {
+    public static TemplatesStateEnum getEnum(String stateName) {
+        for (TemplatesStateEnum projectStateEnum : TemplatesStateEnum.values()) {
             if (projectStateEnum.name().equalsIgnoreCase(stateName)) {
                 return projectStateEnum;
             }

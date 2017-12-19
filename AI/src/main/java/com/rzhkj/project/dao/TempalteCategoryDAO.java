@@ -12,7 +12,15 @@ import org.springframework.stereotype.Repository;
 
 
 @Repository
-public class TempalteCategoryDAO extends BaseMybatisDAOImpl<TempalteCategory,Long> {
+public class TempalteCategoryDAO extends BaseMybatisDAOImpl<TempalteCategory, Long> {
 
 
+    /**
+     * 删除
+     *
+     * @param code 类型编码
+     */
+    public void delete(String code) {
+        getSqlSession().delete(sqlmapNamespace + ".delete", code);
+    }
 }

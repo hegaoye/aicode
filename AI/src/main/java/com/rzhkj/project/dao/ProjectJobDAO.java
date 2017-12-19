@@ -10,8 +10,6 @@ import com.rzhkj.core.base.BaseMybatisDAOImpl;
 import com.rzhkj.project.entity.ProjectJob;
 import org.springframework.stereotype.Repository;
 
-import java.util.Map;
-
 
 @Repository
 public class ProjectJobDAO extends BaseMybatisDAOImpl<ProjectJob, Long> {

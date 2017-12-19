@@ -1,110 +1,129 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 
 <!-- 不使用namespace的话sql搜索定位会比较方便 -->
 <mapper namespace="FrameworkAttributeValue">
 
-	<resultMap id="rs_base" type="FrameworkAttributeValue">
+    <resultMap id="rs_base" type="FrameworkAttributeValue">
         <result property="id" column="id"/>
+        <result property="attributeCode" column="attributeCode"/>
+        <result property="projectCode" column="projectCode"/>
         <result property="frameworkCode" column="frameworkCode"/>
         <result property="code" column="code"/>
         <result property="attribute" column="attribute"/>
         <result property="attributeValue" column="attributeValue"/>
-	</resultMap>
+    </resultMap>
 
-	<!-- 用于select查询公用抽取的列 -->
-	<sql id="FrameworkAttributeValue.columns">
-		id,frameworkCode,code,attribute,attributeValue
+    <!-- 用于select查询公用抽取的列 -->
+    <sql id="FrameworkAttributeValue.columns">
+		id,attributeCode,projectCode,frameworkCode,code,attribute,attributeValue
 	</sql>
 
-	<insert id="FrameworkAttributeValue.insert" useGeneratedKeys="true" keyProperty="id" parameterType="FrameworkAttributeValue">
+    <insert id="FrameworkAttributeValue.insert" useGeneratedKeys="true" keyProperty="id" parameterType="FrameworkAttributeValue">
         INSERT INTO `framework_attribute_value` (
-        	id ,
-        	frameworkCode ,
-        	code ,
-        	attribute ,
-        	attributeValue 
+        id ,
+        attributeCode ,
+        projectCode ,
+        frameworkCode ,
+        code ,
+        attribute ,
+        attributeValue
         ) VALUES (
-        	#{id} ,
-        	#{frameworkCode} ,
-        	#{code} ,
-        	#{attribute} ,
-        	#{attributeValue} 
+        #{id} ,
+        #{attributeCode} ,
+        #{projectCode} ,
+        #{frameworkCode} ,
+        #{code} ,
+        #{attribute} ,
+        #{attributeValue}
         )
-		<selectKey keyProperty="id" resultType="long">
-			select LAST_INSERT_ID()
-		</selectKey>
-	</insert>
+        <selectKey keyProperty="id" resultType="long">
+            select LAST_INSERT_ID()
+        </selectKey>
+    </insert>
 
-	<update id="FrameworkAttributeValue.update" parameterType="FrameworkAttributeValue">
+    <update id="FrameworkAttributeValue.update" parameterType="FrameworkAttributeValue">
         UPDATE `framework_attribute_value`
-		<trim prefix="set" suffixOverrides=",">
-			<if test="frameworkCode!=null and frameworkCode!=''">
-	        frameworkCode = #{frameworkCode} ,
-		    </if>
-			<if test="code!=null and code!=''">
-	        code = #{code} ,
-		    </if>
-			<if test="attribute!=null and attribute!=''">
-	        attribute = #{attribute} ,
-		    </if>
-			<if test="attributeValue!=null and attributeValue!=''">
-	        attributeValue = #{attributeValue} 
-		    </if>
-		</trim>
+        <trim prefix="set" suffixOverrides=",">
+            <if test="attributeCode!=null and attributeCode!=''">
+                attributeCode = #{attributeCode} ,
+            </if>
+            <if test="projectCode!=null and projectCode!=''">
+                projectCode = #{projectCode} ,
+            </if>
+            <if test="frameworkCode!=null and frameworkCode!=''">
+                frameworkCode = #{frameworkCode} ,
+            </if>
+            <if test="code!=null and code!=''">
+                code = #{code} ,
+            </if>
+            <if test="attribute!=null and attribute!=''">
+                attribute = #{attribute} ,
+            </if>
+            <if test="attributeValue!=null and attributeValue!=''">
+                attributeValue = #{attributeValue}
+            </if>
+        </trim>
         WHERE
-	        id = #{id} 
-	</update>
+        id = #{id}
+    </update>
 
     <delete id="FrameworkAttributeValue.delete">
         DELETE FROM `framework_attribute_value`
-		<include refid="FrameworkAttributeValue.where"/>
+        <include refid="FrameworkAttributeValue.where"/>
     </delete>
 
     <select id="FrameworkAttributeValue.load" resultMap="rs_base">
-		SELECT <include refid="FrameworkAttributeValue.columns" />
-		    FROM `framework_attribute_value`
-		<include refid="FrameworkAttributeValue.where"/>
-	</select>
+        SELECT
+        <include refid="FrameworkAttributeValue.columns"/>
+        FROM `framework_attribute_value`
+        <include refid="FrameworkAttributeValue.where"/>
+    </select>
 
-	<sql id="FrameworkAttributeValue.where">
-		<where>
-			<if test="id!=null and id!=''">
-				AND id = #{id}
-			</if>
-			<if test="frameworkCode!=null and frameworkCode!=''">
-				AND frameworkCode = #{frameworkCode}
-			</if>
-			<if test="code!=null and code!=''">
-				AND code = #{code}
-			</if>
-			<if test="attribute!=null and attribute!=''">
-				AND attribute = #{attribute}
-			</if>
-			<if test="attributeValue!=null and attributeValue!=''">
-				AND attributeValue = #{attributeValue}
-			</if>
-		</where>
-	</sql>
-
+    <sql id="FrameworkAttributeValue.where">
+        <where>
+            <if test="id!=null and id!=''">
+                AND id = #{id}
+            </if>
+            <if test="projectCode!=null and projectCode!=''">
+                AND projectCode = #{projectCode}
+            </if>
+            <if test="attributeCode!=null and attributeCode!=''">
+                AND attributeCode = #{attributeCode}
+            </if>
+            <if test="frameworkCode!=null and frameworkCode!=''">
+                AND frameworkCode = #{frameworkCode}
+            </if>
+            <if test="code!=null and code!=''">
+                AND code = #{code}
+            </if>
+            <if test="attribute!=null and attribute!=''">
+                AND attribute = #{attribute}
+            </if>
+            <if test="attributeValue!=null and attributeValue!=''">
+                AND attributeValue = #{attributeValue}
+            </if>
+        </where>
+    </sql>
 
 
     <select id="FrameworkAttributeValue.count" resultType="long">
         SELECT count(*) FROM `framework_attribute_value`
-		<include refid="FrameworkAttributeValue.where"/>
+        <include refid="FrameworkAttributeValue.where"/>
     </select>
 
 
     <select id="FrameworkAttributeValue.query" resultMap="rs_base">
-    	SELECT <include refid="FrameworkAttributeValue.columns" />
-	    FROM `framework_attribute_value`
-		<include refid="FrameworkAttributeValue.where"/>
+        SELECT
+        <include refid="FrameworkAttributeValue.columns"/>
+        FROM `framework_attribute_value`
+        <include refid="FrameworkAttributeValue.where"/>
 
-		<if test="sortColumns!=null and sortColumns!=''">
-			ORDER BY ${sortColumns}
-		</if>
+        <if test="sortColumns!=null and sortColumns!=''">
+            ORDER BY ${sortColumns}
+        </if>
     </select>
 
 

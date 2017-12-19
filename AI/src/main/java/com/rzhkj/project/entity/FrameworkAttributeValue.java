@@ -20,6 +20,8 @@ public class FrameworkAttributeValue extends BaseEntity implements java.io.Seria
     private static final long serialVersionUID = 5454155825314635342L;
 
     private Long id;//数据库字段:id  属性显示:id
+    private String attributeCode;//数据库字段:frameworkCode  属性显示:属性编码
+    private String projectCode;//数据库字段:frameworkCode  属性显示:项目编码
     private String frameworkCode;//数据库字段:frameworkCode  属性显示:技术编码
     private String code;//数据库字段:code  属性显示:属性值编码
     private String attribute;//数据库字段:attribute  属性显示:属性名

@@ -8,6 +8,8 @@ package com.rzhkj.project.entity;
 import com.rzhkj.core.base.BaseEntity;
 import lombok.Data;
 
+import java.util.List;
+
 
 /**
  * @author lixin hegaoye@qq.com
@@ -27,5 +29,6 @@ public class FrameworksConfigureTemplate extends BaseEntity implements java.io.S
     private String path;//数据库字段:path  属性显示:模板路径
     private String state;//数据库字段:state  属性显示:状态：停用[Disenable]，启用[Enable]
 
+    private List<FrameworkAttribute> frameworkAttributeList;
 }
 

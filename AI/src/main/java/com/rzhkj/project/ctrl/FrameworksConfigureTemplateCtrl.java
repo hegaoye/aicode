@@ -6,10 +6,9 @@ import com.rzhkj.core.base.BaseCtrl;
 import com.rzhkj.core.entity.BeanRet;
 import com.rzhkj.core.entity.Page;
 import com.rzhkj.core.exceptions.BaseException;
-import com.rzhkj.project.entity.FrameworkAttribute;
-import com.rzhkj.project.entity.Frameworks;
-import com.rzhkj.project.entity.FrameworksStateEnum;
-import com.rzhkj.project.service.FrameworkAttributeSV;
+import com.rzhkj.project.entity.FrameworksConfigureTemplate;
+import com.rzhkj.project.entity.FrameworksConfigureTemplateStateEnum;
+import com.rzhkj.project.service.FrameworksConfigureTemplateSV;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -25,22 +24,22 @@ import java.util.Map;
 
 
 /**
- * 框架技术属性控制器
+ * 框架配置文件模板控制器
  * 1.查询一个详情信息
  * 2.查询信息集合
  * 3.添加
  * 4.修改
- * 4.删除
+ * 5.删除
  *
  * @author lixin
  */
 @Controller
-@RequestMapping("/framework/attributes")
-@Api(value = "框架技术属性控制器", description = "框架技术属性控制器")
-public class FrameworksAttributesCtrl extends BaseCtrl {
+@RequestMapping("/framework/template")
+@Api(value = "框架配置文件模板控制器", description = "框架配置文件模板控制器")
+public class FrameworksConfigureTemplateCtrl extends BaseCtrl {
 
     @Resource
-    private FrameworkAttributeSV frameworkAttributeSV;
+    private FrameworksConfigureTemplateSV frameworksConfigureTemplateSV;
 
     /**
      * 查询一个详情信息
@@ -50,7 +49,7 @@ public class FrameworksAttributesCtrl extends BaseCtrl {
      */
     @ApiOperation(value = "查询一个详情信息", notes = "查询一个详情信息")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "code", value = "属性编码", required = true, paramType = "query")
+            @ApiImplicitParam(name = "code", value = "模板编码", required = true, paramType = "query")
     })
     @GetMapping(value = "/load")
     @ResponseBody
@@ -60,10 +59,10 @@ public class FrameworksAttributesCtrl extends BaseCtrl {
 
             Map<String, Object> map = new HashedMap();
             map.put("code", code);
-            FrameworkAttribute frameworkAttribute = frameworkAttributeSV.load(map);
+            FrameworksConfigureTemplate frameworksConfigureTemplate = frameworksConfigureTemplateSV.load(map);
 
-            logger.info(JSON.toJSONString(frameworkAttribute));
-            return BeanRet.create(true, "查询一个详情信息", frameworkAttribute);
+            logger.info(JSON.toJSONString(frameworksConfigureTemplate));
+            return BeanRet.create(true, "查询一个详情信息", frameworksConfigureTemplate);
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e.getMessage());
@@ -79,20 +78,21 @@ public class FrameworksAttributesCtrl extends BaseCtrl {
      */
     @ApiOperation(value = "查询信息集合 按照时间顺序倒叙排序", notes = "查询信息集合 按照时间顺序倒叙排序")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "frameworkCode", value = "技术编码", required = true, paramType = "query"),
+            @ApiImplicitParam(name = "frameworksCode", value = "框架编码", required = true, paramType = "query"),
             @ApiImplicitParam(name = "curPage", value = "当前页", required = true, paramType = "query"),
             @ApiImplicitParam(name = "pageSize", value = "分页大小", required = true, paramType = "query")
     })
     @GetMapping(value = "/list")
     @ResponseBody
-    public BeanRet list(String frameworkCode, @ApiIgnore Page<FrameworkAttribute> page) {
+    public BeanRet list(String frameworksCode, @ApiIgnore Page<FrameworksConfigureTemplate> page) {
         try {
             Assert.notNull(page, BaseException.BaseExceptionEnum.Empty_Param.toString());
+
             Map<String, Object> map = Maps.newHashMap();
-            map.put("frameworkCode", frameworkCode);
+            map.put("frameworksCode", frameworksCode);
             page.setParams(map);
-            page = frameworkAttributeSV.getList(page);
-            int count = frameworkAttributeSV.count(map);
+            page = frameworksConfigureTemplateSV.getList(page);
+            int count = frameworksConfigureTemplateSV.count(map);
             page.setTotalRow(count);
 
             logger.info(JSON.toJSONString(page));
@@ -111,18 +111,19 @@ public class FrameworksAttributesCtrl extends BaseCtrl {
      */
     @ApiOperation(value = "添加", notes = "添加")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "frameworkCode", value = "技术编码", required = true, paramType = "query"),
-            @ApiImplicitParam(name = "attribute", value = "属性", required = true, paramType = "query")
+            @ApiImplicitParam(name = "frameworksCode", value = "框架编码", required = true, paramType = "query"),
+            @ApiImplicitParam(name = "name", value = "模板名称", required = true, paramType = "query"),
+            @ApiImplicitParam(name = "description", value = "模板说明", required = true, paramType = "query")
     })
     @PostMapping("/build")
     @ResponseBody
-    public BeanRet build(@ApiIgnore FrameworkAttribute frameworkAttribute) {
+    public BeanRet build(@ApiIgnore FrameworksConfigureTemplate frameworksConfigureTemplate) {
         try {
-            Assert.hasText(frameworkAttribute.getTemplateCode(), BaseException.BaseExceptionEnum.Empty_Param.toString());
-            Assert.hasText(frameworkAttribute.getAttribute(), BaseException.BaseExceptionEnum.Empty_Param.toString());
+            Assert.hasText(frameworksConfigureTemplate.getName(), BaseException.BaseExceptionEnum.Empty_Param.toString());
+            Assert.hasText(frameworksConfigureTemplate.getDescription(), BaseException.BaseExceptionEnum.Empty_Param.toString());
 
-            frameworkAttributeSV.save(frameworkAttribute);
-            return BeanRet.create(true, "添加成功", frameworkAttribute);
+            frameworksConfigureTemplateSV.save(frameworksConfigureTemplate);
+            return BeanRet.create(true, "添加成功", frameworksConfigureTemplate);
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e.getMessage());
@@ -137,17 +138,19 @@ public class FrameworksAttributesCtrl extends BaseCtrl {
      */
     @ApiOperation(value = "修改", notes = "修改")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "code", value = "属性编码", required = true, paramType = "query"),
-            @ApiImplicitParam(name = "frameworkCode", value = "技术编码", paramType = "query"),
-            @ApiImplicitParam(name = "attribute", value = "属性", paramType = "query")
+            @ApiImplicitParam(name = "code", value = "模板编码", required = true, paramType = "query"),
+            @ApiImplicitParam(name = "frameworksCode", value = "框架编码", required = true, paramType = "query"),
+            @ApiImplicitParam(name = "name", value = "模板名称", required = true, paramType = "query"),
+            @ApiImplicitParam(name = "description", value = "模板说明", required = true, paramType = "query"),
+            @ApiImplicitParam(name = "state", value = "状态：停用[Disenable]，启用[Enable]", required = true, paramType = "query")
     })
     @PostMapping("/modify")
     @ResponseBody
-    public BeanRet modify(@ApiIgnore FrameworkAttribute frameworkAttribute) {
+    public BeanRet modify(@ApiIgnore FrameworksConfigureTemplate frameworksConfigureTemplate) {
         try {
-            Assert.hasText(frameworkAttribute.getCode(), BaseException.BaseExceptionEnum.Empty_Param.toString());
-            frameworkAttributeSV.saveOrUpdate(frameworkAttribute);
-            return BeanRet.create(true, "修改成功", frameworkAttribute);
+            Assert.hasText(frameworksConfigureTemplate.getCode(), BaseException.BaseExceptionEnum.Empty_Param.toString());
+            frameworksConfigureTemplateSV.saveOrUpdate(frameworksConfigureTemplate);
+            return BeanRet.create(true, "修改成功", frameworksConfigureTemplate);
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e.getMessage());
@@ -163,14 +166,19 @@ public class FrameworksAttributesCtrl extends BaseCtrl {
      */
     @ApiOperation(value = "删除", notes = "删除")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "code", value = "属性编码", required = true, paramType = "query")
+            @ApiImplicitParam(name = "code", value = "模板编码", required = true, paramType = "query")
     })
     @DeleteMapping("/delete")
     @ResponseBody
     public BeanRet delete(String code) {
         try {
             Assert.hasText(code, BaseException.BaseExceptionEnum.Empty_Param.toString());
-            frameworkAttributeSV.delete(code);
+            Map<String, Object> map = Maps.newHashMap();
+            map.put("code", code);
+            FrameworksConfigureTemplate frameworksConfigureTemplate = frameworksConfigureTemplateSV.load(map);
+
+            frameworksConfigureTemplate.setState(FrameworksConfigureTemplateStateEnum.Delete.name());
+            frameworksConfigureTemplateSV.saveOrUpdate(frameworksConfigureTemplate);
             return BeanRet.create(true, "删除成功");
         } catch (Exception e) {
             e.printStackTrace();

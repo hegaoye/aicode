@@ -21,7 +21,7 @@ public class FrameworkAttribute extends BaseEntity implements java.io.Serializab
 
     private Long id;//数据库字段:id  属性显示:id
     private String code;//数据库字段:frameworkCode  属性显示:属性编码
-    private String frameworkCode;//数据库字段:frameworkCode  属性显示:技术编码
+    private java.lang.String templateCode;//数据库字段:templateCode  属性显示:模板编码
     private String attribute;//数据库字段:attribute  属性显示:属性
 
 }

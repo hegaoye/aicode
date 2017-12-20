@@ -34,7 +34,7 @@ import java.util.Map;
  * @author lixin
  */
 @Controller
-@RequestMapping("/frameworks")
+@RequestMapping("/framework")
 @Api(value = "框架技术控制器", description = "框架技术控制器")
 public class FrameworksCtrl extends BaseCtrl {
 

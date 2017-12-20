@@ -9,25 +9,25 @@
     <resultMap id="rs_base" type="FrameworkAttribute">
         <result property="id" column="id"/>
         <result property="code" column="code"/>
-        <result property="frameworkCode" column="frameworkCode"/>
+        <result property="templateCode" column="templateCode"/>
         <result property="attribute" column="attribute"/>
     </resultMap>
 
     <!-- 用于select查询公用抽取的列 -->
     <sql id="FrameworkAttribute.columns">
-		id,code,frameworkCode,attribute
+		id,code,templateCode,attribute
 	</sql>
 
     <insert id="FrameworkAttribute.insert" useGeneratedKeys="true" keyProperty="id" parameterType="FrameworkAttribute">
         INSERT INTO `framework_attribute` (
         id ,
         code ,
-        frameworkCode ,
+        templateCode ,
         attribute
         ) VALUES (
         #{id} ,
         #{code} ,
-        #{frameworkCode} ,
+        #{templateCode} ,
         #{attribute}
         )
         <selectKey keyProperty="id" resultType="long">
@@ -38,8 +38,8 @@
     <update id="FrameworkAttribute.update" parameterType="FrameworkAttribute">
         UPDATE `framework_attribute`
         <trim prefix="set" suffixOverrides=",">
-            <if test="frameworkCode!=null and frameworkCode!=''">
-                frameworkCode = #{frameworkCode} ,
+            <if test="templateCode!=null and templateCode!=''">
+                templateCode = #{templateCode} ,
             </if>
             <if test="attribute!=null and attribute!=''">
                 attribute = #{attribute}
@@ -63,8 +63,8 @@
 
     <sql id="FrameworkAttribute.where">
         <where>
-            <if test="frameworkCode!=null and frameworkCode!=''">
-                AND frameworkCode = #{frameworkCode}
+            <if test="templateCode!=null and templateCode!=''">
+                AND templateCode = #{templateCode}
             </if>
             <if test="attribute!=null and attribute!=''">
                 AND attribute = #{attribute}

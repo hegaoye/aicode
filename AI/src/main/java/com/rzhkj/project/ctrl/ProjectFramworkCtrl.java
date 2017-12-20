@@ -31,7 +31,7 @@ import java.util.Map;
  * @author lixin
  */
 @Controller
-@RequestMapping("/project/framworks")
+@RequestMapping("/project/framwork")
 @Api(value = "代码仓库账户管理控制器", description = "代码仓库账户管理控制器")
 public class ProjectFramworkCtrl extends BaseCtrl {
 

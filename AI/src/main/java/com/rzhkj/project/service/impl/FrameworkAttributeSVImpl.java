@@ -37,7 +37,7 @@ public class FrameworkAttributeSVImpl extends BaseMybatisSVImpl<FrameworkAttribu
 
     @Override
     public void save(FrameworkAttribute entity) throws BaseException {
-        if (entity == null || StringTools.isEmpty(entity.getAttribute()) || StringTools.isEmpty(entity.getFrameworkCode())) {
+        if (entity == null || StringTools.isEmpty(entity.getAttribute()) || StringTools.isEmpty(entity.getTemplateCode())) {
             logger.error(BaseException.BaseExceptionEnum.Empty_Param.toString());
             throw new BaseException(BaseException.BaseExceptionEnum.Empty_Param);
         }

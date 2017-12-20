@@ -26,7 +26,7 @@ import java.util.Map;
 
 
 /**
- * 框架技术属性控制器
+ * 项目框架技术属性控制器
  * 1.查询一个详情信息
  * 2.查询信息集合
  * 3.添加
@@ -36,7 +36,7 @@ import java.util.Map;
  */
 @Controller
 @RequestMapping("/project/frameworks/attributes")
-@Api(value = "框架技术属性控制器", description = "框架技术属性控制器")
+@Api(value = "项目框架技术属性控制器", description = "项目框架技术属性控制器")
 public class ProjectFrameworksAttributesCtrl extends BaseCtrl {
 
     @Resource
@@ -51,24 +51,27 @@ public class ProjectFrameworksAttributesCtrl extends BaseCtrl {
     @ApiOperation(value = "查询一个详情信息", notes = "查询一个详情信息")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "code", value = "属性值编码", required = true, paramType = "query"),
+            @ApiImplicitParam(name = "templateCode", value = "模板编码", required = true, paramType = "query"),
             @ApiImplicitParam(name = "attributeCode", value = "属性编码", required = true, paramType = "query"),
             @ApiImplicitParam(name = "projectCode", value = "项目编码", required = true, paramType = "query"),
             @ApiImplicitParam(name = "frameworkCode", value = "技术编码", required = true, paramType = "query"),
     })
     @GetMapping(value = "/load")
     @ResponseBody
-    public BeanRet load(String code, String attributeCode, String projectCode, String frameworkCode) {
+    public BeanRet load(String code, String templateCode, String attributeCode, String projectCode, String frameworkCode) {
         try {
             Assert.hasText(code, BaseException.BaseExceptionEnum.Empty_Param.toString());
+            Assert.hasText(templateCode, BaseException.BaseExceptionEnum.Empty_Param.toString());
             Assert.hasText(attributeCode, BaseException.BaseExceptionEnum.Empty_Param.toString());
             Assert.hasText(projectCode, BaseException.BaseExceptionEnum.Empty_Param.toString());
             Assert.hasText(frameworkCode, BaseException.BaseExceptionEnum.Empty_Param.toString());
 
             Map<String, Object> map = new HashedMap();
             map.put("code", code);
-            map.put("attributeCode", code);
-            map.put("projectCode", code);
-            map.put("frameworkCode", code);
+            map.put("templateCode", templateCode);
+            map.put("attributeCode", attributeCode);
+            map.put("projectCode", projectCode);
+            map.put("frameworkCode", frameworkCode);
             ProjectFrameworkAttributeValue projectFrameworkAttributeValue = projectFrameworkAttributeValueSV.load(map);
 
             logger.info(JSON.toJSONString(projectFrameworkAttributeValue));

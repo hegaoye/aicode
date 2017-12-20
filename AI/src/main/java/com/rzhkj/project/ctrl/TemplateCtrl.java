@@ -29,7 +29,7 @@ import java.util.Map;
  * 2.查询信息集合
  * 3.添加
  * 4.修改
- * 4.删除
+ * 5.删除
  *
  * @author lixin
  */

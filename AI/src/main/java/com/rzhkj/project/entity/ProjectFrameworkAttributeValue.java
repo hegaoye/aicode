@@ -21,6 +21,7 @@ public class ProjectFrameworkAttributeValue extends BaseEntity implements java.i
 
     private Long id;//数据库字段:id  属性显示:id
     private String code;//数据库字段:code  属性显示:属性值编码
+    private java.lang.String templateCode;//数据库字段:templateCode  属性显示:模板编码
     private String attributeCode;//数据库字段:frameworkCode  属性显示:属性编码
     private String projectCode;//数据库字段:frameworkCode  属性显示:项目编码
     private String frameworkCode;//数据库字段:frameworkCode  属性显示:技术编码

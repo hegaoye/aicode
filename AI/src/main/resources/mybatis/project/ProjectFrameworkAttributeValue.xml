@@ -8,6 +8,7 @@
 
     <resultMap id="rs_base" type="ProjectFrameworkAttributeValue">
         <result property="id" column="id"/>
+        <result property="templateCode" column="templateCode"/>
         <result property="attributeCode" column="attributeCode"/>
         <result property="projectCode" column="projectCode"/>
         <result property="frameworkCode" column="frameworkCode"/>
@@ -18,12 +19,13 @@
 
     <!-- 用于select查询公用抽取的列 -->
     <sql id="ProjectFrameworkAttributeValue.columns">
-		id,attributeCode,projectCode,frameworkCode,code,attribute,attributeValue
+		id,templateCode,attributeCode,projectCode,frameworkCode,code,attribute,attributeValue
 	</sql>
 
     <insert id="ProjectFrameworkAttributeValue.insert" useGeneratedKeys="true" keyProperty="id" parameterType="ProjectFrameworkAttributeValue">
         INSERT INTO `framework_attribute_value` (
         id ,
+        templateCode ,
         attributeCode ,
         projectCode ,
         frameworkCode ,
@@ -32,6 +34,7 @@
         attributeValue
         ) VALUES (
         #{id} ,
+        #{templateCode} ,
         #{attributeCode} ,
         #{projectCode} ,
         #{frameworkCode} ,
@@ -47,6 +50,9 @@
     <update id="ProjectFrameworkAttributeValue.update" parameterType="ProjectFrameworkAttributeValue">
         UPDATE `framework_attribute_value`
         <trim prefix="set" suffixOverrides=",">
+            <if test="templateCode!=null and templateCode!=''">
+                templateCode = #{templateCode} ,
+            </if>
             <if test="attributeCode!=null and attributeCode!=''">
                 attributeCode = #{attributeCode} ,
             </if>
@@ -89,6 +95,9 @@
             </if>
             <if test="projectCode!=null and projectCode!=''">
                 AND projectCode = #{projectCode}
+            </if>
+            <if test="templateCode!=null and templateCode!=''">
+                AND templateCode = #{templateCode}
             </if>
             <if test="attributeCode!=null and attributeCode!=''">
                 AND attributeCode = #{attributeCode}

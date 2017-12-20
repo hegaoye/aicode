@@ -8,6 +8,8 @@ package com.rzhkj.project.entity;
 import com.rzhkj.core.base.BaseEntity;
 import lombok.Data;
 
+import java.util.List;
+
 
 /**
  * @author lixin hegaoye@qq.com
@@ -25,5 +27,6 @@ public class Frameworks extends BaseEntity implements java.io.Serializable {
     private String description;//数据库字段:description  属性显示:技术描述
     private String state;//数据库字段:state  属性显示:状态：停用[Disenable]，启用[Enable]
 
+    private List<FrameworksConfigureTemplate> frameworksConfigureTemplateList;
 }
 

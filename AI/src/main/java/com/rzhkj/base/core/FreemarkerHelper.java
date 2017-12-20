@@ -1,42 +1,44 @@
 package com.rzhkj.base.core;
 
+import com.google.common.collect.Maps;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 
 import java.io.*;
-import java.util.*;
+import java.util.Map;
 
 public class FreemarkerHelper {
+    public static void main(String[] args) throws IOException, TemplateException {
+        Map<String, Object> map = Maps.newHashMap();
+        map.put("className", "Hegaoye");
+        String targetFilePath = "C:\\workspaces\\AI-Code\\AI\\src\\main\\webapp\\workspace\\szh\\sv\\src\\main\\java\\com\\szh\\ctrl\\" + map.get("className").toString() + ".java";
+        generate(map, targetFilePath, "test.java", "C:\\workspaces\\AI-Code\\AI\\src\\main\\webapp\\templates");
+    }
 
-	public static List<String> getAvailableAutoInclude(Configuration conf, List<String> autoIncludes) {
-		List<String> results = new ArrayList();
-		for(String autoInclude : autoIncludes) {
-			try {
-				Template t = new Template("__auto_include_test__",new StringReader("1"),conf);
-				conf.setAutoIncludes(Arrays.asList(new String[]{autoInclude}));
-				t.process(new HashMap(), new StringWriter());
-				results.add(autoInclude);
-			}catch(Exception e) {
-			}
-		}
-		return results;
-	}
-	
-	public static void processTemplate(Template template, Map model, File outputFile, String encoding) throws IOException, TemplateException {
-		Writer out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputFile),encoding));
-		template.process(model,out);
-		out.close();
-	}
-	
-	public static String processTemplateString(String templateString,Map model,Configuration conf) {
-		StringWriter out = new StringWriter();
-		try {
-			Template template = new Template("templateString...",new StringReader(templateString),conf);
-			template.process(model, out);
-			return out.toString();
-		}catch(Exception e) {
-			throw new IllegalStateException("cannot process templateString:"+templateString+" cause:"+e,e);
-		}
-	}
+
+    /**
+     * 生成源文件
+     *
+     * @param model            模型数据
+     * @param targetFilePath   目标路径 /xxxx/xxx/{ClassName.java}
+     * @param templateFileName 模板文件名 [temp.java|temp.xml|temp.properties]
+     * @param templatePath     模板路径 [/xxx/xxxx|/xxx/xxxx/]
+     */
+    public static void generate(Map<String, Object> model, String targetFilePath, String templateFileName, String templatePath) {
+        try {
+            Configuration configuration = new Configuration();
+            configuration.setDirectoryForTemplateLoading(new File(templatePath));
+            configuration.setDefaultEncoding("UTF-8");
+            Template temp = configuration.getTemplate(templateFileName);
+            Writer out = new OutputStreamWriter(new FileOutputStream(targetFilePath));
+            temp.process(model, out);
+            out.flush();
+            out.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (TemplateException e) {
+            e.printStackTrace();
+        }
+    }
 }

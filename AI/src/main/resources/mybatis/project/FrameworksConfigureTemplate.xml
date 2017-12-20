@@ -18,7 +18,7 @@
 
 
 	<!--查询表信息关联信息-->
-	<resultMap id="rs_base_all" type="Project" extends="rs_base">
+	<resultMap id="rs_base_all" type="FrameworksConfigureTemplate" extends="rs_base">
 		<collection property="frameworkAttributeList" column="{templateCode=code}" select="FrameworkAttribute.query"/>
 	</resultMap>
 

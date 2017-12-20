@@ -8,6 +8,8 @@ package com.rzhkj.project.entity;
 import com.rzhkj.core.base.BaseEntity;
 import lombok.Data;
 
+import java.util.List;
+
 
 /**
  * @author lixin hegaoye@qq.com
@@ -26,6 +28,8 @@ public class ProjectFiles extends BaseEntity implements java.io.Serializable {
     private String path;//数据库字段:path  属性显示:源文件路径
     private String description;//数据库字段:description  属性显示:源文件说明
     private java.util.Date createTime;//数据库字段:createTime  属性显示:创建时间
+    private String fileType;//数据库字段:fileType  属性显示:文件类型 Java，Xml，Property
 
+    private Templates templates;
 }
 

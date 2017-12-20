@@ -4,9 +4,9 @@
 
 
 <!-- 不使用namespace的话sql搜索定位会比较方便 -->
-<mapper namespace="FrameworkAttributeValue">
+<mapper namespace="ProjectFrameworkAttributeValue">
 
-    <resultMap id="rs_base" type="FrameworkAttributeValue">
+    <resultMap id="rs_base" type="ProjectFrameworkAttributeValue">
         <result property="id" column="id"/>
         <result property="attributeCode" column="attributeCode"/>
         <result property="projectCode" column="projectCode"/>
@@ -17,11 +17,11 @@
     </resultMap>
 
     <!-- 用于select查询公用抽取的列 -->
-    <sql id="FrameworkAttributeValue.columns">
+    <sql id="ProjectFrameworkAttributeValue.columns">
 		id,attributeCode,projectCode,frameworkCode,code,attribute,attributeValue
 	</sql>
 
-    <insert id="FrameworkAttributeValue.insert" useGeneratedKeys="true" keyProperty="id" parameterType="FrameworkAttributeValue">
+    <insert id="ProjectFrameworkAttributeValue.insert" useGeneratedKeys="true" keyProperty="id" parameterType="ProjectFrameworkAttributeValue">
         INSERT INTO `framework_attribute_value` (
         id ,
         attributeCode ,
@@ -44,7 +44,7 @@
         </selectKey>
     </insert>
 
-    <update id="FrameworkAttributeValue.update" parameterType="FrameworkAttributeValue">
+    <update id="ProjectFrameworkAttributeValue.update" parameterType="ProjectFrameworkAttributeValue">
         UPDATE `framework_attribute_value`
         <trim prefix="set" suffixOverrides=",">
             <if test="attributeCode!=null and attributeCode!=''">
@@ -70,19 +70,19 @@
         id = #{id}
     </update>
 
-    <delete id="FrameworkAttributeValue.delete">
+    <delete id="ProjectFrameworkAttributeValue.delete">
         DELETE FROM `framework_attribute_value`
-        <include refid="FrameworkAttributeValue.where"/>
+        <include refid="ProjectFrameworkAttributeValue.where"/>
     </delete>
 
-    <select id="FrameworkAttributeValue.load" resultMap="rs_base">
+    <select id="ProjectFrameworkAttributeValue.load" resultMap="rs_base">
         SELECT
-        <include refid="FrameworkAttributeValue.columns"/>
+        <include refid="ProjectFrameworkAttributeValue.columns"/>
         FROM `framework_attribute_value`
-        <include refid="FrameworkAttributeValue.where"/>
+        <include refid="ProjectFrameworkAttributeValue.where"/>
     </select>
 
-    <sql id="FrameworkAttributeValue.where">
+    <sql id="ProjectFrameworkAttributeValue.where">
         <where>
             <if test="id!=null and id!=''">
                 AND id = #{id}
@@ -109,17 +109,17 @@
     </sql>
 
 
-    <select id="FrameworkAttributeValue.count" resultType="long">
+    <select id="ProjectFrameworkAttributeValue.count" resultType="long">
         SELECT count(*) FROM `framework_attribute_value`
-        <include refid="FrameworkAttributeValue.where"/>
+        <include refid="ProjectFrameworkAttributeValue.where"/>
     </select>
 
 
-    <select id="FrameworkAttributeValue.query" resultMap="rs_base">
+    <select id="ProjectFrameworkAttributeValue.query" resultMap="rs_base">
         SELECT
-        <include refid="FrameworkAttributeValue.columns"/>
+        <include refid="ProjectFrameworkAttributeValue.columns"/>
         FROM `framework_attribute_value`
-        <include refid="FrameworkAttributeValue.where"/>
+        <include refid="ProjectFrameworkAttributeValue.where"/>
 
         <if test="sortColumns!=null and sortColumns!=''">
             ORDER BY ${sortColumns}

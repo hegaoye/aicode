@@ -58,7 +58,7 @@ public class SettingCtrl extends BaseUploadCtrl {
     })
     @GetMapping("/load")
     @ResponseBody
-    public BeanRet loadSetting(String k) {
+    public BeanRet load(String k) {
         try {
             logger.info("加载一个系统中的参数设置 k : ====> " + k);
             Assert.hasText(k, BaseException.BaseExceptionEnum.Empty_Param.toString());
@@ -88,7 +88,7 @@ public class SettingCtrl extends BaseUploadCtrl {
     })
     @PostMapping("/modify")
     @ResponseBody
-    public BeanRet modifySetting(@ApiIgnore Setting setting) {
+    public BeanRet modify(@ApiIgnore Setting setting) {
         try {
             Assert.notNull(setting, BaseException.BaseExceptionEnum.Empty_Param.toString());
             settingSV.modifySetting(setting);
@@ -109,7 +109,7 @@ public class SettingCtrl extends BaseUploadCtrl {
     @ApiOperation(value = "查询所有设置参数")
     @GetMapping(value = "/list")
     @ResponseBody
-    public BeanRet settingList() {
+    public BeanRet list() {
         try {
             List<Setting> settings = settingSV.listSetting();
             return BeanRet.create(true, "", settings);

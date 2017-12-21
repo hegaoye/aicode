@@ -6,6 +6,7 @@
 package com.rzhkj.project.service.impl;
 
 
+import com.alibaba.fastjson.JSON;
 import com.baidu.fsg.uid.UidGenerator;
 import com.google.common.collect.Maps;
 import com.rzhkj.base.core.FreemarkerHelper;
@@ -18,6 +19,8 @@ import com.rzhkj.core.tools.StringTools;
 import com.rzhkj.project.dao.*;
 import com.rzhkj.project.entity.*;
 import com.rzhkj.project.service.ProjectJobSV;
+import com.rzhkj.setting.dao.SettingDAO;
+import com.rzhkj.setting.entity.Setting;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -35,6 +38,8 @@ public class ProjectJobSVImpl extends BaseMybatisSVImpl<ProjectJob, Long> implem
 
     @Resource
     private ProjectDAO projectDAO;
+    @Resource
+    private SettingDAO settingDAO;
 
     @Resource
     private ProjectJobDAO projectJobDAO;
@@ -176,15 +181,28 @@ public class ProjectJobSVImpl extends BaseMybatisSVImpl<ProjectJob, Long> implem
      * @param project
      */
     private void buildProject(Project project) {
+        Setting settingWorkspace = settingDAO.loadByKey(Setting.Key.Workspace.name());
+        String workspace = new HandleFuncs().getCurrentClassPath() + settingWorkspace.getV() + "/";
+        workspace = workspace.replace("//", "/");
         //1.检测项目工作工作空间是否存在
         String basePath = project.getBasePackage().replaceAll("\\\\", "/");
         basePath = basePath.endsWith("/") ? basePath : basePath + "/";
-        String projectPath = new HandleFuncs().getCurrentClassPath() + basePath;
+        String projectPath = workspace + basePath;
         File file = new File(projectPath);
         if (!file.exists()) {
             //2.创建项目工作空间
             file.mkdirs();
         }
+        Setting setting = settingDAO.loadByKey(Setting.Key.Gradle_Directory_Structure.name());
+        List<String> gradle_directory_structure = JSON.parseArray(setting.getV(), String.class);
+        String finalWorkspace = workspace;
+        gradle_directory_structure.forEach(dir -> {
+            String dirPath = finalWorkspace + dir;
+            File dirFile = new File(dirPath);
+            if (!dirFile.exists()) {
+                dirFile.mkdirs();
+            }
+        });
     }
 
     /**
@@ -251,4 +269,5 @@ public class ProjectJobSVImpl extends BaseMybatisSVImpl<ProjectJob, Long> implem
             });
         }
     }
+
 }

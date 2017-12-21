@@ -17,7 +17,7 @@
 
 	<!--查询表信息关联信息-->
 	<resultMap id="rs_base_all" type="TableInfo" extends="rs_base">
-		<collection property="columnInfos" column="{tableCode=code}" select="ClassInfo.query"/>
+		<collection property="columnInfos" column="{tableCode=code}" select="ColumnInfo.query"/>
 	</resultMap>
 
 	<!-- 用于select查询公用抽取的列 -->

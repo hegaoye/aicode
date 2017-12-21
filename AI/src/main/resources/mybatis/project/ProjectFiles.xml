@@ -64,7 +64,7 @@
             <if test="description!=null and description!=''">
                 description = #{description} ,
             </if>
-            <if test="createTime!=null and createTime!=''">
+            <if test="createTime!=null ">
                 createTime = #{createTime}
             </if>
         </trim>
@@ -105,10 +105,10 @@
             <if test="description!=null and description!=''">
                 AND description = #{description}
             </if>
-            <if test="createTimeBegin!=null and createTimeBegin!=''">
+            <if test="createTimeBegin!=null ">
                 AND createTime >= #{createTimeBegin}
             </if>
-            <if test="createTimeEnd!=null and createTimeEnd!=''">
+            <if test="createTimeEnd!=null ">
                 AND createTime &lt;= #{createTimeEnd}
             </if>
         </where>

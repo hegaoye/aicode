@@ -305,7 +305,11 @@ public class ProjectSVImpl extends BaseMybatisSVImpl<Project, Long> implements P
         //2.转化类信息
         projectTablesList.forEach(projectTables -> {
             String tableName = projectTables.getTableInfo().getName();
-            String packageName = tableName.substring(0, tableName.indexOf("_")) + ".po";
+            Setting setting = settingDAO.loadByKey(Setting.Key.Package_entity.name());
+            String packageName = tableName + "." + setting.getV();
+            if (tableName.indexOf("_") > 0) {
+                packageName = tableName.substring(0, tableName.indexOf("_")) + "." + setting.getV();
+            }
 
             ClassInfo classInfo = new ClassInfo();
             classInfo.setCode(String.valueOf(uidGenerator.getUID()));
@@ -340,5 +344,10 @@ public class ProjectSVImpl extends BaseMybatisSVImpl<Project, Long> implements P
         return true;
     }
 
+    public static void main(String[] args) {
+        String a = "a_";
+        System.out.println(a.indexOf("_"));
+        System.out.println(a.substring(0, a.indexOf("_")));
+    }
 
 }

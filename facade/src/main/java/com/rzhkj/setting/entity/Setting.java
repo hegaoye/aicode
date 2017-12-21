@@ -32,7 +32,11 @@ public class Setting extends BaseEntity implements java.io.Serializable {
 
     //设置键枚举
     public enum Key {
-        DefaultDatabase;
+        DefaultDatabase,//默认数据库
+        Gradle_Directory_Structure,//gradle目录结构
+        Workspace,//工作目录
+        Package_entity,//实体目录命名
+        ;
 
     }
 

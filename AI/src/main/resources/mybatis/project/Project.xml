@@ -132,10 +132,10 @@
             <if test="isParseClass!=null and isParseClass!=''">
                 isParseClass = #{isParseClass} ,
             </if>
-            <if test="createTime!=null and createTime!=''">
+            <if test="createTime!=null ">
                 createTime = #{createTime} ,
             </if>
-            <if test="updateTime!=null and updateTime!=''">
+            <if test="updateTime!=null ">
                 updateTime = #{updateTime}
             </if>
         </trim>
@@ -209,16 +209,16 @@
             <if test="isParseClass!=null and isParseClass!=''">
                 AND isParseClass = #{isParseClass}
             </if>
-            <if test="createTimeBegin!=null and createTimeBegin!=''">
+            <if test="createTimeBegin!=null ">
                 AND createTime >= #{createTimeBegin}
             </if>
-            <if test="createTimeEnd!=null and createTimeEnd!=''">
+            <if test="createTimeEnd!=null ">
                 AND createTime &lt;= #{createTimeEnd}
             </if>
-            <if test="updateTimeBegin!=null and updateTimeBegin!=''">
+            <if test="updateTimeBegin!=null ">
                 AND updateTime >= #{updateTimeBegin}
             </if>
-            <if test="updateTimeEnd!=null and updateTimeEnd!=''">
+            <if test="updateTimeEnd!=null ">
                 AND updateTime &lt;= #{updateTimeEnd}
             </if>
         </where>

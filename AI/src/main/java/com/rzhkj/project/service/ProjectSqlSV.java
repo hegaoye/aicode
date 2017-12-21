@@ -11,4 +11,10 @@ import com.rzhkj.project.entity.ProjectSql;
 
 public interface ProjectSqlSV extends BaseMybatisSV<ProjectSql, Long> {
 
+    /**
+     * 删除项目sql
+     *
+     * @param code tsql编码
+     */
+    void delete(String code);
 }

@@ -204,7 +204,7 @@ public class ProjectSVImpl extends BaseMybatisSVImpl<Project, Long> implements P
             Setting setting = settingDAO.loadByKey(Setting.Key.DefaultDatabase.name());
             if (!project.getProjectSqlList().isEmpty()) {
                 project.getProjectSqlList().forEach(projectSql -> {
-                    if (projectSql.getState().equals(ProjectSqlEnum.Enable.name())) {
+                    if (projectSql.getState().equals(ProjectSqlStateEnum.Enable.name())) {
                         databaseDAO.createDatabase(projectSql.getTsql(), setting.getV());
                     }
                 });

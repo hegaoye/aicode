@@ -13,5 +13,12 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class ProjectSqlDAO extends BaseMybatisDAOImpl<ProjectSql, Long> {
 
-
+    /**
+     * 删除项目sql
+     *
+     * @param code tsql编码
+     */
+    public void delete(String code) {
+        getSqlSession().delete(sqlmapNamespace + ".delete", code);
+    }
 }

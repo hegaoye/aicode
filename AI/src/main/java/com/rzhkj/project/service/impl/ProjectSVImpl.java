@@ -190,9 +190,8 @@ public class ProjectSVImpl extends BaseMybatisSVImpl<Project, Long> implements P
             throw new ProjectException(BaseException.BaseExceptionEnum.Result_Not_Exist);
         }
 
-        String sql = project.getSqlFile();
         String database = project.getEnglishName();
-        if (StringUtils.isBlank(sql) || StringUtils.isBlank(database)) {
+        if (project.getProjectSqlList().isEmpty() || StringUtils.isBlank(database)) {
             logger.error(BaseException.BaseExceptionEnum.Empty_Param.toString());
             throw new ProjectException(BaseException.BaseExceptionEnum.Empty_Param);
         }
@@ -203,7 +202,13 @@ public class ProjectSVImpl extends BaseMybatisSVImpl<Project, Long> implements P
         int i = databaseDAO.count(map);
         if (i == 0) {
             Setting setting = settingDAO.loadByKey(Setting.Key.DefaultDatabase.name());
-            databaseDAO.createDatabase(project.getSqlFile(), setting.getV());
+            if (!project.getProjectSqlList().isEmpty()) {
+                project.getProjectSqlList().forEach(projectSql -> {
+                    if (projectSql.getState().equals(ProjectSqlEnum.Enable.name())) {
+                        databaseDAO.createDatabase(projectSql.getTsql(), setting.getV());
+                    }
+                });
+            }
         }
 
         //3.记录任务日志

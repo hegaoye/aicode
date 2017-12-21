@@ -3,7 +3,8 @@
 /* Created on:     2017/11/30 16:27:11                          */
 /*==============================================================*/
 
-
+create DATABASE  hegaoye;
+use hegaoye;
 drop table if exists class_attributes;
 
 drop table if exists class_info;

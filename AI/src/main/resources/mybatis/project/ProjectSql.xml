@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<mapper namespace="ProjectSql">
+
+    <resultMap id="rs_base" type="ProjectSql">
+        <result property="id" column="id"/>
+        <result property="projectCode" column="projectCode"/>
+        <result property="code" column="code"/>
+        <result property="tsql" column="tsql"/>
+        <result property="state" column="state"/>
+    </resultMap>
+
+    <!-- 用于select查询公用抽取的列 -->
+    <sql id="ProjectSql.columns">
+		id,projectCode,code,tsql,state
+	</sql>
+
+    <insert id="ProjectSql.insert" useGeneratedKeys="true" keyProperty="id" parameterType="ProjectSql">
+        INSERT INTO `project_sql` (
+        id ,
+        projectCode ,
+        code ,
+        tsql ,
+        state
+        ) VALUES (
+        #{id} ,
+        #{projectCode} ,
+        #{code} ,
+        #{tsql} ,
+        #{state}
+        )
+        <selectKey keyProperty="id" resultType="long">
+            select LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+
+    <update id="ProjectSql.update" parameterType="ProjectSql">
+        UPDATE `project_sql`
+        <trim prefix="set" suffixOverrides=",">
+            <if test="code!=null and code!=''">
+                code = #{code} ,
+            </if>
+            <if test="tsql!=null and tsql!=''">
+                tsql = #{tsql} ,
+            </if>
+            <if test="state!=null and state!=''">
+                state = #{state}
+            </if>
+        </trim>
+        WHERE
+        projectCode = #{projectCode}
+        AND
+        code = #{code}
+    </update>
+
+    <delete id="ProjectSql.delete">
+        DELETE FROM `project_sql`
+        <include refid="ProjectSql.where"/>
+    </delete>
+
+    <select id="ProjectSql.load" resultMap="rs_base">
+        SELECT
+        <include refid="ProjectSql.columns"/>
+        FROM `project_sql`
+        <include refid="ProjectSql.where"/>
+    </select>
+
+    <sql id="ProjectSql.where">
+        <where>
+            <if test="id!=null and id!=''">
+                AND id = #{id}
+            </if>
+            <if test="projectCode!=null and projectCode!=''">
+                AND projectCode = #{projectCode}
+            </if>
+            <if test="code!=null and code!=''">
+                AND code = #{code}
+            </if>
+            <if test="tsql!=null and tsql!=''">
+                AND tsql = #{tsql}
+            </if>
+            <if test="state!=null and state!=''">
+                AND state = #{state}
+            </if>
+        </where>
+    </sql>
+
+
+    <select id="ProjectSql.count" resultType="long">
+        SELECT count(*) FROM `project_sql`
+        <include refid="ProjectSql.where"/>
+    </select>
+
+
+    <select id="ProjectSql.query" resultMap="rs_base">
+        SELECT
+        <include refid="ProjectSql.columns"/>
+        FROM `project_sql`
+        <include refid="ProjectSql.where"/>
+
+        <if test="sortColumns!=null and sortColumns!=''">
+            ORDER BY ${sortColumns}
+        </if>
+    </select>
+
+
+</mapper>
+

@@ -50,5 +50,6 @@ public class Project extends BaseEntity implements java.io.Serializable {
     private List<ProjectTables> projectTablesList;
     private List<ProjectTools> projectToolsList;
     private List<ProjectRepositoryAccount> projectRepositoryAccountList;
+    private List<ProjectSql> projectSqlList;
 }
 

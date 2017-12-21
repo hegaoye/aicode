@@ -3,7 +3,6 @@ package com.rzhkj.project.service.impl;
 import com.alibaba.dubbo.common.utils.StringUtils;
 import com.baidu.fsg.uid.UidGenerator;
 import com.google.common.collect.Maps;
-import com.rzhkj.base.core.DataSourceProvider;
 import com.rzhkj.base.core.StringHelper;
 import com.rzhkj.base.core.typemapping.DatabaseDataTypesUtils;
 import com.rzhkj.core.base.BaseMybatisDAO;
@@ -11,17 +10,17 @@ import com.rzhkj.core.base.BaseMybatisSVImpl;
 import com.rzhkj.core.enums.YNEnum;
 import com.rzhkj.core.exceptions.BaseException;
 import com.rzhkj.core.exceptions.ProjectException;
-import com.rzhkj.core.tools.ConfigUtil;
 import com.rzhkj.core.tools.JSON;
 import com.rzhkj.core.tools.StringTools;
 import com.rzhkj.project.dao.*;
 import com.rzhkj.project.entity.*;
 import com.rzhkj.project.service.ProjectSV;
+import com.rzhkj.setting.dao.SettingDAO;
+import com.rzhkj.setting.entity.Setting;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -34,6 +33,10 @@ public class ProjectSVImpl extends BaseMybatisSVImpl<Project, Long> implements P
 
     @Resource
     private ProjectDAO projectDAO;
+    @Resource
+    private SettingDAO settingDAO;
+    @Resource
+    private DatabaseDAO databaseDAO;
 
     @Resource
     private ProjectJobLogsDAO projectJobLogsDAO;
@@ -195,29 +198,17 @@ public class ProjectSVImpl extends BaseMybatisSVImpl<Project, Long> implements P
         }
 
         //2.创建数据库
-        try {
-            String driver = ConfigUtil.getValue("jdbc.driver", "jdbc.properties");
-            String url = ConfigUtil.getValue("jdbc.url", "jdbc.properties");
-            String username = ConfigUtil.getValue("jdbc.username", "jdbc.properties");
-            String password = ConfigUtil.getValue("jdbc.password", "jdbc.properties");
-            if (StringUtils.isBlank(url) || StringUtils.isBlank(username) || StringUtils.isBlank(password)) {
-                logger.error(BaseException.BaseExceptionEnum.Empty_Param.toString());
-                throw new ProjectException(BaseException.BaseExceptionEnum.Empty_Param);
-            }
-            new DataSourceProvider()
-                    .getConnection(driver, url, username, password)
-                    .createDatabase(database)
-                    .executeSqlScript(sql)
-                    .close();
-        } catch (FileNotFoundException e) {
-            logger.error(e.getMessage());
-            e.printStackTrace();
+        map.clear();
+        map.put("schemaName", database);
+        int i = databaseDAO.count(map);
+        if (i == 0) {
+            Setting setting = settingDAO.loadByKey(Setting.Key.DefaultDatabase.name());
+            databaseDAO.createDatabase(project.getSqlFile(), setting.getV());
         }
 
-
         //3.记录任务日志
-        ProjectJobLogs projectJobLogs = new ProjectJobLogs();
-        projectJobLogsDAO.insert(projectJobLogs);
+//        ProjectJobLogs projectJobLogs = new ProjectJobLogs();
+//        projectJobLogsDAO.insert(projectJobLogs);
         return true;
     }
 

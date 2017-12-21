@@ -11,6 +11,13 @@
         <result property="tableComment" column="table_comment"/>
     </resultMap>
 
+    <resultMap id="database" type="Table">
+        <result property="catalogName" column="catalog_name"/>
+        <result property="schemaName" column="schema_name"/>
+        <result property="defaultCahracterSetName" column="default_cahracter_set_name"/>
+        <result property="defaultCollationName" column="default_collation_name"/>
+    </resultMap>
+
     <select id="Table.load" resultMap="rs_base">
         SELECT table_name,table_comment
         FROM `information_schema.tables`
@@ -29,6 +36,10 @@
 		select table_name,table_comment
 		from information_schema.tables
 		where table_schema=#{database} and table_type='base table'
+    </select>
+
+    <select id="Table.getDatabase" resultMap="database">
+		SELECT * FROM information_schema.SCHEMATA where SCHEMA_NAME=#{value};
     </select>
 </mapper>
 

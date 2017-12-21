@@ -30,11 +30,11 @@ public class ProjectJobLogs extends BaseEntity implements java.io.Serializable {
     public ProjectJobLogs() {
     }
 
-    public ProjectJobLogs(String code, String result, String info, Date createTime) {
+    public ProjectJobLogs(String code, String result, String info) {
         this.code = code;
         this.result = result;
         this.info = info;
-        this.createTime = createTime;
+        this.createTime = new Date();
     }
 }
 

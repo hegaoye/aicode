@@ -65,7 +65,7 @@
             <!--连接池 -->
             <dataSource class="org.apache.commons.dbcp.BasicDataSource">
                 <driverClass>com.mysql.jdbc.Driver</driverClass>
-                <url>jdbc:mysql://192.168.10.250:3306/ai-code</url>
+                <url>jdbc:mysql://192.168.10.250:3306/ai_code</url>
                 <user>root</user>
                 <password>mysqladmin</password>
             </dataSource>

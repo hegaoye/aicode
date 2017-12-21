@@ -14,5 +14,4 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class TableDAO extends BaseMybatisDAOImpl<Table, Long> {
 
-
 }

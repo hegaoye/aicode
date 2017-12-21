@@ -1,134 +1,144 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 
 <!-- 不使用namespace的话sql搜索定位会比较方便 -->
 <mapper namespace="FrameworksConfigureTemplate">
 
-	<resultMap id="rs_base" type="FrameworksConfigureTemplate">
+    <resultMap id="rs_base" type="FrameworksConfigureTemplate">
         <result property="id" column="id"/>
         <result property="code" column="code"/>
         <result property="frameworksCode" column="frameworksCode"/>
         <result property="name" column="name"/>
         <result property="description" column="description"/>
         <result property="path" column="path"/>
+        <result property="saveFilePath" column="saveFilePath"/>
         <result property="state" column="state"/>
-	</resultMap>
+    </resultMap>
 
 
-	<!--查询表信息关联信息-->
-	<resultMap id="rs_base_all" type="FrameworksConfigureTemplate" extends="rs_base">
-		<collection property="frameworkAttributeList" column="{templateCode=code}" select="FrameworkAttribute.query"/>
-	</resultMap>
+    <!--查询表信息关联信息-->
+    <resultMap id="rs_base_all" type="FrameworksConfigureTemplate" extends="rs_base">
+        <collection property="frameworkAttributeList" column="{templateCode=code}" select="FrameworkAttribute.query"/>
+    </resultMap>
 
-	<!-- 用于select查询公用抽取的列 -->
-	<sql id="FrameworksConfigureTemplate.columns">
-		id,code,frameworksCode,name,description,path,state
+    <!-- 用于select查询公用抽取的列 -->
+    <sql id="FrameworksConfigureTemplate.columns">
+		id,code,frameworksCode,name,description,path,saveFilePath,state
 	</sql>
 
-	<insert id="FrameworksConfigureTemplate.insert" useGeneratedKeys="true" keyProperty="id" parameterType="FrameworksConfigureTemplate">
+    <insert id="FrameworksConfigureTemplate.insert" useGeneratedKeys="true" keyProperty="id" parameterType="FrameworksConfigureTemplate">
         INSERT INTO `frameworks_configure_template` (
-        	id ,
-        	code ,
-        	frameworksCode ,
-        	name ,
-        	description ,
-        	path ,
-        	state 
+        id ,
+        code ,
+        frameworksCode ,
+        name ,
+        description ,
+        path ,
+        saveFilePath ,
+        state
         ) VALUES (
-        	#{id} ,
-        	#{code} ,
-        	#{frameworksCode} ,
-        	#{name} ,
-        	#{description} ,
-        	#{path} ,
-        	#{state} 
+        #{id} ,
+        #{code} ,
+        #{frameworksCode} ,
+        #{name} ,
+        #{description} ,
+        #{path} ,
+        #{saveFilePath} ,
+        #{state}
         )
-		<selectKey keyProperty="id" resultType="long">
-			select LAST_INSERT_ID()
-		</selectKey>
-	</insert>
+        <selectKey keyProperty="id" resultType="long">
+            select LAST_INSERT_ID()
+        </selectKey>
+    </insert>
 
-	<update id="FrameworksConfigureTemplate.update" parameterType="FrameworksConfigureTemplate">
+    <update id="FrameworksConfigureTemplate.update" parameterType="FrameworksConfigureTemplate">
         UPDATE `frameworks_configure_template`
-		<trim prefix="set" suffixOverrides=",">
-			<if test="code!=null and code!=''">
-	        code = #{code} ,
-		    </if>
-			<if test="frameworksCode!=null and frameworksCode!=''">
-	        frameworksCode = #{frameworksCode} ,
-		    </if>
-			<if test="name!=null and name!=''">
-	        name = #{name} ,
-		    </if>
-			<if test="description!=null and description!=''">
-	        description = #{description} ,
-		    </if>
-			<if test="path!=null and path!=''">
-	        path = #{path} ,
-		    </if>
-			<if test="state!=null and state!=''">
-	        state = #{state} 
-		    </if>
-		</trim>
+        <trim prefix="set" suffixOverrides=",">
+            <if test="code!=null and code!=''">
+                code = #{code} ,
+            </if>
+            <if test="frameworksCode!=null and frameworksCode!=''">
+                frameworksCode = #{frameworksCode} ,
+            </if>
+            <if test="name!=null and name!=''">
+                name = #{name} ,
+            </if>
+            <if test="description!=null and description!=''">
+                description = #{description} ,
+            </if>
+            <if test="path!=null and path!=''">
+                path = #{path} ,
+            </if>
+            <if test="saveFilePath!=null and saveFilePath!=''">
+                saveFilePath = #{saveFilePath} ,
+            </if>
+            <if test="state!=null and state!=''">
+                state = #{state}
+            </if>
+        </trim>
         WHERE
-		code = #{code}
-	</update>
+        code = #{code}
+    </update>
 
     <delete id="FrameworksConfigureTemplate.delete">
         DELETE FROM `frameworks_configure_template`
-		<include refid="FrameworksConfigureTemplate.where"/>
+        <include refid="FrameworksConfigureTemplate.where"/>
     </delete>
 
     <select id="FrameworksConfigureTemplate.load" resultMap="rs_base_all">
-		SELECT <include refid="FrameworksConfigureTemplate.columns" />
-		    FROM `frameworks_configure_template`
-		<include refid="FrameworksConfigureTemplate.where"/>
-	</select>
+        SELECT
+        <include refid="FrameworksConfigureTemplate.columns"/>
+        FROM `frameworks_configure_template`
+        <include refid="FrameworksConfigureTemplate.where"/>
+    </select>
 
-	<sql id="FrameworksConfigureTemplate.where">
-		<where>
-			<if test="id!=null and id!=''">
-				AND id = #{id}
-			</if>
-			<if test="code!=null and code!=''">
-				AND code = #{code}
-			</if>
-			<if test="frameworksCode!=null and frameworksCode!=''">
-				AND frameworksCode = #{frameworksCode}
-			</if>
-			<if test="name!=null and name!=''">
-				AND name = #{name}
-			</if>
-			<if test="description!=null and description!=''">
-				AND description = #{description}
-			</if>
-			<if test="path!=null and path!=''">
-				AND path = #{path}
-			</if>
-			<if test="state!=null and state!=''">
-				AND state = #{state}
-			</if>
-		</where>
-	</sql>
-
+    <sql id="FrameworksConfigureTemplate.where">
+        <where>
+            <if test="id!=null and id!=''">
+                AND id = #{id}
+            </if>
+            <if test="code!=null and code!=''">
+                AND code = #{code}
+            </if>
+            <if test="frameworksCode!=null and frameworksCode!=''">
+                AND frameworksCode = #{frameworksCode}
+            </if>
+            <if test="name!=null and name!=''">
+                AND name = #{name}
+            </if>
+            <if test="description!=null and description!=''">
+                AND description = #{description}
+            </if>
+            <if test="path!=null and path!=''">
+                AND path = #{path}
+            </if>
+            <if test="saveFilePath!=null and saveFilePath!=''">
+                AND saveFilePath = #{saveFilePath}
+            </if>
+            <if test="state!=null and state!=''">
+                AND state = #{state}
+            </if>
+        </where>
+    </sql>
 
 
     <select id="FrameworksConfigureTemplate.count" resultType="long">
         SELECT count(*) FROM `frameworks_configure_template`
-		<include refid="FrameworksConfigureTemplate.where"/>
+        <include refid="FrameworksConfigureTemplate.where"/>
     </select>
 
 
     <select id="FrameworksConfigureTemplate.query" resultMap="rs_base_all">
-    	SELECT <include refid="FrameworksConfigureTemplate.columns" />
-	    FROM `frameworks_configure_template`
-		<include refid="FrameworksConfigureTemplate.where"/>
+        SELECT
+        <include refid="FrameworksConfigureTemplate.columns"/>
+        FROM `frameworks_configure_template`
+        <include refid="FrameworksConfigureTemplate.where"/>
 
-		<if test="sortColumns!=null and sortColumns!=''">
-			ORDER BY ${sortColumns}
-		</if>
+        <if test="sortColumns!=null and sortColumns!=''">
+            ORDER BY ${sortColumns}
+        </if>
     </select>
 
 

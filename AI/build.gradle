@@ -114,6 +114,14 @@ dependencies {
     compile rootProject.ext.dependencies["sentry-logback"]
     //------------Sentry end-------------------
 
+    // ------------jgit start-------------------
+    compile rootProject.ext.dependencies["jgit"]
+    //------------jgit end-------------------
+
+    // ------------zip4j  操作zip begin start-------------------
+    compile rootProject.ext.dependencies["zip4j"]
+    //------------zip4j  操作zip begin end-------------------
+
 
     compile fileTree(dir: '../libs', include: ['*.jar'])
     compile project(":facade")

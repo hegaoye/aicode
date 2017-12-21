@@ -59,11 +59,7 @@
         author ,
         phone ,
         basePackage ,
-        sqlFile ,
         downloadUrl ,
-        isRepository ,
-        isParseTable ,
-        isParseClass ,
         createTime ,
         updateTime
         ) VALUES (
@@ -79,11 +75,7 @@
         #{author} ,
         #{phone} ,
         #{basePackage} ,
-        #{sqlFile} ,
         #{downloadUrl} ,
-        #{isRepository} ,
-        #{isParseTable} ,
-        #{isParseClass} ,
         #{createTime} ,
         #{updateTime}
         )

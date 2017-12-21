@@ -97,6 +97,7 @@ public class ProjectSVImpl extends BaseMybatisSVImpl<Project, Long> implements P
         project.setBasePackage(basePackage);
         project.setCode(String.valueOf(uidGenerator.getUID()));
         project.setState(ProjectStateEnum.Enable.name());
+        project.setDownloadUrl("DownloadUrl");
         project.setCreateTime(new Date());
         project.setUpdateTime(new Date());
 
@@ -186,7 +187,7 @@ public class ProjectSVImpl extends BaseMybatisSVImpl<Project, Long> implements P
             throw new ProjectException(BaseException.BaseExceptionEnum.Result_Not_Exist);
         }
 
-        String sql = project.getSql();
+        String sql = project.getSqlFile();
         String database = project.getEnglishName();
         if (StringUtils.isBlank(sql) || StringUtils.isBlank(database)) {
             logger.error(BaseException.BaseExceptionEnum.Empty_Param.toString());

@@ -34,7 +34,7 @@ public class Project extends BaseEntity implements java.io.Serializable {
     private String author;//数据库字段:author  属性显示:作者
     private String phone;//数据库字段:phone  属性显示:联系方式
     private String basePackage;//数据库字段:basePackage  属性显示:项目基础包名
-    private String sql;//数据库字段:sql  属性显示:数据库脚本文件地址
+    private String sqlFile;//数据库字段:sql  属性显示:数据库脚本文件地址
     private String downloadUrl;//数据库字段:downloadUrl  属性显示:项目下载地址
     private String isRepository;//数据库字段:isRepository  属性显示:是否仓库管理
     private String isParseTable;//数据库字段:isParseTable  属性显示:是否已经解析表

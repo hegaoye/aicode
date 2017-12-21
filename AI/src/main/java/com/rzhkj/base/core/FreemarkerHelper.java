@@ -11,8 +11,12 @@ import java.util.Map;
 public class FreemarkerHelper {
     public static void main(String[] args) throws IOException, TemplateException {
         Map<String, Object> map = Maps.newHashMap();
-        map.put("className", "Hegaoye");
-        String targetFilePath = "C:\\workspaces\\AI-Code\\AI\\src\\main\\webapp\\workspace\\szh\\sv\\src\\main\\java\\com\\szh\\ctrl\\" + map.get("className").toString() + ".java";
+        map.put("fileName", "Hegaoye");
+        map.put("className", "public\tclass\t" + map.get("fileName") + "\t");
+        map.put("extends", "extends\tPage\timplements\tSerializable\t");
+        map.put("basePackage", "package\tcom.szh.test.ctrl;");
+        map.put("import", "import\tcom.aixin.core.entity.Page;\nimport\torg.apache.commons.lang.builder.ToStringBuilder;\nimport\torg.apache.commons.lang.builder.ToStringStyle;\nimport\tjava.io.Serializable;");
+        String targetFilePath = "C:\\workspaces\\AI-Code\\AI\\src\\main\\webapp\\workspace\\szh\\sv\\src\\main\\java\\com\\szh\\test\\ctrl\\" + map.get("fileName").toString() + ".java";
         generate(map, targetFilePath, "test.java", "C:\\workspaces\\AI-Code\\AI\\src\\main\\webapp\\templates");
     }
 
@@ -27,6 +31,13 @@ public class FreemarkerHelper {
      */
     public static void generate(Map<String, Object> model, String targetFilePath, String templateFileName, String templatePath) {
         try {
+            targetFilePath = targetFilePath.replace("\\", "/");
+            String filePath = targetFilePath.substring(0, targetFilePath.lastIndexOf("/"));
+
+            File dirFile = new File(filePath);
+            if (!dirFile.exists()) {
+                dirFile.mkdirs();
+            }
             Configuration configuration = new Configuration();
             configuration.setDirectoryForTemplateLoading(new File(templatePath));
             configuration.setDefaultEncoding("UTF-8");

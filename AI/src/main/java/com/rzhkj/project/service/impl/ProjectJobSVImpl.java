@@ -20,9 +20,11 @@ import com.rzhkj.project.entity.*;
 import com.rzhkj.project.service.ProjectJobSV;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -42,6 +44,9 @@ public class ProjectJobSVImpl extends BaseMybatisSVImpl<ProjectJob, Long> implem
 
     @Resource
     private ClassInfoDAO classInfoDAO;
+
+    @Resource
+    private ProjectFrameworkAttributeValueDAO projectFrameworkAttributeValueDAO;
 
     @Resource
     private TemplatesDAO templatesDAO;
@@ -139,16 +144,22 @@ public class ProjectJobSVImpl extends BaseMybatisSVImpl<ProjectJob, Long> implem
         map.put("projectCode", projectJob.getProjectCode());
         Project project = projectDAO.load(map);
         this.buildProject(project);
+        logger.info("创建数据库完成");
         //2.获取类信息
         List<ClassInfo> classInfoList = classInfoDAO.query(map);
+        logger.info("已解析所有表信息");
         //3.获取模板信息
         map.put("fileType", FileTypeEnum.Java.name());
         List<ProjectFiles> projectFilesList = projectFilesDAO.query(map);
+        logger.info("已获取项目模板信息");
         //4.获取技术信息
         List<ProjectFramwork> projectFramworkList = project.getProjectFramworkList();
+        logger.info("已获取框架信息");
         classInfoList.forEach(classInfo -> {
             this.generatorJava(classInfo, projectFilesList);
-            this.generatorXml(classInfo, projectFramworkList);
+            logger.info("已生成java 类[" + classInfo.getClassName() + "]相关文件");
+            this.generatorConfigure(classInfo, projectFramworkList);
+            logger.info("已生成框架相关配置文件");
         });
 
         //5.获取工具信息
@@ -156,7 +167,6 @@ public class ProjectJobSVImpl extends BaseMybatisSVImpl<ProjectJob, Long> implem
         //6.获取第三方模块信息
 
         //7.获取版本控制管理信息
-
     }
 
     /**
@@ -198,7 +208,47 @@ public class ProjectJobSVImpl extends BaseMybatisSVImpl<ProjectJob, Long> implem
         });
     }
 
-    private void generatorXml(ClassInfo classInfo, List<ProjectFramwork> projectFramworkList) {
+    /**
+     * 生成配置文件
+     *
+     * @param classInfo           类信息
+     * @param projectFramworkList 技术框架信息
+     */
+    private void generatorConfigure(ClassInfo classInfo, List<ProjectFramwork> projectFramworkList) {
+        Map<String, Object> model = Maps.newHashMap();
+        model.put("className", classInfo.getClassName());
+        model.put("basePackage", classInfo.getBasePackage());
+        model.put("classComment", classInfo.getBasePackage());
+        model.put("fields", classInfo.getClassAttributes());
+        List<Map<String, Object>> modelList = new ArrayList<>();
+        final String[] targetFilePath = {null};
+        final String[] templateFileName = {null};
+        final String[] templatePath = {null};
+        projectFramworkList.forEach(projectFramwork -> {
+            projectFramwork.getFrameworks().getFrameworksConfigureTemplateList().forEach(frameworksConfigureTemplate -> {
+                templateFileName[0] = frameworksConfigureTemplate.getName();
+                templatePath[0] = frameworksConfigureTemplate.getPath();
+                String filePath = new HandleFuncs().getCurrentClassPath()
+                        + frameworksConfigureTemplate.getSaveFilePath()
+                        + "/" + frameworksConfigureTemplate.getName()
+                        + "." + StringUtils.uncapitalize(frameworksConfigureTemplate.getFileType());
+                targetFilePath[0] = filePath.replace("//", "/");
+                if (model.containsKey("values")) {
+                    model.remove("values");
+                }
+                Map<String, Object> valueMap = Maps.newHashMap();
+                valueMap.put("templateCode", frameworksConfigureTemplate.getCode());
+                valueMap.put("projectCode", projectFramwork.getProjectCode());
+                valueMap.put("frameworkCode", projectFramwork.getFrameworkCode());
+                List<ProjectFrameworkAttributeValue> projectFrameworkAttributeValues = projectFrameworkAttributeValueDAO.query(valueMap);
+                model.put("values", projectFrameworkAttributeValues);
+            });
+        });
 
+        if (!modelList.isEmpty() && targetFilePath[0] != null && templateFileName[0] != null && templatePath[0] != null) {
+            modelList.forEach(entityMap -> {
+                FreemarkerHelper.generate(entityMap, targetFilePath[0], templateFileName[0], templatePath[0]);
+            });
+        }
     }
 }

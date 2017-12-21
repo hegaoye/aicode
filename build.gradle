@@ -193,6 +193,15 @@ ext {
             "sentry-logback"                 : 'io.sentry:sentry-logback:1.2.2',
             //-----------Sentry end-----------
 
+            // -----------jgit java 操作git begin-----------
+            "jgit"                           : 'org.eclipse.jgit:org.eclipse.jgit:4.9.2.201712150930-r',
+            //-----------jgit java 操作git end-----------
+
+            // -----------zip4j  操作zip begin-----------
+            "zip4j"                          : 'net.lingala.zip4j:zip4j:1.3.2'
+            //-----------jgit java 操作git end-----------
+
+
     ]
 }
 

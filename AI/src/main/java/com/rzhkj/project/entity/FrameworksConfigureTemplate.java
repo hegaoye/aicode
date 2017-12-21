@@ -27,7 +27,10 @@ public class FrameworksConfigureTemplate extends BaseEntity implements java.io.S
     private String name;//数据库字段:name  属性显示:模板名称
     private String description;//数据库字段:description  属性显示:模板说明
     private String path;//数据库字段:path  属性显示:模板路径
+    private String saveFilePath;//数据库字段:saveFilePath  属性显示:生成文件存储路径
     private String state;//数据库字段:state  属性显示:状态：停用[Disenable]，启用[Enable]
+    private String fileType;//数据库字段:fileType  属性显示:文件类型 Java, Xml, Property
+
 
     private List<FrameworkAttribute> frameworkAttributeList;
 }

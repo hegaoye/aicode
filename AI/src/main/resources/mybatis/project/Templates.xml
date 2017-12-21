@@ -8,6 +8,7 @@
 
     <resultMap id="rs_base" type="Templates">
         <result property="id" column="id"/>
+        <result property="tempalteCategoryCode" column="tempalteCategoryCode"/>
         <result property="code" column="code"/>
         <result property="name" column="name"/>
         <result property="description" column="description"/>
@@ -18,12 +19,13 @@
 
     <!-- 用于select查询公用抽取的列 -->
     <sql id="Templates.columns">
-		id,code,name,description,path,state,fileType
+		id,tempalteCategoryCode,code,name,description,path,state,fileType
 	</sql>
 
     <insert id="Templates.insert" useGeneratedKeys="true" keyProperty="id" parameterType="Templates">
         INSERT INTO `templates` (
         id ,
+        tempalteCategoryCode ,
         code ,
         name ,
         description ,
@@ -32,6 +34,7 @@
         fileType
         ) VALUES (
         #{id} ,
+        #{tempalteCategoryCode} ,
         #{code} ,
         #{name} ,
         #{description} ,
@@ -50,6 +53,9 @@
             <if test="name!=null and name!=''">
                 name = #{name} ,
             </if>
+            <if test="tempalteCategoryCode!=null and tempalteCategoryCode!=''">
+                tempalteCategoryCode = #{tempalteCategoryCode} ,
+            </if>
             <if test="description!=null and description!=''">
                 description = #{description} ,
             </if>
@@ -64,7 +70,6 @@
             </if>
         </trim>
         WHERE
-        id = #{id} AND
         code = #{code}
     </update>
 
@@ -84,6 +89,9 @@
         <where>
             <if test="id!=null and id!=''">
                 AND id = #{id}
+            </if>
+            <if test="tempalteCategoryCode!=null and tempalteCategoryCode!=''">
+                AND tempalteCategoryCode = #{tempalteCategoryCode}
             </if>
             <if test="code!=null and code!=''">
                 AND code = #{code}

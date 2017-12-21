@@ -185,22 +185,24 @@ public class ProjectJobSVImpl extends BaseMybatisSVImpl<ProjectJob, Long> implem
         String workspace = new HandleFuncs().getCurrentClassPath() + settingWorkspace.getV() + "/";
         workspace = workspace.replace("//", "/");
         //1.检测项目工作工作空间是否存在
-        String basePath = project.getBasePackage().replaceAll("\\\\", "/");
-        basePath = basePath.endsWith("/") ? basePath : basePath + "/";
-        String projectPath = workspace + basePath;
-        File file = new File(projectPath);
-        if (!file.exists()) {
-            //2.创建项目工作空间
-            file.mkdirs();
-        }
         Setting setting = settingDAO.loadByKey(Setting.Key.Gradle_Directory_Structure.name());
         List<String> gradle_directory_structure = JSON.parseArray(setting.getV(), String.class);
         String finalWorkspace = workspace;
         gradle_directory_structure.forEach(dir -> {
-            String dirPath = finalWorkspace + dir;
+            String dirPath = finalWorkspace + project.getEnglishName() + "/" + dir;
+            dirPath = dirPath.replace("//", "/");
             File dirFile = new File(dirPath);
             if (!dirFile.exists()) {
                 dirFile.mkdirs();
+            }
+
+            String basePath = project.getBasePackage().replace(".", "/");
+            basePath = basePath.endsWith("/") ? basePath : basePath + "/";
+            String projectPath = dirPath + "/" + basePath;
+            File file = new File(projectPath);
+            if (!file.exists()) {
+                //2.创建项目工作空间
+                file.mkdirs();
             }
         });
     }

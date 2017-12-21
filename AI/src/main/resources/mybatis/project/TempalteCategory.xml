@@ -28,12 +28,12 @@
         	id ,
         	code ,
         	name ,
-        	description 
+        	description
         ) VALUES (
         	#{id} ,
         	#{code} ,
         	#{name} ,
-        	#{description} 
+        	#{description}
         )
 		<selectKey keyProperty="id" resultType="long">
 			select LAST_INSERT_ID()
@@ -47,12 +47,12 @@
 	        name = #{name} ,
 		    </if>
 			<if test="description!=null and description!=''">
-	        description = #{description} 
+	        description = #{description}
 		    </if>
 		</trim>
         WHERE
-	        id = #{id}  AND 
-	        code = #{code} 
+	        id = #{id}  AND
+	        code = #{code}
 	</update>
 
     <delete id="TempalteCategory.delete">

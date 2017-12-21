@@ -43,7 +43,7 @@ public class TemplatesSVImpl extends BaseMybatisSVImpl<Templates, Long> implemen
         if (entity == null
                 || StringTools.isEmpty(entity.getDescription())
                 || StringTools.isEmpty(entity.getName())
-                || StringTools.isEmpty(entity.getTempalteCategorycode())) {
+                || StringTools.isEmpty(entity.getTempalteCategoryCode())) {
             logger.error(BaseException.BaseExceptionEnum.Empty_Param.toString());
             throw new TemplatesException(BaseException.BaseExceptionEnum.Empty_Param);
         }

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<mapper namespace="ProjectServiceModuleClass">
+
+    <resultMap id="rs_base" type="ProjectServiceModuleClass">
+        <result property="id" column="id"/>
+        <result property="classInfoCode" column="classInfoCode"/>
+        <result property="serviceModuleCode" column="serviceModuleCode"/>
+    </resultMap>
+
+    <resultMap id="rs_base_all" type="ProjectServiceModuleClass" extends="rs_base">
+        <collection property="classInfo" column="{code=classInfoCode}" select="ClassInfo.load"/>
+    </resultMap>
+    <!-- 用于select查询公用抽取的列 -->
+    <sql id="ProjectServiceModuleClass.columns">
+		id,classInfoCode,serviceModuleCode
+	</sql>
+
+    <insert id="ProjectServiceModuleClass.insert" useGeneratedKeys="true" keyProperty="id" parameterType="ProjectServiceModuleClass">
+        INSERT INTO `project_service_module_class` (
+        id ,
+        classInfoCode ,
+        serviceModuleCode
+        ) VALUES (
+        #{id} ,
+        #{classInfoCode} ,
+        #{serviceModuleCode}
+        )
+        <selectKey keyProperty="id" resultType="long">
+            select LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+
+    <update id="ProjectServiceModuleClass.update" parameterType="ProjectServiceModuleClass">
+        UPDATE `project_service_module_class`
+        <trim prefix="set" suffixOverrides=",">
+            <if test="serviceModuleCode!=null and serviceModuleCode!=''">
+                serviceModuleCode = #{serviceModuleCode}
+            </if>
+        </trim>
+        WHERE
+        id = #{id} AND
+        classInfoCode = #{classInfoCode}
+    </update>
+
+    <delete id="ProjectServiceModuleClass.delete">
+        DELETE FROM `project_service_module_class`
+        <include refid="ProjectServiceModuleClass.where"/>
+    </delete>
+
+    <select id="ProjectServiceModuleClass.load" resultMap="rs_base_all">
+        SELECT
+        <include refid="ProjectServiceModuleClass.columns"/>
+        FROM `project_service_module_class`
+        <include refid="ProjectServiceModuleClass.where"/>
+    </select>
+
+    <sql id="ProjectServiceModuleClass.where">
+        <where>
+            <if test="id!=null and id!=''">
+                AND id = #{id}
+            </if>
+            <if test="classInfoCode!=null and classInfoCode!=''">
+                AND classInfoCode = #{classInfoCode}
+            </if>
+            <if test="serviceModuleCode!=null and serviceModuleCode!=''">
+                AND serviceModuleCode = #{serviceModuleCode}
+            </if>
+        </where>
+    </sql>
+
+
+    <select id="ProjectServiceModuleClass.count" resultType="long">
+        SELECT count(*) FROM `project_service_module_class`
+        <include refid="ProjectServiceModuleClass.where"/>
+    </select>
+
+
+    <select id="ProjectServiceModuleClass.query" resultMap="rs_base_all">
+        SELECT
+        <include refid="ProjectServiceModuleClass.columns"/>
+        FROM `project_service_module_class`
+        <include refid="ProjectServiceModuleClass.where"/>
+
+        <if test="sortColumns!=null and sortColumns!=''">
+            ORDER BY ${sortColumns}
+        </if>
+    </select>
+
+
+</mapper>
+

@@ -5,10 +5,9 @@
 
 package com.rzhkj.project.service;
 
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import com.ponddy.tutor.entity.BuildToolsPath;
+import com.rzhkj.core.base.BaseMybatisSV;
+import com.rzhkj.project.entity.BuildToolsPath;
 
-public interface BuildToolsPathSV extends BaseMybatisSV<BuildToolsPath,Long>{
+public interface BuildToolsPathSV extends BaseMybatisSV<BuildToolsPath, Long> {
 
 }

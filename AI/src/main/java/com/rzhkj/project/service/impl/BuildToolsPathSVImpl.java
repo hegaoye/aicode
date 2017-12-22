@@ -5,30 +5,31 @@
 
 package com.rzhkj.project.service.impl;
 
-import com.aixin.core.base.BaseMybatisDAO;
-import com.aixin.core.base.BaseMybatisSVImpl;
-import com.alibaba.dubbo.config.annotation.Service;
-import org.springframework.stereotype.Component;
-import javax.annotation.Resource;
 import com.baidu.fsg.uid.UidGenerator;
+import com.rzhkj.core.base.BaseMybatisDAO;
+import com.rzhkj.core.base.BaseMybatisSVImpl;
+import com.rzhkj.project.dao.BuildToolsPathDAO;
+import com.rzhkj.project.entity.BuildToolsPath;
+import com.rzhkj.project.service.BuildToolsPathSV;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-import com.ponddy.tutor.dao.BuildToolsPathDAO;
-import com.ponddy.tutor.entity.BuildToolsPath;
+import javax.annotation.Resource;
 
 
 @Component
 @Service
-public class BuildToolsPathSVImpl extends BaseMybatisSVImpl<BuildToolsPath,Long> implements BuildToolsPathSV{
+public class BuildToolsPathSVImpl extends BaseMybatisSVImpl<BuildToolsPath, Long> implements BuildToolsPathSV {
 
-	@Resource
-	private BuildToolsPathDAO buildToolsPathDAO;
+    @Resource
+    private BuildToolsPathDAO buildToolsPathDAO;
 
-	@Resource
-	private UidGenerator uidGenerator;
+    @Resource
+    private UidGenerator uidGenerator;
 
-	@Override
-	protected BaseMybatisDAO getBaseMybatisDAO() {
-		return buildToolsPathDAO;
-	}
+    @Override
+    protected BaseMybatisDAO getBaseMybatisDAO() {
+        return buildToolsPathDAO;
+    }
 
 }

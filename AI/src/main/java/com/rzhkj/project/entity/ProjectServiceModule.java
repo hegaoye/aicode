@@ -8,6 +8,8 @@ package com.rzhkj.project.entity;
 import com.rzhkj.core.base.BaseEntity;
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * @author lixin hegaoye@qq.com
  * @version 1.0
@@ -25,6 +27,8 @@ public class ProjectServiceModule extends BaseEntity implements java.io.Serializ
     private String englishName;//数据库字段:englishName  属性显示:业务英文名
     private String state;//数据库字段:state  属性显示:状态停用[Disenable]，启用[Enable]
 
+    private List<ProjectCodeModel> projectCodeModelList;
+    private List<ProjectServiceModuleClass> projectServiceModuleClassList;
 
 }
 

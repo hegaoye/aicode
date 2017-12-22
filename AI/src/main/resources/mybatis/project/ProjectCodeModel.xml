@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<mapper namespace="ProjectCodeModel">
+
+	<resultMap id="rs_base" type="ProjectCodeModel">
+        <result property="id" column="id"/>
+        <result property="code" column="code"/>
+        <result property="serviceModuleCode" column="serviceModuleCode"/>
+        <result property="model" column="model"/>
+	</resultMap>
+
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="ProjectCodeModel.columns">
+		id,code,serviceModuleCode,model
+	</sql>
+
+	<insert id="ProjectCodeModel.insert" useGeneratedKeys="true" keyProperty="id" parameterType="ProjectCodeModel">
+        INSERT INTO `project_code_model` (
+        	id ,
+        	code ,
+        	serviceModuleCode ,
+        	model 
+        ) VALUES (
+        	#{id} ,
+        	#{code} ,
+        	#{serviceModuleCode} ,
+        	#{model} 
+        )
+		<selectKey keyProperty="id" resultType="long">
+			select LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+
+	<update id="ProjectCodeModel.update" parameterType="ProjectCodeModel">
+        UPDATE `project_code_model`
+		<trim prefix="set" suffixOverrides=",">
+			<if test="model!=null and model!=''">
+	        model = #{model} 
+		    </if>
+		</trim>
+        WHERE
+	        id = #{id}  AND 
+	        code = #{code}  AND 
+	        serviceModuleCode = #{serviceModuleCode} 
+	</update>
+
+    <delete id="ProjectCodeModel.delete">
+        DELETE FROM `project_code_model`
+		<include refid="ProjectCodeModel.where"/>
+    </delete>
+
+    <select id="ProjectCodeModel.load" resultMap="rs_base">
+		SELECT <include refid="ProjectCodeModel.columns" />
+		    FROM `project_code_model`
+		<include refid="ProjectCodeModel.where"/>
+	</select>
+
+	<sql id="ProjectCodeModel.where">
+		<where>
+			<if test="id!=null and id!=''">
+				AND id = #{id}
+			</if>
+			<if test="code!=null and code!=''">
+				AND code = #{code}
+			</if>
+			<if test="serviceModuleCode!=null and serviceModuleCode!=''">
+				AND serviceModuleCode = #{serviceModuleCode}
+			</if>
+			<if test="model!=null and model!=''">
+				AND model = #{model}
+			</if>
+		</where>
+	</sql>
+
+
+
+    <select id="ProjectCodeModel.count" resultType="long">
+        SELECT count(*) FROM `project_code_model`
+		<include refid="ProjectCodeModel.where"/>
+    </select>
+
+
+    <select id="ProjectCodeModel.query" resultMap="rs_base">
+    	SELECT <include refid="ProjectCodeModel.columns" />
+	    FROM `project_code_model`
+		<include refid="ProjectCodeModel.where"/>
+
+		<if test="sortColumns!=null and sortColumns!=''">
+			ORDER BY ${sortColumns}
+		</if>
+    </select>
+
+
+</mapper>
+

@@ -44,6 +44,15 @@ public class ProjectSVImpl extends BaseMybatisSVImpl<Project, Long> implements P
     @Resource
     private ProjectBuildToolsDAO projectBuildToolsDAO;
 
+    @Resource
+    private ProjectModuleDAO projectModuleDAO;
+    @Resource
+    private ProjectServiceModuleDAO projectServiceModuleDAO;
+    @Resource
+    private ProjectCodeModelDAO projectCodeModelDAO;
+    @Resource
+    private ProjectCodeCatalogDAO projectCodeCatalogDAO;
+
 
     @Resource
     private ProjectJobLogsDAO projectJobLogsDAO;
@@ -174,6 +183,11 @@ public class ProjectSVImpl extends BaseMybatisSVImpl<Project, Long> implements P
         }
 
         //4.生成项目基本目录信息
+        flag = this.createBuildPath(code);
+        if (!flag) {
+            logger.error(BaseException.BaseExceptionEnum.Server_Error.toString());
+            throw new ProjectException(BaseException.BaseExceptionEnum.Server_Error);
+        }
     }
 
     /**
@@ -220,6 +234,7 @@ public class ProjectSVImpl extends BaseMybatisSVImpl<Project, Long> implements P
                 });
             }
         }
+
 
         //3.记录任务日志
 //        ProjectJobLogs projectJobLogs = new ProjectJobLogs();
@@ -362,8 +377,10 @@ public class ProjectSVImpl extends BaseMybatisSVImpl<Project, Long> implements P
     /**
      * 生成项目基本目录信息
      * 1.查询项目
-     * 2.获取类信息
-     * 3.生成项目构建路径
+     * 2.获取模块信息
+     * 3.获取业务模块信息
+     * 4.获取源码结构
+     * 5.生成项目构建路径
      *
      * @param code 项目编码
      * @return true/false
@@ -380,27 +397,50 @@ public class ProjectSVImpl extends BaseMybatisSVImpl<Project, Long> implements P
         map.put("buildType", BuildToolsTypeEnum.Gradle.name());
         BuildTools buildTools = buildToolsDAO.load(map);
         List<BuildToolsPath> buildToolsPathList = buildTools.getBuildToolsPathList();
-        //2.获取类信息
-        List<ProjectClass> projectClassList = project.getProjectClassList();
-        List<ProjectBuildTools> projectBuildToolsList = new ArrayList<>();
-        projectClassList.forEach(projectClass -> {
-            ClassInfo classInfo = projectClass.getClassInfo();
-            buildToolsPathList.forEach(buildToolsPath -> {
-                if (buildToolsPath.getPathType().equals(BuildToolsPathTypeEnum.Java.name())) {
-                    //3.生成项目构建路径
-                    ProjectBuildTools projectBuildTools = new ProjectBuildTools();
-                    String classPath = buildToolsPath.getBuildPath() + classInfo.getBasePackage().replace(".", "/") + "/" + classInfo.getClassName();
-                    classPath = classPath.replace("//", "/");
-                    projectBuildTools.setBuildPath(classPath);
-                    projectBuildTools.setBuildCode(buildToolsPath.getBuildCode());
-                    projectBuildTools.setProjectCode(project.getCode());
-                    projectBuildTools.setPathType(BuildToolsPathTypeEnum.Java.name());
-                    projectBuildToolsList.add(projectBuildTools);
-                }
+        //2.获取模块信息
+        List<ProjectModule> projectModuleList = project.getProjectModuleList();
+        projectModuleList.forEach(projectModule -> {
+            //3.获取业务模块信息
+            List<ProjectServiceModule> projectServiceModuleList = projectModule.getProjectServiceModuleList();
+            projectServiceModuleList.forEach(projectServiceModule -> {
+                //4.获取源码结构
+                List<ProjectCodeModel> projectCodeModelList = projectServiceModule.getProjectCodeModelList();
+                List<ProjectServiceModuleClass> projectServiceModuleClassList = projectServiceModule.getProjectServiceModuleClassList();
+                projectCodeModelList.forEach(projectCodeModel -> {
+                    projectServiceModuleClassList.forEach(projectServiceModuleClass -> {
+                        //5.生成项目构建路径
+                        final String[] relativePath = {null};
+                        buildToolsPathList.forEach(buildToolsPath -> {
+                            if (buildToolsPath.getPathType().equals(BuildToolsPathTypeEnum.Java.name())) {
+                                relativePath[0] = project.getEnglishName()
+                                        + "/" + org.springframework.util.StringUtils.uncapitalize(projectModule.getEnglishName())
+                                        + "/" + org.springframework.util.StringUtils.uncapitalize(buildToolsPath.getBuildPath())
+                                        + "/" + org.springframework.util.StringUtils.uncapitalize(project.getBasePackage().replace(".", "/"))
+                                        + "/" + org.springframework.util.StringUtils.uncapitalize(projectServiceModule.getEnglishName())
+                                        + "/" + org.springframework.util.StringUtils.uncapitalize(projectCodeModel.getModel());
+                            }
+                        });
+                        relativePath[0] = relativePath[0].replace("//", "/");
+
+                        ProjectCodeCatalog projectCodeCatalog = new ProjectCodeCatalog();
+                        projectCodeCatalog.setCode(String.valueOf(uidGenerator.getUID()));
+                        projectCodeCatalog.setProjectCode(project.getCode());
+                        projectCodeCatalog.setModuleCode(projectModule.getCode());
+                        projectCodeCatalog.setServiceModuleCode(projectServiceModule.getCode());
+                        projectCodeCatalog.setCodeModelCode(projectCodeModel.getCode());
+                        projectCodeCatalog.setRelativePath(relativePath[0]);
+                        projectCodeCatalog.setAbsolutePath(relativePath[0] + "/" + projectServiceModuleClass.getClassInfo().getClassName());
+                        projectCodeCatalog.setFileName(projectServiceModuleClass.getClassInfo().getClassName());
+                        projectCodeCatalog.setFileSuffix("." + org.springframework.util.StringUtils.uncapitalize(FileTypeEnum.Java.name()));
+                        projectCodeCatalog.setFileType(FileTypeEnum.Java.name());
+                        projectCodeCatalogDAO.insert(projectCodeCatalog);
+                    });
+                });
+
             });
 
         });
-        projectBuildToolsDAO.batchInsert(projectBuildToolsList);
+
 
         return true;
     }

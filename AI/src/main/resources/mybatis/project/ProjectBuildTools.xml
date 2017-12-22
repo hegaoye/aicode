@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<mapper namespace="ProjectBuildTools">
+
+	<resultMap id="rs_base" type="ProjectBuildTools">
+        <result property="id" column="id"/>
+        <result property="projectCode" column="projectCode"/>
+        <result property="buildCode" column="buildCode"/>
+        <result property="buildPath" column="buildPath"/>
+        <result property="pathType" column="pathType"/>
+	</resultMap>
+
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="ProjectBuildTools.columns">
+		id,projectCode,buildCode,buildPath,pathType
+	</sql>
+
+	<insert id="ProjectBuildTools.insert" useGeneratedKeys="true" keyProperty="id" parameterType="ProjectBuildTools">
+        INSERT INTO `project_build_tools` (
+        	id ,
+        	projectCode ,
+        	buildCode ,
+        	buildPath ,
+        	pathType 
+        ) VALUES (
+        	#{id} ,
+        	#{projectCode} ,
+        	#{buildCode} ,
+        	#{buildPath} ,
+        	#{pathType} 
+        )
+		<selectKey keyProperty="id" resultType="long">
+			select LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+
+	<update id="ProjectBuildTools.update" parameterType="ProjectBuildTools">
+        UPDATE `project_build_tools`
+		<trim prefix="set" suffixOverrides=",">
+			<if test="buildPath!=null and buildPath!=''">
+	        buildPath = #{buildPath} ,
+		    </if>
+			<if test="pathType!=null and pathType!=''">
+	        pathType = #{pathType} 
+		    </if>
+		</trim>
+        WHERE
+	        id = #{id}  AND 
+	        projectCode = #{projectCode}  AND 
+	        buildCode = #{buildCode} 
+	</update>
+
+    <delete id="ProjectBuildTools.delete">
+        DELETE FROM `project_build_tools`
+		<include refid="ProjectBuildTools.where"/>
+    </delete>
+
+    <select id="ProjectBuildTools.load" resultMap="rs_base">
+		SELECT <include refid="ProjectBuildTools.columns" />
+		    FROM `project_build_tools`
+		<include refid="ProjectBuildTools.where"/>
+	</select>
+
+	<sql id="ProjectBuildTools.where">
+		<where>
+			<if test="id!=null and id!=''">
+				AND id = #{id}
+			</if>
+			<if test="projectCode!=null and projectCode!=''">
+				AND projectCode = #{projectCode}
+			</if>
+			<if test="buildCode!=null and buildCode!=''">
+				AND buildCode = #{buildCode}
+			</if>
+			<if test="buildPath!=null and buildPath!=''">
+				AND buildPath = #{buildPath}
+			</if>
+			<if test="pathType!=null and pathType!=''">
+				AND pathType = #{pathType}
+			</if>
+		</where>
+	</sql>
+
+
+
+    <select id="ProjectBuildTools.count" resultType="long">
+        SELECT count(*) FROM `project_build_tools`
+		<include refid="ProjectBuildTools.where"/>
+    </select>
+
+
+    <select id="ProjectBuildTools.query" resultMap="rs_base">
+    	SELECT <include refid="ProjectBuildTools.columns" />
+	    FROM `project_build_tools`
+		<include refid="ProjectBuildTools.where"/>
+
+		<if test="sortColumns!=null and sortColumns!=''">
+			ORDER BY ${sortColumns}
+		</if>
+    </select>
+
+
+</mapper>
+

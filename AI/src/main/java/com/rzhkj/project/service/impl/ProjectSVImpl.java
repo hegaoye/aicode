@@ -256,9 +256,9 @@ public class ProjectSVImpl extends BaseMybatisSVImpl<Project, Long> implements P
                                     projectCodeCatalog.setModuleCode(projectModule.getCode());
                                     projectCodeCatalog.setServiceModuleCode(projectServiceModule.getCode());
                                     projectCodeCatalog.setCodeModelCode(projectCodeModel.getCode());
-                                    projectCodeCatalog.setFileName(StringHelper.toJavaClassName(projectServiceModuleClass.getClassInfo().getClassName() + projectCodeModel.getModelSuffix()));
+                                    projectCodeCatalog.setFileName(projectServiceModuleClass.getClassInfo().getClassName() + StringHelper.toJavaClassName(projectCodeModel.getModelSuffix()));
                                     projectCodeCatalog.setRelativePath(relativePath[0] + projectCodeCatalog.getFileName());
-                                    projectCodeCatalog.setFileSuffix("." + org.springframework.util.StringUtils.uncapitalize(FileTypeEnum.Java.name()));
+                                    projectCodeCatalog.setFileSuffix("." + FileTypeEnum.Java.name().toLowerCase());
                                     projectCodeCatalog.setAbsolutePath(projectCodeCatalog.getRelativePath() + projectCodeCatalog.getFileSuffix());
                                     projectCodeCatalog.setFileType(FileTypeEnum.Java.name());
                                     projectCodeCatalogDAO.insert(projectCodeCatalog);

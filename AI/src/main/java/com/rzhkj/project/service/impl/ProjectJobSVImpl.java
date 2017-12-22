@@ -6,7 +6,6 @@
 package com.rzhkj.project.service.impl;
 
 
-import com.alibaba.fastjson.JSON;
 import com.baidu.fsg.uid.UidGenerator;
 import com.google.common.collect.Maps;
 import com.rzhkj.base.core.FreemarkerHelper;
@@ -40,7 +39,8 @@ public class ProjectJobSVImpl extends BaseMybatisSVImpl<ProjectJob, Long> implem
     private ProjectDAO projectDAO;
     @Resource
     private SettingDAO settingDAO;
-
+    @Resource
+    private ProjectCodeCatalogDAO projectCodeCatalogDAO;
     @Resource
     private ProjectJobDAO projectJobDAO;
 
@@ -149,7 +149,7 @@ public class ProjectJobSVImpl extends BaseMybatisSVImpl<ProjectJob, Long> implem
         map.put("projectCode", projectJob.getProjectCode());
         Project project = projectDAO.load(map);
         this.buildProject(project);
-        logger.info("创建数据库完成");
+        logger.info("创建工作空间库完成");
         //2.获取类信息
         List<ClassInfo> classInfoList = classInfoDAO.query(map);
         logger.info("已解析所有表信息");
@@ -160,12 +160,19 @@ public class ProjectJobSVImpl extends BaseMybatisSVImpl<ProjectJob, Long> implem
         //4.获取技术信息
         List<ProjectFramwork> projectFramworkList = project.getProjectFramworkList();
         logger.info("已获取框架信息");
-        classInfoList.forEach(classInfo -> {
-            this.generatorJava(classInfo, projectFilesList);
-            logger.info("已生成java 类[" + classInfo.getClassName() + "]相关文件");
-            this.generatorConfigure(classInfo, projectFramworkList);
+        List<ProjectCodeCatalog> projectCodeCatalogList = projectCodeCatalogDAO.query(map);
+        projectCodeCatalogList.forEach(projectCodeCatalog -> {
+            this.generatorJava(projectCodeCatalog, projectFilesList);
+            logger.info("已生成java 类[" + projectCodeCatalog.getAbsolutePath() + "]相关文件");
+//            this.generatorConfigure(classInfo, projectFramworkList);
             logger.info("已生成框架相关配置文件");
         });
+//        classInfoList.forEach(classInfo -> {
+//            this.generatorJava(classInfo, projectFilesList);
+//            logger.info("已生成java 类[" + classInfo.getClassName() + "]相关文件");
+//            this.generatorConfigure(classInfo, projectFramworkList);
+//            logger.info("已生成框架相关配置文件");
+//        });
 
         //5.获取工具信息
 
@@ -182,48 +189,37 @@ public class ProjectJobSVImpl extends BaseMybatisSVImpl<ProjectJob, Long> implem
      */
     private void buildProject(Project project) {
         Setting settingWorkspace = settingDAO.loadByKey(Setting.Key.Workspace.name());
-        String workspace = new HandleFuncs().getCurrentClassPath() + settingWorkspace.getV() + "/";
+        String workspace = new HandleFuncs().getCurrentClassPath() + settingWorkspace.getV() + "/" + project.getEnglishName();
         workspace = workspace.replace("//", "/");
         //1.检测项目工作工作空间是否存在
-        Setting setting = settingDAO.loadByKey(Setting.Key.Gradle_Directory_Structure.name());
-        List<String> gradle_directory_structure = JSON.parseArray(setting.getV(), String.class);
-        String finalWorkspace = workspace;
-        gradle_directory_structure.forEach(dir -> {
-            String dirPath = finalWorkspace + project.getEnglishName() + "/" + dir;
-            dirPath = dirPath.replace("//", "/");
-            File dirFile = new File(dirPath);
-            if (!dirFile.exists()) {
-                dirFile.mkdirs();
-            }
-
-            String basePath = project.getBasePackage().replace(".", "/");
-            basePath = basePath.endsWith("/") ? basePath : basePath + "/";
-            String projectPath = dirPath + "/" + basePath;
-            File file = new File(projectPath);
-            if (!file.exists()) {
-                //2.创建项目工作空间
-                file.mkdirs();
-            }
-        });
+        File file = new File(workspace);
+        if (!file.exists()) {
+            file.mkdirs();
+        }
     }
 
     /**
      * 生成java文件
      *
-     * @param classInfo        类信息
-     * @param projectFilesList 项目文件信息
+     * @param projectCodeCatalog 项目源码目录
+     * @param projectFilesList   项目文件信息
      */
-    private void generatorJava(ClassInfo classInfo, List<ProjectFiles> projectFilesList) {
+    private void generatorJava(ProjectCodeCatalog projectCodeCatalog, List<ProjectFiles> projectFilesList) {
+        ClassInfo classInfo = projectCodeCatalog.getClassInfo();
         Map<String, Object> map = Maps.newHashMap();
-        map.put("className", classInfo.getClassName());
+        map.put("className", projectCodeCatalog.getFileName());
         map.put("basePackage", classInfo.getBasePackage());
         map.put("classComment", classInfo.getBasePackage());
         map.put("fields", classInfo.getClassAttributes());
-
+        Setting setting = settingDAO.loadByKey(Setting.Key.Workspace.name());
+        Setting templatePathSetting = settingDAO.loadByKey(Setting.Key.Template_Path.name());
+        String projectPath = new HandleFuncs().getCurrentClassPath();
         projectFilesList.forEach(projectFiles -> {
             String templateFileName = projectFiles.getTemplates().getName();
             String templatePath = projectFiles.getTemplates().getPath();
-            String targetFilePath = classInfo.basePackage();
+            String targetFilePath = projectCodeCatalog.basePackage(setting.getV());
+            templatePath = projectPath + templatePathSetting.getV() + templatePath;
+            templatePath = templatePath.replace("//", "/");
             FreemarkerHelper.generate(map, targetFilePath, templateFileName, templatePath);
         });
     }

@@ -261,6 +261,7 @@ public class ProjectSVImpl extends BaseMybatisSVImpl<Project, Long> implements P
                                     projectCodeCatalog.setFileSuffix("." + FileTypeEnum.Java.name().toLowerCase());
                                     projectCodeCatalog.setAbsolutePath(projectCodeCatalog.getRelativePath() + projectCodeCatalog.getFileSuffix());
                                     projectCodeCatalog.setFileType(FileTypeEnum.Java.name());
+                                    projectCodeCatalog.setClassInfoCode(projectServiceModuleClass.getClassInfo().getCode());
                                     projectCodeCatalogDAO.insert(projectCodeCatalog);
                                 }
                             });

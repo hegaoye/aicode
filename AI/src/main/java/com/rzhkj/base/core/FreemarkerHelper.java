@@ -30,6 +30,7 @@ public class FreemarkerHelper {
      * @param templatePath     模板路径 [/xxx/xxxx|/xxx/xxxx/]
      */
     public static void generate(Map<String, Object> model, String targetFilePath, String templateFileName, String templatePath) {
+        Writer out = null;
         try {
             targetFilePath = targetFilePath.replace("\\", "/");
             String filePath = targetFilePath.substring(0, targetFilePath.lastIndexOf("/"));
@@ -41,8 +42,8 @@ public class FreemarkerHelper {
             Configuration configuration = new Configuration();
             configuration.setDirectoryForTemplateLoading(new File(templatePath));
             configuration.setDefaultEncoding("UTF-8");
-            Template temp = configuration.getTemplate(templateFileName);
-            Writer out = new OutputStreamWriter(new FileOutputStream(targetFilePath));
+            Template  temp = configuration.getTemplate(templateFileName);
+            out = new OutputStreamWriter(new FileOutputStream(targetFilePath));
             temp.process(model, out);
             out.flush();
             out.close();
@@ -50,6 +51,12 @@ public class FreemarkerHelper {
             e.printStackTrace();
         } catch (TemplateException e) {
             e.printStackTrace();
+        } finally {
+            try {
+                out.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

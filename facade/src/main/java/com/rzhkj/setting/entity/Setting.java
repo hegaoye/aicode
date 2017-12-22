@@ -36,6 +36,7 @@ public class Setting extends BaseEntity implements java.io.Serializable {
         Gradle_Directory_Structure,//gradle目录结构
         Workspace,//工作目录
         Package_entity,//实体目录命名
+        Template_Path,//模板默认路径
         ;
 
     }

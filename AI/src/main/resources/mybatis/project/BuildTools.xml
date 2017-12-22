@@ -1,90 +1,95 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 
 <!-- 不使用namespace的话sql搜索定位会比较方便 -->
 <mapper namespace="BuildTools">
 
-	<resultMap id="rs_base" type="BuildTools">
+    <resultMap id="rs_base" type="BuildTools">
         <result property="id" column="id"/>
         <result property="code" column="code"/>
         <result property="buildType" column="buildType"/>
-	</resultMap>
+    </resultMap>
 
-	<!-- 用于select查询公用抽取的列 -->
-	<sql id="BuildTools.columns">
+    <resultMap id="rs_base_all" type="BuildTools" extends="rs_base">
+        <collection property="buildToolsPathList" column="{buildCode=code}" select="BuildToolsPath.query"/>
+    </resultMap>
+
+    <!-- 用于select查询公用抽取的列 -->
+    <sql id="BuildTools.columns">
 		id,code,buildType
 	</sql>
 
-	<insert id="BuildTools.insert" useGeneratedKeys="true" keyProperty="id" parameterType="BuildTools">
+    <insert id="BuildTools.insert" useGeneratedKeys="true" keyProperty="id" parameterType="BuildTools">
         INSERT INTO `build_tools` (
-        	id ,
-        	code ,
-        	buildType 
+        id ,
+        code ,
+        buildType
         ) VALUES (
-        	#{id} ,
-        	#{code} ,
-        	#{buildType} 
+        #{id} ,
+        #{code} ,
+        #{buildType}
         )
-		<selectKey keyProperty="id" resultType="long">
-			select LAST_INSERT_ID()
-		</selectKey>
-	</insert>
+        <selectKey keyProperty="id" resultType="long">
+            select LAST_INSERT_ID()
+        </selectKey>
+    </insert>
 
-	<update id="BuildTools.update" parameterType="BuildTools">
+    <update id="BuildTools.update" parameterType="BuildTools">
         UPDATE `build_tools`
-		<trim prefix="set" suffixOverrides=",">
-			<if test="buildType!=null and buildType!=''">
-	        buildType = #{buildType} 
-		    </if>
-		</trim>
+        <trim prefix="set" suffixOverrides=",">
+            <if test="buildType!=null and buildType!=''">
+                buildType = #{buildType}
+            </if>
+        </trim>
         WHERE
-	        id = #{id}  AND 
-	        code = #{code} 
-	</update>
+        id = #{id} AND
+        code = #{code}
+    </update>
 
     <delete id="BuildTools.delete">
         DELETE FROM `build_tools`
-		<include refid="BuildTools.where"/>
+        <include refid="BuildTools.where"/>
     </delete>
 
-    <select id="BuildTools.load" resultMap="rs_base">
-		SELECT <include refid="BuildTools.columns" />
-		    FROM `build_tools`
-		<include refid="BuildTools.where"/>
-	</select>
+    <select id="BuildTools.load" resultMap="rs_base_all">
+        SELECT
+        <include refid="BuildTools.columns"/>
+        FROM `build_tools`
+        <include refid="BuildTools.where"/>
+    </select>
 
-	<sql id="BuildTools.where">
-		<where>
-			<if test="id!=null and id!=''">
-				AND id = #{id}
-			</if>
-			<if test="code!=null and code!=''">
-				AND code = #{code}
-			</if>
-			<if test="buildType!=null and buildType!=''">
-				AND buildType = #{buildType}
-			</if>
-		</where>
-	</sql>
-
+    <sql id="BuildTools.where">
+        <where>
+            <if test="id!=null and id!=''">
+                AND id = #{id}
+            </if>
+            <if test="code!=null and code!=''">
+                AND code = #{code}
+            </if>
+            <if test="buildType!=null and buildType!=''">
+                AND buildType = #{buildType}
+            </if>
+        </where>
+    </sql>
 
 
     <select id="BuildTools.count" resultType="long">
         SELECT count(*) FROM `build_tools`
-		<include refid="BuildTools.where"/>
+        <include refid="BuildTools.where"/>
     </select>
 
 
-    <select id="BuildTools.query" resultMap="rs_base">
-    	SELECT <include refid="BuildTools.columns" />
-	    FROM `build_tools`
-		<include refid="BuildTools.where"/>
+    <select id="BuildTools.query" resultMap="rs_base_all">
+        SELECT
+        <include refid="BuildTools.columns"/>
+        FROM `build_tools`
+        <include refid="BuildTools.where"/>
 
-		<if test="sortColumns!=null and sortColumns!=''">
-			ORDER BY ${sortColumns}
-		</if>
+        <if test="sortColumns!=null and sortColumns!=''">
+            ORDER BY ${sortColumns}
+        </if>
     </select>
 
 

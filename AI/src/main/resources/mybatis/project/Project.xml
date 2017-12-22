@@ -39,6 +39,7 @@
         <collection property="projectToolsList" column="{projectCode=code}" select="ProjectTools.query"/>
         <collection property="projectRepositoryAccountList" column="{projectCode=code}" select="ProjectRepositoryAccount.query"/>
         <collection property="projectSqlList" column="{projectCode=code}" select="ProjectSql.query"/>
+        <collection property="projectBuildToolsList" column="{projectCode=code}" select="ProjectBuildTools.query"/>
     </resultMap>
 
     <!-- 用于select查询公用抽取的列 -->

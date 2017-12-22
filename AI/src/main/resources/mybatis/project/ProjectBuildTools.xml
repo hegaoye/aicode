@@ -49,8 +49,7 @@
 		    </if>
 		</trim>
         WHERE
-	        id = #{id}  AND 
-	        projectCode = #{projectCode}  AND 
+	        projectCode = #{projectCode}  AND
 	        buildCode = #{buildCode} 
 	</update>
 

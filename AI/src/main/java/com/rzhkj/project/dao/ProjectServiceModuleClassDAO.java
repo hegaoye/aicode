@@ -6,12 +6,12 @@
 package com.rzhkj.project.dao;
 
 import com.rzhkj.core.base.BaseMybatisDAOImpl;
-import com.rzhkj.project.entity.BuildTools;
+import com.rzhkj.project.entity.ProjectServiceModuleClass;
 import org.springframework.stereotype.Repository;
 
 
 @Repository
-public class BuildToolsDAO extends BaseMybatisDAOImpl<BuildTools,Long> {
+public class ProjectServiceModuleClassDAO extends BaseMybatisDAOImpl<ProjectServiceModuleClass,Long> {
 
 
 }

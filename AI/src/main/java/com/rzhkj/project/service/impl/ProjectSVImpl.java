@@ -39,6 +39,13 @@ public class ProjectSVImpl extends BaseMybatisSVImpl<Project, Long> implements P
     private DatabaseDAO databaseDAO;
 
     @Resource
+    private BuildToolsDAO buildToolsDAO;
+
+    @Resource
+    private ProjectBuildToolsDAO projectBuildToolsDAO;
+
+
+    @Resource
     private ProjectJobLogsDAO projectJobLogsDAO;
 
     @Resource
@@ -139,6 +146,7 @@ public class ProjectSVImpl extends BaseMybatisSVImpl<Project, Long> implements P
      * 1.创建数据库
      * 2.解析数据库信息
      * 3.生成java类映射信息
+     * 4.生成项目基本目录信息
      *
      * @param code 项目编码
      */
@@ -164,6 +172,8 @@ public class ProjectSVImpl extends BaseMybatisSVImpl<Project, Long> implements P
             logger.error(BaseException.BaseExceptionEnum.Server_Error.toString());
             throw new ProjectException(BaseException.BaseExceptionEnum.Server_Error);
         }
+
+        //4.生成项目基本目录信息
     }
 
     /**
@@ -349,10 +359,51 @@ public class ProjectSVImpl extends BaseMybatisSVImpl<Project, Long> implements P
         return true;
     }
 
-    public static void main(String[] args) {
-        String a = "a_";
-        System.out.println(a.indexOf("_"));
-        System.out.println(a.substring(0, a.indexOf("_")));
+    /**
+     * 生成项目基本目录信息
+     * 1.查询项目
+     * 2.获取类信息
+     * 3.生成项目构建路径
+     *
+     * @param code 项目编码
+     * @return true/false
+     */
+    private boolean createBuildPath(String code) {
+        //1.查询项目
+        Map<String, Object> map = Maps.newHashMap();
+        map.put("code", code);
+        Project project = projectDAO.load(map);
+        if (project == null) {
+            return false;
+        }
+        map.clear();
+        map.put("buildType", BuildToolsTypeEnum.Gradle.name());
+        BuildTools buildTools = buildToolsDAO.load(map);
+        List<BuildToolsPath> buildToolsPathList = buildTools.getBuildToolsPathList();
+        //2.获取类信息
+        List<ProjectClass> projectClassList = project.getProjectClassList();
+        List<ProjectBuildTools> projectBuildToolsList = new ArrayList<>();
+        projectClassList.forEach(projectClass -> {
+            ClassInfo classInfo = projectClass.getClassInfo();
+            buildToolsPathList.forEach(buildToolsPath -> {
+                if (buildToolsPath.getPathType().equals(BuildToolsPathTypeEnum.Java.name())) {
+                    //3.生成项目构建路径
+                    ProjectBuildTools projectBuildTools = new ProjectBuildTools();
+                    String classPath = buildToolsPath.getBuildPath() + classInfo.getBasePackage().replace(".", "/") + "/" + classInfo.getClassName();
+                    classPath = classPath.replace("//", "/");
+                    projectBuildTools.setBuildPath(classPath);
+                    projectBuildTools.setBuildCode(buildToolsPath.getBuildCode());
+                    projectBuildTools.setProjectCode(project.getCode());
+                    projectBuildTools.setPathType(BuildToolsPathTypeEnum.Java.name());
+                    projectBuildToolsList.add(projectBuildTools);
+                }
+            });
+
+        });
+        projectBuildToolsDAO.batchInsert(projectBuildToolsList);
+
+        return true;
     }
+
 
 }

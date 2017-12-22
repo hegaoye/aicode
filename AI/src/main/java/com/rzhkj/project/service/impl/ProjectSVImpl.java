@@ -216,47 +216,59 @@ public class ProjectSVImpl extends BaseMybatisSVImpl<Project, Long> implements P
         map.put("buildType", BuildToolsTypeEnum.Gradle.name());
         BuildTools buildTools = buildToolsDAO.load(map);
         List<BuildToolsPath> buildToolsPathList = buildTools.getBuildToolsPathList();
+
         //2.获取模块信息
         List<ProjectModule> projectModuleList = project.getProjectModuleList();
         projectModuleList.forEach(projectModule -> {
+
             //3.获取业务模块信息
             List<ProjectServiceModule> projectServiceModuleList = projectModule.getProjectServiceModuleList();
             projectServiceModuleList.forEach(projectServiceModule -> {
-                //4.获取源码结构
-                List<ProjectCodeModel> projectCodeModelList = projectServiceModule.getProjectCodeModelList();
-                List<ProjectServiceModuleClass> projectServiceModuleClassList = projectServiceModule.getProjectServiceModuleClassList();
-                projectCodeModelList.forEach(projectCodeModel -> {
-                    projectServiceModuleClassList.forEach(projectServiceModuleClass -> {
-                        //5.生成项目构建路径
-                        final String[] relativePath = {null};
-                        buildToolsPathList.forEach(buildToolsPath -> {
-                            if (buildToolsPath.getPathType().equals(BuildToolsPathTypeEnum.Java.name())) {
-                                relativePath[0] = project.getEnglishName()
-                                        + "/" + org.springframework.util.StringUtils.uncapitalize(projectModule.getEnglishName())
-                                        + "/" + org.springframework.util.StringUtils.uncapitalize(buildToolsPath.getBuildPath())
-                                        + "/" + org.springframework.util.StringUtils.uncapitalize(project.getBasePackage().replace(".", "/"))
-                                        + "/" + org.springframework.util.StringUtils.uncapitalize(projectServiceModule.getEnglishName())
-                                        + "/" + org.springframework.util.StringUtils.uncapitalize(projectCodeModel.getModel()) + "/";
-                            }
-                        });
-                        relativePath[0] = relativePath[0].replace("//", "/");
+                if (projectServiceModule.getModuleCode().equals(projectModule.getCode())) {
 
-                        ProjectCodeCatalog projectCodeCatalog = new ProjectCodeCatalog();
-                        projectCodeCatalog.setCode(String.valueOf(uidGenerator.getUID()));
-                        projectCodeCatalog.setProjectCode(project.getCode());
-                        projectCodeCatalog.setModuleCode(projectModule.getCode());
-                        projectCodeCatalog.setServiceModuleCode(projectServiceModule.getCode());
-                        projectCodeCatalog.setCodeModelCode(projectCodeModel.getCode());
-                        projectCodeCatalog.setRelativePath(relativePath[0] + projectServiceModuleClass.getClassInfo().getClassName());
-                        projectCodeCatalog.setFileSuffix("." + org.springframework.util.StringUtils.uncapitalize(FileTypeEnum.Java.name()));
-                        projectCodeCatalog.setAbsolutePath(projectCodeCatalog.getRelativePath() + projectCodeCatalog.getFileSuffix());
-                        projectCodeCatalog.setFileName(projectServiceModuleClass.getClassInfo().getClassName());
-                        projectCodeCatalog.setFileType(FileTypeEnum.Java.name());
-                        projectCodeCatalogDAO.insert(projectCodeCatalog);
+                    //4.获取源码结构
+                    List<ProjectCodeModel> projectCodeModelList = projectServiceModule.getProjectCodeModelList();
+                    List<ProjectServiceModuleClass> projectServiceModuleClassList = projectServiceModule.getProjectServiceModuleClassList();
+
+                    projectCodeModelList.forEach(projectCodeModel -> {
+
+                        if (projectCodeModel.getServiceModuleCode().equals(projectServiceModule.getCode())) {
+                            projectServiceModuleClassList.forEach(projectServiceModuleClass -> {
+
+                                //5.生成项目构建路径
+                                if (projectServiceModuleClass.getServiceModuleCode().equals(projectServiceModule.getCode())) {
+                                    final String[] relativePath = {null};
+                                    buildToolsPathList.forEach(buildToolsPath -> {
+                                        if (buildToolsPath.getPathType().equals(BuildToolsPathTypeEnum.Java.name())) {
+                                            relativePath[0] = project.getEnglishName()
+                                                    + "/" + projectModule.getEnglishName().toLowerCase()
+                                                    + "/" + buildToolsPath.getBuildPath().toLowerCase()
+                                                    + "/" + project.getBasePackage().replace(".", "/").toLowerCase()
+                                                    + "/" + projectServiceModule.getEnglishName().toLowerCase()
+                                                    + "/" + projectCodeModel.getModel().toLowerCase() + "/";
+                                        }
+                                    });
+                                    relativePath[0] = relativePath[0].replace("//", "/");
+
+                                    ProjectCodeCatalog projectCodeCatalog = new ProjectCodeCatalog();
+                                    projectCodeCatalog.setCode(String.valueOf(uidGenerator.getUID()));
+                                    projectCodeCatalog.setProjectCode(project.getCode());
+                                    projectCodeCatalog.setModuleCode(projectModule.getCode());
+                                    projectCodeCatalog.setServiceModuleCode(projectServiceModule.getCode());
+                                    projectCodeCatalog.setCodeModelCode(projectCodeModel.getCode());
+                                    projectCodeCatalog.setFileName(StringHelper.toJavaClassName(projectServiceModuleClass.getClassInfo().getClassName() + projectCodeModel.getModelSuffix()));
+                                    projectCodeCatalog.setRelativePath(relativePath[0] + projectCodeCatalog.getFileName());
+                                    projectCodeCatalog.setFileSuffix("." + org.springframework.util.StringUtils.uncapitalize(FileTypeEnum.Java.name()));
+                                    projectCodeCatalog.setAbsolutePath(projectCodeCatalog.getRelativePath() + projectCodeCatalog.getFileSuffix());
+                                    projectCodeCatalog.setFileType(FileTypeEnum.Java.name());
+                                    projectCodeCatalogDAO.insert(projectCodeCatalog);
+                                }
+                            });
+                        }
                     });
-                });
-
+                }
             });
+
 
         });
         return true;

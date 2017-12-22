@@ -23,5 +23,6 @@ public class ProjectCodeModel extends BaseEntity implements java.io.Serializable
 	private String code;//数据库字段:code  属性显示:结构编码
 	private String serviceModuleCode;//数据库字段:serviceModuleCode  属性显示:业务编码
 	private String model;//数据库字段:model  属性显示:模型：po,ctrl,vo,dao,facade,service
+	private String modelSuffix;//数据库字段:modelSuffix  属性显示:代码后缀
 }
 

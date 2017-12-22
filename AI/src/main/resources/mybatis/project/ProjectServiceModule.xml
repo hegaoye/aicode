@@ -1,114 +1,120 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 
 <!-- 不使用namespace的话sql搜索定位会比较方便 -->
 <mapper namespace="ProjectServiceModule">
 
-	<resultMap id="rs_base" type="ProjectServiceModule">
+    <resultMap id="rs_base" type="ProjectServiceModule">
         <result property="id" column="id"/>
+        <result property="moduleCode" column="moduleCode"/>
         <result property="code" column="code"/>
         <result property="name" column="name"/>
         <result property="englishName" column="englishName"/>
         <result property="state" column="state"/>
-	</resultMap>
+    </resultMap>
 
-	<!--查询表信息关联信息-->
-	<resultMap id="rs_base_all" type="ProjectServiceModule" extends="rs_base">
-		<collection property="projectCodeModelList" column="{serviceModuleCode=code}" select="ProjectCodeModel.query"/>
-		<collection property="projectServiceModuleClassList" column="{serviceModuleCode=code}" select="ProjectServiceModuleClass.query"/>
-	</resultMap>
+    <!--查询表信息关联信息-->
+    <resultMap id="rs_base_all" type="ProjectServiceModule" extends="rs_base">
+        <collection property="projectCodeModelList" column="{serviceModuleCode=code}" select="ProjectCodeModel.query"/>
+        <collection property="projectServiceModuleClassList" column="{serviceModuleCode=code}" select="ProjectServiceModuleClass.query"/>
+    </resultMap>
 
-	<!-- 用于select查询公用抽取的列 -->
-	<sql id="ProjectServiceModule.columns">
-		id,code,name,englishName,state
+    <!-- 用于select查询公用抽取的列 -->
+    <sql id="ProjectServiceModule.columns">
+		id,moduleCode,code,name,englishName,state
 	</sql>
 
-	<insert id="ProjectServiceModule.insert" useGeneratedKeys="true" keyProperty="id" parameterType="ProjectServiceModule">
+    <insert id="ProjectServiceModule.insert" useGeneratedKeys="true" keyProperty="id" parameterType="ProjectServiceModule">
         INSERT INTO `project_service_module` (
-        	id ,
-        	code ,
-        	name ,
-        	englishName ,
-        	state 
+        id ,
+        moduleCode ,
+        code ,
+        name ,
+        englishName ,
+        state
         ) VALUES (
-        	#{id} ,
-        	#{code} ,
-        	#{name} ,
-        	#{englishName} ,
-        	#{state} 
+        #{id} ,
+        #{moduleCode} ,
+        #{code} ,
+        #{name} ,
+        #{englishName} ,
+        #{state}
         )
-		<selectKey keyProperty="id" resultType="long">
-			select LAST_INSERT_ID()
-		</selectKey>
-	</insert>
+        <selectKey keyProperty="id" resultType="long">
+            select LAST_INSERT_ID()
+        </selectKey>
+    </insert>
 
-	<update id="ProjectServiceModule.update" parameterType="ProjectServiceModule">
+    <update id="ProjectServiceModule.update" parameterType="ProjectServiceModule">
         UPDATE `project_service_module`
-		<trim prefix="set" suffixOverrides=",">
-			<if test="name!=null and name!=''">
-	        name = #{name} ,
-		    </if>
-			<if test="englishName!=null and englishName!=''">
-	        englishName = #{englishName} ,
-		    </if>
-			<if test="state!=null and state!=''">
-	        state = #{state} 
-		    </if>
-		</trim>
+        <trim prefix="set" suffixOverrides=",">
+            <if test="name!=null and name!=''">
+                name = #{name} ,
+            </if>
+            <if test="englishName!=null and englishName!=''">
+                englishName = #{englishName} ,
+            </if>
+            <if test="state!=null and state!=''">
+                state = #{state}
+            </if>
+        </trim>
         WHERE
-	        id = #{id}  AND 
-	        code = #{code} 
-	</update>
+        code = #{code}
+    </update>
 
     <delete id="ProjectServiceModule.delete">
         DELETE FROM `project_service_module`
-		<include refid="ProjectServiceModule.where"/>
+        <include refid="ProjectServiceModule.where"/>
     </delete>
 
     <select id="ProjectServiceModule.load" resultMap="rs_base_all">
-		SELECT <include refid="ProjectServiceModule.columns" />
-		    FROM `project_service_module`
-		<include refid="ProjectServiceModule.where"/>
-	</select>
+        SELECT
+        <include refid="ProjectServiceModule.columns"/>
+        FROM `project_service_module`
+        <include refid="ProjectServiceModule.where"/>
+    </select>
 
-	<sql id="ProjectServiceModule.where">
-		<where>
-			<if test="id!=null and id!=''">
-				AND id = #{id}
-			</if>
-			<if test="code!=null and code!=''">
-				AND code = #{code}
-			</if>
-			<if test="name!=null and name!=''">
-				AND name = #{name}
-			</if>
-			<if test="englishName!=null and englishName!=''">
-				AND englishName = #{englishName}
-			</if>
-			<if test="state!=null and state!=''">
-				AND state = #{state}
-			</if>
-		</where>
-	</sql>
-
+    <sql id="ProjectServiceModule.where">
+        <where>
+            <if test="id!=null and id!=''">
+                AND id = #{id}
+            </if>
+            <if test="moduleCode!=null and moduleCode!=''">
+                AND moduleCode = #{moduleCode}
+            </if>
+            <if test="code!=null and code!=''">
+                AND code = #{code}
+            </if>
+            <if test="name!=null and name!=''">
+                AND name = #{name}
+            </if>
+            <if test="englishName!=null and englishName!=''">
+                AND englishName = #{englishName}
+            </if>
+            <if test="state!=null and state!=''">
+                AND state = #{state}
+            </if>
+        </where>
+    </sql>
 
 
     <select id="ProjectServiceModule.count" resultType="long">
         SELECT count(*) FROM `project_service_module`
-		<include refid="ProjectServiceModule.where"/>
+        <include refid="ProjectServiceModule.where"/>
     </select>
 
 
     <select id="ProjectServiceModule.query" resultMap="rs_base_all">
-    	SELECT <include refid="ProjectServiceModule.columns" />
-	    FROM `project_service_module`
-		<include refid="ProjectServiceModule.where"/>
+        SELECT
+        <include refid="ProjectServiceModule.columns"/>
+        FROM `project_service_module`
+        <include refid="ProjectServiceModule.where"/>
 
-		<if test="sortColumns!=null and sortColumns!=''">
-			ORDER BY ${sortColumns}
-		</if>
+        <if test="sortColumns!=null and sortColumns!=''">
+            ORDER BY ${sortColumns}
+        </if>
     </select>
 
 

@@ -22,6 +22,7 @@ public class ProjectServiceModule extends BaseEntity implements java.io.Serializ
 
 
     private Long id;//数据库字段:id  属性显示:id
+    private String moduleCode;//数据库字段:moduleCode  属性显示:项目模块编码
     private String code;//数据库字段:code  属性显示:业务编码
     private String name;//数据库字段:name  属性显示:业务名
     private String englishName;//数据库字段:englishName  属性显示:业务英文名

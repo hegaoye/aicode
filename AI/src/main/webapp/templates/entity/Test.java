@@ -1,0 +1,8 @@
+${basePackage}
+${className} {
+
+}
+
+
+
+

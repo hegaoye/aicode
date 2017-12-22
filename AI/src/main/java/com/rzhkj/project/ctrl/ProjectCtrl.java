@@ -220,5 +220,28 @@ public class ProjectCtrl extends BaseCtrl {
         }
     }
 
+    /**
+     * 创建文件目录
+     *
+     * @return BeanRet
+     */
+    @ApiOperation(value = "创建文件目录", notes = "创建文件目录")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "code", value = "项目编码", required = true, paramType = "query")
+    })
+    @PutMapping("/build/catalog")
+    @ResponseBody
+    public BeanRet catalog(String code) {
+        try {
+            Assert.hasText(code, BaseException.BaseExceptionEnum.Empty_Param.toString());
+            projectSV.buildCatalog(code);
+            return BeanRet.create(true, "创建文件目录成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error(e.getMessage());
+            return BeanRet.create(false, "创建文件目录失败");
+        }
+    }
+
 
 }

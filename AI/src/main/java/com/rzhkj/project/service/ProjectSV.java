@@ -32,4 +32,11 @@ public interface ProjectSV extends BaseMybatisSV<Project, Long> {
      * @param code 项目编码
      */
     void execute(String code);
+
+    /**
+     * 创建文件目录
+     *
+     * @param code 项目编码
+     */
+    void buildCatalog(String code);
 }

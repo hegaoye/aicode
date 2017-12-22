@@ -155,7 +155,6 @@ public class ProjectSVImpl extends BaseMybatisSVImpl<Project, Long> implements P
      * 1.创建数据库
      * 2.解析数据库信息
      * 3.生成java类映射信息
-     * 4.生成项目基本目录信息
      *
      * @param code 项目编码
      */
@@ -182,12 +181,85 @@ public class ProjectSVImpl extends BaseMybatisSVImpl<Project, Long> implements P
             throw new ProjectException(BaseException.BaseExceptionEnum.Server_Error);
         }
 
-        //4.生成项目基本目录信息
-        flag = this.createBuildPath(code);
-        if (!flag) {
-            logger.error(BaseException.BaseExceptionEnum.Server_Error.toString());
-            throw new ProjectException(BaseException.BaseExceptionEnum.Server_Error);
+    }
+
+    /**
+     * 创建文件目录
+     *
+     * @param code 项目编码
+     */
+    @Override
+    public void buildCatalog(String code) {
+        this.createBuildPath(code);
+    }
+
+    /**
+     * 生成项目基本目录信息
+     * 1.查询项目
+     * 2.获取模块信息
+     * 3.获取业务模块信息
+     * 4.获取源码结构
+     * 5.生成项目构建路径
+     *
+     * @param code 项目编码
+     * @return true/false
+     */
+    private boolean createBuildPath(String code) {
+        //1.查询项目
+        Map<String, Object> map = Maps.newHashMap();
+        map.put("code", code);
+        Project project = projectDAO.load(map);
+        if (project == null) {
+            return false;
         }
+        map.clear();
+        map.put("buildType", BuildToolsTypeEnum.Gradle.name());
+        BuildTools buildTools = buildToolsDAO.load(map);
+        List<BuildToolsPath> buildToolsPathList = buildTools.getBuildToolsPathList();
+        //2.获取模块信息
+        List<ProjectModule> projectModuleList = project.getProjectModuleList();
+        projectModuleList.forEach(projectModule -> {
+            //3.获取业务模块信息
+            List<ProjectServiceModule> projectServiceModuleList = projectModule.getProjectServiceModuleList();
+            projectServiceModuleList.forEach(projectServiceModule -> {
+                //4.获取源码结构
+                List<ProjectCodeModel> projectCodeModelList = projectServiceModule.getProjectCodeModelList();
+                List<ProjectServiceModuleClass> projectServiceModuleClassList = projectServiceModule.getProjectServiceModuleClassList();
+                projectCodeModelList.forEach(projectCodeModel -> {
+                    projectServiceModuleClassList.forEach(projectServiceModuleClass -> {
+                        //5.生成项目构建路径
+                        final String[] relativePath = {null};
+                        buildToolsPathList.forEach(buildToolsPath -> {
+                            if (buildToolsPath.getPathType().equals(BuildToolsPathTypeEnum.Java.name())) {
+                                relativePath[0] = project.getEnglishName()
+                                        + "/" + org.springframework.util.StringUtils.uncapitalize(projectModule.getEnglishName())
+                                        + "/" + org.springframework.util.StringUtils.uncapitalize(buildToolsPath.getBuildPath())
+                                        + "/" + org.springframework.util.StringUtils.uncapitalize(project.getBasePackage().replace(".", "/"))
+                                        + "/" + org.springframework.util.StringUtils.uncapitalize(projectServiceModule.getEnglishName())
+                                        + "/" + org.springframework.util.StringUtils.uncapitalize(projectCodeModel.getModel()) + "/";
+                            }
+                        });
+                        relativePath[0] = relativePath[0].replace("//", "/");
+
+                        ProjectCodeCatalog projectCodeCatalog = new ProjectCodeCatalog();
+                        projectCodeCatalog.setCode(String.valueOf(uidGenerator.getUID()));
+                        projectCodeCatalog.setProjectCode(project.getCode());
+                        projectCodeCatalog.setModuleCode(projectModule.getCode());
+                        projectCodeCatalog.setServiceModuleCode(projectServiceModule.getCode());
+                        projectCodeCatalog.setCodeModelCode(projectCodeModel.getCode());
+                        projectCodeCatalog.setRelativePath(relativePath[0] + projectServiceModuleClass.getClassInfo().getClassName());
+                        projectCodeCatalog.setFileSuffix("." + org.springframework.util.StringUtils.uncapitalize(FileTypeEnum.Java.name()));
+                        projectCodeCatalog.setAbsolutePath(projectCodeCatalog.getRelativePath() + projectCodeCatalog.getFileSuffix());
+                        projectCodeCatalog.setFileName(projectServiceModuleClass.getClassInfo().getClassName());
+                        projectCodeCatalog.setFileType(FileTypeEnum.Java.name());
+                        projectCodeCatalogDAO.insert(projectCodeCatalog);
+                    });
+                });
+
+            });
+
+        });
+        return true;
     }
 
     /**
@@ -370,77 +442,6 @@ public class ProjectSVImpl extends BaseMybatisSVImpl<Project, Long> implements P
                 classAttributesDAO.insert(classAttributes);
             });
         });
-
-        return true;
-    }
-
-    /**
-     * 生成项目基本目录信息
-     * 1.查询项目
-     * 2.获取模块信息
-     * 3.获取业务模块信息
-     * 4.获取源码结构
-     * 5.生成项目构建路径
-     *
-     * @param code 项目编码
-     * @return true/false
-     */
-    private boolean createBuildPath(String code) {
-        //1.查询项目
-        Map<String, Object> map = Maps.newHashMap();
-        map.put("code", code);
-        Project project = projectDAO.load(map);
-        if (project == null) {
-            return false;
-        }
-        map.clear();
-        map.put("buildType", BuildToolsTypeEnum.Gradle.name());
-        BuildTools buildTools = buildToolsDAO.load(map);
-        List<BuildToolsPath> buildToolsPathList = buildTools.getBuildToolsPathList();
-        //2.获取模块信息
-        List<ProjectModule> projectModuleList = project.getProjectModuleList();
-        projectModuleList.forEach(projectModule -> {
-            //3.获取业务模块信息
-            List<ProjectServiceModule> projectServiceModuleList = projectModule.getProjectServiceModuleList();
-            projectServiceModuleList.forEach(projectServiceModule -> {
-                //4.获取源码结构
-                List<ProjectCodeModel> projectCodeModelList = projectServiceModule.getProjectCodeModelList();
-                List<ProjectServiceModuleClass> projectServiceModuleClassList = projectServiceModule.getProjectServiceModuleClassList();
-                projectCodeModelList.forEach(projectCodeModel -> {
-                    projectServiceModuleClassList.forEach(projectServiceModuleClass -> {
-                        //5.生成项目构建路径
-                        final String[] relativePath = {null};
-                        buildToolsPathList.forEach(buildToolsPath -> {
-                            if (buildToolsPath.getPathType().equals(BuildToolsPathTypeEnum.Java.name())) {
-                                relativePath[0] = project.getEnglishName()
-                                        + "/" + org.springframework.util.StringUtils.uncapitalize(projectModule.getEnglishName())
-                                        + "/" + org.springframework.util.StringUtils.uncapitalize(buildToolsPath.getBuildPath())
-                                        + "/" + org.springframework.util.StringUtils.uncapitalize(project.getBasePackage().replace(".", "/"))
-                                        + "/" + org.springframework.util.StringUtils.uncapitalize(projectServiceModule.getEnglishName())
-                                        + "/" + org.springframework.util.StringUtils.uncapitalize(projectCodeModel.getModel());
-                            }
-                        });
-                        relativePath[0] = relativePath[0].replace("//", "/");
-
-                        ProjectCodeCatalog projectCodeCatalog = new ProjectCodeCatalog();
-                        projectCodeCatalog.setCode(String.valueOf(uidGenerator.getUID()));
-                        projectCodeCatalog.setProjectCode(project.getCode());
-                        projectCodeCatalog.setModuleCode(projectModule.getCode());
-                        projectCodeCatalog.setServiceModuleCode(projectServiceModule.getCode());
-                        projectCodeCatalog.setCodeModelCode(projectCodeModel.getCode());
-                        projectCodeCatalog.setRelativePath(relativePath[0]);
-                        projectCodeCatalog.setAbsolutePath(relativePath[0] + "/" + projectServiceModuleClass.getClassInfo().getClassName());
-                        projectCodeCatalog.setFileName(projectServiceModuleClass.getClassInfo().getClassName());
-                        projectCodeCatalog.setFileSuffix("." + org.springframework.util.StringUtils.uncapitalize(FileTypeEnum.Java.name()));
-                        projectCodeCatalog.setFileType(FileTypeEnum.Java.name());
-                        projectCodeCatalogDAO.insert(projectCodeCatalog);
-                    });
-                });
-
-            });
-
-        });
-
 
         return true;
     }

@@ -223,7 +223,6 @@ public class ProjectJobSVImpl extends BaseMybatisSVImpl<ProjectJob, Long> implem
                 templatePath = templatePath.replace("//", "/");
                 FreemarkerHelper.generate(map, targetFilePath, templateFileName, templatePath);
                 logger.info("已生成java 类[" + projectCodeCatalog.getAbsolutePath() + "]相关文件");
-                projectFilesDAO.update(projectFiles);
             }
         });
     }

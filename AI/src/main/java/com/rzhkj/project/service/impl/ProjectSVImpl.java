@@ -240,9 +240,13 @@ public class ProjectSVImpl extends BaseMybatisSVImpl<Project, Long> implements P
                                     final String[] relativePath = {null};
                                     buildToolsPathList.forEach(buildToolsPath -> {
                                         if (buildToolsPath.getPathType().equals(BuildToolsPathTypeEnum.Java.name())) {
-                                            relativePath[0] = project.getEnglishName()
-                                                    + "/" + projectModule.getEnglishName().toLowerCase()
-                                                    + "/" + buildToolsPath.getBuildPath().toLowerCase()
+                                            relativePath[0] = project.getEnglishName();
+                                            if (projectModule != null) {
+                                                relativePath[0] = relativePath[0] + "/" + projectModule.getEnglishName().toLowerCase();
+                                            } else {
+                                                relativePath[0] = relativePath[0] + "/" + project.getEnglishName();
+                                            }
+                                            relativePath[0] = relativePath[0] + "/" + buildToolsPath.getBuildPath().toLowerCase()
                                                     + "/" + project.getBasePackage().replace(".", "/").toLowerCase()
                                                     + "/" + projectServiceModule.getEnglishName().toLowerCase()
                                                     + "/" + projectCodeModel.getModel().toLowerCase() + "/";
@@ -250,18 +254,18 @@ public class ProjectSVImpl extends BaseMybatisSVImpl<Project, Long> implements P
                                     });
                                     relativePath[0] = relativePath[0].replace("//", "/");
 
-                                    ProjectCodeCatalog projectCodeCatalog = new ProjectCodeCatalog();
-                                    projectCodeCatalog.setCode(String.valueOf(uidGenerator.getUID()));
-                                    projectCodeCatalog.setProjectCode(project.getCode());
-                                    projectCodeCatalog.setModuleCode(projectModule.getCode());
-                                    projectCodeCatalog.setServiceModuleCode(projectServiceModule.getCode());
-                                    projectCodeCatalog.setCodeModelCode(projectCodeModel.getCode());
-                                    projectCodeCatalog.setFileName(projectServiceModuleClass.getClassInfo().getClassName() + StringHelper.toJavaClassName(projectCodeModel.getModelSuffix()));
+                                    ProjectCodeCatalog projectCodeCatalog = new ProjectCodeCatalog(
+                                            String.valueOf(uidGenerator.getUID()), project.getCode(),
+                                            projectModule.getCode(), projectServiceModule.getCode(),
+                                            projectCodeModel.getCode(), projectServiceModuleClass.getClassInfo().getCode());
+
+                                    String fileName = projectServiceModuleClass.getClassInfo().getClassName() + StringHelper.toJavaClassName(projectCodeModel.getModelSuffix());
+                                    projectCodeCatalog.setFileName(fileName);
                                     projectCodeCatalog.setRelativePath(relativePath[0] + projectCodeCatalog.getFileName());
                                     projectCodeCatalog.setFileSuffix("." + FileTypeEnum.Java.name().toLowerCase());
                                     projectCodeCatalog.setAbsolutePath(projectCodeCatalog.getRelativePath() + projectCodeCatalog.getFileSuffix());
                                     projectCodeCatalog.setFileType(FileTypeEnum.Java.name());
-                                    projectCodeCatalog.setClassInfoCode(projectServiceModuleClass.getClassInfo().getCode());
+
                                     projectCodeCatalogDAO.insert(projectCodeCatalog);
                                 }
                             });

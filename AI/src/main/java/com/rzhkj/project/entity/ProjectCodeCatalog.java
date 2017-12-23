@@ -37,6 +37,18 @@ public class ProjectCodeCatalog extends BaseEntity implements java.io.Serializab
     private ClassInfo classInfo;
     private ProjectCodeModel projectCodeModel;
 
+    public ProjectCodeCatalog() {
+    }
+
+    public ProjectCodeCatalog(String code, String projectCode, String moduleCode, String serviceModuleCode, String codeModelCode, String classInfoCode) {
+        this.code = code;
+        this.projectCode = projectCode;
+        this.moduleCode = moduleCode;
+        this.serviceModuleCode = serviceModuleCode;
+        this.codeModelCode = codeModelCode;
+        this.classInfoCode = classInfoCode;
+    }
+
     public String basePackage(String workspace) {
         return (new HandleFuncs().getCurrentClassPath() + "/"
                 + workspace + "/"

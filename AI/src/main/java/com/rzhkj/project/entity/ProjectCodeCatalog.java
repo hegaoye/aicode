@@ -9,7 +9,6 @@ package com.rzhkj.project.entity;
 import com.rzhkj.core.base.BaseEntity;
 import com.rzhkj.core.tools.HandleFuncs;
 import lombok.Data;
-import org.springframework.util.StringUtils;
 
 /**
  * @author lixin hegaoye@qq.com
@@ -33,6 +32,8 @@ public class ProjectCodeCatalog extends BaseEntity implements java.io.Serializab
     private String fileName;//数据库字段:fileName  属性显示:文件名
     private String fileSuffix;//数据库字段:fileSuffix  属性显示:文件后缀
     private String fileType;//数据库字段:fileType  属性显示:文件类型：java,xml,property
+    private String classPackage;//数据库字段:classPackage  属性显示:类包名
+    private String basePackage;//数据库字段:basePackage  属性显示:项目基础包名
 
     private ClassInfo classInfo;
     private ProjectCodeModel projectCodeModel;

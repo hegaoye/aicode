@@ -150,9 +150,6 @@ public class ProjectJobSVImpl extends BaseMybatisSVImpl<ProjectJob, Long> implem
         Project project = projectDAO.load(map);
         this.buildProject(project);
         logger.info("创建工作空间库完成");
-        //2.获取类信息
-        List<ClassInfo> classInfoList = classInfoDAO.query(map);
-        logger.info("已解析所有表信息");
         //3.获取模板信息
         map.put("fileType", FileTypeEnum.Java.name());
         List<ProjectFiles> projectFilesList = projectFilesDAO.query(map);
@@ -162,17 +159,10 @@ public class ProjectJobSVImpl extends BaseMybatisSVImpl<ProjectJob, Long> implem
         logger.info("已获取框架信息");
         List<ProjectCodeCatalog> projectCodeCatalogList = projectCodeCatalogDAO.query(map);
         projectCodeCatalogList.forEach(projectCodeCatalog -> {
-            this.generatorJava(projectCodeCatalog, projectFilesList);
+            this.generatorJava(project.getAuthor(), project.getCopyright(), projectCodeCatalog, projectFilesList);
 
-//            this.generatorConfigure(classInfo, projectFramworkList);
-            logger.info("已生成框架相关配置文件");
+//            this.generatorConfigure(project.getCopyright(),projectCodeCatalog, projectFramworkList);
         });
-//        classInfoList.forEach(classInfo -> {
-//            this.generatorJava(classInfo, projectFilesList);
-//            logger.info("已生成java 类[" + classInfo.getClassName() + "]相关文件");
-//            this.generatorConfigure(classInfo, projectFramworkList);
-//            logger.info("已生成框架相关配置文件");
-//        });
 
         //5.获取工具信息
 
@@ -204,13 +194,20 @@ public class ProjectJobSVImpl extends BaseMybatisSVImpl<ProjectJob, Long> implem
      * @param projectCodeCatalog 项目源码目录
      * @param projectFilesList   项目文件信息
      */
-    private void generatorJava(ProjectCodeCatalog projectCodeCatalog, List<ProjectFiles> projectFilesList) {
+    private void generatorJava(String author, String copyright, ProjectCodeCatalog projectCodeCatalog, List<ProjectFiles> projectFilesList) {
         ClassInfo classInfo = projectCodeCatalog.getClassInfo();
         Map<String, Object> map = Maps.newHashMap();
-        map.put("className", projectCodeCatalog.getFileName());
-        map.put("basePackage", classInfo.getBasePackage());
-        map.put("classComment", classInfo.getBasePackage());
-        map.put("fields", classInfo.getClassAttributes());
+        map.put("basePackage", classInfo.getBasePackage());//包名
+        map.put("package", projectCodeCatalog.getClassPackage());//包名
+        map.put("className", projectCodeCatalog.getFileName());//类名
+        map.put("classNameLower", projectCodeCatalog.getFileName().toLowerCase());//类名小写
+        map.put("classSimpleName", classInfo.getClassName());//类名
+        map.put("classSimpleNameLower", classInfo.getClassName().toLowerCase());//类名小写
+        map.put("fields", classInfo.getClassAttributes());//类属性集合
+        map.put("comment", classInfo.getNotes());//类注释
+        map.put("namespace", classInfo.getClassName().toLowerCase());//命名空间
+        map.put("copyright", copyright);//项目版权
+        map.put("author", author);//作者
         Setting setting = settingDAO.loadByKey(Setting.Key.Workspace.name());
         Setting templatePathSetting = settingDAO.loadByKey(Setting.Key.Template_Path.name());
         String projectPath = new HandleFuncs().getCurrentClassPath();
@@ -230,15 +227,18 @@ public class ProjectJobSVImpl extends BaseMybatisSVImpl<ProjectJob, Long> implem
     /**
      * 生成配置文件
      *
-     * @param classInfo           类信息
+     * @param projectCodeCatalog  类信息
      * @param projectFramworkList 技术框架信息
      */
-    private void generatorConfigure(ClassInfo classInfo, List<ProjectFramwork> projectFramworkList) {
+    private void generatorConfigure(String copyright, ProjectCodeCatalog projectCodeCatalog, List<ProjectFramwork> projectFramworkList) {
+        ClassInfo classInfo = projectCodeCatalog.getClassInfo();
         Map<String, Object> model = Maps.newHashMap();
-        model.put("className", classInfo.getClassName());
-        model.put("basePackage", classInfo.getBasePackage());
-        model.put("classComment", classInfo.getBasePackage());
-        model.put("fields", classInfo.getClassAttributes());
+        model.put("basePackage", classInfo.getBasePackage());//包名
+        model.put("className", projectCodeCatalog.getFileName());//类名
+        model.put("fields", classInfo.getClassAttributes());//类属性集合
+        model.put("comment", classInfo.getNotes());//类注释
+        model.put("copyright", copyright);//项目版权
+
         List<Map<String, Object>> modelList = new ArrayList<>();
         final String[] targetFilePath = {null};
         final String[] templateFileName = {null};
@@ -267,8 +267,10 @@ public class ProjectJobSVImpl extends BaseMybatisSVImpl<ProjectJob, Long> implem
         if (!modelList.isEmpty() && targetFilePath[0] != null && templateFileName[0] != null && templatePath[0] != null) {
             modelList.forEach(entityMap -> {
                 FreemarkerHelper.generate(entityMap, targetFilePath[0], templateFileName[0], templatePath[0]);
+                logger.info("已生成框架相关配置文件");
             });
         }
+
     }
 
 }

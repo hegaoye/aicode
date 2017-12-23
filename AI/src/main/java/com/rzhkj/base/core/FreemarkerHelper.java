@@ -6,6 +6,7 @@ import freemarker.template.Template;
 import freemarker.template.TemplateException;
 
 import java.io.*;
+import java.nio.charset.Charset;
 import java.util.Map;
 
 public class FreemarkerHelper {
@@ -40,10 +41,10 @@ public class FreemarkerHelper {
                 dirFile.mkdirs();
             }
             Configuration configuration = new Configuration();
-            configuration.setDirectoryForTemplateLoading(new File(templatePath));
             configuration.setDefaultEncoding("UTF-8");
+            configuration.setDirectoryForTemplateLoading(new File(templatePath));
             Template  temp = configuration.getTemplate(templateFileName);
-            out = new OutputStreamWriter(new FileOutputStream(targetFilePath));
+            out = new OutputStreamWriter(new FileOutputStream(targetFilePath), Charset.forName("UTF-8"));
             temp.process(model, out);
             out.flush();
             out.close();

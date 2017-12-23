@@ -19,6 +19,8 @@
         <result property="fileName" column="fileName"/>
         <result property="fileSuffix" column="fileSuffix"/>
         <result property="fileType" column="fileType"/>
+        <result property="classPackage" column="classPackage"/>
+        <result property="basePackage" column="basePackage"/>
     </resultMap>
 
 
@@ -30,7 +32,7 @@
 
     <!-- 用于select查询公用抽取的列 -->
     <sql id="ProjectCodeCatalog.columns">
-		id,code,projectCode,moduleCode,serviceModuleCode,codeModelCode,classInfoCode,relativePath,absolutePath,fileName,fileSuffix,fileType
+		id,code,projectCode,moduleCode,serviceModuleCode,codeModelCode,classInfoCode,relativePath,absolutePath,fileName,fileSuffix,fileType,classPackage,basePackage
 	</sql>
 
     <insert id="ProjectCodeCatalog.insert" useGeneratedKeys="true" keyProperty="id" parameterType="ProjectCodeCatalog">
@@ -46,7 +48,9 @@
         absolutePath ,
         fileName ,
         fileSuffix ,
-        fileType
+        fileType,
+        classPackage,
+        basePackage
         ) VALUES (
         #{id} ,
         #{code} ,
@@ -59,7 +63,9 @@
         #{absolutePath} ,
         #{fileName} ,
         #{fileSuffix} ,
-        #{fileType}
+        #{fileType},
+        #{classPackage},
+        #{basePackage}
         )
         <selectKey keyProperty="id" resultType="long">
             select LAST_INSERT_ID()
@@ -83,6 +89,12 @@
             </if>
             <if test="fileType!=null and fileType!=''">
                 fileType = #{fileType}
+            </if>
+            <if test="classPackage!=null and classPackage!=''">
+                classPackage = #{classPackage}
+            </if>
+            <if test="basePackage!=null and basePackage!=''">
+                basePackage = #{basePackage}
             </if>
         </trim>
         WHERE
@@ -142,6 +154,12 @@
             </if>
             <if test="fileType!=null and fileType!=''">
                 AND fileType = #{fileType}
+            </if>
+            <if test="classPackage!=null and classPackage!=''">
+                AND classPackage = #{classPackage}
+            </if>
+            <if test="basePackage!=null and basePackage!=''">
+                AND basePackage = #{basePackage}
             </if>
         </where>
     </sql>

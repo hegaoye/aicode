@@ -238,6 +238,7 @@ public class ProjectSVImpl extends BaseMybatisSVImpl<Project, Long> implements P
                                 //5.生成项目构建路径
                                 if (projectServiceModuleClass.getServiceModuleCode().equals(projectServiceModule.getCode())) {
                                     final String[] relativePath = {null};
+                                    final String[] classPackage = {null};
                                     buildToolsPathList.forEach(buildToolsPath -> {
                                         if (buildToolsPath.getPathType().equals(BuildToolsPathTypeEnum.Java.name())) {
                                             relativePath[0] = project.getEnglishName();
@@ -250,6 +251,8 @@ public class ProjectSVImpl extends BaseMybatisSVImpl<Project, Long> implements P
                                                     + "/" + project.getBasePackage().replace(".", "/").toLowerCase()
                                                     + "/" + projectServiceModule.getEnglishName().toLowerCase()
                                                     + "/" + projectCodeModel.getModel().toLowerCase() + "/";
+                                            classPackage[0] = project.getBasePackage() + "." + projectServiceModule.getEnglishName().toLowerCase() + "." + projectCodeModel.getModel().toLowerCase();
+                                            classPackage[0] = classPackage[0].replace("..", ".");
                                         }
                                     });
                                     relativePath[0] = relativePath[0].replace("//", "/");
@@ -265,7 +268,8 @@ public class ProjectSVImpl extends BaseMybatisSVImpl<Project, Long> implements P
                                     projectCodeCatalog.setFileSuffix("." + FileTypeEnum.Java.name().toLowerCase());
                                     projectCodeCatalog.setAbsolutePath(projectCodeCatalog.getRelativePath() + projectCodeCatalog.getFileSuffix());
                                     projectCodeCatalog.setFileType(FileTypeEnum.Java.name());
-
+                                    projectCodeCatalog.setBasePackage(project.getBasePackage());
+                                    projectCodeCatalog.setClassPackage(classPackage[0]);
                                     projectCodeCatalogDAO.insert(projectCodeCatalog);
                                 }
                             });

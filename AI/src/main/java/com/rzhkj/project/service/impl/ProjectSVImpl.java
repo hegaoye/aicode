@@ -184,13 +184,13 @@ public class ProjectSVImpl extends BaseMybatisSVImpl<Project, Long> implements P
     }
 
     /**
-     * 创建文件目录
+     * 加工数据
      *
      * @param code 项目编码
      */
     @Override
-    public void buildCatalog(String code) {
-        this.createBuildPath(code);
+    public void process(String code) {
+        this.processJavaFileInfo(code);
     }
 
     /**
@@ -204,7 +204,7 @@ public class ProjectSVImpl extends BaseMybatisSVImpl<Project, Long> implements P
      * @param code 项目编码
      * @return true/false
      */
-    private boolean createBuildPath(String code) {
+    private boolean processJavaFileInfo(String code) {
         //1.查询项目
         Map<String, Object> map = Maps.newHashMap();
         map.put("code", code);
@@ -265,12 +265,56 @@ public class ProjectSVImpl extends BaseMybatisSVImpl<Project, Long> implements P
                                     String fileName = projectServiceModuleClass.getClassInfo().getClassName() + StringHelper.toJavaClassName(projectCodeModel.getModelSuffix());
                                     projectCodeCatalog.setFileName(fileName);
                                     projectCodeCatalog.setRelativePath(relativePath[0] + projectCodeCatalog.getFileName());
-                                    projectCodeCatalog.setFileSuffix("." + FileTypeEnum.Java.name().toLowerCase());
+                                    projectCodeCatalog.setFileSuffix(FileTypeEnum.Java.val);
                                     projectCodeCatalog.setAbsolutePath(projectCodeCatalog.getRelativePath() + projectCodeCatalog.getFileSuffix());
                                     projectCodeCatalog.setFileType(FileTypeEnum.Java.name());
                                     projectCodeCatalog.setBasePackage(project.getBasePackage());
                                     projectCodeCatalog.setClassPackage(classPackage[0]);
                                     projectCodeCatalogDAO.insert(projectCodeCatalog);
+
+                                    List<ProjectFramwork> projectFramworkList = project.getProjectFramworkList();
+                                    if (!projectFramworkList.isEmpty()) {
+                                        projectFramworkList.forEach(projectFramwork -> {
+                                            List<FrameworksConfigureTemplate> frameworksConfigureTemplateList = projectFramwork.getFrameworks().getFrameworksConfigureTemplateList();
+                                            if (!frameworksConfigureTemplateList.isEmpty()) {
+                                                frameworksConfigureTemplateList.forEach(frameworksConfigureTemplate -> {
+                                                    if (frameworksConfigureTemplate.getIsMapper().equals(YNEnum.Y.name())) {
+                                                        projectCodeCatalog.setCode(String.valueOf(uidGenerator.getUID()));
+                                                        projectCodeCatalog.setFrameworksConfigureTemplateCode(frameworksConfigureTemplate.getCode());
+                                                        projectCodeCatalog.setFileName(fileName);
+
+                                                        String configurePath = frameworksConfigureTemplate.getBasePath();
+                                                        if (frameworksConfigureTemplate.getIsProjectBasePath().equals(YNEnum.Y.name())) {
+                                                            configurePath = configurePath + "/" + project.getBasePackage().toLowerCase().replace(".", "/");
+                                                        }
+                                                        if (frameworksConfigureTemplate.getIsProjectServiceModulePath().equals(YNEnum.Y.name())) {
+                                                            configurePath = configurePath + "/" + projectServiceModule.getEnglishName().toLowerCase();
+                                                        }
+                                                        if (frameworksConfigureTemplate.getIsProjectCodeModelPath().equals(YNEnum.Y.name())) {
+                                                            configurePath = configurePath + "/" + projectCodeModel.getModel().toLowerCase();
+                                                        }
+                                                        configurePath = configurePath + "/" + fileName;
+
+                                                        projectCodeCatalog.setRelativePath(configurePath.replace("//", "/"));
+                                                        projectCodeCatalog.setAbsolutePath(projectCodeCatalog.getRelativePath() + projectCodeCatalog.getFileSuffix());
+
+                                                        if (frameworksConfigureTemplate.getFileType().equals(FileTypeEnum.Xml.name())) {
+                                                            projectCodeCatalog.setFileType(FileTypeEnum.Xml.name());
+                                                            projectCodeCatalog.setFileSuffix(FileTypeEnum.Xml.val);
+                                                        } else if (frameworksConfigureTemplate.getFileType().equals(FileTypeEnum.Property.name())) {
+                                                            projectCodeCatalog.setFileType(FileTypeEnum.Property.name());
+                                                            projectCodeCatalog.setFileSuffix(FileTypeEnum.Property.val);
+                                                        }
+
+                                                        projectCodeCatalog.setBasePackage(project.getBasePackage());
+                                                        projectCodeCatalog.setClassPackage(classPackage[0]);
+                                                        projectCodeCatalogDAO.insert(projectCodeCatalog);
+
+                                                    }
+                                                });
+                                            }
+                                        });
+                                    }
                                 }
                             });
                         }

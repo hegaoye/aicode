@@ -197,7 +197,7 @@ public class ProjectCtrl extends BaseCtrl {
 
 
     /**
-     * 执行脚本
+     * 初始化
      *
      * @return BeanRet
      */
@@ -205,9 +205,9 @@ public class ProjectCtrl extends BaseCtrl {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "code", value = "项目编码", required = true, paramType = "query")
     })
-    @PutMapping("/execute")
+    @PutMapping("/init")
     @ResponseBody
-    public BeanRet execute(String code) {
+    public BeanRet init(String code) {
         try {
             Assert.hasText(code, BaseException.BaseExceptionEnum.Empty_Param.toString());
 
@@ -221,7 +221,7 @@ public class ProjectCtrl extends BaseCtrl {
     }
 
     /**
-     * 创建文件目录
+     * 加工数据
      *
      * @return BeanRet
      */
@@ -229,12 +229,12 @@ public class ProjectCtrl extends BaseCtrl {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "code", value = "项目编码", required = true, paramType = "query")
     })
-    @PutMapping("/build/catalog")
+    @PutMapping("/process")
     @ResponseBody
-    public BeanRet catalog(String code) {
+    public BeanRet process(String code) {
         try {
             Assert.hasText(code, BaseException.BaseExceptionEnum.Empty_Param.toString());
-            projectSV.buildCatalog(code);
+            projectSV.process(code);
             return BeanRet.create(true, "创建文件目录成功");
         } catch (Exception e) {
             e.printStackTrace();

@@ -184,7 +184,7 @@ public class ProjectJobCtrl extends BaseCtrl {
 
 
     /**
-     * 执行任务
+     * 构建任务
      *
      * @param code 任务编码
      * @return BeanRet

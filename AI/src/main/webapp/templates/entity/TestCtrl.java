@@ -34,7 +34,7 @@ import java.util.Map;
 public class ${className} extends BaseCtrl {
 
     @Resource
-    private ${classSimpleName}SV ${classSimpleName}SV;
+    private ${classSimpleName}SV ${classSimpleNameLower}SV;
 
     /**
      * 查询${classSimpleName}详情信息
@@ -44,22 +44,24 @@ public class ${className} extends BaseCtrl {
      */
     @ApiOperation(value = "查询${classSimpleName}详情信息", notes = "查询${classSimpleName}详情信息")
     @ApiImplicitParams({
-            <#list fields as field>
-             <#if field.isPrimaryKey=='Y'>
+            <#list primaryKeys as field>
               @ApiImplicitParam(name = "${field.name}", value = "${field.notes}", paramType = "query")<#if field_has_next>,</#if>
-             </#if>
             </#list>
     })
     @GetMapping(value = "/load")
     @ResponseBody
-    public BeanRet load(<#list fields as field><#if field.isPrimaryKey=='Y'>${field.type} ${field.name}<#if field_has_next>,</#if></#if></#list>) {
+    public BeanRet load(<#list primaryKeys as field>${field.type} ${field.name}<#if field_has_next>,</#if></#list>) {
         try {
-            Assert.hasText(code, BaseException.BaseExceptionEnum.Empty_Param.toString());
+           <#list primaryKeys as field>
+            Assert.hasText(field.name, BaseException.BaseExceptionEnum.Empty_Param.toString());
+           </#list>
             Map<String, Object> map = new HashedMap();
-            map.put("code", code);
-            Project project = projectSV.load(map);
-            logger.info(JSON.toJSONString(project));
-            return BeanRet.create(true, "查询一个详情信息", project);
+           <#list primaryKeys as field>
+            map.put("${field.name}", ${field.name});
+           </#list>
+           ${classSimpleName} ${classSimpleNameLower} = ${classSimpleNameLower}SV.load(map);
+            logger.info(JSON.toJSONString(${classSimpleNameLower}));
+            return BeanRet.create(true, "查询一个详情信息", ${classSimpleNameLower});
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e.getMessage());

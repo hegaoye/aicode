@@ -215,12 +215,14 @@ public class ProjectJobSVImpl extends BaseMybatisSVImpl<ProjectJob, Long> implem
         Setting templatePathSetting = settingDAO.loadByKey(Setting.Key.Template_Path.name());
         String projectPath = new HandleFuncs().getCurrentClassPath();
         projectFilesList.forEach(projectFiles -> {
-            String templateFileName = projectFiles.getTemplates().getName();
-            String templatePath = projectFiles.getTemplates().getPath();
-            String targetFilePath = projectCodeCatalog.basePackage(setting.getV());
-            templatePath = projectPath + templatePathSetting.getV() + templatePath;
-            templatePath = templatePath.replace("//", "/");
-            FreemarkerHelper.generate(map, targetFilePath, templateFileName, templatePath);
+            if (projectFiles.getTemplates().getModel().equals(projectCodeCatalog.getProjectCodeModel().getModel())) {
+                String templateFileName = projectFiles.getTemplates().getName();
+                String templatePath = projectFiles.getTemplates().getPath();
+                String targetFilePath = projectCodeCatalog.basePackage(setting.getV());
+                templatePath = projectPath + templatePathSetting.getV() + templatePath;
+                templatePath = templatePath.replace("//", "/");
+                FreemarkerHelper.generate(map, targetFilePath, templateFileName, templatePath);
+            }
         });
     }
 

@@ -25,7 +25,7 @@
     <!--查询表信息关联信息-->
     <resultMap id="rs_base_all" type="ProjectCodeCatalog" extends="rs_base">
         <association property="classInfo" column="{code=classInfoCode}" select="ClassInfo.load"/>
-
+        <association property="projectCodeModel" column="{code=codeModelCode}" select="ProjectCodeModel.load"/>
     </resultMap>
 
     <!-- 用于select查询公用抽取的列 -->

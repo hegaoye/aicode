@@ -15,11 +15,12 @@
         <result property="path" column="path"/>
         <result property="state" column="state"/>
         <result property="fileType" column="fileType"/>
+        <result property="model" column="model"/>
     </resultMap>
 
     <!-- 用于select查询公用抽取的列 -->
     <sql id="Templates.columns">
-		id,tempalteCategoryCode,code,name,description,path,state,fileType
+		id,tempalteCategoryCode,code,name,description,path,state,fileType,model
 	</sql>
 
     <insert id="Templates.insert" useGeneratedKeys="true" keyProperty="id" parameterType="Templates">
@@ -31,7 +32,8 @@
         description ,
         path ,
         state,
-        fileType
+        fileType,
+        model
         ) VALUES (
         #{id} ,
         #{tempalteCategoryCode} ,
@@ -40,7 +42,8 @@
         #{description} ,
         #{path} ,
         #{state} ,
-        fileType
+        #{fileType},
+        #{model}
         )
         <selectKey keyProperty="id" resultType="long">
             select LAST_INSERT_ID()
@@ -67,6 +70,9 @@
             </if>
             <if test="fileType!=null and fileType!=''">
                 fileType = #{fileType}
+            </if>
+            <if test="model!=null and model!=''">
+                model = #{model}
             </if>
         </trim>
         WHERE
@@ -110,6 +116,9 @@
             </if>
             <if test="fileType!=null and fileType!=''">
                 AND fileType = #{fileType}
+            </if>
+            <if test="model!=null and model!=''">
+                AND model = #{model}
             </if>
         </where>
     </sql>

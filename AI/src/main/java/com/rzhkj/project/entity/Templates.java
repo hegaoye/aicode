@@ -26,7 +26,7 @@ public class Templates extends BaseEntity implements java.io.Serializable {
     private String path;//数据库字段:path  属性显示:模板路径
     private String state;//数据库字段:state  属性显示:状态：停用[Disenable]，启用[Enable]
     private String fileType;//数据库字段:fileType  属性显示:文件类型 Java, Xml, Property
-
+    private String model;//数据库字段:model  属性显示:模型：po,ctrl,vo,dao,facade,service
 
 }
 

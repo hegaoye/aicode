@@ -35,6 +35,7 @@ public class ProjectCodeCatalog extends BaseEntity implements java.io.Serializab
     private String fileType;//数据库字段:fileType  属性显示:文件类型：java,xml,property
 
     private ClassInfo classInfo;
+    private ProjectCodeModel projectCodeModel;
 
     public String basePackage(String workspace) {
         return (new HandleFuncs().getCurrentClassPath() + "/"

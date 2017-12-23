@@ -8,12 +8,8 @@
 
     <resultMap id="rs_base" type="ProjectFiles">
         <result property="id" column="id"/>
-        <result property="code" column="code"/>
         <result property="templateCode" column="templateCode"/>
         <result property="projectCode" column="projectCode"/>
-        <result property="path" column="path"/>
-        <result property="description" column="description"/>
-        <result property="createTime" column="createTime"/>
     </resultMap>
 
 
@@ -23,26 +19,18 @@
     </resultMap>
     <!-- 用于select查询公用抽取的列 -->
     <sql id="ProjectFiles.columns">
-		id,code,templateCode,projectCode,path,description,createTime
+		id,templateCode,projectCode
 	</sql>
 
     <insert id="ProjectFiles.insert" useGeneratedKeys="true" keyProperty="id" parameterType="ProjectFiles">
         INSERT INTO `project_files` (
         id ,
-        code ,
         templateCode ,
         projectCode ,
-        path ,
-        description ,
-        createTime
         ) VALUES (
         #{id} ,
-        #{code} ,
         #{templateCode} ,
         #{projectCode} ,
-        #{path} ,
-        #{description} ,
-        #{createTime}
         )
         <selectKey keyProperty="id" resultType="long">
             select LAST_INSERT_ID()
@@ -58,19 +46,9 @@
             <if test="projectCode!=null and projectCode!=''">
                 projectCode = #{projectCode} ,
             </if>
-            <if test="path!=null and path!=''">
-                path = #{path} ,
-            </if>
-            <if test="description!=null and description!=''">
-                description = #{description} ,
-            </if>
-            <if test="createTime!=null ">
-                createTime = #{createTime}
-            </if>
         </trim>
         WHERE
-        id = #{id} AND
-        code = #{code}
+        id = #{id}
     </update>
 
     <delete id="ProjectFiles.delete">
@@ -90,26 +68,11 @@
             <if test="id!=null and id!=''">
                 AND id = #{id}
             </if>
-            <if test="code!=null and code!=''">
-                AND code = #{code}
-            </if>
             <if test="templateCode!=null and templateCode!=''">
                 AND templateCode = #{templateCode}
             </if>
             <if test="projectCode!=null and projectCode!=''">
                 AND projectCode = #{projectCode}
-            </if>
-            <if test="path!=null and path!=''">
-                AND path = #{path}
-            </if>
-            <if test="description!=null and description!=''">
-                AND description = #{description}
-            </if>
-            <if test="createTimeBegin!=null ">
-                AND createTime >= #{createTimeBegin}
-            </if>
-            <if test="createTimeEnd!=null ">
-                AND createTime &lt;= #{createTimeEnd}
             </if>
         </where>
     </sql>

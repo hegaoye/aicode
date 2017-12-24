@@ -277,7 +277,7 @@ public class ProjectSVImpl extends BaseMybatisSVImpl<Project, Long> implements P
                 projectServiceModule.getCode(), projectCodeModel.getCode(), projectServiceModuleClass.getClassInfo().getCode(), fileName);
 
         projectCodeCatalog.setFileSuffix(FileTypeEnum.Java.val);
-        projectCodeCatalog.setRelativePath(relativePath + projectCodeCatalog.getFileName());
+        projectCodeCatalog.setRelativePath(relativePath);
         projectCodeCatalog.setAbsolutePath(projectCodeCatalog.getRelativePath() + projectCodeCatalog.getFileSuffix());
         projectCodeCatalog.setFileType(FileTypeEnum.Java.name());
         projectCodeCatalog.setBasePackage(project.getBasePackage());
@@ -433,10 +433,11 @@ public class ProjectSVImpl extends BaseMybatisSVImpl<Project, Long> implements P
         if (codeModel != null) {
             relatevePath += "/" + codeModel;
         }
+        relatevePath = relatevePath.toLowerCase();
         if (fileName != null) {
             relatevePath += "/" + fileName;
         }
-        return relatevePath.replace("//", "/").toLowerCase();
+        return relatevePath.replace("//", "/");
     }
 
 

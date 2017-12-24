@@ -23,7 +23,7 @@
 	</sql>
 
     <insert id="ProjectFrameworkAttributeValue.insert" useGeneratedKeys="true" keyProperty="id" parameterType="ProjectFrameworkAttributeValue">
-        INSERT INTO `framework_attribute_value` (
+        INSERT INTO `project_framework_attribute_value` (
         id ,
         templateCode ,
         attributeCode ,
@@ -48,7 +48,7 @@
     </insert>
 
     <update id="ProjectFrameworkAttributeValue.update" parameterType="ProjectFrameworkAttributeValue">
-        UPDATE `framework_attribute_value`
+        UPDATE `project_framework_attribute_value`
         <trim prefix="set" suffixOverrides=",">
             <if test="templateCode!=null and templateCode!=''">
                 templateCode = #{templateCode} ,
@@ -77,14 +77,14 @@
     </update>
 
     <delete id="ProjectFrameworkAttributeValue.delete">
-        DELETE FROM `framework_attribute_value`
+        DELETE FROM `project_framework_attribute_value`
         <include refid="ProjectFrameworkAttributeValue.where"/>
     </delete>
 
     <select id="ProjectFrameworkAttributeValue.load" resultMap="rs_base">
         SELECT
         <include refid="ProjectFrameworkAttributeValue.columns"/>
-        FROM `framework_attribute_value`
+        FROM `project_framework_attribute_value`
         <include refid="ProjectFrameworkAttributeValue.where"/>
     </select>
 
@@ -119,7 +119,7 @@
 
 
     <select id="ProjectFrameworkAttributeValue.count" resultType="long">
-        SELECT count(*) FROM `framework_attribute_value`
+        SELECT count(*) FROM `project_framework_attribute_value`
         <include refid="ProjectFrameworkAttributeValue.where"/>
     </select>
 
@@ -127,7 +127,7 @@
     <select id="ProjectFrameworkAttributeValue.query" resultMap="rs_base">
         SELECT
         <include refid="ProjectFrameworkAttributeValue.columns"/>
-        FROM `framework_attribute_value`
+        FROM `project_framework_attribute_value`
         <include refid="ProjectFrameworkAttributeValue.where"/>
 
         <if test="sortColumns!=null and sortColumns!=''">

@@ -199,7 +199,9 @@ public class ProjectSVImpl extends BaseMybatisSVImpl<Project, Long> implements P
      * 2.获取模块信息
      * 3.获取业务模块信息
      * 4.获取源码结构
-     * 5.生成项目构建路径
+     * 5.生成java构建信息
+     * 6.生成mapper构建信息
+     * 7.生成配置构建信息
      *
      * @param code 项目编码
      * @return true/false
@@ -220,111 +222,239 @@ public class ProjectSVImpl extends BaseMybatisSVImpl<Project, Long> implements P
         //2.获取模块信息
         List<ProjectModule> projectModuleList = project.getProjectModuleList();
         projectModuleList.forEach(projectModule -> {
-
+            // 7.生成配置构建信息
+            this.parseToConfigure(project, projectModule, buildToolsPathList);
             //3.获取业务模块信息
             List<ProjectServiceModule> projectServiceModuleList = projectModule.getProjectServiceModuleList();
             projectServiceModuleList.forEach(projectServiceModule -> {
                 if (projectServiceModule.getModuleCode().equals(projectModule.getCode())) {
-
                     //4.获取源码结构
                     List<ProjectCodeModel> projectCodeModelList = projectServiceModule.getProjectCodeModelList();
                     List<ProjectServiceModuleClass> projectServiceModuleClassList = projectServiceModule.getProjectServiceModuleClassList();
-
                     projectCodeModelList.forEach(projectCodeModel -> {
-
                         if (projectCodeModel.getServiceModuleCode().equals(projectServiceModule.getCode())) {
                             projectServiceModuleClassList.forEach(projectServiceModuleClass -> {
-
-                                //5.生成项目构建路径
                                 if (projectServiceModuleClass.getServiceModuleCode().equals(projectServiceModule.getCode())) {
-                                    final String[] relativePath = {null};
-                                    final String[] classPackage = {null};
-                                    buildToolsPathList.forEach(buildToolsPath -> {
-                                        if (buildToolsPath.getPathType().equals(BuildToolsPathTypeEnum.Java.name())) {
-                                            relativePath[0] = project.getEnglishName();
-                                            if (projectModule != null) {
-                                                relativePath[0] = relativePath[0] + "/" + projectModule.getEnglishName().toLowerCase();
-                                            } else {
-                                                relativePath[0] = relativePath[0] + "/" + project.getEnglishName();
-                                            }
-                                            relativePath[0] = relativePath[0] + "/" + buildToolsPath.getBuildPath().toLowerCase()
-                                                    + "/" + project.getBasePackage().replace(".", "/").toLowerCase()
-                                                    + "/" + projectServiceModule.getEnglishName().toLowerCase()
-                                                    + "/" + projectCodeModel.getModel().toLowerCase() + "/";
-                                            classPackage[0] = project.getBasePackage() + "." + projectServiceModule.getEnglishName().toLowerCase() + "." + projectCodeModel.getModel().toLowerCase();
-                                            classPackage[0] = classPackage[0].replace("..", ".");
-                                        }
-                                    });
-                                    relativePath[0] = relativePath[0].replace("//", "/");
+                                    //5.生成java构建信息
+                                    ProjectCodeCatalog projectCodeCatalog = this.parseToJava(project, projectModule, projectServiceModule, projectCodeModel, projectServiceModuleClass, buildToolsPathList);
 
-                                    ProjectCodeCatalog projectCodeCatalog = new ProjectCodeCatalog(
-                                            String.valueOf(uidGenerator.getUID()), project.getCode(),
-                                            projectModule.getCode(), projectServiceModule.getCode(),
-                                            projectCodeModel.getCode(), projectServiceModuleClass.getClassInfo().getCode());
+                                    // 6.生成mapper构建信息
+                                    this.parseToJavaMapper(projectCodeCatalog, project, projectModule, projectServiceModule, projectCodeModel, projectServiceModuleClass, buildToolsPathList);
 
-                                    String fileName = projectServiceModuleClass.getClassInfo().getClassName() + StringHelper.toJavaClassName(projectCodeModel.getModelSuffix());
-                                    projectCodeCatalog.setFileName(fileName);
-                                    projectCodeCatalog.setRelativePath(relativePath[0] + projectCodeCatalog.getFileName());
-                                    projectCodeCatalog.setFileSuffix(FileTypeEnum.Java.val);
-                                    projectCodeCatalog.setAbsolutePath(projectCodeCatalog.getRelativePath() + projectCodeCatalog.getFileSuffix());
-                                    projectCodeCatalog.setFileType(FileTypeEnum.Java.name());
-                                    projectCodeCatalog.setBasePackage(project.getBasePackage());
-                                    projectCodeCatalog.setClassPackage(classPackage[0]);
-                                    projectCodeCatalogDAO.insert(projectCodeCatalog);
-
-                                    List<ProjectFramwork> projectFramworkList = project.getProjectFramworkList();
-                                    if (!projectFramworkList.isEmpty()) {
-                                        projectFramworkList.forEach(projectFramwork -> {
-                                            List<FrameworksConfigureTemplate> frameworksConfigureTemplateList = projectFramwork.getFrameworks().getFrameworksConfigureTemplateList();
-                                            if (!frameworksConfigureTemplateList.isEmpty()) {
-                                                frameworksConfigureTemplateList.forEach(frameworksConfigureTemplate -> {
-                                                    if (frameworksConfigureTemplate.getIsMapper().equals(YNEnum.Y.name())) {
-                                                        projectCodeCatalog.setCode(String.valueOf(uidGenerator.getUID()));
-                                                        projectCodeCatalog.setFrameworksConfigureTemplateCode(frameworksConfigureTemplate.getCode());
-                                                        projectCodeCatalog.setFileName(fileName);
-
-                                                        String configurePath = frameworksConfigureTemplate.getBasePath();
-                                                        if (frameworksConfigureTemplate.getIsProjectBasePath().equals(YNEnum.Y.name())) {
-                                                            configurePath = configurePath + "/" + project.getBasePackage().toLowerCase().replace(".", "/");
-                                                        }
-                                                        if (frameworksConfigureTemplate.getIsProjectServiceModulePath().equals(YNEnum.Y.name())) {
-                                                            configurePath = configurePath + "/" + projectServiceModule.getEnglishName().toLowerCase();
-                                                        }
-                                                        if (frameworksConfigureTemplate.getIsProjectCodeModelPath().equals(YNEnum.Y.name())) {
-                                                            configurePath = configurePath + "/" + projectCodeModel.getModel().toLowerCase();
-                                                        }
-                                                        configurePath = configurePath + "/" + fileName;
-
-                                                        projectCodeCatalog.setRelativePath(configurePath.replace("//", "/"));
-                                                        projectCodeCatalog.setAbsolutePath(projectCodeCatalog.getRelativePath() + projectCodeCatalog.getFileSuffix());
-
-                                                        if (frameworksConfigureTemplate.getFileType().equals(FileTypeEnum.Xml.name())) {
-                                                            projectCodeCatalog.setFileType(FileTypeEnum.Xml.name());
-                                                            projectCodeCatalog.setFileSuffix(FileTypeEnum.Xml.val);
-                                                        } else if (frameworksConfigureTemplate.getFileType().equals(FileTypeEnum.Property.name())) {
-                                                            projectCodeCatalog.setFileType(FileTypeEnum.Property.name());
-                                                            projectCodeCatalog.setFileSuffix(FileTypeEnum.Property.val);
-                                                        }
-
-                                                        projectCodeCatalog.setBasePackage(project.getBasePackage());
-                                                        projectCodeCatalog.setClassPackage(classPackage[0]);
-                                                        projectCodeCatalogDAO.insert(projectCodeCatalog);
-
-                                                    }
-                                                });
-                                            }
-                                        });
-                                    }
                                 }
                             });
                         }
                     });
                 }
             });
-
-
         });
         return true;
+    }
+
+    /**
+     * 解析信息生成Java信息
+     *
+     * @param project                   项目信息
+     * @param projectModule             项目模块信息
+     * @param projectServiceModule      项目业务模块 信息
+     * @param projectCodeModel          项目模型信息
+     * @param projectServiceModuleClass 项目业务模块关联类信息
+     * @param buildToolsPathList        构建工具信息
+     * @return
+     */
+    private ProjectCodeCatalog parseToJava(Project project, ProjectModule projectModule, ProjectServiceModule projectServiceModule,
+                                           ProjectCodeModel projectCodeModel, ProjectServiceModuleClass projectServiceModuleClass, List<BuildToolsPath> buildToolsPathList) {
+        String classPackage = project.getBasePackage() + "." + projectServiceModule.getEnglishName().toLowerCase() + "." + projectCodeModel.getModel().toLowerCase();
+        String fileName = projectServiceModuleClass.getClassInfo().getClassName();
+
+        if (!projectCodeModel.getModel().equals(ProjectCodeModelEnum.po.name())) {
+            fileName += StringHelper.toJavaClassName(projectCodeModel.getModelSuffix());
+        }
+        String relativePath = this.relativePath(project.getEnglishName(), projectModule != null ? projectModule.getEnglishName() : "", project.getBasePackage(),
+                projectServiceModule.getEnglishName(), projectCodeModel.getModel(), fileName, buildToolsPathList, BuildToolsPathTypeEnum.Java);
+
+        ProjectCodeCatalog projectCodeCatalog = new ProjectCodeCatalog(String.valueOf(uidGenerator.getUID()), project.getCode(), projectModule.getCode(),
+                projectServiceModule.getCode(), projectCodeModel.getCode(), projectServiceModuleClass.getClassInfo().getCode(), fileName);
+
+        projectCodeCatalog.setFileSuffix(FileTypeEnum.Java.val);
+        projectCodeCatalog.setRelativePath(relativePath + projectCodeCatalog.getFileName());
+        projectCodeCatalog.setAbsolutePath(projectCodeCatalog.getRelativePath() + projectCodeCatalog.getFileSuffix());
+        projectCodeCatalog.setFileType(FileTypeEnum.Java.name());
+        projectCodeCatalog.setBasePackage(project.getBasePackage());
+        projectCodeCatalog.setClassPackage(classPackage.replace("..", "."));
+        projectCodeCatalogDAO.insert(projectCodeCatalog);
+        return projectCodeCatalog;
+    }
+
+
+    /**
+     * 解析信息生成Java Mapper信息
+     *
+     * @param projectCodeCatalog        项目目录信息
+     * @param project                   项目信息
+     * @param projectModule             项目模块信息
+     * @param projectServiceModule      项目业务模块 信息
+     * @param projectCodeModel          项目模型信息
+     * @param projectServiceModuleClass 项目业务模块关联类信息
+     * @param buildToolsPathList        构建工具信息
+     * @return ProjectCodeCatalog
+     */
+    private ProjectCodeCatalog parseToJavaMapper(ProjectCodeCatalog projectCodeCatalog, Project project, ProjectModule projectModule, ProjectServiceModule projectServiceModule,
+                                                 ProjectCodeModel projectCodeModel, ProjectServiceModuleClass projectServiceModuleClass, List<BuildToolsPath> buildToolsPathList) {
+        if (projectCodeModel.getModel().equals(ProjectCodeModelEnum.po.name())) {//po 模型生成mapper信息
+            List<ProjectFramwork> projectFramworkList = project.getProjectFramworkList();
+            if (!projectFramworkList.isEmpty()) {
+                projectFramworkList.forEach(projectFramwork -> {
+                    List<FrameworksConfigureTemplate> frameworksConfigureTemplateList = projectFramwork.getFrameworks().getFrameworksConfigureTemplateList();
+                    if (!frameworksConfigureTemplateList.isEmpty()) {
+                        frameworksConfigureTemplateList.forEach(frameworksConfigureTemplate -> {
+                            if (frameworksConfigureTemplate.getIsMapper().equals(YNEnum.Y.name())) {
+                                projectCodeCatalog.setCode(String.valueOf(uidGenerator.getUID()));
+                                projectCodeCatalog.setFrameworksConfigureTemplateCode(frameworksConfigureTemplate.getCode());
+                                projectCodeCatalog.setFileName(projectServiceModuleClass.getClassInfo().getClassName());
+
+                                if (frameworksConfigureTemplate.getFileType().equals(FileTypeEnum.Xml.name())) {
+                                    projectCodeCatalog.setFileType(FileTypeEnum.Xml.name());
+                                    projectCodeCatalog.setFileSuffix(FileTypeEnum.Xml.val);
+                                } else if (frameworksConfigureTemplate.getFileType().equals(FileTypeEnum.Property.name())) {
+                                    projectCodeCatalog.setFileType(FileTypeEnum.Property.name());
+                                    projectCodeCatalog.setFileSuffix(FileTypeEnum.Property.val);
+                                }
+
+                                String configurePath = frameworksConfigureTemplate.getBasePath();
+                                if (frameworksConfigureTemplate.getIsProjectBasePath().equals(YNEnum.Y.name())) {
+                                    configurePath = configurePath + "/" + project.getBasePackage().toLowerCase().replace(".", "/");
+                                }
+                                if (frameworksConfigureTemplate.getIsProjectServiceModulePath().equals(YNEnum.Y.name())) {
+                                    configurePath = configurePath + "/" + projectServiceModule.getEnglishName().toLowerCase();
+                                }
+                                if (frameworksConfigureTemplate.getIsProjectCodeModelPath().equals(YNEnum.Y.name())) {
+                                    configurePath = configurePath + "/" + projectCodeModel.getModel().toLowerCase();
+                                }
+
+                                configurePath = configurePath + "/" + projectCodeCatalog.getFileName();
+
+                                String projectPath = project.getEnglishName();
+                                if (projectModule != null) {
+                                    projectPath = projectPath + "/" + projectModule.getEnglishName().toLowerCase();
+                                } else {
+                                    projectPath = projectPath + "/" + project.getEnglishName();
+                                }
+                                projectPath = projectPath + "/" + this.buildPath(buildToolsPathList, BuildToolsPathTypeEnum.Resource);
+                                projectCodeCatalog.setRelativePath((projectPath + "/" + configurePath).replace("//", "/"));
+                                projectCodeCatalog.setAbsolutePath(projectCodeCatalog.getRelativePath() + projectCodeCatalog.getFileSuffix());
+
+                                projectCodeCatalogDAO.insert(projectCodeCatalog);
+                            }
+                        });
+                    }
+                });
+            }
+        }
+        return projectCodeCatalog;
+    }
+
+
+    /**
+     * 解析信息生成模块配置信息
+     *
+     * @param project            项目信息
+     * @param projectModule      项目模块信息
+     * @param buildToolsPathList 构建工具信息
+     */
+    private void parseToConfigure(Project project, ProjectModule projectModule, List<BuildToolsPath> buildToolsPathList) {
+        List<ProjectModuleFramework> projectModuleFrameworkList = projectModule.getProjectModuleFrameworkList();
+        if (!projectModuleFrameworkList.isEmpty()) {
+            projectModuleFrameworkList.forEach(projectModuleFramework -> {
+                List<FrameworksConfigureTemplate> frameworksConfigureTemplateList = projectModuleFramework.getProjectFramwork().getFrameworks().getFrameworksConfigureTemplateList();
+                if (!frameworksConfigureTemplateList.isEmpty()) {
+                    frameworksConfigureTemplateList.forEach(frameworksConfigureTemplate -> {
+                        if (frameworksConfigureTemplate.getIsMapper().equals(YNEnum.N.name())) {
+                            ProjectCodeCatalog projectCodeCatalog = new ProjectCodeCatalog(String.valueOf(uidGenerator.getUID()), project.getCode(), projectModule.getCode(),
+                                    null, null, null, frameworksConfigureTemplate.getName());
+                            projectCodeCatalog.setFrameworksConfigureTemplateCode(frameworksConfigureTemplate.getCode());
+                            if (frameworksConfigureTemplate.getFileType().equals(FileTypeEnum.Xml.name())) {
+                                projectCodeCatalog.setFileType(FileTypeEnum.Xml.name());
+                                projectCodeCatalog.setFileSuffix(FileTypeEnum.Xml.val);
+                            } else if (frameworksConfigureTemplate.getFileType().equals(FileTypeEnum.Property.name())) {
+                                projectCodeCatalog.setFileType(FileTypeEnum.Property.name());
+                                projectCodeCatalog.setFileSuffix(FileTypeEnum.Property.val);
+                            }
+
+                            String configurePath = frameworksConfigureTemplate.getBasePath();
+                            if (frameworksConfigureTemplate.getIsProjectBasePath().equals(YNEnum.Y.name())) {
+                                configurePath = configurePath + "/" + project.getBasePackage().toLowerCase().replace(".", "/");
+                            }
+
+                            String relativePath = this.relativePath(project.getEnglishName(), projectModule.getEnglishName(), configurePath, null, null, frameworksConfigureTemplate.getName(), buildToolsPathList, BuildToolsPathTypeEnum.Resource);
+
+                            projectCodeCatalog.setRelativePath(relativePath);
+                            projectCodeCatalog.setAbsolutePath(projectCodeCatalog.getRelativePath().replace(projectCodeCatalog.getFileSuffix(), "") + projectCodeCatalog.getFileSuffix());
+
+                            projectCodeCatalogDAO.insert(projectCodeCatalog);
+                        }
+                    });
+                }
+            });
+        }
+
+    }
+
+    /**
+     * 项目相对路径构建
+     *
+     * @param projectName            项目名
+     * @param module                 模块
+     * @param projectBasePackage     项目基本包名
+     * @param serviceModule          业务模块
+     * @param codeModel              模型
+     * @param fileName               文件名
+     * @param buildToolsPaths        构建工具路径
+     * @param buildToolsPathTypeEnum 构建工具路径类型
+     * @return
+     */
+    private String relativePath(String projectName, String module, String projectBasePackage, String serviceModule, String codeModel, String fileName, List<BuildToolsPath> buildToolsPaths, BuildToolsPathTypeEnum buildToolsPathTypeEnum) {
+        String relatevePath = projectName;
+        String buildPath = this.buildPath(buildToolsPaths, buildToolsPathTypeEnum);
+        if (module != null) {
+            relatevePath += "/" + module;
+        } else {
+            relatevePath += "/" + projectName;
+        }
+
+        relatevePath += "/" + buildPath;
+
+        if (projectBasePackage != null) {
+            relatevePath += "/" + projectBasePackage.replace(".", "/");
+        }
+        if (serviceModule != null) {
+            relatevePath += "/" + serviceModule;
+        }
+        if (codeModel != null) {
+            relatevePath += "/" + codeModel;
+        }
+        if (fileName != null) {
+            relatevePath += "/" + fileName;
+        }
+        return relatevePath.replace("//", "/").toLowerCase();
+    }
+
+
+    /**
+     * 获得构建工具路径
+     *
+     * @param buildToolsPaths        构建工具集合
+     * @param buildToolsPathTypeEnum 路径类型
+     * @return 路径
+     */
+    private String buildPath(List<BuildToolsPath> buildToolsPaths, BuildToolsPathTypeEnum buildToolsPathTypeEnum) {
+        final String[] buildPath = {null};
+        buildToolsPaths.forEach(buildToolsPath -> {
+            if (buildToolsPath.getPathType().equals(buildToolsPathTypeEnum.name())) {
+                buildPath[0] = buildToolsPath.getBuildPath();
+            }
+        });
+        return buildPath[0];
     }
 
     /**

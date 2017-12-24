@@ -14,6 +14,12 @@
         <result property="state" column="state"/>
     </resultMap>
 
+    <!--查询表信息关联信息-->
+    <resultMap id="rs_base_all" type="Frameworks" extends="rs_base">
+        <collection property="frameworksConfigureTemplateList" column="{frameworksCode=code}" select="FrameworksConfigureTemplate.query"/>
+    </resultMap>
+
+
     <!-- 用于select查询公用抽取的列 -->
     <sql id="Frameworks.columns">
 		id,name,code,description,state
@@ -57,7 +63,7 @@
         <include refid="Frameworks.where"/>
     </delete>
 
-    <select id="Frameworks.load" resultMap="rs_base">
+    <select id="Frameworks.load" resultMap="rs_base_all">
         SELECT
         <include refid="Frameworks.columns"/>
         FROM `frameworks`
@@ -91,7 +97,7 @@
     </select>
 
 
-    <select id="Frameworks.query" resultMap="rs_base">
+    <select id="Frameworks.query" resultMap="rs_base_all">
         SELECT
         <include refid="Frameworks.columns"/>
         FROM `frameworks`

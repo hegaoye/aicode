@@ -23,11 +23,11 @@ import com.rzhkj.setting.dao.SettingDAO;
 import com.rzhkj.setting.entity.Setting;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -160,11 +160,21 @@ public class ProjectJobSVImpl extends BaseMybatisSVImpl<ProjectJob, Long> implem
         logger.info("已获取框架信息");
         List<ProjectCodeCatalog> projectCodeCatalogList = projectCodeCatalogDAO.query(map);
         projectCodeCatalogList.forEach(projectCodeCatalog -> {
-            if (projectCodeCatalog.getFileType().equals(FileTypeEnum.Java.name())) {
-                this.generatorJava(project.getAuthor(), project.getCopyright(), projectCodeCatalog, projectFilesList);
-            } else {
-                this.generatorConfigure(project.getAuthor(), project.getCopyright(), projectCodeCatalog, projectFramworkList);
+            this.generatorJava(project.getAuthor(), project.getCopyright(), projectCodeCatalog, projectFilesList);
+        });
+        List<String> poPackageList = new ArrayList<>();
+        projectCodeCatalogList.forEach(projectCodeCatalog -> {
+            if (projectCodeCatalog.getProjectCodeModel().getModel().equals(ProjectCodeModelEnum.po.name())) {
+                poPackageList.add(projectCodeCatalog.getClassPackage());
             }
+        });
+        List<String> poPackages = new ArrayList<>(new HashSet<>(poPackageList));
+
+        map.put("fileType", FileTypeEnum.Xml.name());
+        projectCodeCatalogList = projectCodeCatalogDAO.query(map);
+
+        projectCodeCatalogList.forEach(projectCodeCatalog -> {
+            this.generatorConfigure(project.getAuthor(), project.getCopyright(), projectCodeCatalog, poPackages, projectFramworkList);
         });
 
         //5.获取工具信息
@@ -199,6 +209,12 @@ public class ProjectJobSVImpl extends BaseMybatisSVImpl<ProjectJob, Long> implem
      */
     private void generatorJava(String author, String copyright, ProjectCodeCatalog projectCodeCatalog, List<ProjectFiles> projectFilesList) {
         ClassInfo classInfo = projectCodeCatalog.getClassInfo();
+        List<ClassAttributes> classAttributesList = new ArrayList<>();
+        classInfo.getClassAttributes().forEach(classAttributes -> {
+            if (classAttributes.getIsPrimaryKey().equals(YNEnum.Y.name())) {
+                classAttributesList.add(classAttributes);
+            }
+        });
         Map<String, Object> model = Maps.newHashMap();
         model.put("basePackage", classInfo.getBasePackage());//包名
         model.put("package", projectCodeCatalog.getClassPackage());//包名
@@ -207,6 +223,7 @@ public class ProjectJobSVImpl extends BaseMybatisSVImpl<ProjectJob, Long> implem
         model.put("classSimpleName", classInfo.getClassName());//类名
         model.put("classSimpleNameLower", classInfo.getClassName().toLowerCase());//类名小写
         model.put("fields", classInfo.getClassAttributes());//类属性集合
+        model.put("primaryKeys", classAttributesList);
         model.put("comment", classInfo.getNotes());//类注释
         model.put("namespace", classInfo.getClassName().toLowerCase());//命名空间
         model.put("copyright", copyright);//项目版权
@@ -233,25 +250,32 @@ public class ProjectJobSVImpl extends BaseMybatisSVImpl<ProjectJob, Long> implem
      * @param projectCodeCatalog  类信息
      * @param projectFramworkList 技术框架信息
      */
-    private void generatorConfigure(String author, String copyright, ProjectCodeCatalog projectCodeCatalog, List<ProjectFramwork> projectFramworkList) {
+    private void generatorConfigure(String author, String copyright, ProjectCodeCatalog projectCodeCatalog, List<String> poPackageList, List<ProjectFramwork> projectFramworkList) {
         ClassInfo classInfo = projectCodeCatalog.getClassInfo();
         List<ClassAttributes> classAttributesList = new ArrayList<>();
-        classInfo.getClassAttributes().forEach(classAttributes -> {
-            if (classAttributes.getIsPrimaryKey().equals(YNEnum.Y.name())) {
-                classAttributesList.add(classAttributes);
-            }
-        });
+        if (classInfo != null) {
+            classInfo.getClassAttributes().forEach(classAttributes -> {
+                if (classAttributes.getIsPrimaryKey().equals(YNEnum.Y.name())) {
+                    classAttributesList.add(classAttributes);
+                }
+            });
+        }
         Map<String, Object> model = Maps.newHashMap();
-        model.put("basePackage", classInfo.getBasePackage());//包名
-        model.put("package", projectCodeCatalog.getClassPackage());//包名
+        if (projectCodeCatalog.getClassPackage() != null) {
+            model.put("package", projectCodeCatalog.getClassPackage());//包名
+        }
         model.put("className", projectCodeCatalog.getFileName());//类名
         model.put("classNameLower", projectCodeCatalog.getFileName().toLowerCase());//类名小写
-        model.put("classSimpleName", classInfo.getClassName());//类名
-        model.put("classSimpleNameLower", classInfo.getClassName().toLowerCase());//类名小写
-        model.put("fields", classInfo.getClassAttributes());//类属性集合
+        if (classInfo != null) {
+            model.put("basePackage", classInfo.getBasePackage());//包名
+            model.put("classSimpleName", classInfo.getClassName());//类名
+            model.put("classSimpleNameLower", classInfo.getClassName().toLowerCase());//类名小写
+            model.put("fields", classInfo.getClassAttributes());//类属性集合
+            model.put("comment", classInfo.getNotes());//类注释
+            model.put("namespace", classInfo.getClassName().toLowerCase());//命名空间
+        }
         model.put("primaryKeys", classAttributesList);
-        model.put("comment", classInfo.getNotes());//类注释
-        model.put("namespace", classInfo.getClassName().toLowerCase());//命名空间
+        model.put("typeAliases", poPackageList);
         model.put("copyright", copyright);//项目版权
         model.put("author", author);//作者
 

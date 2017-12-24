@@ -27,7 +27,7 @@ public class ProjectCodeCatalog extends BaseEntity implements java.io.Serializab
     private String serviceModuleCode;//数据库字段:serviceModuleCode  属性显示:业务编码
     private String codeModelCode;//数据库字段:codeModelCode  属性显示:源码结构编码
     private String classInfoCode;//数据库字段:classInfoCode  属性显示:类编码
-    private String FrameworksConfigureTemplateCode;//数据库字段:FrameworksConfigureTemplateCode  属性显示:框架模板编码
+    private String frameworksConfigureTemplateCode;//数据库字段:frameworksConfigureTemplateCode  属性显示:框架模板编码
     private String relativePath;//数据库字段:relativePath  属性显示:相对路径
     private String absolutePath;//数据库字段:absolutePath  属性显示:绝对路径
     private String fileName;//数据库字段:fileName  属性显示:文件名
@@ -42,13 +42,14 @@ public class ProjectCodeCatalog extends BaseEntity implements java.io.Serializab
     public ProjectCodeCatalog() {
     }
 
-    public ProjectCodeCatalog(String code, String projectCode, String moduleCode, String serviceModuleCode, String codeModelCode, String classInfoCode) {
+    public ProjectCodeCatalog(String code, String projectCode, String moduleCode, String serviceModuleCode, String codeModelCode, String classInfoCode, String fileName) {
         this.code = code;
         this.projectCode = projectCode;
         this.moduleCode = moduleCode;
         this.serviceModuleCode = serviceModuleCode;
         this.codeModelCode = codeModelCode;
         this.classInfoCode = classInfoCode;
+        this.fileName = fileName;
     }
 
     public String basePackage(String workspace) {

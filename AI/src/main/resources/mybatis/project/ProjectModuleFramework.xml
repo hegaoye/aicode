@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<mapper namespace="ProjectModuleFramework">
+
+    <resultMap id="rs_base" type="ProjectModuleFramework">
+        <result property="id" column="id"/>
+        <result property="moduleCode" column="moduleCode"/>
+        <result property="frameworksCode" column="frameworksCode"/>
+    </resultMap>
+
+
+    <!--查询表信息关联信息-->
+    <resultMap id="rs_base_all" type="ProjectModuleFramework" extends="rs_base">
+        <association property="projectFramwork" column="{frameworksCode=frameworksCode}" select="ProjectFramwork.load"/>
+    </resultMap>
+
+    <!-- 用于select查询公用抽取的列 -->
+    <sql id="ProjectModuleFramework.columns">
+		id,moduleCode,frameworksCode
+	</sql>
+
+    <insert id="ProjectModuleFramework.insert" useGeneratedKeys="true" keyProperty="id" parameterType="ProjectModuleFramework">
+        INSERT INTO `project_module_framework` (
+        id ,
+        moduleCode ,
+        frameworksCode
+        ) VALUES (
+        #{id} ,
+        #{moduleCode} ,
+        #{frameworksCode}
+        )
+        <selectKey keyProperty="id" resultType="long">
+            select LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+
+    <update id="ProjectModuleFramework.update" parameterType="ProjectModuleFramework">
+        UPDATE `project_module_framework`
+        <trim prefix="set" suffixOverrides=",">
+        </trim>
+        WHERE
+        id = #{id} AND
+        moduleCode = #{moduleCode} AND
+        frameworksCode = #{frameworksCode}
+    </update>
+
+    <delete id="ProjectModuleFramework.delete">
+        DELETE FROM `project_module_framework`
+        <include refid="ProjectModuleFramework.where"/>
+    </delete>
+
+    <select id="ProjectModuleFramework.load" resultMap="rs_base_all">
+        SELECT
+        <include refid="ProjectModuleFramework.columns"/>
+        FROM `project_module_framework`
+        <include refid="ProjectModuleFramework.where"/>
+    </select>
+
+    <sql id="ProjectModuleFramework.where">
+        <where>
+            <if test="id!=null and id!=''">
+                AND id = #{id}
+            </if>
+            <if test="moduleCode!=null and moduleCode!=''">
+                AND moduleCode = #{moduleCode}
+            </if>
+            <if test="frameworksCode!=null and frameworksCode!=''">
+                AND frameworksCode = #{frameworksCode}
+            </if>
+        </where>
+    </sql>
+
+
+    <select id="ProjectModuleFramework.count" resultType="long">
+        SELECT count(*) FROM `project_module_framework`
+        <include refid="ProjectModuleFramework.where"/>
+    </select>
+
+
+    <select id="ProjectModuleFramework.query" resultMap="rs_base_all">
+        SELECT
+        <include refid="ProjectModuleFramework.columns"/>
+        FROM `project_module_framework`
+        <include refid="ProjectModuleFramework.where"/>
+
+        <if test="sortColumns!=null and sortColumns!=''">
+            ORDER BY ${sortColumns}
+        </if>
+    </select>
+
+
+</mapper>
+

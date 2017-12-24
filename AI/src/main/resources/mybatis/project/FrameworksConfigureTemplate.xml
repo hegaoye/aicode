@@ -15,6 +15,12 @@
         <result property="path" column="path"/>
         <result property="saveFilePath" column="saveFilePath"/>
         <result property="state" column="state"/>
+        <result property="fileType" column="fileType"/>
+        <result property="basePath" column="basePath"/>
+        <result property="isProjectBasePath" column="isProjectBasePath"/>
+        <result property="isProjectServiceModulePath" column="isProjectServiceModulePath"/>
+        <result property="isProjectCodeModelPath" column="isProjectCodeModelPath"/>
+        <result property="isMapper" column="isMapper"/>
     </resultMap>
 
 
@@ -25,7 +31,7 @@
 
     <!-- 用于select查询公用抽取的列 -->
     <sql id="FrameworksConfigureTemplate.columns">
-		id,code,frameworksCode,name,description,path,saveFilePath,state
+		id,code,frameworksCode,name,description,path,saveFilePath,state,fileType,basePath,isProjectBasePath,isProjectServiceModulePath ,isProjectCodeModelPath,isMapper
 	</sql>
 
     <insert id="FrameworksConfigureTemplate.insert" useGeneratedKeys="true" keyProperty="id" parameterType="FrameworksConfigureTemplate">
@@ -37,7 +43,13 @@
         description ,
         path ,
         saveFilePath ,
-        state
+        state,
+        fileType,
+        basePath,
+        isProjectBasePath,
+        isProjectServiceModulePath,
+        isProjectCodeModelPath,
+        isMapper
         ) VALUES (
         #{id} ,
         #{code} ,
@@ -46,7 +58,13 @@
         #{description} ,
         #{path} ,
         #{saveFilePath} ,
-        #{state}
+        #{state},
+        #{fileType},
+        #{basePath},
+        #{isProjectBasePath},
+        #{isProjectServiceModulePath},
+        #{isProjectCodeModelPath},
+        #{isMapper}
         )
         <selectKey keyProperty="id" resultType="long">
             select LAST_INSERT_ID()
@@ -76,6 +94,24 @@
             </if>
             <if test="state!=null and state!=''">
                 state = #{state}
+            </if>
+            <if test="fileType!=null and fileType!=''">
+                fileType = #{fileType}
+            </if>
+            <if test="basePath!=null and basePath!=''">
+                basePath = #{basePath}
+            </if>
+            <if test="isProjectBasePath!=null and isProjectBasePath!=''">
+                isProjectBasePath = #{isProjectBasePath}
+            </if>
+            <if test="isProjectServiceModulePath!=null and isProjectServiceModulePath!=''">
+                isProjectServiceModulePath = #{isProjectServiceModulePath}
+            </if>
+            <if test="isProjectCodeModelPath!=null and isProjectCodeModelPath!=''">
+                isProjectCodeModelPath = #{isProjectCodeModelPath}
+            </if>
+            <if test="isMapper!=null and isMapper!=''">
+                isMapper = #{isMapper}
             </if>
         </trim>
         WHERE
@@ -119,6 +155,24 @@
             </if>
             <if test="state!=null and state!=''">
                 AND state = #{state}
+            </if>
+            <if test="fileType!=null and fileType!=''">
+                AND fileType = #{fileType}
+            </if>
+            <if test="basePath!=null and basePath!=''">
+                AND basePath = #{basePath}
+            </if>
+            <if test="isProjectBasePath!=null and isProjectBasePath!=''">
+                AND isProjectBasePath = #{isProjectBasePath}
+            </if>
+            <if test="isProjectServiceModulePath!=null and isProjectServiceModulePath!=''">
+                AND isProjectServiceModulePath = #{isProjectServiceModulePath}
+            </if>
+            <if test="isProjectCodeModelPath!=null and isProjectCodeModelPath!=''">
+                AND isProjectCodeModelPath = #{isProjectCodeModelPath}
+            </if>
+            <if test="isMapper!=null and isMapper!=''">
+                AND isMapper = #{isMapper}
             </if>
         </where>
     </sql>

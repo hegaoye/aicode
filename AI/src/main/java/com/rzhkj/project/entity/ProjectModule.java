@@ -30,6 +30,7 @@ public class ProjectModule extends BaseEntity implements java.io.Serializable {
     private String state;//数据库字段:state  属性显示:模块状态 停用[Disenable]，启用[Enable]
 
     private List<ProjectServiceModule> projectServiceModuleList;
+    private List<ProjectModuleFramework> projectModuleFrameworkList;
 
 }
 

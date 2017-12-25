@@ -210,15 +210,19 @@ public class ProjectJobSVImpl extends BaseMybatisSVImpl<ProjectJob, Long> implem
     private void generatorJava(String author, String copyright, ProjectCodeCatalog projectCodeCatalog, List<ProjectFiles> projectFilesList) {
         ClassInfo classInfo = projectCodeCatalog.getClassInfo();
         List<ClassAttributes> classAttributesList = new ArrayList<>();
+        List<ColumnInfo> columnInfoList = new ArrayList<>();
         classInfo.getClassAttributes().forEach(classAttributes -> {
             if (classAttributes.getIsPrimaryKey().equals(YNEnum.Y.name())) {
                 classAttributesList.add(classAttributes);
             }
+            columnInfoList.add(classAttributes.getColumnInfo());
         });
         Map<String, Object> model = Maps.newHashMap();
         model.put("basePackage", classInfo.getBasePackage());//包名
         model.put("package", projectCodeCatalog.getClassPackage());//包名
         model.put("className", projectCodeCatalog.getFileName());//类名
+        model.put("table", classInfo.getTableInfo());//表对象
+        model.put("columns", columnInfoList);//列对象集合
         model.put("classNameLower", projectCodeCatalog.getFileName().toLowerCase());//类名小写
         model.put("classSimpleName", classInfo.getClassName());//类名
         model.put("classSimpleNameLower", classInfo.getClassName().toLowerCase());//类名小写
@@ -252,12 +256,21 @@ public class ProjectJobSVImpl extends BaseMybatisSVImpl<ProjectJob, Long> implem
      */
     private void generatorConfigure(String author, String copyright, ProjectCodeCatalog projectCodeCatalog, List<String> poPackageList, List<ProjectFramwork> projectFramworkList) {
         ClassInfo classInfo = projectCodeCatalog.getClassInfo();
-        List<ClassAttributes> classAttributesList = new ArrayList<>();
+        List<ClassAttributes> primaryKeys = new ArrayList<>();
+        List<ClassAttributes> commonClassAttributes = new ArrayList<>();
+        List<ColumnInfo> commonColumnInfoList = new ArrayList<>();
+        List<ColumnInfo> primaryKeysColumnInfoList = new ArrayList<>();
+        List<ColumnInfo> columnInfoList = new ArrayList<>();
         if (classInfo != null) {
             classInfo.getClassAttributes().forEach(classAttributes -> {
                 if (classAttributes.getIsPrimaryKey().equals(YNEnum.Y.name())) {
-                    classAttributesList.add(classAttributes);
+                    primaryKeys.add(classAttributes);
+                    primaryKeysColumnInfoList.add(classAttributes.getColumnInfo());
+                } else {
+                    commonClassAttributes.add(classAttributes);
+                    commonColumnInfoList.add(classAttributes.getColumnInfo());
                 }
+                columnInfoList.add(classAttributes.getColumnInfo());
             });
         }
         Map<String, Object> model = Maps.newHashMap();
@@ -271,10 +284,15 @@ public class ProjectJobSVImpl extends BaseMybatisSVImpl<ProjectJob, Long> implem
             model.put("classSimpleName", classInfo.getClassName());//类名
             model.put("classSimpleNameLower", classInfo.getClassName().toLowerCase());//类名小写
             model.put("fields", classInfo.getClassAttributes());//类属性集合
+            model.put("pkFields", primaryKeys);//主键数据信息
+            model.put("notPkFields", commonClassAttributes);//非主键主键数据信息
+            model.put("columns", columnInfoList);//列对象集合
+            model.put("pkColumns", primaryKeysColumnInfoList);//主键数据信息
+            model.put("notPkColumns", commonColumnInfoList);//非主键数据信息
             model.put("comment", classInfo.getNotes());//类注释
             model.put("namespace", classInfo.getClassName().toLowerCase());//命名空间
+            model.put("table", classInfo.getTableInfo());//表对象
         }
-        model.put("primaryKeys", classAttributesList);
         model.put("typeAliases", poPackageList);
         model.put("copyright", copyright);//项目版权
         model.put("author", author);//作者

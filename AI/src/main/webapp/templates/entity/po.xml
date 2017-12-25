@@ -1,116 +1,108 @@
-<#include "/macro.include"/>
-<#assign className = table.className>
-<#assign classNameFirstLower = table.classNameFirstLower>
-        <?xml version="1.0" encoding="UTF-8" ?>
-        <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <#macro mapperEl value>${r"#{"}${value}}</#macro>
-<#macro namespace>${className}.</#macro>
+<#macro sort value>${value}</#macro>
 
-        <!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
 <mapper namespace="${className}">
 
-<resultMap id="rs_base" type="${className}">
-    <#list fields as field>
-    <result property="${field.name}" column="${field..columnInfo.name}"/>
-    </#list>
-</resultMap>
+    <resultMap id="rs_base" type="${className}">
+        <#list fields as field>
+        <result property="${field.name}" column="${field.columnInfo.name}"/>
+        </#list>
+    </resultMap>
 
-        <!-- 用于select查询公用抽取的列 -->
-<sql id="<@namespace/>columns">
-<#list table.columns as column>${column.sqlName}<#if column_has_next>,</#if></#list>
-        </sql>
+     <!-- 用于select查询公用抽取的列 -->
+     <sql id="columns">
+        <#list columns as column>${column.name}<#if column_has_next>,</#if></#list>
+     </sql>
 
-<insert id="<@namespace/>insert" useGeneratedKeys="true" keyProperty="${table.idColumn.columnNameFirstLower}" parameterType="${className}">
-INSERT INTO `${table.sqlName}` (
-<#list table.columns as column>
-${column.sqlName} <#if column_has_next>,</#if>
+     <insert id="insert" useGeneratedKeys="true" keyProperty="{table.idColumn.columnNameFirstLower}" parameterType="${className}">
+       INSERT INTO `${table.name}` (
+       <#list columns as column>
+        ${column.name} <#if column_has_next>,</#if>
         </#list>
         ) VALUES (
-<#list table.columns as column>
-<@mapperEl column.columnNameFirstLower/> <#if column_has_next>,</#if>
+       <#list fields as field>
+         <@mapperEl field.name/> <#if field_has_next>,</#if>
         </#list>
         )
-<selectKey keyProperty="id" resultType="long">
-select LAST_INSERT_ID()
-</selectKey>
-        </insert>
+      <selectKey keyProperty="id" resultType="long">
+      select LAST_INSERT_ID()
+      </selectKey>
+     </insert>
 
-<update id="<@namespace/>update" parameterType="${className}">
-UPDATE `${table.sqlName}`
-<trim prefix="set" suffixOverrides=",">
-    <#list table.notPkColumns as column>
-    <if test="${column.columnNameFirstLower}!=null and ${column.columnNameFirstLower}!=''">
-        ${column.sqlName} = <@mapperEl column.columnNameFirstLower/> <#if column_has_next>,</#if>
-</if>
-</#list>
-        </trim>
+     <update id="update" parameterType="${className}">
+       UPDATE `${table.name}`
+       <trim prefix="set" suffixOverrides=",">
+         <#list notPkFields as field>
+          <if test="${field.name}!=null and ${field.name}!=''">
+            ${field.columnInfo.name} = <@mapperEl field.name/> <#if field_has_next>,</#if>
+          </if>
+         </#list>
+       </trim>
         WHERE
-<#list table.compositeIdColumns as column>
-        ${column.sqlName} = <@mapperEl column.columnNameLower/> <#if column_has_next> AND </#if>
+           <#list pkFields as field>
+           ${field.columnInfo.name} = <@mapperEl field.name/> <#if field_has_next> AND </#if>
         </#list>
-        </update>
+     </update>
 
-<delete id="<@namespace/>delete">
-DELETE FROM `${table.sqlName}`
-<include refid="<@namespace/>where"/>
-</delete>
+     <delete id="delete">
+        DELETE FROM `${table.name}`
+        <include refid="where"/>
+     </delete>
 
-<select id="<@namespace/>load" resultMap="rs_base">
-SELECT <include refid="<@namespace/>columns" />
-FROM `${table.sqlName}`
-<include refid="<@namespace/>where"/>
-</select>
+     <select id="load" resultMap="rs_base">
+       SELECT <include refid="columns" />
+       FROM `${table.name}`
+       <include refid="where"/>
+     </select>
 
-<sql id="<@namespace/>where">
-<where>
-    <#list table.columns as column>
-    <#if column.isDateTimeColumn>
-    <if test="${column.columnNameFirstLower}Begin!=null and ${column.columnNameFirstLower}Begin!=''">
-        AND ${column.sqlName} >= <@mapperEl column.columnNameFirstLower+"Begin"/>
-    </if>
-    <if test="${column.columnNameFirstLower}End!=null and ${column.columnNameFirstLower}End!=''">
-        AND ${column.sqlName} &lt;= <@mapperEl column.columnNameFirstLower+"End"/>
-    </if>
-    <#else>
-    <if test="${column.columnNameFirstLower}!=null and ${column.columnNameFirstLower}!=''">
-        AND ${column.sqlName} = <@mapperEl column.columnNameFirstLower/>
-    </if>
-</#if>
-</#list>
-        </where>
-        </sql>
-
-
-
-<select id="<@namespace/>count" resultType="long">
-SELECT count(*) FROM `${table.sqlName}`
-<include refid="<@namespace/>where"/>
-</select>
-
-
-<select id="<@namespace/>query" resultMap="rs_base">
-SELECT <include refid="<@namespace/>columns" />
-FROM `${table.sqlName}`
-<include refid="<@namespace/>where"/>
-
-<if test="sortColumns!=null and sortColumns!=''">
-    ORDER BY <@jspEl 'sortColumns'/>
-</if>
-</select>
-
-<#list table.columns as column>
-<#if column.unique && !column.pk>
-<select id="<@namespace/>load${column.columnName}" resultMap="rs_base" parameterType="${column.javaType}">
-SELECT <include refid="<@namespace/>columns"/>
-
-FROM `${table.sqlName}` where ${column.sqlName} = <@mapperEl column.columnNameLower/>
-
-</select>
-
-        </#if>
+     <sql id="where">
+      <where>
+        <#list fields as field>
+          <#if field.columnInfo.isDate=='Y'>
+         <if test="${field.columnInfo.name}Begin!=null">
+            AND ${field.columnInfo.name} >= <@mapperEl field.name+"Begin"/>
+         </if>
+         <if test="${field.columnInfo.name}End!=null">
+            AND ${field.columnInfo.name} &lt;= <@mapperEl field.name+"End"/>
+         </if>
+         <#else>
+         <if test="${field.columnInfo.name}!=null and ${field.columnInfo.name}!=''">
+           AND ${field.columnInfo.name} = <@mapperEl field.name/>
+         </if>
+         </#if>
         </#list>
+      </where>
+     </sql>
 
-        </mapper>
+
+
+      <select id="count" resultType="long">
+        SELECT count(*) FROM `${table.name}`
+        <include refid="where"/>
+      </select>
+
+
+      <select id="query" resultMap="rs_base">
+        SELECT <include refid="columns" />
+        FROM `${table.name}`
+        <include refid="where"/>
+
+        <if test="sortColumns!=null and sortColumns!=''">
+        ORDER BY <@sort 'sortColumns'/>
+        </if>
+      </select>
+
+      <#list pkFields as pkfield>
+        <select id="load${pkfield.name}" resultMap="rs_base" parameterType="${pkfield.type}">
+           SELECT <include refid="columns"/>
+           FROM `${table.name}` where ${pkfield.columnInfo.name} = <@mapperEl pkfield.name/>
+        </select>
+      </#list>
+
+</mapper>
 

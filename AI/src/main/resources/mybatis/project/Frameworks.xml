@@ -11,18 +11,17 @@
         <result property="code" column="code"/>
         <result property="name" column="name"/>
         <result property="description" column="description"/>
-        <result property="state" column="state"/>
     </resultMap>
 
     <!--查询表信息关联信息-->
     <resultMap id="rs_base_all" type="Frameworks" extends="rs_base">
-        <collection property="frameworksConfigureTemplateList" column="{frameworksCode=code}" select="FrameworksConfigureTemplate.query"/>
+        <collection property="frameworksTemplateList" column="{frameworksCode=code}" select="FrameworksTemplate.query"/>
     </resultMap>
 
 
     <!-- 用于select查询公用抽取的列 -->
     <sql id="Frameworks.columns">
-		id,name,code,description,state
+		id,name,code,description
 	</sql>
 
     <insert id="Frameworks.insert" useGeneratedKeys="true" keyProperty="id" parameterType="Frameworks">
@@ -30,14 +29,12 @@
         id ,
         code ,
         name ,
-        description ,
-        state
+        description
         ) VALUES (
         #{id} ,
         #{code} ,
         #{name} ,
-        #{description} ,
-        #{state}
+        #{description}
         )
         <selectKey keyProperty="id" resultType="long">
             select LAST_INSERT_ID()
@@ -49,9 +46,6 @@
         <trim prefix="set" suffixOverrides=",">
             <if test="description!=null and description!=''">
                 description = #{description} ,
-            </if>
-            <if test="state!=null and state!=''">
-                state = #{state}
             </if>
         </trim>
         WHERE
@@ -83,9 +77,6 @@
             </if>
             <if test="description!=null and description!=''">
                 AND description = #{description}
-            </if>
-            <if test="state!=null and state!=''">
-                AND state = #{state}
             </if>
         </where>
     </sql>

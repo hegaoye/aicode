@@ -27,7 +27,6 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -49,16 +48,7 @@ public class ProjectJobSVImpl extends BaseMybatisSVImpl<ProjectJob, Long> implem
     private ProjectJobLogsDAO projectJobLogsDAO;
 
     @Resource
-    private ClassInfoDAO classInfoDAO;
-
-    @Resource
-    private ProjectFrameworkAttributeValueDAO projectFrameworkAttributeValueDAO;
-
-    @Resource
-    private TemplatesDAO templatesDAO;
-
-    @Resource
-    private ProjectFilesDAO projectFilesDAO;
+    private MapClassTableDAO mapClassTableDAO;
 
     @Resource
     private UidGenerator uidGenerator;
@@ -79,7 +69,7 @@ public class ProjectJobSVImpl extends BaseMybatisSVImpl<ProjectJob, Long> implem
     @Override
     public void build(ProjectJob projectJob) {
         //1.验证参数
-        if (projectJob == null || StringTools.isEmpty(projectJob.getProjectCode(), projectJob.getDescription(), projectJob.getName())) {
+        if (projectJob == null || StringTools.isEmpty(projectJob.getProjectCode())) {
             logger.error(BaseException.BaseExceptionEnum.Empty_Param.toString());
             throw new ProjectJobException(BaseException.BaseExceptionEnum.Empty_Param);
         }
@@ -129,10 +119,9 @@ public class ProjectJobSVImpl extends BaseMybatisSVImpl<ProjectJob, Long> implem
      * 1.创建项目
      * 2.获取类信息
      * 3.获取模板信息
-     * 4.获取技术信息
-     * 5.获取工具信息
-     * 6.获取第三方模块信息
-     * 7.获取版本控制管理信息
+     * 4.生成源码
+     * 5.获取模块信息
+     * 6.获取版本控制管理信息
      *
      * @param code 任务编码
      */
@@ -149,39 +138,27 @@ public class ProjectJobSVImpl extends BaseMybatisSVImpl<ProjectJob, Long> implem
         map.clear();
         map.put("projectCode", projectJob.getProjectCode());
         Project project = projectDAO.load(map);
-        this.buildProject(project);
+        String projectPath = this.buildProject(project);
         logger.info("创建工作空间库完成");
+
+        //2.获取类信息
+        List<ProjectMap> projectMapList = project.getProjectMapList();
         //3.获取模板信息
-        map.put("fileType", FileTypeEnum.Java.name());
-        List<ProjectFiles> projectFilesList = projectFilesDAO.query(map);
-        logger.info("已获取项目模板信息");
-        //4.获取技术信息
         List<ProjectFramwork> projectFramworkList = project.getProjectFramworkList();
-        logger.info("已获取框架信息");
-        List<ProjectCodeCatalog> projectCodeCatalogList = projectCodeCatalogDAO.query(map);
-        projectCodeCatalogList.forEach(projectCodeCatalog -> {
-            this.generatorJava(project.getAuthor(), project.getCopyright(), projectCodeCatalog, projectFilesList);
-        });
-        List<String> poPackageList = new ArrayList<>();
-        projectCodeCatalogList.forEach(projectCodeCatalog -> {
-            if (projectCodeCatalog.getProjectCodeModel().getModel().equals(ProjectCodeModelEnum.po.name())) {
-                poPackageList.add(projectCodeCatalog.getClassPackage());
-            }
-        });
-        List<String> poPackages = new ArrayList<>(new HashSet<>(poPackageList));
-
-        map.put("fileType", FileTypeEnum.Xml.name());
-        projectCodeCatalogList = projectCodeCatalogDAO.query(map);
-
-        projectCodeCatalogList.forEach(projectCodeCatalog -> {
-            this.generatorConfigure(project.getAuthor(), project.getCopyright(), projectCodeCatalog, poPackages, projectFramworkList);
+        //4.生成源码
+        projectFramworkList.forEach(projectFramwork -> {
+            List<FrameworksTemplate> frameworksTemplateList = projectFramwork.getFrameworks().getFrameworksTemplateList();
+            frameworksTemplateList.forEach(frameworksTemplate -> {
+                projectMapList.forEach(projectMap -> {
+                    this.generator(projectPath, project, projectMap.getMapClassTable(), frameworksTemplate);
+                });
+            });
         });
 
-        //5.获取工具信息
+        //5.获取模块信息
 
-        //6.获取第三方模块信息
+        //6.获取版本控制管理信息
 
-        //7.获取版本控制管理信息
     }
 
     /**
@@ -190,139 +167,65 @@ public class ProjectJobSVImpl extends BaseMybatisSVImpl<ProjectJob, Long> implem
      *
      * @param project
      */
-    private void buildProject(Project project) {
+    private String buildProject(Project project) {
         Setting settingWorkspace = settingDAO.loadByKey(Setting.Key.Workspace.name());
-        String workspace = new HandleFuncs().getCurrentClassPath() + settingWorkspace.getV() + "/" + project.getEnglishName();
-        workspace = workspace.replace("//", "/");
+        String projectPath = new HandleFuncs().getCurrentClassPath() + settingWorkspace.getV() + "/" + project.getEnglishName();
+        projectPath = projectPath.replace("//", "/");
         //1.检测项目工作工作空间是否存在
-        File file = new File(workspace);
+        File file = new File(projectPath);
         if (!file.exists()) {
             file.mkdirs();
         }
+        return projectPath;
     }
+
 
     /**
-     * 生成java文件
+     * 生成源码文件
      *
-     * @param projectCodeCatalog 项目源码目录
-     * @param projectFilesList   项目文件信息
+     * @param projectPath
+     * @param project
+     * @param mapClassTable
+     * @param frameworksTemplate
      */
-    private void generatorJava(String author, String copyright, ProjectCodeCatalog projectCodeCatalog, List<ProjectFiles> projectFilesList) {
-        ClassInfo classInfo = projectCodeCatalog.getClassInfo();
-        List<ClassAttributes> classAttributesList = new ArrayList<>();
-        List<ColumnInfo> columnInfoList = new ArrayList<>();
-        classInfo.getClassAttributes().forEach(classAttributes -> {
-            if (classAttributes.getIsPrimaryKey().equals(YNEnum.Y.name())) {
-                classAttributesList.add(classAttributes);
+    private void generator(String projectPath, Project project, MapClassTable mapClassTable, FrameworksTemplate frameworksTemplate) {
+        List<MapFieldColumn> mapFieldColumnPks = new ArrayList<>();
+        List<MapFieldColumn> mapFieldColumnNotPks = new ArrayList<>();
+        List<MapFieldColumn> mapFieldColumnList = new ArrayList<>();
+        mapClassTable.getMapFieldColumnList().forEach(mapFieldColumn -> {
+            if (mapFieldColumn.getIsPrimaryKey().equals(YNEnum.Y.name())) {
+                mapFieldColumnPks.add(mapFieldColumn);
+            } else {
+                mapFieldColumnNotPks.add(mapFieldColumn);
             }
-            columnInfoList.add(classAttributes.getColumnInfo());
+            mapFieldColumnList.add(mapFieldColumn);
         });
+
         Map<String, Object> model = Maps.newHashMap();
-        model.put("basePackage", classInfo.getBasePackage());//包名
-        model.put("package", projectCodeCatalog.getClassPackage());//包名
-        model.put("className", projectCodeCatalog.getFileName());//类名
-        model.put("table", classInfo.getTableInfo());//表对象
-        model.put("columns", columnInfoList);//列对象集合
-        model.put("classNameLower", projectCodeCatalog.getFileName().toLowerCase());//类名小写
-        model.put("classSimpleName", classInfo.getClassName());//类名
-        model.put("classSimpleNameLower", classInfo.getClassName().toLowerCase());//类名小写
-        model.put("fields", classInfo.getClassAttributes());//类属性集合
-        model.put("primaryKeys", classAttributesList);
-        model.put("comment", classInfo.getNotes());//类注释
-        model.put("namespace", classInfo.getClassName().toLowerCase());//命名空间
-        model.put("copyright", copyright);//项目版权
-        model.put("author", author);//作者
-        Setting setting = settingDAO.loadByKey(Setting.Key.Workspace.name());
-        Setting templatePathSetting = settingDAO.loadByKey(Setting.Key.Template_Path.name());
-        String projectPath = new HandleFuncs().getCurrentClassPath();
-        projectFilesList.forEach(projectFiles -> {
-            if (projectFiles.getTemplates().getModel().equals(projectCodeCatalog.getProjectCodeModel().getModel())) {
-                String templateFileName = projectFiles.getTemplates().getName();
-                String templatePath = projectFiles.getTemplates().getPath();
-                String targetFilePath = projectCodeCatalog.basePackage(setting.getV());
-                templatePath = projectPath + templatePathSetting.getV() + templatePath;
-                templatePath = templatePath.replace("//", "/");
-                FreemarkerHelper.generate(model, targetFilePath, templateFileName, templatePath);
-                logger.info("已生成java 类[" + projectCodeCatalog.getAbsolutePath() + "]相关文件");
-            }
-        });
+        model.put("basePackage", project.getBasePackage());//包名
+        model.put("table", mapClassTable);//表对象
+        model.put("tableName", mapClassTable.getTableName());//表名
+
+        model.put("Class", mapClassTable);//类对象
+        model.put("className", mapClassTable.getClassName());//类名
+        model.put("classNameLower", mapClassTable.getClassName().toLowerCase());//类名小写
+
+        model.put("columns", mapFieldColumnList);//列对象集合
+        model.put("pkColumns", mapFieldColumnPks);//主键数据信息
+        model.put("notPkColumns", mapFieldColumnNotPks);//非主键数据信息
+
+        model.put("fields", mapFieldColumnList);//类属性集合
+        model.put("pkFields", mapFieldColumnPks);//主键数据信息
+        model.put("notPkFields", mapFieldColumnNotPks);//非主键主键数据信息
+
+        model.put("notes", mapClassTable.getNotes());//类注释
+        model.put("copyright", project.getCopyright());//项目版权
+        model.put("author", project.getAuthor());//作者
+
+        Setting settingTemplatePath = settingDAO.loadByKey(Setting.Key.Template_Path.name());
+        String targetFilePath = projectPath + "/" + frameworksTemplate.getPath().replace("${basepackage}", project.getBasePackage().replace(".", "/")).replace("${className}", mapClassTable.getClassName());
+        String templatePath = new HandleFuncs().getCurrentClassPath() + "/" + settingTemplatePath.getV() + "/" + frameworksTemplate.getPath();
+
+        FreemarkerHelper.generate(model, targetFilePath, templatePath);
     }
-
-    /**
-     * 生成配置文件
-     *
-     * @param projectCodeCatalog  类信息
-     * @param projectFramworkList 技术框架信息
-     */
-    private void generatorConfigure(String author, String copyright, ProjectCodeCatalog projectCodeCatalog, List<String> poPackageList, List<ProjectFramwork> projectFramworkList) {
-        ClassInfo classInfo = projectCodeCatalog.getClassInfo();
-        List<ClassAttributes> primaryKeys = new ArrayList<>();
-        List<ClassAttributes> commonClassAttributes = new ArrayList<>();
-        List<ColumnInfo> commonColumnInfoList = new ArrayList<>();
-        List<ColumnInfo> primaryKeysColumnInfoList = new ArrayList<>();
-        List<ColumnInfo> columnInfoList = new ArrayList<>();
-        if (classInfo != null) {
-            classInfo.getClassAttributes().forEach(classAttributes -> {
-                if (classAttributes.getIsPrimaryKey().equals(YNEnum.Y.name())) {
-                    primaryKeys.add(classAttributes);
-                    primaryKeysColumnInfoList.add(classAttributes.getColumnInfo());
-                } else {
-                    commonClassAttributes.add(classAttributes);
-                    commonColumnInfoList.add(classAttributes.getColumnInfo());
-                }
-                columnInfoList.add(classAttributes.getColumnInfo());
-            });
-        }
-        Map<String, Object> model = Maps.newHashMap();
-        if (projectCodeCatalog.getClassPackage() != null) {
-            model.put("package", projectCodeCatalog.getClassPackage());//包名
-        }
-        model.put("className", projectCodeCatalog.getFileName());//类名
-        model.put("classNameLower", projectCodeCatalog.getFileName().toLowerCase());//类名小写
-        if (classInfo != null) {
-            model.put("basePackage", classInfo.getBasePackage());//包名
-            model.put("classSimpleName", classInfo.getClassName());//类名
-            model.put("classSimpleNameLower", classInfo.getClassName().toLowerCase());//类名小写
-            model.put("fields", classInfo.getClassAttributes());//类属性集合
-            model.put("pkFields", primaryKeys);//主键数据信息
-            model.put("notPkFields", commonClassAttributes);//非主键主键数据信息
-            model.put("columns", columnInfoList);//列对象集合
-            model.put("pkColumns", primaryKeysColumnInfoList);//主键数据信息
-            model.put("notPkColumns", commonColumnInfoList);//非主键数据信息
-            model.put("comment", classInfo.getNotes());//类注释
-            model.put("namespace", classInfo.getClassName().toLowerCase());//命名空间
-            model.put("table", classInfo.getTableInfo());//表对象
-        }
-        model.put("typeAliases", poPackageList);
-        model.put("copyright", copyright);//项目版权
-        model.put("author", author);//作者
-
-        Setting setting = settingDAO.loadByKey(Setting.Key.Workspace.name());
-        Setting templatePathSetting = settingDAO.loadByKey(Setting.Key.Template_Path.name());
-        String projectPath = new HandleFuncs().getCurrentClassPath();
-        projectFramworkList.forEach(projectFramwork -> {
-            projectFramwork.getFrameworks().getFrameworksConfigureTemplateList().forEach(frameworksConfigureTemplate -> {
-                if (frameworksConfigureTemplate.getCode().equals(projectCodeCatalog.getFrameworksConfigureTemplateCode())) {
-
-                    String templateFileName = frameworksConfigureTemplate.getName();
-                    String templatePath = (projectPath + templatePathSetting.getV() + frameworksConfigureTemplate.getPath()).replace("//", "/");
-                    String targetFilePath = projectCodeCatalog.basePackage(setting.getV());
-
-                    if (model.containsKey("values")) {
-                        model.remove("values");
-                    }
-
-                    Map<String, Object> valueMap = Maps.newHashMap();
-                    valueMap.put("templateCode", frameworksConfigureTemplate.getCode());
-                    valueMap.put("projectCode", projectFramwork.getProjectCode());
-                    valueMap.put("frameworkCode", projectFramwork.getFrameworkCode());
-                    List<ProjectFrameworkAttributeValue> projectFrameworkAttributeValues = projectFrameworkAttributeValueDAO.query(valueMap);
-                    model.put("values", projectFrameworkAttributeValues);//配置值集合
-                    FreemarkerHelper.generate(model, targetFilePath, templateFileName, templatePath);
-                    logger.info("已生成框架相关配置文件");
-                }
-            });
-        });
-    }
-
 }

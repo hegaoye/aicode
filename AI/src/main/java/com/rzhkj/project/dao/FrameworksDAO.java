@@ -12,7 +12,14 @@ import org.springframework.stereotype.Repository;
 
 
 @Repository
-public class FrameworksDAO extends BaseMybatisDAOImpl<Frameworks,Long> {
+public class FrameworksDAO extends BaseMybatisDAOImpl<Frameworks, Long> {
 
-
+    /**
+     * 删除
+     *
+     * @param code 技术编码
+     */
+    public void delete(String code) {
+        getSqlSession().delete(sqlmapNamespace + ".delete", code);
+    }
 }

@@ -113,8 +113,6 @@ public class ProjectJobCtrl extends BaseCtrl {
     public BeanRet build(@ApiIgnore ProjectJob projectJob) {
         try {
             Assert.hasText(projectJob.getProjectCode(), BaseException.BaseExceptionEnum.Empty_Param.toString());
-            Assert.hasText(projectJob.getName(), BaseException.BaseExceptionEnum.Empty_Param.toString());
-            Assert.hasText(projectJob.getDescription(), BaseException.BaseExceptionEnum.Empty_Param.toString());
 
             projectJobSV.build(projectJob);
             return BeanRet.create(true, "创建任务成功", projectJob);
@@ -144,7 +142,7 @@ public class ProjectJobCtrl extends BaseCtrl {
         try {
             Assert.hasText(projectJob.getCode(), BaseException.BaseExceptionEnum.Empty_Param.toString());
 
-            if (StringTools.isEmpty(projectJob.getName(), projectJob.getDescription(), projectJob.getState())) {
+            if (StringTools.isEmpty(projectJob.getState())) {
                 return BeanRet.create(false, "任务没有做任何修改");
             }
 

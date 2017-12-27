@@ -1,0 +1,116 @@
+<#include "/macro.include"/>
+<#assign className = table.className>
+<#assign classNameFirstLower = table.classNameFirstLower>
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<#macro mapperEl value>${r"#{"}${value}}</#macro>
+<#macro namespace>${className}.</#macro>
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<mapper namespace="${className}">
+
+	<resultMap id="rs_base" type="${className}">
+        <#list table.columns as column>
+        <result property="${column.columnNameLower}" column="${column.sqlName}"/>
+		</#list>
+	</resultMap>
+
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="<@namespace/>columns">
+		<#list table.columns as column>${column.sqlName}<#if column_has_next>,</#if></#list>
+	</sql>
+
+	<insert id="<@namespace/>insert" useGeneratedKeys="true" keyProperty="${table.idColumn.columnNameFirstLower}" parameterType="${className}">
+        INSERT INTO `${table.sqlName}` (
+        <#list table.columns as column>
+        	${column.sqlName} <#if column_has_next>,</#if>
+        </#list>
+        ) VALUES (
+        <#list table.columns as column>
+        	<@mapperEl column.columnNameFirstLower/> <#if column_has_next>,</#if>
+        </#list>
+        )
+		<selectKey keyProperty="id" resultType="long">
+			select LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+
+	<update id="<@namespace/>update" parameterType="${className}">
+        UPDATE `${table.sqlName}`
+		<trim prefix="set" suffixOverrides=",">
+	        <#list table.notPkColumns as column>
+			<if test="${column.columnNameFirstLower}!=null and ${column.columnNameFirstLower}!=''">
+	        ${column.sqlName} = <@mapperEl column.columnNameFirstLower/> <#if column_has_next>,</#if>
+		    </if>
+	        </#list>
+		</trim>
+        WHERE
+        	<#list table.compositeIdColumns as column>
+	        ${column.sqlName} = <@mapperEl column.columnNameLower/> <#if column_has_next> AND </#if>
+	        </#list>
+	</update>
+
+    <delete id="<@namespace/>delete">
+        DELETE FROM `${table.sqlName}`
+		<include refid="<@namespace/>where"/>
+    </delete>
+
+    <select id="<@namespace/>load" resultMap="rs_base">
+		SELECT <include refid="<@namespace/>columns" />
+		    FROM `${table.sqlName}`
+		<include refid="<@namespace/>where"/>
+	</select>
+
+	<sql id="<@namespace/>where">
+		<where>
+	       <#list table.columns as column>
+	       <#if column.isDateTimeColumn>
+			<if test="${column.columnNameFirstLower}Begin!=null and ${column.columnNameFirstLower}Begin!=''">
+				AND ${column.sqlName} >= <@mapperEl column.columnNameFirstLower+"Begin"/>
+		   </if>
+			<if test="${column.columnNameFirstLower}End!=null and ${column.columnNameFirstLower}End!=''">
+				AND ${column.sqlName} &lt;= <@mapperEl column.columnNameFirstLower+"End"/>
+		   </if>
+	       <#else>
+			<if test="${column.columnNameFirstLower}!=null and ${column.columnNameFirstLower}!=''">
+				AND ${column.sqlName} = <@mapperEl column.columnNameFirstLower/>
+			</if>
+	       </#if>
+	       </#list>
+		</where>
+	</sql>
+
+
+
+    <select id="<@namespace/>count" resultType="long">
+        SELECT count(*) FROM `${table.sqlName}`
+		<include refid="<@namespace/>where"/>
+    </select>
+
+
+    <select id="<@namespace/>query" resultMap="rs_base">
+    	SELECT <include refid="<@namespace/>columns" />
+	    FROM `${table.sqlName}`
+		<include refid="<@namespace/>where"/>
+
+		<if test="sortColumns!=null and sortColumns!=''">
+			ORDER BY <@jspEl 'sortColumns'/>
+		</if>
+    </select>
+
+    <#list table.columns as column>
+    <#if column.unique && !column.pk>
+    <select id="<@namespace/>load${column.columnName}" resultMap="rs_base" parameterType="${column.javaType}">
+	    SELECT <include refid="<@namespace/>columns"/>
+
+	        FROM `${table.sqlName}` where ${column.sqlName} = <@mapperEl column.columnNameLower/>
+
+    </select>
+
+    </#if>
+	</#list>
+
+</mapper>
+

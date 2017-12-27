@@ -143,6 +143,10 @@ public class ProjectJobSVImpl extends BaseMybatisSVImpl<ProjectJob, Long> implem
 
         //2.获取类信息
         List<ProjectMap> projectMapList = project.getProjectMapList();
+        List<MapClassTable> mapClassTableList = new ArrayList<>();
+        projectMapList.forEach(projectMap -> {
+            mapClassTableList.add(projectMap.getMapClassTable());
+        });
         //3.获取模板信息
         List<ProjectFramwork> projectFramworkList = project.getProjectFramworkList();
         //4.生成源码
@@ -150,7 +154,7 @@ public class ProjectJobSVImpl extends BaseMybatisSVImpl<ProjectJob, Long> implem
             List<FrameworksTemplate> frameworksTemplateList = projectFramwork.getFrameworks().getFrameworksTemplateList();
             frameworksTemplateList.forEach(frameworksTemplate -> {
                 projectMapList.forEach(projectMap -> {
-                    this.generator(projectPath, project, projectMap.getMapClassTable(), frameworksTemplate);
+                    this.generator(projectPath, project, projectMap.getMapClassTable(), frameworksTemplate, mapClassTableList);
                 });
             });
         });
@@ -188,7 +192,7 @@ public class ProjectJobSVImpl extends BaseMybatisSVImpl<ProjectJob, Long> implem
      * @param mapClassTable
      * @param frameworksTemplate
      */
-    private void generator(String projectPath, Project project, MapClassTable mapClassTable, FrameworksTemplate frameworksTemplate) {
+    private void generator(String projectPath, Project project, MapClassTable mapClassTable, FrameworksTemplate frameworksTemplate, List<MapClassTable> mapClassTableList) {
         List<MapFieldColumn> mapFieldColumnPks = new ArrayList<>();
         List<MapFieldColumn> mapFieldColumnNotPks = new ArrayList<>();
         List<MapFieldColumn> mapFieldColumnList = new ArrayList<>();
@@ -206,7 +210,8 @@ public class ProjectJobSVImpl extends BaseMybatisSVImpl<ProjectJob, Long> implem
         model.put("table", mapClassTable);//表对象
         model.put("tableName", mapClassTable.getTableName());//表名
 
-        model.put("Class", mapClassTable);//类对象
+        model.put("classes", mapClassTableList);//类对象
+        model.put("class", mapClassTable);//类对象
         model.put("className", mapClassTable.getClassName());//类名
         model.put("classNameLower", mapClassTable.getClassName().toLowerCase());//类名小写
 

@@ -8,8 +8,9 @@
         <setting name="mapUnderscoreToCamelCase" value="true"/>
     </settings>
     <typeAliases>
-        <package name="com.rzhkj.project.entity"/>
-        <package name="com.rzhkj.setting.entity"/>
+        <#list pkFields as pkField>
+           <package name=""/>
+        </#list>
     </typeAliases>
 
     <plugins>

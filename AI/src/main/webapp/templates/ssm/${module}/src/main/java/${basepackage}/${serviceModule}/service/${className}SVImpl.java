@@ -22,12 +22,12 @@ public class ${className}SVImpl extends BaseMybatisSVImpl<${className},${table.i
 	private ${className}DAO ${classNameLower}DAO;
 
 	@Resource
-	private UidGenerator uidGenerator;
+private UidGenerator uidGenerator;
 
-	@Override
-	protected BaseMybatisDAO getBaseMybatisDAO() {
+@Override
+protected BaseMybatisDAO getBaseMybatisDAO() {
 		return ${classNameLower}DAO;
-	}
+		}
 
 <#list table.columns as column>
 	<#if column.unique && !column.pk>

@@ -14,6 +14,7 @@ import com.rzhkj.core.base.BaseMybatisSVImpl;
 import com.rzhkj.core.enums.YNEnum;
 import com.rzhkj.core.exceptions.BaseException;
 import com.rzhkj.core.exceptions.ProjectJobException;
+import com.rzhkj.core.tools.GitTools;
 import com.rzhkj.core.tools.HandleFuncs;
 import com.rzhkj.core.tools.StringTools;
 import com.rzhkj.project.dao.*;
@@ -43,6 +44,8 @@ public class ProjectJobSVImpl extends BaseMybatisSVImpl<ProjectJob, Long> implem
     private ProjectCodeCatalogDAO projectCodeCatalogDAO;
     @Resource
     private ProjectJobDAO projectJobDAO;
+    @Resource
+    private ProjectRepositoryAccountDAO projectRepositoryAccountDAO;
 
     @Resource
     private ProjectJobLogsDAO projectJobLogsDAO;
@@ -168,6 +171,7 @@ public class ProjectJobSVImpl extends BaseMybatisSVImpl<ProjectJob, Long> implem
     /**
      * 1.检测项目工作工作空间是否存在
      * 2.创建项目工作空间
+     * 3.代码仓库检出
      *
      * @param project
      */
@@ -180,6 +184,12 @@ public class ProjectJobSVImpl extends BaseMybatisSVImpl<ProjectJob, Long> implem
         if (!file.exists()) {
             file.mkdirs();
         }
+
+        //3.代码仓库检出
+        Map<String, Object> map = Maps.newHashMap();
+        map.put("projectCode", project.getCode());
+        ProjectRepositoryAccount projectRepositoryAccount = projectRepositoryAccountDAO.load(map);
+        GitTools.cloneGit(projectRepositoryAccount.getHome(), projectPath);
         return projectPath;
     }
 

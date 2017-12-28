@@ -85,7 +85,7 @@
              AND ${field.column} >= <@mapperEl field.field+"Begin"/>
           </if>
           <if test="${field.field}End!=null">
-             AND ${field.columnI} &lt;= <@mapperEl field.field+"End"/>
+             AND ${field.column} &lt;= <@mapperEl field.field+"End"/>
           </if>
         <#elseif field.checkState>
           <if test="${field.field}s!=null and ${field.field}s!=''">

@@ -60,9 +60,12 @@ dependencies {
     //----------poi 导入导出 end------------
 
 
+
     compile rootProject.ext.dependencies["swagger-annotations"]
 
     compile rootProject.ext.dependencies["lombok"]
+
+    compile rootProject.ext.dependencies["jsch"]
 
     compile fileTree(dir: '../libs', include: ['*.jar'])
 }

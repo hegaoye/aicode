@@ -12,6 +12,8 @@ import org.apache.commons.lang.StringUtils;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 public class FileUtil {
 
@@ -342,4 +344,28 @@ public class FileUtil {
             }
         }
     }
+
+    /**
+     * 获取指定目录下所有文件路径
+     * @param dirPath
+     */
+    public static List<File> getDirFiles(String dirPath) {
+        List<File> ret = new ArrayList<File>();
+        File file = new File(dirPath);
+        //获取目录下的所有文件或文件夹
+        File[] files = file.listFiles();
+        if (files == null) {
+            return null;
+        }
+        // 遍历目录下的所有文件
+        for (File f : files) {
+            if (f.isFile()) {
+                ret.add(f);
+            } else if (f.isDirectory()) {
+                ret.addAll(getDirFiles(f.getAbsolutePath()));
+            }
+        }
+        return ret;
+    }
+
 }

@@ -165,7 +165,10 @@ public class ProjectJobSVImpl extends BaseMybatisSVImpl<ProjectJob, Long> implem
         //5.获取模块信息
 
         //6.获取版本控制管理信息
-
+        map.clear();
+        map.put("projectCode", project.getCode());
+        ProjectRepositoryAccount projectRepositoryAccount = projectRepositoryAccountDAO.load(map);
+        GitTools.commitAndPush(new File(projectPath), projectRepositoryAccount.getAccount(), projectRepositoryAccount.getPassword(), "AI-Code 为您构建代码");
     }
 
     /**
@@ -189,7 +192,7 @@ public class ProjectJobSVImpl extends BaseMybatisSVImpl<ProjectJob, Long> implem
         Map<String, Object> map = Maps.newHashMap();
         map.put("projectCode", project.getCode());
         ProjectRepositoryAccount projectRepositoryAccount = projectRepositoryAccountDAO.load(map);
-        GitTools.cloneGit(projectRepositoryAccount.getHome(), projectPath);
+        GitTools.cloneGit(projectRepositoryAccount.getHome(), projectPath, projectRepositoryAccount.getAccount(), projectRepositoryAccount.getPassword());
         return projectPath;
     }
 
@@ -197,10 +200,10 @@ public class ProjectJobSVImpl extends BaseMybatisSVImpl<ProjectJob, Long> implem
     /**
      * 生成源码文件
      *
-     * @param projectPath
-     * @param project
-     * @param mapClassTable
-     * @param frameworksTemplate
+     * @param projectPath        项目路径
+     * @param project            项目对象
+     * @param mapClassTable      映射对象
+     * @param frameworksTemplate 框架模板对象
      */
     private void generator(String projectPath, Project project, MapClassTable mapClassTable, FrameworksTemplate frameworksTemplate, List<MapClassTable> mapClassTableList) {
         List<MapFieldColumn> mapFieldColumnPks = new ArrayList<>();

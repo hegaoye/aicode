@@ -8,6 +8,7 @@ package com.rzhkj.project.entity;
 import com.rzhkj.base.core.StringHelper;
 import com.rzhkj.base.core.typemapping.DatabaseDataTypesUtils;
 import com.rzhkj.core.base.BaseEntity;
+import com.rzhkj.core.enums.YNEnum;
 import lombok.Data;
 
 
@@ -34,6 +35,10 @@ public class MapFieldColumn extends BaseEntity implements java.io.Serializable {
     private String isDate;//数据库字段:isDate  属性显示:是否是时间类型
     private String isState;//数据库字段:isState  属性显示:是否是状态
 
+    private boolean checkDate;
+    private boolean checkState;
+    private boolean checkPk;
+
     public MapFieldColumn() {
     }
 
@@ -52,6 +57,14 @@ public class MapFieldColumn extends BaseEntity implements java.io.Serializable {
         this.fieldType = DatabaseDataTypesUtils.getPreferredJavaType(this.sqlType);
     }
 
+
+    public boolean getCheckDate() {
+        return isDate.equals(YNEnum.Y.name()) ? true : false;
+    }
+
+    public boolean getCheckState() {
+        return isState.equals(YNEnum.Y.name()) ? true : false;
+    }
 
 }
 

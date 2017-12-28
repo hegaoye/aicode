@@ -65,7 +65,7 @@ public class ${className}DAO extends BaseMybatisDAOImpl<${className},Long>{
 
 
 <#list fields as field>
-  <#if field.isDate>
+  <#if field.checkDate>
     /**
      * 根据时间查询${className}列表 通过${pkField.field}
      * @param ${pkField.field} ${pkField.notes}

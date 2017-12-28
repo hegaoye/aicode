@@ -14,6 +14,12 @@
         <result property="isOneToMany" column="isOneToMany"/>
     </resultMap>
 
+
+    <!--查询表信息关联信息-->
+    <resultMap id="rs_base_all" type="MapRelationship" extends="rs_base">
+        <association property="mapClassTable" column="{code=mapClassTableCode}" select="MapClassTable.load"/>
+    </resultMap>
+
     <!-- 用于select查询公用抽取的列 -->
     <sql id="MapRelationship.columns">
 		id,code,mapClassTableCode,isOneToOne,isOneToMany
@@ -57,7 +63,7 @@
         <include refid="MapRelationship.where"/>
     </delete>
 
-    <select id="MapRelationship.load" resultMap="rs_base">
+    <select id="MapRelationship.load" resultMap="rs_base_all">
         SELECT
         <include refid="MapRelationship.columns"/>
         FROM `map_relationship`
@@ -91,7 +97,7 @@
     </select>
 
 
-    <select id="MapRelationship.query" resultMap="rs_base">
+    <select id="MapRelationship.query" resultMap="rs_base_all">
         SELECT
         <include refid="MapRelationship.columns"/>
         FROM `map_relationship`

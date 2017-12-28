@@ -14,61 +14,23 @@
         </#list>
     </resultMap>
 
-
-        <!--查询表信息关联信息-->
-     <#if (relationships?size>0)>
-     <resultMap id="rs_base_all" type="${className}" extends="rs_base">
-     <#list relationships as relationship>
-     <#if relationship.isOneToOne>
-            <association property="${joinClassNameField}" column="{${joinField}=${mainField}}" select="${joinClassName}.${loadBy}"/>
-     </#if>
-     <#if relationship.isOneToMany>
-            <collection property="${joinClassNameFields}" column="{${joinField}=${mainField}}" select="${joinClassName}.${queryBy}"/>
-     </#if>
-     </#list>
-     </resultMap>
-
-   <#list relationships as relationship>
-   <#if relationship.isOneToOne>
-    <select id="${loadBy}" resultMap="rs_base">
-        SELECT <include refid="columns" />
-        FROM `${table.name}`
-        <include refid="where"/>
-    </select>
-    </#if>
-
-    <#if relationship.isOneToMany>
-    <select id="query" resultMap="rs_base">
-    SELECT <include refid="columns" />
-    FROM `${table.name}`
-    <include refid="where"/>
-
-    <if test="sortColumns!=null and sortColumns!=''">
-        ORDER BY <@sort 'sortColumns'/>
-    </if>
-    </select>
-    </#if>
-    </#list>
-    </#if>
-
-
-
      <!-- 用于select查询公用抽取的列 -->
      <sql id="columns">
         <#list columns as column>${column.column}<#if column_has_next>,</#if></#list>
      </sql>
 
+    <!--全局where条件-->
      <sql id="where">
       <where>
         <#list fields as field>
-        <#if field.isDate>
+        <#if field.checkDate>
           <if test="${field.field}Begin!=null">
              AND ${field.column} >= <@mapperEl field.field+"Begin"/>
           </if>
           <if test="${field.field}End!=null">
              AND ${field.column} &lt;= <@mapperEl field.field+"End"/>
           </if>
-        <#elseif field.isState>
+        <#elseif field.checkState>
           <if test="${field.field}s!=null and ${field.field}s!=''">
               AND ${field.column} in
               <foreach collection="${field.field}s" index="index" item="stateIn" open="(" separator="," close=")">
@@ -84,6 +46,7 @@
       </where>
      </sql>
 
+    <!--向${tableName}插入一条数据-->
      <insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="${className}">
        INSERT INTO `${tableName}` (
        <#list columns as column>
@@ -99,12 +62,13 @@
       </selectKey>
      </insert>
 
+    <!--根据任意条件删除${tableName}信息-->
     <delete id="delete">
       DELETE FROM `${tableName}`
       <include refid="where"/>
     </delete>
 
-
+    <!--根据主键联合更新 ${tableName} 的数据-->
      <update id="update" parameterType="${className}">
        UPDATE `${tableName}`
        <trim prefix="set" suffixOverrides=",">
@@ -116,14 +80,14 @@
        </trim>
         <where>
         <#list fields as field>
-        <#if field.isDate>
+        <#if field.checkDate>
           <if test="${field.field}Begin!=null">
              AND ${field.column} >= <@mapperEl field.field+"Begin"/>
           </if>
           <if test="${field.field}End!=null">
              AND ${field.columnI} &lt;= <@mapperEl field.field+"End"/>
           </if>
-        <#elseif field.isState>
+        <#elseif field.checkState>
           <if test="${field.field}s!=null and ${field.field}s!=''">
               AND ${field.column} in
               <foreach collection="${field.field}s" index="index" item="stateIn" open="(" separator="," close=")">
@@ -140,6 +104,7 @@
 
      </update>
 
+     <!--根据任何条件加载一条${tableName}的数据-->
      <select id="load" resultMap="rs_base">
        SELECT <include refid="columns" />
        FROM `${tableName}`
@@ -148,18 +113,22 @@
 
 
      <#list pkFields as pkfield>
+
+      <!--查询一条${tableName} loadBy${pkfield.field?cap_first}  通过${pkfield.field} -->
       <select id="loadBy${pkfield.field?cap_first}" resultMap="rs_base" parameterType="${pkfield.fieldType}">
         SELECT <include refid="columns"/>
         FROM `${tableName}` where ${pkfield.column} = <@mapperEl pkfield.field/>
       </select>
+
      </#list>
 
+     <!--根据任何条件统计${tableName}数据条数-->
       <select id="count" resultType="long">
         SELECT count(1) FROM `${tableName}`
         <include refid="where"/>
       </select>
 
-
+      <!--根据任何条件分页查询${tableName}-->
       <select id="query" resultMap="rs_base">
         SELECT <include refid="columns" />
         FROM `${tableName}`

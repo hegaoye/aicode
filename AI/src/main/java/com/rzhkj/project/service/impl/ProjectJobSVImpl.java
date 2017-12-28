@@ -219,6 +219,8 @@ public class ProjectJobSVImpl extends BaseMybatisSVImpl<ProjectJob, Long> implem
         model.put("pkColumns", mapFieldColumnPks);//主键数据信息
         model.put("notPkColumns", mapFieldColumnNotPks);//非主键数据信息
 
+//        model.put("relationships", mapClassTable.getMapRelationshipList());//关联关系
+
         model.put("fields", mapFieldColumnList);//类属性集合
         model.put("pkFields", mapFieldColumnPks);//主键数据信息
         model.put("notPkFields", mapFieldColumnNotPks);//非主键主键数据信息

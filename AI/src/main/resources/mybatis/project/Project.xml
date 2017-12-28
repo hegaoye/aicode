@@ -24,28 +24,24 @@
         <result property="isRepository" column="isRepository"/>
         <result property="isParseTable" column="isParseTable"/>
         <result property="isParseClass" column="isParseClass"/>
+        <result property="accountCode" column="accountCode"/>
         <result property="createTime" column="createTime"/>
         <result property="updateTime" column="updateTime"/>
     </resultMap>
 
     <!--查询表信息关联信息-->
     <resultMap id="rs_base_all" type="Project" extends="rs_base">
-        <collection property="projectClassList" column="{projectCode=code}" select="ProjectClass.query"/>
-        <collection property="projectFilesList" column="{projectCode=code}" select="ProjectFiles.query"/>
         <collection property="projectFramworkList" column="{projectCode=code}" select="ProjectFramwork.query"/>
+        <collection property="projectMapList" column="{projectCode=code}" select="ProjectMap.query"/>
         <collection property="projectJobList" column="{projectCode=code}" select="ProjectJob.query"/>
-        <collection property="projectMoudlesList" column="{projectCode=code}" select="ProjectMoudles.query"/>
-        <collection property="projectTablesList" column="{projectCode=code}" select="ProjectTables.query"/>
-        <collection property="projectToolsList" column="{projectCode=code}" select="ProjectTools.query"/>
+        <collection property="projectModuleList" column="{projectCode=code}" select="ProjectModule.query"/>
         <collection property="projectRepositoryAccountList" column="{projectCode=code}" select="ProjectRepositoryAccount.query"/>
         <collection property="projectSqlList" column="{projectCode=code}" select="ProjectSql.query"/>
-        <collection property="projectBuildToolsList" column="{projectCode=code}" select="ProjectBuildTools.query"/>
-        <collection property="projectModuleList" column="{projectCode=code}" select="ProjectModule.query"/>
     </resultMap>
 
     <!-- 用于select查询公用抽取的列 -->
     <sql id="Project.columns">
-		id,code,name,description,englishName,databaseType,language,state,copyright,author,phone,basePackage,sqlFile,downloadUrl,isRepository,isParseTable,isParseClass,createTime,updateTime
+		id,code,name,description,englishName,databaseType,language,state,copyright,author,phone,basePackage,sqlFile,downloadUrl,isRepository,isParseTable,isParseClass,accountCode,createTime,updateTime
 	</sql>
 
     <insert id="Project.insert" useGeneratedKeys="true" keyProperty="id" parameterType="Project">
@@ -63,6 +59,7 @@
         phone ,
         basePackage ,
         downloadUrl ,
+        accountCode ,
         createTime ,
         updateTime
         ) VALUES (
@@ -79,6 +76,7 @@
         #{phone} ,
         #{basePackage} ,
         #{downloadUrl} ,
+        #{accountCode} ,
         #{createTime} ,
         #{updateTime}
         )
@@ -134,6 +132,12 @@
             </if>
             <if test="isParseClass!=null and isParseClass!=''">
                 isParseClass = #{isParseClass} ,
+            </if>
+            <if test="buildNumber!=null and buildNumber!=''">
+                buildNumber = #{buildNumber} ,
+            </if>
+            <if test="accountCode!=null and accountCode!=''">
+                accountCode = #{accountCode} ,
             </if>
             <if test="createTime!=null ">
                 createTime = #{createTime} ,
@@ -211,6 +215,12 @@
             </if>
             <if test="isParseClass!=null and isParseClass!=''">
                 AND isParseClass = #{isParseClass}
+            </if>
+            <if test="buildNumber!=null and buildNumber!=''">
+                AND buildNumber = #{buildNumber}
+            </if>
+            <if test="accountCode!=null and accountCode!=''">
+                AND accountCode = #{accountCode}
             </if>
             <if test="createTimeBegin!=null ">
                 AND createTime >= #{createTimeBegin}

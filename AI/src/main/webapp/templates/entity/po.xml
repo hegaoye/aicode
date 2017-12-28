@@ -14,6 +14,45 @@
         </#list>
     </resultMap>
 
+
+        <!--查询表信息关联信息-->
+     <#if (relationships?size>0)>
+     <resultMap id="rs_base_all" type="${className}" extends="rs_base">
+     <#list relationships as relationship>
+     <#if relationship.isOneToOne>
+            <association property="${joinClassNameField}" column="{${joinField}=${mainField}}" select="${joinClassName}.${loadBy}"/>
+     </#if>
+     <#if relationship.isOneToMany>
+            <collection property="${joinClassNameFields}" column="{${joinField}=${mainField}}" select="${joinClassName}.${queryBy}"/>
+     </#if>
+     </#list>
+     </resultMap>
+
+   <#list relationships as relationship>
+   <#if relationship.isOneToOne>
+    <select id="${loadBy}" resultMap="rs_base">
+        SELECT <include refid="columns" />
+        FROM `${table.name}`
+        <include refid="where"/>
+    </select>
+    </#if>
+
+    <#if relationship.isOneToMany>
+    <select id="query" resultMap="rs_base">
+    SELECT <include refid="columns" />
+    FROM `${table.name}`
+    <include refid="where"/>
+
+    <if test="sortColumns!=null and sortColumns!=''">
+        ORDER BY <@sort 'sortColumns'/>
+    </if>
+    </select>
+    </#if>
+    </#list>
+    </#if>
+
+
+
      <!-- 用于select查询公用抽取的列 -->
      <sql id="columns">
         <#list columns as column>${column.name}<#if column_has_next>,</#if></#list>

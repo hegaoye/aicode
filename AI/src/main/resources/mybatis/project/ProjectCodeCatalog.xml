@@ -10,30 +10,23 @@
         <result property="id" column="id"/>
         <result property="code" column="code"/>
         <result property="projectCode" column="projectCode"/>
-        <result property="moduleCode" column="moduleCode"/>
-        <result property="serviceModuleCode" column="serviceModuleCode"/>
-        <result property="codeModelCode" column="codeModelCode"/>
-        <result property="classInfoCode" column="classInfoCode"/>
-        <result property="frameworksConfigureTemplateCode" column="frameworksConfigureTemplateCode"/>
+        <result property="mapClassTableCode" column="mapClassTableCode"/>
         <result property="relativePath" column="relativePath"/>
         <result property="absolutePath" column="absolutePath"/>
         <result property="fileName" column="fileName"/>
         <result property="fileSuffix" column="fileSuffix"/>
-        <result property="fileType" column="fileType"/>
-        <result property="classPackage" column="classPackage"/>
         <result property="basePackage" column="basePackage"/>
     </resultMap>
 
 
     <!--查询表信息关联信息-->
     <resultMap id="rs_base_all" type="ProjectCodeCatalog" extends="rs_base">
-        <association property="classInfo" column="{code=classInfoCode}" select="ClassInfo.load"/>
-        <association property="projectCodeModel" column="{code=codeModelCode}" select="ProjectCodeModel.load"/>
+        <association property="mapClassTable" column="{code=mapClassTableCode}" select="MapClassTable.load"/>
     </resultMap>
 
     <!-- 用于select查询公用抽取的列 -->
     <sql id="ProjectCodeCatalog.columns">
-		id,code,projectCode,moduleCode,serviceModuleCode,codeModelCode,classInfoCode,frameworksConfigureTemplateCode,relativePath,absolutePath,fileName,fileSuffix,fileType,classPackage,basePackage
+		id,code,projectCode,mapClassTableCode,relativePath,absolutePath,fileName,fileSuffix,basePackage
 	</sql>
 
     <insert id="ProjectCodeCatalog.insert" useGeneratedKeys="true" keyProperty="id" parameterType="ProjectCodeCatalog">
@@ -41,33 +34,21 @@
         id ,
         code ,
         projectCode ,
-        moduleCode ,
-        serviceModuleCode ,
-        codeModelCode ,
-        classInfoCode ,
-        frameworksConfigureTemplateCode ,
+        mapClassTableCode ,
         relativePath ,
         absolutePath ,
         fileName ,
         fileSuffix ,
-        fileType,
-        classPackage,
         basePackage
         ) VALUES (
         #{id} ,
         #{code} ,
         #{projectCode} ,
-        #{moduleCode} ,
-        #{serviceModuleCode} ,
-        #{codeModelCode} ,
-        #{classInfoCode} ,
-        #{frameworksConfigureTemplateCode} ,
+        #{mapClassTableCode} ,
         #{relativePath} ,
         #{absolutePath} ,
         #{fileName} ,
         #{fileSuffix} ,
-        #{fileType},
-        #{classPackage},
         #{basePackage}
         )
         <selectKey keyProperty="id" resultType="long">
@@ -99,16 +80,10 @@
             <if test="basePackage!=null and basePackage!=''">
                 basePackage = #{basePackage}
             </if>
-            <if test="frameworksConfigureTemplateCode!=null and frameworksConfigureTemplateCode!=''">
-                frameworksConfigureTemplateCode = #{frameworksConfigureTemplateCode}
-            </if>
         </trim>
         WHERE
         code = #{code} AND
         projectCode = #{projectCode} AND
-        moduleCode = #{moduleCode} AND
-        serviceModuleCode = #{serviceModuleCode} AND
-        codeModelCode = #{codeModelCode}
     </update>
 
     <delete id="ProjectCodeCatalog.delete">
@@ -134,21 +109,11 @@
             <if test="projectCode!=null and projectCode!=''">
                 AND projectCode = #{projectCode}
             </if>
-            <if test="moduleCode!=null and moduleCode!=''">
-                AND moduleCode = #{moduleCode}
+
+            <if test="mapClassTableCode!=null and mapClassTableCode!=''">
+                AND mapClassTableCode = #{mapClassTableCode}
             </if>
-            <if test="serviceModuleCode!=null and serviceModuleCode!=''">
-                AND serviceModuleCode = #{serviceModuleCode}
-            </if>
-            <if test="codeModelCode!=null and codeModelCode!=''">
-                AND codeModelCode = #{codeModelCode}
-            </if>
-            <if test="classInfoCode!=null and classInfoCode!=''">
-                AND classInfoCode = #{classInfoCode}
-            </if>
-            <if test="frameworksConfigureTemplateCode!=null and frameworksConfigureTemplateCode!=''">
-                AND frameworksConfigureTemplateCode = #{frameworksConfigureTemplateCode}
-            </if>
+
             <if test="relativePath!=null and relativePath!=''">
                 AND relativePath = #{relativePath}
             </if>
@@ -160,12 +125,6 @@
             </if>
             <if test="fileSuffix!=null and fileSuffix!=''">
                 AND fileSuffix = #{fileSuffix}
-            </if>
-            <if test="fileType!=null and fileType!=''">
-                AND fileType = #{fileType}
-            </if>
-            <if test="classPackage!=null and classPackage!=''">
-                AND classPackage = #{classPackage}
             </if>
             <if test="basePackage!=null and basePackage!=''">
                 AND basePackage = #{basePackage}

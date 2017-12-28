@@ -167,12 +167,7 @@ public class FrameworksCtrl extends BaseCtrl {
     public BeanRet delete(String code) {
         try {
             Assert.hasText(code, BaseException.BaseExceptionEnum.Empty_Param.toString());
-            Map<String, Object> map = Maps.newHashMap();
-            map.put("code", code);
-            Frameworks frameworks = frameworksSV.load(map);
-
-            frameworks.setState(FrameworksStateEnum.Delete.name());
-            frameworksSV.saveOrUpdate(frameworks);
+            frameworksSV.delete(code);
             return BeanRet.create(true, "删除成功");
         } catch (Exception e) {
             e.printStackTrace();

@@ -39,19 +39,16 @@ public class Project extends BaseEntity implements java.io.Serializable {
     private String isRepository;//数据库字段:isRepository  属性显示:是否仓库管理
     private String isParseTable;//数据库字段:isParseTable  属性显示:是否已经解析表
     private String isParseClass;//数据库字段:isParseClass  属性显示:是否已经解析类
+    private Integer buildNumber;//数据库字段:buildNumber  属性显示:生成次数
+    private String accountCode;//数据库字段:accountCode  属性显示:账户编码
     private java.util.Date createTime;//数据库字段:createTime  属性显示:创建时间
     private java.util.Date updateTime;//数据库字段:updateTime  属性显示:更新时间
 
-    private List<ProjectClass> projectClassList;
-    private List<ProjectFiles> projectFilesList;
     private List<ProjectFramwork> projectFramworkList;
+    private List<ProjectMap> projectMapList;
     private List<ProjectJob> projectJobList;
-    private List<ProjectMoudles> projectMoudlesList;
-    private List<ProjectTables> projectTablesList;
-    private List<ProjectTools> projectToolsList;
+    private List<ProjectModule> projectModuleList;
     private List<ProjectRepositoryAccount> projectRepositoryAccountList;
     private List<ProjectSql> projectSqlList;
-    private List<ProjectBuildTools> projectBuildToolsList;
-    private List<ProjectModule> projectModuleList;
 }
 

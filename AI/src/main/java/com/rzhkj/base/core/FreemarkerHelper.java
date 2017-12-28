@@ -18,22 +18,24 @@ public class FreemarkerHelper {
         map.put("basePackage", "package\tcom.szh.test.ctrl;");
         map.put("import", "import\tcom.aixin.core.entity.Page;\nimport\torg.apache.commons.lang.builder.ToStringBuilder;\nimport\torg.apache.commons.lang.builder.ToStringStyle;\nimport\tjava.io.Serializable;");
         String targetFilePath = "C:\\workspaces\\AI-Code\\AI\\src\\main\\webapp\\workspace\\szh\\sv\\src\\main\\java\\com\\szh\\test\\ctrl\\" + map.get("fileName").toString() + ".java";
-        generate(map, targetFilePath, "Test.java", "C:\\workspaces\\AI-Code\\AI\\src\\main\\webapp\\templates");
+        generate(map, targetFilePath, "C:\\workspaces\\AI-Code\\AI\\src\\main\\webapp\\templates\\Test.java");
     }
 
 
     /**
      * 生成源文件
      *
-     * @param model            模型数据
-     * @param targetFilePath   目标路径 /xxxx/xxx/{ClassName.java}
-     * @param templateFileName 模板文件名 [temp.java|temp.xml|temp.properties]
-     * @param templatePath     模板路径 [/xxx/xxxx|/xxx/xxxx/]
+     * @param model          模型数据
+     * @param targetFilePath 目标路径 /xxxx/xxx/{ClassName.java}
+     * @param templatePath   模板路径 [/xxx/xxxx|/xxx/xxxx/]
      */
-    public static void generate(Map<String, Object> model, String targetFilePath, String templateFileName, String templatePath) {
+    public static void generate(Map<String, Object> model, String targetFilePath, String templatePath) {
         Writer out = null;
         try {
-            targetFilePath = targetFilePath.replace("\\", "/");
+            templatePath = templatePath.replace("//", "/").replace("\\", "/");
+            String templateFileName = templatePath.substring(templatePath.lastIndexOf("/") + 1);
+            templatePath = templatePath.substring(0, templatePath.lastIndexOf("/"));
+            targetFilePath = targetFilePath.replace("\\", "/").replace("//", "/");
             String filePath = targetFilePath.substring(0, targetFilePath.lastIndexOf("/"));
 
             File dirFile = new File(filePath);
@@ -43,7 +45,7 @@ public class FreemarkerHelper {
             Configuration configuration = new Configuration();
             configuration.setDefaultEncoding("UTF-8");
             configuration.setDirectoryForTemplateLoading(new File(templatePath));
-            Template  temp = configuration.getTemplate(templateFileName);
+            Template temp = configuration.getTemplate(templateFileName);
             out = new OutputStreamWriter(new FileOutputStream(targetFilePath), Charset.forName("UTF-8"));
             temp.process(model, out);
             out.flush();

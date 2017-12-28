@@ -45,7 +45,16 @@ public class FrameworksSVImpl extends BaseMybatisSVImpl<Frameworks, Long> implem
         }
 
         entity.setCode(String.valueOf(uidGenerator.getUID()));
-        entity.setState(FrameworksStateEnum.Enable.name());
         super.save(entity);
+    }
+
+    /**
+     * 删除
+     *
+     * @param code 技术编码
+     */
+    @Override
+    public void delete(String code) {
+        frameworksDAO.delete(code);
     }
 }

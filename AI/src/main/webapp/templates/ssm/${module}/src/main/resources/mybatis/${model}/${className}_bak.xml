@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+                "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<#macro mapperEl value>${r"#{"}${value}}</#macro>
+<#macro sort value>${value}</#macro>
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<mapper namespace="${className}">
+
+    <resultMap id="rs_base" type="${className}">
+        <#list fields as field>
+        <result property="${field.field}" column="${field.column}"/>
+        </#list>
+    </resultMap>
+
+
+        <!--查询表信息关联信息-->
+     <#if (relationships?size>0)>
+     <resultMap id="rs_base_all" type="${className}" extends="rs_base">
+     <#list relationships as relationship>
+     <#if relationship.oneToOne>
+            <association property="${relationship.mapClassTable}" column="{${joinField}=${mainField}}" select="${joinClassName}.${loadBy}"/>
+     </#if>
+     <#if relationship.oneToMany>
+            <collection property="${joinClassNameFields}" column="{${joinField}=${mainField}}" select="${joinClassName}.${queryBy}"/>
+     </#if>
+     </#list>
+     </resultMap>
+
+   <#list relationships as relationship>
+   <#if relationship.isOneToOne>
+    <select id="${loadBy}" resultMap="rs_base">
+        SELECT <include refid="columns" />
+        FROM `${tableName}`
+        <include refid="where"/>
+    </select>
+    </#if>
+
+    <#if relationship.isOneToMany>
+    <select id="query" resultMap="rs_base">
+    SELECT <include refid="columns" />
+    FROM `${tableName}`
+    <include refid="where"/>
+
+    <if test="sortColumns!=null and sortColumns!=''">
+        ORDER BY <@sort 'sortColumns'/>
+    </if>
+    </select>
+    </#if>
+    </#list>
+    </#if>
+
+
+
+     <!-- 用于select查询公用抽取的列 -->
+     <sql id="columns">
+        <#list columns as column>${column.column}<#if column_has_next>,</#if></#list>
+     </sql>
+
+     <sql id="where">
+      <where>
+        <#list fields as field>
+        <#if field.checkDate>
+          <if test="${field.field}Begin!=null">
+             AND ${field.column} >= <@mapperEl field.field+"Begin"/>
+          </if>
+          <if test="${field.field}End!=null">
+             AND ${field.column} &lt;= <@mapperEl field.field+"End"/>
+          </if>
+        <#elseif field.checkState>
+          <if test="${field.field}s!=null and ${field.field}s!=''">
+              AND ${field.column} in
+              <foreach collection="${field.field}s" index="index" item="stateIn" open="(" separator="," close=")">
+                  <@mapperEl stateIn/>
+              </foreach>
+          </if>
+        <#else>
+        <if test="${field.field}!=null and ${field.field}!=''">
+            AND ${field.column} = <@mapperEl field.field/>
+        </if>
+        </#if>
+        </#list>
+      </where>
+     </sql>
+
+     <insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="${className}">
+       INSERT INTO `${tableName}` (
+       <#list columns as column>
+        ${column.column} <#if column_has_next>,</#if>
+        </#list>
+        ) VALUES (
+       <#list fields as field>
+         <@mapperEl field.field/> <#if field_has_next>,</#if>
+        </#list>
+        )
+      <selectKey keyProperty="id" resultType="long">
+      select LAST_INSERT_ID()
+      </selectKey>
+     </insert>
+
+    <delete id="delete">
+      DELETE FROM `${tableName}`
+      <include refid="where"/>
+    </delete>
+
+
+     <update id="update" parameterType="${className}">
+       UPDATE `${tableName}`
+       <trim prefix="set" suffixOverrides=",">
+         <#list notPkFields as field>
+          <if test="${field.field}!=null and ${field.field}!=''">
+            ${field.column} = <@mapperEl field.field/> <#if field_has_next>,</#if>
+          </if>
+         </#list>
+       </trim>
+        <where>
+        <#list fields as field>
+        <#if field.checkDate>
+          <if test="${field.field}Begin!=null">
+             AND ${field.column} >= <@mapperEl field.field+"Begin"/>
+          </if>
+          <if test="${field.field}End!=null">
+             AND ${field.columnI} &lt;= <@mapperEl field.field+"End"/>
+          </if>
+        <#elseif field.checkState>
+          <if test="${field.field}s!=null and ${field.field}s!=''">
+              AND ${field.column} in
+              <foreach collection="${field.field}s" index="index" item="stateIn" open="(" separator="," close=")">
+                  <@mapperEl stateIn/>
+              </foreach>
+          </if>
+        <#else>
+          <if test="${field.field}!=null and ${field.field}!=''">
+             AND ${field.column} = <@mapperEl field.field/>
+          </if>
+        </#if>
+        </#list>
+        </where>
+
+     </update>
+
+     <select id="load" resultMap="rs_base">
+       SELECT <include refid="columns" />
+       FROM `${tableName}`
+       <include refid="where"/>
+     </select>
+
+
+     <#list pkFields as pkfield>
+      <select id="loadBy${pkfield.field?cap_first}" resultMap="rs_base" parameterType="${pkfield.fieldType}">
+        SELECT <include refid="columns"/>
+        FROM `${tableName}` where ${pkfield.column} = <@mapperEl pkfield.field/>
+      </select>
+     </#list>
+
+      <select id="count" resultType="long">
+        SELECT count(1) FROM `${tableName}`
+        <include refid="where"/>
+      </select>
+
+
+      <select id="query" resultMap="rs_base">
+        SELECT <include refid="columns" />
+        FROM `${tableName}`
+        <include refid="where"/>
+
+        <if test="sortColumns!=null and sortColumns!=''">
+        ORDER BY <@sort 'sortColumns'/>
+        </if>
+      </select>
+
+
+</mapper>
+

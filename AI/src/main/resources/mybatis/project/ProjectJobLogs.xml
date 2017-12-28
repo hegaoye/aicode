@@ -1,113 +1,95 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 
 <!-- 不使用namespace的话sql搜索定位会比较方便 -->
 <mapper namespace="ProjectJobLogs">
 
-	<resultMap id="rs_base" type="ProjectJobLogs">
+    <resultMap id="rs_base" type="ProjectJobLogs">
         <result property="id" column="id"/>
         <result property="code" column="code"/>
-        <result property="result" column="result"/>
-        <result property="info" column="info"/>
-        <result property="createTime" column="createTime"/>
-	</resultMap>
+        <result property="log" column="log"/>
+    </resultMap>
 
-	<!-- 用于select查询公用抽取的列 -->
-	<sql id="ProjectJobLogs.columns">
-		id,code,result,info,createTime
+    <!-- 用于select查询公用抽取的列 -->
+    <sql id="ProjectJobLogs.columns">
+		id,code,log
 	</sql>
 
-	<insert id="ProjectJobLogs.insert" useGeneratedKeys="true" keyProperty="id" parameterType="ProjectJobLogs">
+    <insert id="ProjectJobLogs.insert" useGeneratedKeys="true" keyProperty="id" parameterType="ProjectJobLogs">
         INSERT INTO `project_job_logs` (
-        	id ,
-        	code ,
-        	result ,
-        	info ,
-        	createTime 
+        id ,
+        code ,
+        log
         ) VALUES (
-        	#{id} ,
-        	#{code} ,
-        	#{result} ,
-        	#{info} ,
-        	#{createTime} 
+        #{id} ,
+        #{code} ,
+        #{log}
         )
-		<selectKey keyProperty="id" resultType="long">
-			select LAST_INSERT_ID()
-		</selectKey>
-	</insert>
+        <selectKey keyProperty="id" resultType="long">
+            select LAST_INSERT_ID()
+        </selectKey>
+    </insert>
 
-	<update id="ProjectJobLogs.update" parameterType="ProjectJobLogs">
+    <update id="ProjectJobLogs.update" parameterType="ProjectJobLogs">
         UPDATE `project_job_logs`
-		<trim prefix="set" suffixOverrides=",">
-			<if test="code!=null and code!=''">
-	        code = #{code} ,
-		    </if>
-			<if test="result!=null and result!=''">
-	        result = #{result} ,
-		    </if>
-			<if test="info!=null and info!=''">
-	        info = #{info} ,
-		    </if>
-			<if test="createTime!=null ">
-	        createTime = #{createTime} 
-		    </if>
-		</trim>
+        <trim prefix="set" suffixOverrides=",">
+            <if test="code!=null and code!=''">
+                code = #{code} ,
+            </if>
+
+            <if test="log!=null and log!=''">
+                log = #{log} ,
+            </if>
+
+        </trim>
         WHERE
-	        id = #{id} 
-	</update>
+        id = #{id}
+    </update>
 
     <delete id="ProjectJobLogs.delete">
         DELETE FROM `project_job_logs`
-		<include refid="ProjectJobLogs.where"/>
+        <include refid="ProjectJobLogs.where"/>
     </delete>
 
     <select id="ProjectJobLogs.load" resultMap="rs_base">
-		SELECT <include refid="ProjectJobLogs.columns" />
-		    FROM `project_job_logs`
-		<include refid="ProjectJobLogs.where"/>
-	</select>
+        SELECT
+        <include refid="ProjectJobLogs.columns"/>
+        FROM `project_job_logs`
+        <include refid="ProjectJobLogs.where"/>
+    </select>
 
-	<sql id="ProjectJobLogs.where">
-		<where>
-			<if test="id!=null and id!=''">
-				AND id = #{id}
-			</if>
-			<if test="code!=null and code!=''">
-				AND code = #{code}
-			</if>
-			<if test="result!=null and result!=''">
-				AND result = #{result}
-			</if>
-			<if test="info!=null and info!=''">
-				AND info = #{info}
-			</if>
-			<if test="createTimeBegin!=null ">
-				AND createTime >= #{createTimeBegin}
-		   </if>
-			<if test="createTimeEnd!=null ">
-				AND createTime &lt;= #{createTimeEnd}
-		   </if>
-		</where>
-	</sql>
-
+    <sql id="ProjectJobLogs.where">
+        <where>
+            <if test="id!=null and id!=''">
+                AND id = #{id}
+            </if>
+            <if test="code!=null and code!=''">
+                AND code = #{code}
+            </if>
+            <if test="log!=null and log!=''">
+                AND log = #{log}
+            </if>
+        </where>
+    </sql>
 
 
     <select id="ProjectJobLogs.count" resultType="long">
         SELECT count(*) FROM `project_job_logs`
-		<include refid="ProjectJobLogs.where"/>
+        <include refid="ProjectJobLogs.where"/>
     </select>
 
 
     <select id="ProjectJobLogs.query" resultMap="rs_base">
-    	SELECT <include refid="ProjectJobLogs.columns" />
-	    FROM `project_job_logs`
-		<include refid="ProjectJobLogs.where"/>
+        SELECT
+        <include refid="ProjectJobLogs.columns"/>
+        FROM `project_job_logs`
+        <include refid="ProjectJobLogs.where"/>
 
-		<if test="sortColumns!=null and sortColumns!=''">
-			ORDER BY ${sortColumns}
-		</if>
+        <if test="sortColumns!=null and sortColumns!=''">
+            ORDER BY ${sortColumns}
+        </if>
     </select>
 
 

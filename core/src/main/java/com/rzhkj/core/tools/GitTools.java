@@ -1,14 +1,17 @@
 package com.rzhkj.core.tools;
 
+import com.alibaba.dubbo.common.utils.StringUtils;
 import org.eclipse.jgit.api.*;
 import org.eclipse.jgit.internal.storage.file.FileRepository;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
+import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by liuyang on 2017/12/27.
@@ -96,22 +99,27 @@ public class GitTools {
     }
 
     /**
-     * 克隆远程仓库
+     * 克隆远程仓库（私有，需要用户名、密码）
      * 本地不能有相同名的仓库
      * @param httpsUrl  https地址
      * @param repoDir   仓库文件夹
+     * @param username  git用户名
+     * @param password  git密码
      * @return
      */
-    public static boolean cloneGit(String httpsUrl, File repoDir) {
+    public static boolean cloneGit(String httpsUrl, File repoDir, String username, String password) {
         boolean ret = false;
         try {
            CloneCommand cloneCommand = Git.cloneRepository().setURI(httpsUrl);
-            if (repoDir != null) {
+           if (!StringUtils.isBlank(username)) {
+               cloneCommand.setCredentialsProvider(new UsernamePasswordCredentialsProvider(username, password));
+           }
+           if (repoDir != null) {
                 //目录为null则克隆到当前项目下的目录，不建议这样做
                 cloneCommand.setDirectory(repoDir);
-            }
-            cloneCommand.call();
-            ret = true;
+           }
+           cloneCommand.call();
+           ret = true;
         } catch (Exception e) {
             e.printStackTrace();
             return false;
@@ -119,8 +127,23 @@ public class GitTools {
         return ret;
     }
 
+    public static boolean cloneGit(String httpsUrl, String dirPath, String username, String password) {
+        return cloneGit(httpsUrl, new File(dirPath), username, password);
+    }
+
+    /**
+     * 克隆远程仓库（公共，不需要用户名、密码）
+     * 本地不能有相同名的仓库
+     * @param httpsUrl  https地址
+     * @param repoDir   仓库文件夹
+     * @return
+     */
+    public static boolean cloneGit(String httpsUrl, File repoDir) {
+        return cloneGit(httpsUrl, repoDir, null, null);
+    }
+
     public static boolean cloneGit(String httpsUrl, String dirPath) {
-        return cloneGit(httpsUrl, new File(dirPath));
+        return cloneGit(httpsUrl, new File(dirPath), null, null);
     }
 
     /**
@@ -287,28 +310,34 @@ public class GitTools {
     }
 
     /**
-     *
-     * @param repoDir
-     * @param message
+     * 提交并推送远程仓库
+     * @param repoDir   本地仓库文件夹
+     * @param message   提交信息
+     * @param username  用户名
+     * @param password  密码
      * @return
      */
-    public static boolean commitAndPush(File repoDir, String authorName, String authorEmail, String message) {
+    public static boolean commitAndPush(File repoDir, String username, String password, String message) {
         boolean ret = false;
         File repoGitDir = getGitAbsolutePath(repoDir);
         if (!repoGitDir.exists()) {
-            System.out.println("远程仓库不存在");
+            System.out.println("仓库不存在");
             return false;
         } else {
             Repository repository = null;
             try {
                 repository = new FileRepository(repoGitDir.getAbsoluteFile());
                 Git git = new Git(repository);
-                git.add().addFilepattern("pets").call();
-                git.commit()
-                        //.setAuthor(authorName, authorEmail)
-                        //.setCommitter(authorName, authorEmail)
-                        .setMessage(message).call();
-                git.push().call();
+                Status repoStatus = getGitStatus(repoDir);
+                Set<String> untractedFiles = repoStatus.getUntracked();
+                for (String fileName : untractedFiles) {
+                    System.out.println(fileName);
+                    git.add().addFilepattern(fileName).call();
+                }
+                git.commit().setMessage(message).call();
+                PushCommand pushCommand = git.push();
+                pushCommand.setCredentialsProvider(new UsernamePasswordCredentialsProvider(username, password));
+                pushCommand.call();
                 ret = true;
             } catch (Exception e) {
                 e.printStackTrace();
@@ -348,12 +377,14 @@ public class GitTools {
     }
 
     public static void main(String[] args) throws IOException {
+        String username = "vevoly";
+        String password = "liuyang3311680";
         String authorName = "vevoly";
         String authorEmail = "jevoly@163.com";
         String dirPath = "c:/repoTest/";
         String clonePath = "c:/JGitTest0";
-        //String httpsUrl = "https://github.com/vevoly/JGitTest.git";
         String httpsUrl = "https://github.com/vevoly/allinpayView.git";
+        httpsUrl = "https://gitee.com/vevoly/git-workflow-test.git";
         String sshUrl = "git@github.com:vevoly/allinpayView.git";
         //新建仓库
         /*Repository newRepo = createGitRepository(dirPath);
@@ -369,7 +400,7 @@ public class GitTools {
         System.out.println("删除的文件：" + repoStatus.getRemoved());
         System.out.println("未提交文件：" + repoStatus.getUncommittedChanges());*/
         //克隆
-        /*if (cloneGit(httpsUrl, clonePath)) {
+        /*if (cloneGit(httpsUrl, clonePath, username, password)) {
             System.out.println("clone完成\n目录：" + clonePath);
         } else {
             System.out.println("clone失败");
@@ -391,7 +422,7 @@ public class GitTools {
         System.out.println("新打开仓库分支：" + repo.getBranch());*/
 
         //提交
-        if (commitAndPush(new File(clonePath), authorName, authorEmail, "jgit提交测试")) {
+        if (commitAndPush(new File(clonePath), username, password, "jgit提交测试")) {
             System.out.println("提交成功");
         } else {
             System.out.println("提交失败");

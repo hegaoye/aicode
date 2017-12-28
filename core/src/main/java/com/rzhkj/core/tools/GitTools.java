@@ -331,7 +331,6 @@ public class GitTools {
                 Status repoStatus = getGitStatus(repoDir);
                 Set<String> untractedFiles = repoStatus.getUntracked();
                 for (String fileName : untractedFiles) {
-                    System.out.println(fileName);
                     git.add().addFilepattern(fileName).call();
                 }
                 git.commit().setMessage(message).call();
@@ -349,6 +348,10 @@ public class GitTools {
             }
         }
         return ret;
+    }
+
+    public static boolean commitAndPush(String repoDir, String username, String password, String message){
+        return commitAndPush(new File(repoDir), username, password, message);
     }
 
     /**
@@ -412,21 +415,21 @@ public class GitTools {
             System.out.println("检出失败");
         }*/
         //创建分支
-        /*if (createBranch("dev", clonePath)) {
+        if (createBranch("dev", clonePath)) {
             System.out.println("创建新分支成功\n分支名：dev");
         } else {
             System.out.println("创建新分支失败");
         }
         //打开仓库
         Repository repo = openGitRepository(dirPath);
-        System.out.println("新打开仓库分支：" + repo.getBranch());*/
+        System.out.println("新打开仓库分支：" + repo.getBranch());
 
         //提交
-        if (commitAndPush(new File(clonePath), username, password, "jgit提交测试")) {
+        /*if (commitAndPush(new File(clonePath), username, password, "jgit提交测试")) {
             System.out.println("提交成功");
         } else {
             System.out.println("提交失败");
-        }
+        }*/
     }
 
 

@@ -168,7 +168,7 @@ public class ProjectJobSVImpl extends BaseMybatisSVImpl<ProjectJob, Long> implem
         map.clear();
         map.put("projectCode", project.getCode());
         ProjectRepositoryAccount projectRepositoryAccount = projectRepositoryAccountDAO.load(map);
-        GitTools.commitAndPush(new File(projectPath), projectRepositoryAccount.getAccount(), projectRepositoryAccount.getPassword(), "AI-Code 完成代码构建");
+        GitTools.commitAndPush(new File(projectPath), projectRepositoryAccount.getAccount(), projectRepositoryAccount.getPassword(), "AI-Code 为您构建代码，享受智慧生活");
     }
 
     /**
@@ -243,9 +243,11 @@ public class ProjectJobSVImpl extends BaseMybatisSVImpl<ProjectJob, Long> implem
         model.put("author", project.getAuthor());//作者
 
         Setting settingTemplatePath = settingDAO.loadByKey(Setting.Key.Template_Path.name());
-        String targetFilePath = projectPath + "/" + frameworksTemplate.getPath().replace("${basepackage}", project.getBasePackage().replace(".", "/")).replace("${className}", mapClassTable.getClassName());
+        String frameworksTemplatePath = frameworksTemplate.getPath();
+        frameworksTemplatePath = frameworksTemplatePath.substring(frameworksTemplatePath.indexOf("/$"));
+        String targetFilePath = projectPath + "/" + frameworksTemplatePath.replace("${basepackage}", project.getBasePackage().replace(".", "/")).replace("${className}", mapClassTable.getClassName());
         String templatePath = new HandleFuncs().getCurrentClassPath() + "/" + settingTemplatePath.getV() + "/" + frameworksTemplate.getPath();
 
-        FreemarkerHelper.generate(model, targetFilePath, templatePath);
+        FreemarkerHelper.generate(model, targetFilePath.replace("${module}", "").replace("${model}", ""), templatePath);
     }
 }

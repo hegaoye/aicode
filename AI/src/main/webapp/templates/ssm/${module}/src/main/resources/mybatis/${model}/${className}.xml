@@ -72,11 +72,13 @@
      <update id="update" parameterType="${className}">
        UPDATE `${tableName}`
        <trim prefix="set" suffixOverrides=",">
+        <#if (notPkFields?size>0)>
          <#list notPkFields as field>
           <if test="${field.field}!=null and ${field.field}!=''">
             ${field.column} = <@mapperEl field.field/> <#if field_has_next>,</#if>
           </if>
          </#list>
+         </#if>
        </trim>
         <where>
         <#list fields as field>
@@ -111,7 +113,7 @@
        <include refid="where"/>
      </select>
 
-
+   <#if (pkFields?size>0)>
      <#list pkFields as pkfield>
 
       <!--查询一条${tableName} loadBy${pkfield.field?cap_first}  通过${pkfield.field} -->
@@ -121,7 +123,7 @@
       </select>
 
      </#list>
-
+   </#if>
      <!--根据任何条件统计${tableName}数据条数-->
       <select id="count" resultType="long">
         SELECT count(1) FROM `${tableName}`

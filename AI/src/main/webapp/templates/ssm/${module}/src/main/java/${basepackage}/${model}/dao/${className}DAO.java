@@ -15,6 +15,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class ${className}DAO extends BaseMybatisDAOImpl<${className},Long>{
 
+<#if (pkFields?size>0)>
 <#list pkFields as pkField>
     /**
      * 加载一个对象${className} 通过${pkField.field}
@@ -61,14 +62,14 @@ public class ${className}DAO extends BaseMybatisDAOImpl<${className},Long>{
             return getSqlSession().selectList(this.sqlmapNamespace + ".list", ${pkField.field}, new RowBounds(offset, limit))
     }
 </#list>
-
+</#if>
 
 
 <#list fields as field>
   <#if field.checkDate>
     /**
-     * 根据时间查询${className}列表 通过${pkField.field}
-     * @param ${pkField.field} ${pkField.notes}
+     * 根据时间查询${className}列表 通过${field.field}
+     * @param ${field.field} ${field.notes}
      * @return List<${className}>
      */
     public List<${className}> listBy${field.field?cap_first}Begin(${field.fieldType} ${field.field}) {
@@ -78,8 +79,8 @@ public class ${className}DAO extends BaseMybatisDAOImpl<${className},Long>{
     }
 
     /**
-     * 根据时间查询${className}列表 通过${pkField.field}
-     * @param ${pkField.field} ${pkField.notes}
+     * 根据时间查询${className}列表 通过${field.field}
+     * @param ${field.field} ${field.notes}
      * @return List<${className}>
      */
     public List<${className}> listBy${field.field?cap_first}Begin(${field.fieldType} ${field.field},int offset,int limit) {
@@ -89,8 +90,8 @@ public class ${className}DAO extends BaseMybatisDAOImpl<${className},Long>{
     }
 
     /**
-     * 根据时间查询${className}列表 通过${pkField.field}
-     * @param ${pkField.field} ${pkField.notes}
+     * 根据时间查询${className}列表 通过${field.field}
+     * @param ${field.field} ${field.notes}
      * @return List<${className}>
      */
     public List<${className}> listBy${field.field?cap_first}End(${field.fieldType} ${field.field}) {
@@ -100,8 +101,8 @@ public class ${className}DAO extends BaseMybatisDAOImpl<${className},Long>{
     }
 
     /**
-     * 根据时间查询${className}列表 通过${pkField.field}
-     * @param ${pkField.field} ${pkField.notes}
+     * 根据时间查询${className}列表 通过${field.field}
+     * @param ${field.field} ${field.notes}
      * @return List<${className}>
      */
     public List<${className}> listBy${field.field?cap_first}End(${field.fieldType} ${field.field},int offset,int limit) {
@@ -111,9 +112,9 @@ public class ${className}DAO extends BaseMybatisDAOImpl<${className},Long>{
     }
 
     /**
-     * 根据时间查询${className}列表 通过${pkField.field}
-     * @param ${pkField.field} ${pkField.notes}Begin
-     * @param ${pkField.field} ${pkField.notes}End
+     * 根据时间查询${className}列表 通过${field.field}
+     * @param ${field.field} ${field.notes}Begin
+     * @param ${field.field} ${field.notes}End
      * @return List<${className}>
      */
     public List<${className}> listBy${field.field?cap_first}(${field.fieldType} ${field.field}Begin,${field.fieldType} ${field.field}End) {
@@ -124,9 +125,9 @@ public class ${className}DAO extends BaseMybatisDAOImpl<${className},Long>{
     }
 
     /**
-     * 根据时间查询${className}列表 通过${pkField.field}
-     * @param ${pkField.field} ${pkField.notes}Begin
-     * @param ${pkField.field} ${pkField.notes}End
+     * 根据时间查询${className}列表 通过${field.field}
+     * @param ${field.field} ${field.notes}Begin
+     * @param ${field.field} ${field.notes}End
      * @return List<${className}>
      */
     public List<${className}> listBy${field.field?cap_first}(${field.fieldType} ${field.field}Begin,${field.fieldType} ${field.field}End,int offset,int limit) {

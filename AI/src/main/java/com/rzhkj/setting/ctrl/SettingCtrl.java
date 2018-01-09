@@ -84,7 +84,7 @@ public class SettingCtrl extends BaseUploadCtrl {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "k", value = "键", required = true, paramType = "query"),
             @ApiImplicitParam(name = "v", value = "值", required = true, paramType = "query"),
-            @ApiImplicitParam(name = "summary", value = "说明", paramType = "query")
+            @ApiImplicitParam(name = "description", value = "说明", paramType = "query")
     })
     @PostMapping("/modify")
     @ResponseBody

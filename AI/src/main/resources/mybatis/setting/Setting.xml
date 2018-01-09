@@ -10,12 +10,12 @@
         <result property="id" column="id"/>
         <result property="k" column="k"/>
         <result property="v" column="v"/>
-        <result property="summary" column="summary"/>
+        <result property="description" column="description"/>
     </resultMap>
 
     <!-- 用于select查询公用抽取的列 -->
     <sql id="Setting.columns">
-		id,k,v,summary
+		id,k,v,description
 	</sql>
 
     <insert id="Setting.insert" useGeneratedKeys="true" keyProperty="id" parameterType="Setting">
@@ -23,12 +23,12 @@
         id ,
         k ,
         v,
-        summary,
+        description,
         ) VALUES (
         #{id} ,
         #{k} ,
         #{v},
-        #{summary}
+        #{description}
         )
         <selectKey keyProperty="id" resultType="long">
             select LAST_INSERT_ID()
@@ -41,8 +41,8 @@
             <if test="v!=null and v!=''">
                 v = #{v} ,
             </if>
-            <if test="summary!=null and summary!=''">
-                summary = #{summary} ,
+            <if test="description!=null and description!=''">
+                description = #{description} ,
             </if>
         </trim>
         where k=#{k}
@@ -69,8 +69,8 @@
             <if test="v!=null and v!=''">
                 AND v = #{v}
             </if>
-            <if test="summary!=null and summary!=''">
-                AND summary = #{summary}
+            <if test="description!=null and description!=''">
+                AND description = #{description}
             </if>
         </where>
     </sql>
@@ -106,8 +106,8 @@
             <if test="v!=null and v!=''">
                 v = #{v} ,
             </if>
-            <if test="summary!=null and summary!=''">
-                summary = #{summary} ,
+            <if test="description!=null and description!=''">
+                description = #{description} ,
             </if>
         </trim>
         WHERE k = #{k}

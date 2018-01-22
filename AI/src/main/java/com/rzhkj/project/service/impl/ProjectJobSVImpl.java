@@ -144,6 +144,8 @@ public class ProjectJobSVImpl extends BaseMybatisSVImpl<ProjectJob, Long> implem
         map.put("projectCode", projectJob.getProjectCode());
         Project project = projectDAO.load(map);
         String projectPath = this.buildProject(project);
+        project.setBuildNumber(project.getBuildNumber() + 1);
+        projectDAO.update(project);
         logger.info("创建工作空间库完成");
 
         //2.获取类信息

@@ -137,8 +137,8 @@ public class ProjectSqlCtrl extends BaseCtrl {
     public BeanRet modify(@ApiIgnore ProjectSql projectSql) {
         try {
             Assert.hasText(projectSql.getCode(), BaseException.BaseExceptionEnum.Empty_Param.toString());
-
-            projectSqlSV.saveOrUpdate(projectSql);
+            projectSqlSV.delete(projectSql.getCode());
+            projectSqlSV.save(projectSql);
             return BeanRet.create(true, "修改项目成功", projectSql);
         } catch (Exception e) {
             e.printStackTrace();
@@ -148,7 +148,7 @@ public class ProjectSqlCtrl extends BaseCtrl {
     }
 
     /**
-     * 删除项目sql
+     * 删除项目sql`
      *
      * @return BeanRet
      */

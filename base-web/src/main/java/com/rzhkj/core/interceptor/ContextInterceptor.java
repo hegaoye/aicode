@@ -73,7 +73,7 @@ public class ContextInterceptor extends HandlerInterceptorAdapter {
         }
 
         // 判断黑名单
-        String[] inj_stra = {"script", "master", "truncate", "insert", "select", "update", "declare", "alert", "atestu", "\\", "onload", "onmouseover", "onfocus", "onerror"};
+        String[] inj_stra = {};
 
         str = str.toLowerCase(); // sql不区分大小写
 

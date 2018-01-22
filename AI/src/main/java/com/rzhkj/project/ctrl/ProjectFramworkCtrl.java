@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.annotation.Resource;
+import java.util.List;
 import java.util.Map;
 
 
@@ -107,20 +108,18 @@ public class ProjectFramworkCtrl extends BaseCtrl {
      *
      * @return BeanRet
      */
-    @ApiOperation(value = "添加项目技术", notes = "添加项目技术")
+    @ApiOperation(value = "添加项目技术", notes = "请求方式请用POST，Ajax的[Content-Type: application/json;charset=utf-8]模式，并对以下属性进行设置，最后以JSON格式提交如：[{\"frameworkCode\":\"123\"....},{\"projectCode\":\"456\"....}]")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "projectCode", value = "项目编码", required = true, paramType = "query"),
             @ApiImplicitParam(name = "frameworkCode", value = "技术编码", required = true, paramType = "query")
     })
     @PostMapping("/add")
     @ResponseBody
-    public BeanRet add(@ApiIgnore ProjectFramwork projectFramwork) {
+    public BeanRet add(@ApiIgnore @RequestBody List<ProjectFramwork> projectFramwors) {
         try {
-            Assert.hasText(projectFramwork.getProjectCode(), BaseException.BaseExceptionEnum.Empty_Param.toString());
-            Assert.hasText(projectFramwork.getFrameworkCode(), BaseException.BaseExceptionEnum.Empty_Param.toString());
-
-            projectFramworkSV.save(projectFramwork);
-            return BeanRet.create(true, "添加项目技术成功", projectFramwork);
+            Assert.notNull(projectFramwors, BaseException.BaseExceptionEnum.Empty_Param.toString());
+            projectFramworkSV.save(projectFramwors);
+            return BeanRet.create(true, "添加项目技术成功", projectFramwors);
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e.getMessage());

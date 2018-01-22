@@ -7,6 +7,7 @@ package com.rzhkj.project.service.impl;
 
 
 import com.baidu.fsg.uid.UidGenerator;
+import com.google.common.collect.Maps;
 import com.rzhkj.core.base.BaseMybatisDAO;
 import com.rzhkj.core.base.BaseMybatisSVImpl;
 import com.rzhkj.core.exceptions.BaseException;
@@ -19,6 +20,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
+import java.util.Map;
 
 
 @Component
@@ -36,6 +39,35 @@ public class ProjectFramworkSVImpl extends BaseMybatisSVImpl<ProjectFramwork, Lo
         return projectFramworkDAO;
     }
 
+
+    /**
+     * 批量存储 项目框架选择
+     * 1.判断集合
+     * 2.判断是否已经选择
+     * 3.保存
+     *
+     * @param projectFramwors 项目选择的框架集合
+     */
+    @Override
+    public void save(List<ProjectFramwork> projectFramwors) {
+        //1.判断集合
+        if (projectFramwors == null || projectFramwors.isEmpty()) {
+            logger.warn(BaseException.BaseExceptionEnum.Empty_Param.toString());
+            throw new ProjectException(BaseException.BaseExceptionEnum.Empty_Param);
+        }
+        projectFramwors.forEach(projectFramwork -> {
+            //2.判断是否已经选择
+            Map<String, Object> map = Maps.newHashMap();
+            map.put("frameworkCode", projectFramwork.getFrameworkCode());
+            map.put("projectCode", projectFramwork.getProjectCode());
+            ProjectFramwork projectFramworkLoad = projectFramworkDAO.load(map);
+            if (projectFramworkLoad == null) {
+                //3.保存
+                projectFramworkDAO.insert(projectFramwork);
+            }
+        });
+
+    }
 
     /**
      * 删除

@@ -28,6 +28,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -80,6 +81,7 @@ public class ProjectJobSVImpl extends BaseMybatisSVImpl<ProjectJob, Long> implem
         projectJob.setCode(String.valueOf(uidGenerator.getUID()));
         projectJob.setNumber(0);
         projectJob.setState(ProjectJobStateEnum.Create.name());
+        projectJob.setCreateTime(new Date());
         //3.保存
         this.save(projectJob);
     }

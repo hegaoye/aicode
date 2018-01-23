@@ -42,7 +42,7 @@ public class ${className}SVImpl extends BaseMybatisSVImpl<${className},Long> imp
 	 * @return ${className}
 	 */
 	public ${className} load(<#list pkFields as field>${field.fieldType} ${field.field}<#if field_has_next>,</#if></#list>) {
-		return ${classNameLower}DAO.load(<#list pkFields as field>${field.fieldType} ${field.field}<#if field_has_next>,</#if></#list>);
+		return ${classNameLower}DAO.load(<#list pkFields as field>${field.field}<#if field_has_next>,</#if></#list>);
 	}
 
 <#if (pkFields?size>0)>
@@ -159,14 +159,14 @@ public class ${className}SVImpl extends BaseMybatisSVImpl<${className},Long> imp
 	 * @param ${field.field}End ${field.notes}End
 	 * @return List<${className}>
 	 */
-	public List<${className}> listBy${field.field?cap_first}(${field.fieldType} ${field.field}Begin,${field.fieldType} ${field.field}End,int offset,int limit) {
+	public List<${className}> listBy${field.field?cap_first}(${field.fieldType} ${field.field}Begin,${field.fieldType} ${field.field}End, offset, limit) {
 		if (offset < 0) {
 		 offset = 0;
 		}
 		if (limit < 0) {
 		 limit = Page.limit;
 		}
-		return ${classNameLower}DAO.listBy${field.field?cap_first}(${field.field}Begin,${field.field}End,int offset,int limit);
+		return ${classNameLower}DAO.listBy${field.field?cap_first}(${field.field}Begin,${field.field}End, offset, limit);
 	}
 </#if>
 </#list>

@@ -9,8 +9,9 @@
     </settings>
     <typeAliases>
         <#list classes as class>
-          <!--${class.notes} 对应数据库表明 ${class.tableName}-->
-           <package name="${basePackage}.${class.classModel}.entity.${class.className}"/>
+          <!--${class.notes} 对应数据库表名 ${class.tableName}-->
+           <package name="${basePackage}.${class.classModel}.entity"/>
+
         </#list>
     </typeAliases>
 

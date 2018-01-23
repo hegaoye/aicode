@@ -1,13 +1,13 @@
 /*
  *${copyright}
  */
-package ${basepackage}.${model}.entity;
+package ${basePackage}.${model}.entity;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
-import ${basepackage}.common.BaseEntity;
+import ${basePackage}.common.BaseEntity;
 import lombok.Data;
 
 /**
@@ -18,6 +18,6 @@ import lombok.Data;
 public class ${className} extends BaseEntity implements java.io.Serializable{
 
 	<#list fields as field>
-	private ${field.fieldType} ${field.field};//数据库字段:${field.columnInfo.name}  属性显示:${field.columnInfo.notes}
+	private ${field.fieldType} ${field.field};//数据库字段:${field.column}  属性显示:${field.notes}
 	</#list>
 }

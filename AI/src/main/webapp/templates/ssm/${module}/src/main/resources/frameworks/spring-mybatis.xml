@@ -63,7 +63,7 @@
 
     <!-- 对子类业务逻辑层实施事务 -->
     <aop:config>
-        <aop:pointcut id="executeService" expression="execution(* com.rzhkj.*.service.*SVImpl.*(..))"/>
+        <aop:pointcut id="executeService" expression="execution(* ${basePackage}.*.service.*SVImpl.*(..))"/>
         <aop:advisor pointcut-ref="executeService" advice-ref="txAdvice"/>
     </aop:config>
 

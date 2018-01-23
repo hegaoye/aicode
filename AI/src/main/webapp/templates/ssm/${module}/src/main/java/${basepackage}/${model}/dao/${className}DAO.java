@@ -4,8 +4,8 @@
 
 package ${basePackage}.dao;
 
-import ${basepackage}.core.base.BaseMybatisDAOImpl;
-import ${basepackage}.${model}.entity.${className};
+import ${basePackage}.core.base.BaseMybatisDAOImpl;
+import ${basePackage}.${model}.entity.${className};
 import org.springframework.stereotype.Repository;
 
 /**

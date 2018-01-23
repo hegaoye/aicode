@@ -1,18 +1,18 @@
 /*
  *${copyright}
  */
-package ${basepackage}.service;
+package ${basePackage}.service;
 
-import ${basepackage}.core.base.BaseMybatisDAO;
-import ${basepackage}.core.base.BaseMybatisSVImpl;
-import ${basepackage}.core.entity.Page;
+import ${basePackage}.core.base.BaseMybatisDAO;
+import ${basePackage}.core.base.BaseMybatisSVImpl;
+import ${basePackage}.core.entity.Page;
 import com.alibaba.dubbo.config.annotation.Service;
 import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import com.baidu.fsg.uid.UidGenerator;
 
-import ${basepackage}.dao.${className}DAO;
-import ${basepackage}.${model}.entity.${className};
+import ${basePackage}.dao.${className}DAO;
+import ${basePackage}.${model}.entity.${className};
 
 /**
  * ${notes}
@@ -36,7 +36,7 @@ public class ${className}SVImpl extends BaseMybatisSVImpl<${className},Long> imp
 	/**
 	 * 加载一个对象${className}
 	 * 通过<#list pkFields as field>${field.field}<#if field_has_next>,</#if></#list>
-	 * <#list pkFields as field>@param ${pkField.field} ${pkField.notes}</#list>
+	 * <#list pkFields as field>@param ${field.field} ${field.notes}</#list>
 	 * @return ${className}
 	 */
 	public ${className} load(<#list pkFields as field>${field.fieldType} ${field.field}<#if field_has_next>,</#if></#list>) {
@@ -46,12 +46,12 @@ public class ${className}SVImpl extends BaseMybatisSVImpl<${className},Long> imp
 <#if (pkFields?size>0)>
 	<#list pkFields as field>
 	/**
-	 * 加载一个对象${className} 通过${pkField.field}
-	 * @param ${pkField.field} ${pkField.notes}
+	 * 加载一个对象${className} 通过${field.field}
+	 * @param ${field.field} ${field.notes}
 	 * @return ${className}
 	 */
-     public ${className} loadBy${pkField.field?cap_first}(${field.fieldType} ${field.field}) {
-		return ${classNameLower}DAO.loadBy${pkField.field?cap_first}(${field.field});
+     public ${className} loadBy${field.field?cap_first}(${field.fieldType} ${field.field}) {
+		return ${classNameLower}DAO.loadBy${field.field?cap_first}(${field.field});
 	 }
 	</#list>
 </#if>

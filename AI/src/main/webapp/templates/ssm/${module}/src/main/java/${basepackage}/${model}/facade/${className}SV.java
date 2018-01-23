@@ -1,11 +1,11 @@
 /*
- *${copyright}
+ * ${copyright}
  */
-package ${basepackage}.service;
+package ${basePackage}.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ${basepackage}.${model}.entity.${className};
+import ${basePackage}.${model}.entity.${className};
 
 /**
  * ${notes}
@@ -17,7 +17,7 @@ public interface ${className}SV extends BaseMybatisSV<${className},Long>{
     /**
      * 加载一个对象${className}
      * 通过<#list pkFields as field>${field.field}<#if field_has_next>,</#if></#list>
-     * <#list pkFields as field>@param ${pkField.field} ${pkField.notes}</#list>
+     * <#list pkFields as field>@param ${field.field} ${field.notes}</#list>
      * @return ${className}
      */
     public ${className} load(<#list pkFields as field>${field.fieldType} ${field.field}<#if field_has_next>,</#if></#list>);
@@ -25,11 +25,11 @@ public interface ${className}SV extends BaseMybatisSV<${className},Long>{
     <#if (pkFields?size>0)>
     <#list pkFields as field>
     /**
-     * 加载一个对象${className} 通过${pkField.field}
-     * @param ${pkField.field} ${pkField.notes}
+     * 加载一个对象${className} 通过${field.field}
+     * @param ${field.field} ${field.notes}
      * @return ${className}
      */
-    public ${className} loadBy${pkField.field?cap_first}(${field.fieldType} ${field.field});
+    public ${className} loadBy${field.field?cap_first}(${field.fieldType} ${field.field});
     </#list>
     </#if>
 

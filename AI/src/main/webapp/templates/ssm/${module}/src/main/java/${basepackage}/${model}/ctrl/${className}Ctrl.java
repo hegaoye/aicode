@@ -4,13 +4,13 @@
 package ${basePackage}.ctrl;
 
 import com.alibaba.fastjson.JSON;
-import ${basepackage}.core.base.BaseCtrl;
-import ${basepackage}.core.entity.BeanRet;
-import ${basepackage}.core.entity.Page;
-import ${basepackage}.core.exceptions.BaseException;
-import ${basepackage}.project.entity.Project;
-import ${basepackage}.project.service.ProjectSV;
-import ${basepackage}.${model}.entity.${className};
+import ${basePackage}.core.base.BaseCtrl;
+import ${basePackage}.core.entity.BeanRet;
+import ${basePackage}.core.entity.Page;
+import ${basePackage}.core.exceptions.BaseException;
+import ${basePackage}.project.entity.Project;
+import ${basePackage}.project.service.ProjectSV;
+import ${basePackage}.${model}.entity.${className};
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -31,7 +31,7 @@ import java.util.Map;
  * @author ${author}
  */
 @Controller
-@RequestMapping("/${className}")
+@RequestMapping("/${classNameLower}")
 @Api(value = "${notes}控制器", description = "${notes}控制器")
 public class ${className}Ctrl extends BaseCtrl {
 
@@ -54,7 +54,7 @@ public class ${className}Ctrl extends BaseCtrl {
     @ResponseBody
     public BeanRet load(<#list pkFields as field>${field.fieldType} ${field.field}<#if field_has_next>,</#if></#list>) {
         <#list pkFields as field>
-        Assert.hasText(field.name, BaseException.BaseExceptionEnum.Empty_Param.toString());
+        Assert.hasText(${field.field}, BaseException.BaseExceptionEnum.Empty_Param.toString());
         </#list>
         ${className} ${classNameLower} = ${classNameLower}SV.load(<#list pkFields as field>${field.field}<#if field_has_next>,</#if></#list>);
         logger.info(JSON.toJSONString(${classNameLower}));
@@ -62,7 +62,7 @@ public class ${className}Ctrl extends BaseCtrl {
     }
 
 
-<#list pkFields as field>
+<#list pkFields as pkField>
     /**
      * 查询${className}一个详情信息
      *
@@ -71,13 +71,13 @@ public class ${className}Ctrl extends BaseCtrl {
      */
     @ApiOperation(value = "查询${className}一个详情信息", notes = "查询${className}一个详情信息")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "${field.field}", value = "${field.notes}", paramType = "query")
+            @ApiImplicitParam(name = "${pkField.field}", value = "${pkField.notes}", paramType = "query")
     })
-    @GetMapping(value = "/load/${field.field}")
+    @GetMapping(value = "/load/${pkField.field}")
     @ResponseBody
-    public BeanRet load(${field.fieldType} ${field.field}) {
-        Assert.hasText(field.name, BaseException.BaseExceptionEnum.Empty_Param.toString());
-        ${className} ${classNameLower} = ${classNameLower}SV.loadBy${pkField.field?cap_first}(${field.field});
+    public BeanRet load(${pkField.fieldType} ${pkField.field}) {
+        Assert.hasText(${pkField.field}, BaseException.BaseExceptionEnum.Empty_Param.toString());
+        ${className} ${classNameLower} = ${classNameLower}SV.loadBy${pkField.field?cap_first}(${pkField.field});
         logger.info(JSON.toJSONString(${classNameLower}));
         return BeanRet.create(true, "查询详情信息", ${classNameLower});
     }
@@ -125,7 +125,7 @@ public class ${className}Ctrl extends BaseCtrl {
     @ResponseBody
     public BeanRet build(@ApiIgnore ${className} ${classNameLower}) {
         <#list fields as field>
-          Assert.hasText(field.name, BaseException.BaseExceptionEnum.Empty_Param.toString());
+          Assert.hasText(${field.field}, BaseException.BaseExceptionEnum.Empty_Param.toString());
         </#list>
 
         ${classNameLower}SV.saveOrUpdate(${classNameLower});
@@ -148,7 +148,7 @@ public class ${className}Ctrl extends BaseCtrl {
     @ResponseBody
     public BeanRet modify(@ApiIgnore ${className} ${classNameLower}) {
         <#list fields as field>
-         Assert.hasText(field.name, BaseException.BaseExceptionEnum.Empty_Param.toString());
+         Assert.hasText(${field.field}, BaseException.BaseExceptionEnum.Empty_Param.toString());
         </#list>
 
         ${classNameLower}SV.saveOrUpdate(${classNameLower});
@@ -170,7 +170,7 @@ public class ${className}Ctrl extends BaseCtrl {
     @ResponseBody
     public BeanRet delete(<#list pkFields as field>${field.fieldType} ${field.field}<#if field_has_next>,</#if></#list>) {
         <#list pkFields as field>
-         Assert.hasText(field.name, BaseException.BaseExceptionEnum.Empty_Param.toString());
+         Assert.hasText(${field.field}, BaseException.BaseExceptionEnum.Empty_Param.toString());
         </#list>
 
         ${classNameLower}SV.delete(<#list pkFields as field>${field.field}<#if field_has_next>,</#if></#list>);

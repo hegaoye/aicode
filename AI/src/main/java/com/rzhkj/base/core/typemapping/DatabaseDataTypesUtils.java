@@ -147,8 +147,8 @@ public class DatabaseDataTypesUtils {
         _preferredJavaTypeForSqlType.put("longvarbinary", "byte[]");
         _preferredJavaTypeForSqlType.put("date", "java.sql.Date");
         _preferredJavaTypeForSqlType.put("time", "java.sql.Time");
-        _preferredJavaTypeForSqlType.put("datetime", "java.sql.Date");
-        _preferredJavaTypeForSqlType.put("timestamp", "java.sql.Timestamp");
+        _preferredJavaTypeForSqlType.put("datetime", "java.util.Date");
+        _preferredJavaTypeForSqlType.put("timestamp", "java.util.Date");
         _preferredJavaTypeForSqlType.put("clob", "java.sql.Clob");
         _preferredJavaTypeForSqlType.put("blob", "java.sql.Blob");
         _preferredJavaTypeForSqlType.put("array", "java.sql.Array");

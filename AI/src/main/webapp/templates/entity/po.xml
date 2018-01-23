@@ -10,7 +10,7 @@
 
     <resultMap id="rs_base" type="${className}">
         <#list fields as field>
-        <result property="${field.name}" column="${field.columnInfo.name}"/>
+        <result property="${field.field}" column="${field.columnInfo.name}"/>
         </#list>
     </resultMap>
 
@@ -77,7 +77,7 @@
        UPDATE `${table.name}`
        <trim prefix="set" suffixOverrides=",">
          <#list notPkFields as field>
-          <if test="${field.name}!=null and ${field.name}!=''">
+          <if test="${field.field}!=null and ${field.field}!=''">
             ${field.columnInfo.name} = <@mapperEl field.name/> <#if field_has_next>,</#if>
           </if>
          </#list>
@@ -137,7 +137,7 @@
       </select>
 
       <#list pkFields as pkfield>
-        <select id="load${pkfield.name}" resultMap="rs_base" parameterType="${pkfield.type}">
+        <select id="load${pkfield.name}" resultMap="rs_base" parameterType="${pkfield.fieldType}">
            SELECT <include refid="columns"/>
            FROM `${table.name}` where ${pkfield.columnInfo.name} = <@mapperEl pkfield.name/>
         </select>

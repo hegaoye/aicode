@@ -45,19 +45,19 @@ public class ${className} extends BaseCtrl {
     @ApiOperation(value = "查询${classSimpleName}详情信息", notes = "查询${classSimpleName}详情信息")
     @ApiImplicitParams({
             <#list primaryKeys as field>
-              @ApiImplicitParam(name = "${field.name}", value = "${field.notes}", paramType = "query")<#if field_has_next>,</#if>
+              @ApiImplicitParam(name = "${field.field}", value = "${field.notes}", paramType = "query")<#if field_has_next>,</#if>
             </#list>
     })
     @GetMapping(value = "/load")
     @ResponseBody
-    public BeanRet load(<#list primaryKeys as field>${field.type} ${field.name}<#if field_has_next>,</#if></#list>) {
+    public BeanRet load(<#list primaryKeys as field>${field.fieldType} ${field.field}<#if field_has_next>,</#if></#list>) {
         try {
            <#list primaryKeys as field>
             Assert.hasText(field.name, BaseException.BaseExceptionEnum.Empty_Param.toString());
            </#list>
             Map<String, Object> map = new HashedMap();
            <#list primaryKeys as field>
-            map.put("${field.name}", ${field.name});
+            map.put("${field.field}", ${field.field});
            </#list>
            ${classSimpleName} ${classSimpleNameLower} = ${classSimpleNameLower}SV.load(map);
             logger.info(JSON.toJSONString(${classSimpleNameLower}));

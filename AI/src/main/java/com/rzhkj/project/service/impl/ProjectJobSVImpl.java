@@ -245,6 +245,7 @@ public class ProjectJobSVImpl extends BaseMybatisSVImpl<ProjectJob, Long> implem
         model.put("notes", mapClassTable.getNotes());//类注释
         model.put("copyright", project.getCopyright());//项目版权
         model.put("author", project.getAuthor());//作者
+        model.put("model", mapClassTable.getTableName().substring(0, mapClassTable.getTableName().indexOf("_")));//模块
 
         Setting settingTemplatePath = settingDAO.loadByKey(Setting.Key.Template_Path.name());
         String frameworksTemplatePath = frameworksTemplate.getPath();
@@ -252,6 +253,6 @@ public class ProjectJobSVImpl extends BaseMybatisSVImpl<ProjectJob, Long> implem
         String targetFilePath = projectPath + "/" + frameworksTemplatePath.replace("${basepackage}", project.getBasePackage().replace(".", "/")).replace("${className}", mapClassTable.getClassName());
         String templatePath = new HandleFuncs().getCurrentClassPath() + "/" + settingTemplatePath.getV() + "/" + frameworksTemplate.getPath();
 
-        FreemarkerHelper.generate(model, targetFilePath.replace("${module}", "").replace("${model}", ""), templatePath);
+        FreemarkerHelper.generate(model, targetFilePath.replace("${module}", "").replace("${model}", "mapClassTable.getClassName().toLowerCase()"), templatePath);
     }
 }

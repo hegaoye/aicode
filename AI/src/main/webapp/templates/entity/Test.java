@@ -15,7 +15,7 @@ import lombok.Data;
 public class ${className} extends BaseEntity implements java.io.Serializable{
 
     <#list fields as field>
-    private ${field.type} ${field.name};//数据库字段:${field.columnInfo.name}  属性显示:${field.columnInfo.notes}
+        private ${field.fieldType} ${field.field};//数据库字段:${field.columnInfo.name}  属性显示:${field.columnInfo.notes}
     </#list>
 
 

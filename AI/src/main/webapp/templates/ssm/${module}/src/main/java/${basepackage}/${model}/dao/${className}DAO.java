@@ -4,8 +4,8 @@
 
 package ${basePackage}.dao;
 
-import com.aixin.core.base.BaseMybatisDAOImpl;
-import com.aixin.elder.entity.${className};
+import ${basepackage}.core.base.BaseMybatisDAOImpl;
+import ${basepackage}.${model}.entity.${className};
 import org.springframework.stereotype.Repository;
 
 /**

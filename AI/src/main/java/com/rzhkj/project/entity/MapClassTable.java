@@ -27,6 +27,8 @@ public class MapClassTable extends BaseEntity implements java.io.Serializable {
     private String notes;//数据库字段:notes  属性显示:注释
 
 
+    private String classModel;
+
     private List<MapFieldColumn> mapFieldColumnList;//one to many
     private List<MapRelationship> mapRelationshipList;//one to many
 
@@ -43,5 +45,8 @@ public class MapClassTable extends BaseEntity implements java.io.Serializable {
         this.className = StringHelper.toJavaClassName(this.tableName);
     }
 
+    public String getClassModel() {
+        return this.classModel = tableName.contains("_") ? tableName.substring(0, tableName.indexOf("_")) : tableName;
+    }
 }
 

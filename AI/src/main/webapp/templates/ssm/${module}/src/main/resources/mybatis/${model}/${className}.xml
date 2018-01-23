@@ -96,7 +96,7 @@
                   <@mapperEl stateIn/>
               </foreach>
           </if>
-        <#else>
+        <#elseif field.checkPk>
           <if test="${field.field}!=null and ${field.field}!=''">
              AND ${field.column} = <@mapperEl field.field/>
           </if>

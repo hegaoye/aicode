@@ -24,14 +24,14 @@
     <context:annotation-config/>
     <context:component-scan base-package="com"/>
     <!-- 导入数据源配置 -->
-    <import resource="classpath:/framework/spring-datasource.xml"/>
+    <import resource="classpath:frameworks/spring-datasource.xml"/>
     <!-- 导入mybatis配置 -->
-    <import resource="classpath:/framework/spring-mybatis.xml"/>
+    <import resource="classpath:frameworks/spring-mybatis.xml"/>
     <!-- 导入jdbctemplate配置 -->
-    <import resource="classpath:/framework/spring-jdbctemplate.xml"/>
+    <import resource="classpath:frameworks/spring-jdbctemplate.xml"/>
     <!--导入uid配置-->
-    <import resource="classpath:framework/spring-uid.xml"/>
+    <import resource="classpath:frameworks/spring-uid.xml"/>
     <!-- 导入redis配置 -->
-    <import resource="classpath:/framework/spring-data-redis.xml"/>
+    <import resource="classpath:frameworks/spring-data-redis.xml"/>
 
 </beans>

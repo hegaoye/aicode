@@ -1,16 +1,9 @@
 /*
- *${copyright}
+ * ${copyright}
  */
-package ${basePackage}.ctrl;
+package ${basePackage}.${model}.ctrl;
 
 import com.alibaba.fastjson.JSON;
-import ${basePackage}.core.base.BaseCtrl;
-import ${basePackage}.core.entity.BeanRet;
-import ${basePackage}.core.entity.Page;
-import ${basePackage}.core.exceptions.BaseException;
-import ${basePackage}.project.entity.Project;
-import ${basePackage}.project.service.ProjectSV;
-import ${basePackage}.${model}.entity.${className};
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -22,7 +15,15 @@ import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.annotation.Resource;
-import java.util.Map;
+import java.util.List;
+
+import ${basePackage}.core.base.BaseCtrl;
+import ${basePackage}.core.entity.BeanRet;
+import ${basePackage}.core.entity.Page;
+import ${basePackage}.core.exceptions.BaseException;
+import ${basePackage}.${model}.facade.${className}SV;
+import ${basePackage}.${model}.entity.${className};
+
 
 
 /**
@@ -40,8 +41,7 @@ public class ${className}Ctrl extends BaseCtrl {
 <#if (pkFields?size>0)>
     /**
      * 查询${className}一个详情信息
-     *
-     * @param code 项目编码
+     * <#list pkFields as field>@param ${field.field} ${field.notes}</#list>
      * @return BeanRet
      */
     @ApiOperation(value = "查询${className}一个详情信息", notes = "查询${className}一个详情信息")
@@ -66,7 +66,7 @@ public class ${className}Ctrl extends BaseCtrl {
     /**
      * 查询${className}一个详情信息
      *
-     * @param code 项目编码
+     * @param ${pkField.field} ${pkField.notes}
      * @return BeanRet
      */
     @ApiOperation(value = "查询${className}一个详情信息", notes = "查询${className}一个详情信息")

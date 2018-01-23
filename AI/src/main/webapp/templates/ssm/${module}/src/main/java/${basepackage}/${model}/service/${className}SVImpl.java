@@ -1,17 +1,19 @@
 /*
- *${copyright}
+ * ${copyright}
  */
-package ${basePackage}.service;
+package ${basePackage}.${model}.service;
 
 import ${basePackage}.core.base.BaseMybatisDAO;
 import ${basePackage}.core.base.BaseMybatisSVImpl;
 import ${basePackage}.core.entity.Page;
-import com.alibaba.dubbo.config.annotation.Service;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import com.baidu.fsg.uid.UidGenerator;
-
-import ${basePackage}.dao.${className}DAO;
+import java.util.Map;
+import java.util.List;
+import ${basePackage}.${model}.facade.${className}SV;
+import ${basePackage}.${model}.dao.${className}DAO;
 import ${basePackage}.${model}.entity.${className};
 
 /**
@@ -60,7 +62,7 @@ public class ${className}SVImpl extends BaseMybatisSVImpl<${className},Long> imp
 	/**
 	 * 查询${className}分页
 	 *
-	 * @param ${className}  ${notes}
+	 * @param ${classNameLower}  ${notes}
 	 * @param offset 查询开始行
 	 * @param limit  查询行数
 	 * @return List<${className}>
@@ -143,8 +145,8 @@ public class ${className}SVImpl extends BaseMybatisSVImpl<${className},Long> imp
 
 	/**
 	 * 根据时间查询${className}列表 通过${field.field}
-	 * @param ${field.field} ${field.notes}Begin
-	 * @param ${field.field} ${field.notes}End
+	 * @param ${field.field}Begin ${field.notes}Begin
+	 * @param ${field.field}End ${field.notes}End
 	 * @return List<${className}>
 	 */
 	public List<${className}> listBy${field.field?cap_first}(${field.fieldType} ${field.field}Begin,${field.fieldType} ${field.field}End) {
@@ -153,8 +155,8 @@ public class ${className}SVImpl extends BaseMybatisSVImpl<${className},Long> imp
 
 	/**
 	 * 根据时间查询${className}列表 通过${field.field}
-	 * @param ${field.field} ${field.notes}Begin
-	 * @param ${field.field} ${field.notes}End
+	 * @param ${field.field}Begin ${field.notes}Begin
+	 * @param ${field.field}End ${field.notes}End
 	 * @return List<${className}>
 	 */
 	public List<${className}> listBy${field.field?cap_first}(${field.fieldType} ${field.field}Begin,${field.fieldType} ${field.field}End,int offset,int limit) {

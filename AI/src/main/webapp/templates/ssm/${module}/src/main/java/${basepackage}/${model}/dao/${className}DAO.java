@@ -1,12 +1,17 @@
 /*
- *${copyright}
+ * ${copyright}
  */
 
-package ${basePackage}.dao;
+package ${basePackage}.${model}.dao;
+
+import org.apache.ibatis.session.RowBounds;
+import org.springframework.stereotype.Repository;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import ${basePackage}.core.base.BaseMybatisDAOImpl;
 import ${basePackage}.${model}.entity.${className};
-import org.springframework.stereotype.Repository;
 
 /**
  * ${notes}
@@ -113,8 +118,8 @@ public class ${className}DAO extends BaseMybatisDAOImpl<${className},Long>{
 
     /**
      * 根据时间查询${className}列表 通过${field.field}
-     * @param ${field.field} ${field.notes}Begin
-     * @param ${field.field} ${field.notes}End
+     * @param ${field.field}Begin ${field.notes}Begin
+     * @param ${field.field}End ${field.notes}End
      * @return List<${className}>
      */
     public List<${className}> listBy${field.field?cap_first}(${field.fieldType} ${field.field}Begin,${field.fieldType} ${field.field}End) {
@@ -126,8 +131,8 @@ public class ${className}DAO extends BaseMybatisDAOImpl<${className},Long>{
 
     /**
      * 根据时间查询${className}列表 通过${field.field}
-     * @param ${field.field} ${field.notes}Begin
-     * @param ${field.field} ${field.notes}End
+     * @param ${field.field}Begin ${field.notes}Begin
+     * @param ${field.field}End ${field.notes}End
      * @return List<${className}>
      */
     public List<${className}> listBy${field.field?cap_first}(${field.fieldType} ${field.field}Begin,${field.fieldType} ${field.field}End,int offset,int limit) {

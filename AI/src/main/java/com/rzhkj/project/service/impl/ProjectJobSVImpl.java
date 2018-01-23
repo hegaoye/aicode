@@ -222,8 +222,11 @@ public class ProjectJobSVImpl extends BaseMybatisSVImpl<ProjectJob, Long> implem
             mapFieldColumnList.add(mapFieldColumn);
         });
 
+
+
         Map<String, Object> model = Maps.newHashMap();
         model.put("basePackage", project.getBasePackage());//包名
+        model.put("projectName", project.getEnglishName());//项目英文名
         model.put("table", mapClassTable);//表对象
         model.put("tableName", mapClassTable.getTableName());//表名
 

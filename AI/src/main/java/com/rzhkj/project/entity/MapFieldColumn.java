@@ -66,5 +66,9 @@ public class MapFieldColumn extends BaseEntity implements java.io.Serializable {
         return isState.equals(YNEnum.Y.name()) ? true : false;
     }
 
+    public boolean getCheckPk() {
+        return isPrimaryKey.equals(YNEnum.Y.name()) ? true : false;
+    }
+
 }
 

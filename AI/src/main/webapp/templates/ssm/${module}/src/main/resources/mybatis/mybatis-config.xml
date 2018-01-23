@@ -8,8 +8,9 @@
         <setting name="mapUnderscoreToCamelCase" value="true"/>
     </settings>
     <typeAliases>
-        <#list pkFields as pkField>
-           <package name=""/>
+        <#list classes as class>
+          <!--${class.notes} 对应数据库表明 ${class.tableName}-->
+           <package name="${basePackage}.${class.classModel}.entity.${class.className}"/>
         </#list>
     </typeAliases>
 

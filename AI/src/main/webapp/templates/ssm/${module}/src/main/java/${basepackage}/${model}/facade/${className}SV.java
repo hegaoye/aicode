@@ -1,10 +1,11 @@
 /*
  * ${copyright}
  */
-package ${basePackage}.service;
+package ${basePackage}.${model}.facade;
 
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import java.util.List;
+
+import ${basePackage}.core.base.BaseMybatisSV;
 import ${basePackage}.${model}.entity.${className};
 
 /**
@@ -38,7 +39,7 @@ public interface ${className}SV extends BaseMybatisSV<${className},Long>{
     /**
      * 查询${className}分页
      *
-     * @param ${className}  ${notes}
+     * @param ${classNameLower}  ${notes}
      * @param offset 查询开始行
      * @param limit  查询行数
      * @return List<${className}>
@@ -77,15 +78,15 @@ public interface ${className}SV extends BaseMybatisSV<${className},Long>{
 
     /**
      * 根据时间查询${className}列表 通过${field.field}
-     * @param ${field.field} ${field.notes}Begin
-     * @param ${field.field} ${field.notes}End
+     * @param ${field.field}Begin ${field.notes}Begin
+     * @param ${field.field}End ${field.notes}End
      * @return List<${className}>
      */
     public List<${className}> listBy${field.field?cap_first}(${field.fieldType} ${field.field}Begin,${field.fieldType} ${field.field}End) ;
     /**
      * 根据时间查询${className}列表 通过${field.field}
-     * @param ${field.field} ${field.notes}Begin
-     * @param ${field.field} ${field.notes}End
+     * @param ${field.field}Begin ${field.notes}Begin
+     * @param ${field.field}End ${field.notes}End
      * @return List<${className}>
      */
     public List<${className}> listBy${field.field?cap_first}(${field.fieldType} ${field.field}Begin,${field.fieldType} ${field.field}End,int offset,int limit);

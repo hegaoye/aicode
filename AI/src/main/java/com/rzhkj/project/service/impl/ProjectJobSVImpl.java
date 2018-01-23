@@ -14,6 +14,7 @@ import com.rzhkj.core.base.BaseMybatisSVImpl;
 import com.rzhkj.core.enums.YNEnum;
 import com.rzhkj.core.exceptions.BaseException;
 import com.rzhkj.core.exceptions.ProjectJobException;
+import com.rzhkj.core.tools.FileUtil;
 import com.rzhkj.core.tools.GitTools;
 import com.rzhkj.core.tools.HandleFuncs;
 import com.rzhkj.core.tools.StringTools;
@@ -188,9 +189,10 @@ public class ProjectJobSVImpl extends BaseMybatisSVImpl<ProjectJob, Long> implem
         projectPath = projectPath.replace("//", "/");
         //1.检测项目工作工作空间是否存在
         File file = new File(projectPath);
-        if (!file.exists()) {
-            file.mkdirs();
+        if (file.exists()) {
+            FileUtil.delFolder(projectPath);
         }
+        file.mkdirs();
 
         //3.代码仓库检出
         Map<String, Object> map = Maps.newHashMap();
@@ -221,7 +223,6 @@ public class ProjectJobSVImpl extends BaseMybatisSVImpl<ProjectJob, Long> implem
             }
             mapFieldColumnList.add(mapFieldColumn);
         });
-
 
 
         Map<String, Object> model = Maps.newHashMap();

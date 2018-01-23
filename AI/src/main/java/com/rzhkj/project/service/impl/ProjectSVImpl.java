@@ -90,7 +90,7 @@ public class ProjectSVImpl extends BaseMybatisSVImpl<Project, Long> implements P
 
         //2.设定默认参数
         String basePackage = project.getBasePackage();
-        basePackage = basePackage.endsWith(".") ? basePackage : basePackage + ".";
+        basePackage = basePackage.endsWith(".") ? basePackage.substring(0, basePackage.lastIndexOf(".")) : basePackage;
         project.setBasePackage(basePackage);
         project.setCode(String.valueOf(uidGenerator.getUID()));
         project.setState(ProjectStateEnum.Enable.name());
@@ -261,7 +261,7 @@ public class ProjectSVImpl extends BaseMybatisSVImpl<Project, Long> implements P
                 mapFieldColumn.setSqlType(column.getDataType());
                 mapFieldColumn.setNotes(column.getColumnComment());
                 mapFieldColumn.setDefaultValue(column.getColumnDefault());
-                mapFieldColumn.setIsPrimaryKey(DatabaseDataTypesUtils.isPrimaryKey(column.getDataType()) ? YNEnum.Y.name() : YNEnum.N.name());
+                mapFieldColumn.setIsPrimaryKey(DatabaseDataTypesUtils.isPrimaryKey(column.getColumnKey()) ? YNEnum.Y.name() : YNEnum.N.name());
                 mapFieldColumn.setIsDate(DatabaseDataTypesUtils.isDate(column.getDataType()) ? YNEnum.Y.name() : YNEnum.N.name());
                 mapFieldColumn.setIsState(DatabaseDataTypesUtils.isState(column.getDataType()) ? YNEnum.Y.name() : YNEnum.N.name());
                 mapFieldColumn.toJava();

@@ -42,6 +42,7 @@ public class ${className}SVImpl extends BaseMybatisSVImpl<${className},Long> imp
 	  <#list pkFields as field>* @param ${field.field} ${field.notes}</#list>
 	 * @return ${className}
 	 */
+	@Override
 	public ${className} load(<#list pkFields as field>${field.fieldType} ${field.field}<#if field_has_next>,</#if></#list>) {
 		return ${classNameLower}DAO.load(<#list pkFields as field>${field.field}<#if field_has_next>,</#if></#list>);
 	}
@@ -51,6 +52,7 @@ public class ${className}SVImpl extends BaseMybatisSVImpl<${className},Long> imp
 	 * @param ${pkField.field} ${pkField.notes}
 	 * @return ${className}
 	 */
+     @Override
      public ${className} loadBy${pkField.field?cap_first}(${pkField.fieldType} ${pkField.field}) {
 		return ${classNameLower}DAO.loadBy${pkField.field?cap_first}(${pkField.field});
 	 }
@@ -62,6 +64,7 @@ public class ${className}SVImpl extends BaseMybatisSVImpl<${className},Long> imp
 	   <#list pkFields as pkField>* @param ${pkField.field} ${pkField.notes}</#list>
       * @return ${className}
       */
+	 @Override
      public void delete(<#list pkFields as pkField>${pkField.fieldType} ${pkField.field}<#if pkField_has_next>,</#if></#list>) {
 		${classNameLower}DAO.delete(<#list pkFields as pkField>${pkField.field}<#if pkField_has_next>,</#if></#list>);
 	 }
@@ -153,6 +156,7 @@ public class ${className}SVImpl extends BaseMybatisSVImpl<${className},Long> imp
 	 * @param ${field.field} ${field.notes}
 	 * @return List<${className}>
 	 */
+	@Override
 	public List<${className}> listBy${field.field?cap_first}Begin(${field.fieldType} ${field.field}) {
 		return ${classNameLower}DAO.listBy${field.field?cap_first}Begin(${field.field});
 	}
@@ -162,6 +166,7 @@ public class ${className}SVImpl extends BaseMybatisSVImpl<${className},Long> imp
 	 * @param ${field.field} ${field.notes}
 	 * @return List<${className}>
 	 */
+	@Override
 	public List<${className}> listBy${field.field?cap_first}Begin(${field.fieldType} ${field.field},int offset,int limit) {
 		return ${classNameLower}DAO.listBy${field.field?cap_first}Begin(${field.field}, offset, limit);
 	}
@@ -171,6 +176,7 @@ public class ${className}SVImpl extends BaseMybatisSVImpl<${className},Long> imp
 	 * @param ${field.field} ${field.notes}
 	 * @return List<${className}>
 	 */
+    @Override
 	public List<${className}> listBy${field.field?cap_first}End(${field.fieldType} ${field.field}) {
 		return ${classNameLower}DAO.listBy${field.field?cap_first}End(${field.field});
 	}
@@ -180,6 +186,7 @@ public class ${className}SVImpl extends BaseMybatisSVImpl<${className},Long> imp
 	 * @param ${field.field} ${field.notes}
 	 * @return List<${className}>
 	 */
+	@Override
 	public List<${className}> listBy${field.field?cap_first}End(${field.fieldType} ${field.field},int offset,int limit) {
 		if (offset < 0) {
 		 offset = 0;
@@ -196,6 +203,7 @@ public class ${className}SVImpl extends BaseMybatisSVImpl<${className},Long> imp
 	 * @param ${field.field}End ${field.notes}End
 	 * @return List<${className}>
 	 */
+	@Override
 	public List<${className}> listBy${field.field?cap_first}(${field.fieldType} ${field.field}Begin,${field.fieldType} ${field.field}End) {
 		return ${classNameLower}DAO.listBy${field.field?cap_first}(${field.field}Begin,${field.field}End);
 	}
@@ -206,6 +214,7 @@ public class ${className}SVImpl extends BaseMybatisSVImpl<${className},Long> imp
 	 * @param ${field.field}End ${field.notes}End
 	 * @return List<${className}>
 	 */
+	@Override
 	public List<${className}> listBy${field.field?cap_first}(${field.fieldType} ${field.field}Begin,${field.fieldType} ${field.field}End, offset, limit) {
 		if (offset < 0) {
 		 offset = 0;

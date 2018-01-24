@@ -1,7 +1,4 @@
-package ${basePackage}.core.entity;
-
-import ${basePackage}.core.tools.SortTools;
-import ${basePackage}.core.tools.StringTools;
+package ${basePackage}.core.base;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -205,21 +202,6 @@ public class Page<VO> implements java.io.Serializable {
     }
 
     public Map<String, Object> getParams() {
-        if (StringTools.isNotEmpty(getSortColumns())) {
-            List<SortTools> sortList = SortTools.formString(getSortColumns(), ".");
-            String resultSort = "";
-            StringBuffer stringBuffer = new StringBuffer();
-            for (SortTools sortTool : sortList) {
-                stringBuffer.append(sortTool.getProperty());
-                stringBuffer.append(" ");
-                stringBuffer.append(sortTool.getDirection());
-                stringBuffer.append(",");
-            }
-            if (stringBuffer.length() > 0) {
-                resultSort = stringBuffer.substring(0, stringBuffer.length() - 1);
-            }
-            params.put("sortColumns", resultSort);
-        }
         return params;
     }
 

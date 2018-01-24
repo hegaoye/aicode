@@ -6,14 +6,13 @@ package ${basePackage}.${model}.service;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
-import com.baidu.fsg.uid.UidGenerator;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
 import com.alibaba.fastjson.JSON;
 import ${basePackage}.core.base.BaseMybatisDAO;
 import ${basePackage}.core.base.BaseMybatisSVImpl;
-import ${basePackage}.core.entity.Page;
+import ${basePackage}.core.base.Page;
 import ${basePackage}.${model}.facade.${className}SV;
 import ${basePackage}.${model}.dao.${className}DAO;
 import ${basePackage}.${model}.entity.${className};
@@ -29,8 +28,6 @@ public class ${className}SVImpl extends BaseMybatisSVImpl<${className},Long> imp
 	@Resource
 	private ${className}DAO ${classNameLower}DAO;
 
-	@Resource
-	private UidGenerator uidGenerator;
 
     @Override
     protected BaseMybatisDAO getBaseMybatisDAO(){

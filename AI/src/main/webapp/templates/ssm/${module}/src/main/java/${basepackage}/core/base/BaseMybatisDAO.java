@@ -1,6 +1,5 @@
 package ${basePackage}.core.base;
 
-import com.ponddy.core.exceptions.BaseException;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -228,7 +227,6 @@ public interface BaseMybatisDAO<E, PK extends Serializable> {
      * @param entity              实体
      * @param uniquePropertyNames 判断属性名称
      * @return boolean
-     * @throws BaseException
      */
     boolean isUnique(E entity, String uniquePropertyNames);
 }

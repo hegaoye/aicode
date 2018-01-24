@@ -1,4 +1,4 @@
-package ${basePackage}.core.entity;
+package ${basePackage}.core.base;
 
 import java.io.Serializable;
 

@@ -47,7 +47,7 @@
 
 
     <!--异常统一处理-->
-    <bean class="${basePackage}.core.base.handler.ExceptionHandler"/>
+    <bean class="${basePackage}.core.base.ExceptionHandler"/>
 
 
     <bean id="contentNegotiationManager" class="org.springframework.web.accept.ContentNegotiationManagerFactoryBean">
@@ -107,7 +107,7 @@
         </property>
     </bean>
     <!--开启swagger-->
-    <bean class="${basePackage}.core.config.SwaggerConfig"/>
+    <bean class="${basePackage}.core.tools.SwaggerConfig"/>
 
     <!-- 配置拦截器 -->
     <mvc:interceptors>

@@ -2,6 +2,8 @@
  * ${copyright}
  */
 package ${basePackage}.${model}.entity;
+
+import ${basePackage}.core.base.BaseEntity;
 import lombok.Data;
 
 /**
@@ -9,7 +11,7 @@ import lombok.Data;
  * @author ${author}
  */
 @Data
-public class ${className} implements java.io.Serializable {
+public class ${className} extends BaseEntity implements java.io.Serializable {
 
 	<#list fields as field>
 	private ${field.fieldType} ${field.field};//数据库字段:${field.column}  属性显示:${field.notes}

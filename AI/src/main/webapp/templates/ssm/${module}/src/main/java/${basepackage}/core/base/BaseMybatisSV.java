@@ -1,7 +1,5 @@
 package ${basePackage}.core.base;
 
-import ${basePackage}.core.entity.Page;
-
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;

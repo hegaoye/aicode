@@ -1,12 +1,14 @@
 package ${basePackage}.core.base;
 
-import ${basePackage}.core.entity.Page;
+import ${basePackage}.core.tools.redis.RedisUtils;
 import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.util.Assert;
 
+import javax.annotation.Resource;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +20,11 @@ import java.util.Map;
 @Transactional
 public abstract class BaseMybatisSVImpl<E, PK extends Serializable> implements BaseMybatisSV<E, PK> {
     protected final static Logger logger = LoggerFactory.getLogger(BaseMybatisSVImpl.class);
+
+    @Resource
+    protected RedisTemplate<String, Object> redisTemplate;
+    @Resource
+    protected RedisUtils redisUtils;
 
     /**
      * 获得dao对象

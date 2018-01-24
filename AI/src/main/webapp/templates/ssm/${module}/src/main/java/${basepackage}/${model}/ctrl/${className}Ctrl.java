@@ -10,14 +10,15 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.data.redis.core.RedisTemplate;
 import springfox.documentation.annotations.ApiIgnore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import javax.annotation.Resource;
 import java.util.List;
-
-import ${basePackage}.core.entity.BeanRet;
-import ${basePackage}.core.entity.Page;
+import ${basePackage}.core.tools.redis.RedisUtils;
+import ${basePackage}.core.base.BeanRet;
+import ${basePackage}.core.base.Page;
 import ${basePackage}.${model}.facade.${className}SV;
 import ${basePackage}.${model}.entity.${className};
 
@@ -33,6 +34,11 @@ import ${basePackage}.${model}.entity.${className};
 @Api(value = "${notes}控制器", description = "${notes}控制器")
 public class ${className}Ctrl {
  private final static Logger logger = LoggerFactory.getLogger(${className}Ctrl.class);
+
+    @Resource
+    protected RedisTemplate<String, Object> redisTemplate;
+    @Resource
+    protected RedisUtils redisUtils;
 
     @Resource
     private ${className}SV ${classNameLower}SV;

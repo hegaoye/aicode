@@ -28,7 +28,7 @@ public class ${className}DAO extends BaseMybatisDAOImpl<${className},Long>{
      * @return ${className}
      */
     public ${className} load(<#list pkFields as pkField>${pkField.fieldType} ${pkField.field}<#if pkField_has_next>,</#if></#list>) {
-        Map<String,Object> map= new HashMap<String,Object>;
+        Map<String,Object> map= new HashMap<String,Object>();
         <#list pkFields as pkField>
         map.put("${pkField.field}",${pkField.field});
         </#list>
@@ -86,7 +86,7 @@ public class ${className}DAO extends BaseMybatisDAOImpl<${className},Long>{
      * @return ${className}
      */
      public void delete(<#list pkFields as pkField>${pkField.fieldType} ${pkField.field}<#if pkField_has_next>,</#if></#list>) {
-         Map<String,Object> map= new HashMap<String,Object>;
+         Map<String,Object> map= new HashMap<String,Object>();
          <#list pkFields as pkField>
          if(${pkField.field}!=null){
             map.put("${pkField.field}",${pkField.field});

@@ -27,8 +27,8 @@ public interface ${className}SV extends BaseMybatisSV<${className},Long>{
 
     <#list pkFields as pkField>
     /**
-     * 加载一个对象${className} 通过${field.field}
-     * @param ${field.field} ${field.notes}
+     * 加载一个对象${className} 通过${pkField.field}
+     * @param ${pkField.field} ${pkField.notes}
      * @return ${className}
      */
      ${className} loadBy${pkField.field?cap_first}(${pkField.fieldType} ${pkField.field});
@@ -65,7 +65,7 @@ public interface ${className}SV extends BaseMybatisSV<${className},Long>{
      * @return List<${className}>
      */
      List<${className}> list(<#list pkFields as pkField>${pkField.fieldType} ${pkField.field},</#list>int offset, int limit);
-     int count(<#list pkFields as pkField>${pkField.fieldType} ${pkField.field}<#if field_has_next>,</#if></#list>);
+     int count(<#list pkFields as pkField>${pkField.fieldType} ${pkField.field}<#if pkField_has_next>,</#if></#list>);
 
     <#list fields as field>
     <#if field.checkDate>

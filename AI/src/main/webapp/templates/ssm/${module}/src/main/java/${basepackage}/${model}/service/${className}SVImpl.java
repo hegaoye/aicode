@@ -3,15 +3,17 @@
  */
 package ${basePackage}.${model}.service;
 
-import ${basePackage}.core.base.BaseMybatisDAO;
-import ${basePackage}.core.base.BaseMybatisSVImpl;
-import ${basePackage}.core.entity.Page;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import com.baidu.fsg.uid.UidGenerator;
 import java.util.Map;
+import java.util.HashMap;
 import java.util.List;
+import com.alibaba.fastjson.JSON;
+import ${basePackage}.core.base.BaseMybatisDAO;
+import ${basePackage}.core.base.BaseMybatisSVImpl;
+import ${basePackage}.core.entity.Page;
 import ${basePackage}.${model}.facade.${className}SV;
 import ${basePackage}.${model}.dao.${className}DAO;
 import ${basePackage}.${model}.entity.${className};
@@ -94,7 +96,7 @@ public class ${className}SVImpl extends BaseMybatisSVImpl<${className},Long> imp
 		if (${classNameLower} != null) {
 		  map = JSON.parseObject(JSON.toJSONString(${classNameLower}));
 		} else {
-		  map = Maps.newHashMap();
+		  map = new HashMap<>();
 		}
 		return ${classNameLower}DAO.query(map, offset, limit);
 	}
@@ -105,7 +107,7 @@ public class ${className}SVImpl extends BaseMybatisSVImpl<${className},Long> imp
 		if (${classNameLower} != null) {
 		  map = JSON.parseObject(JSON.toJSONString(${classNameLower}));
 		} else {
-		  map = Maps.newHashMap();
+		  map = new HashMap<>();
 		}
 
 		return ${classNameLower}DAO.count(map);
@@ -140,7 +142,7 @@ public class ${className}SVImpl extends BaseMybatisSVImpl<${className},Long> imp
 	}
 
     @Override
-    public int count(<#list pkFields as pkField>${pkField.fieldType} ${pkField.field}<#if field_has_next>,</#if></#list>) {
+    public int count(<#list pkFields as pkField>${pkField.fieldType} ${pkField.field}<#if pkField_has_next>,</#if></#list>) {
 		Map<String, Object> map = new HashMap();
       <#list pkFields as pkField>
 		if(${pkField.field}!=null){
@@ -149,6 +151,7 @@ public class ${className}SVImpl extends BaseMybatisSVImpl<${className},Long> imp
       </#list>
 		return ${classNameLower}DAO.count(map);
 	}
+
 <#list fields as field>
 <#if field.checkDate>
 	/**
@@ -215,7 +218,7 @@ public class ${className}SVImpl extends BaseMybatisSVImpl<${className},Long> imp
 	 * @return List<${className}>
 	 */
 	@Override
-	public List<${className}> listBy${field.field?cap_first}(${field.fieldType} ${field.field}Begin,${field.fieldType} ${field.field}End, offset, limit) {
+	public List<${className}> listBy${field.field?cap_first}(${field.fieldType} ${field.field}Begin,${field.fieldType} ${field.field}End,int offset,int limit) {
 		if (offset < 0) {
 		 offset = 0;
 		}

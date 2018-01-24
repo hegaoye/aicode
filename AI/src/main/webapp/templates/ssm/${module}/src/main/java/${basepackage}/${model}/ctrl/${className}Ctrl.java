@@ -8,19 +8,16 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import org.apache.commons.collections.map.HashedMap;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import javax.annotation.Resource;
 import java.util.List;
 
-import ${basePackage}.core.base.BaseCtrl;
 import ${basePackage}.core.entity.BeanRet;
 import ${basePackage}.core.entity.Page;
-import ${basePackage}.core.exceptions.BaseException;
 import ${basePackage}.${model}.facade.${className}SV;
 import ${basePackage}.${model}.entity.${className};
 
@@ -34,7 +31,8 @@ import ${basePackage}.${model}.entity.${className};
 @Controller
 @RequestMapping("/${classNameLower}")
 @Api(value = "${notes}控制器", description = "${notes}控制器")
-public class ${className}Ctrl extends BaseCtrl {
+public class ${className}Ctrl {
+ private final static Logger logger = LoggerFactory.getLogger(${className}Ctrl.class);
 
     @Resource
     private ${className}SV ${classNameLower}SV;
@@ -127,7 +125,7 @@ public class ${className}Ctrl extends BaseCtrl {
             @ApiImplicitParam(name = "curPage", value = "当前页", required = true, paramType = "query"),
             @ApiImplicitParam(name = "pageSize", value = "分页大小", required = true, paramType = "query"),
             <#list pkFields as pkField>
-            @ApiImplicitParam(name = "${pkField.field}", value = "${pkField.notes}", paramType = "query")<#if field_has_next>,</#if>
+            @ApiImplicitParam(name = "${pkField.field}", value = "${pkField.notes}", paramType = "query")<#if pkField_has_next>,</#if>
             </#list>
 
     })
@@ -138,7 +136,7 @@ public class ${className}Ctrl extends BaseCtrl {
           return BeanRet.create();
         }
         List<${className}> ${classNameLower}s = ${classNameLower}SV.list(<#list pkFields as pkField>${pkField.field},</#list> page.genRowStart(),page.getPageSize());
-        int total = ${classNameLower}SV.count(<#list pkFields as pkField>${pkField.field}<#if field_has_next>,</#if></#list>);
+        int total = ${classNameLower}SV.count(<#list pkFields as pkField>${pkField.field}<#if pkField_has_next>,</#if></#list>);
         page.setTotalRow(total);
         page.setVoList(${classNameLower}s);
         logger.info(JSON.toJSONString(page));
@@ -160,7 +158,7 @@ public class ${className}Ctrl extends BaseCtrl {
     @ResponseBody
     public BeanRet build(@ApiIgnore ${className} ${classNameLower}) {
         <#list fields as field>
-        if(${field.field}==null){
+        if(${classNameLower}.get${field.field?cap_first}()==null){
           return BeanRet.create();
         }
         </#list>
@@ -185,8 +183,8 @@ public class ${className}Ctrl extends BaseCtrl {
     @ResponseBody
     public BeanRet modify(@ApiIgnore ${className} ${classNameLower}) {
         <#list fields as field>
-        if(${field.field}==null){
-           return BeanRet.create();
+        if(${classNameLower}.get${field.field?cap_first}()==null){
+        return BeanRet.create();
         }
         </#list>
 
@@ -201,14 +199,14 @@ public class ${className}Ctrl extends BaseCtrl {
      */
     @ApiOperation(value = "删除${className}", notes = "删除${className}")
     @ApiImplicitParams({
-            <#list pkFields as field>
-            @ApiImplicitParam(name = "${field.field}", value = "${field.notes}", paramType = "query")<#if field_has_next>,</#if>
+            <#list pkFields as pkField>
+            @ApiImplicitParam(name = "${pkField.field}", value = "${pkField.notes}", paramType = "query")<#if pkField_has_next>,</#if>
             </#list>
     })
     @DeleteMapping("/delete")
     @ResponseBody
-    public BeanRet delete(<#list pkFields as field>${field.fieldType} ${field.field}<#if field_has_next>,</#if></#list>) {
-        ${classNameLower}SV.deleteBy${pkField.field?cap_first}(<#list pkFields as pkField>${pkField.field}<#if pkField_has_next>,</#if></#list>);
+    public BeanRet delete(<#list pkFields as pkField>${pkField.fieldType} ${pkField.field}<#if pkField_has_next>,</#if></#list>) {
+        ${classNameLower}SV.delete(<#list pkFields as pkField>${pkField.field}<#if pkField_has_next>,</#if></#list>);
         return BeanRet.create(true, "删除${className}成功");
     }
 

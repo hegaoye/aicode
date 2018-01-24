@@ -56,6 +56,17 @@ public interface ${className}SV extends BaseMybatisSV<${className},Long>{
      List<${className}> list(${className} ${classNameLower}, int offset, int limit);
      int count(${className} ${classNameLower});
 
+     /**
+     * 查询${className}分页
+     *
+     <#list pkFields as pkField>* @param ${pkField.field}  ${pkField.notes}</#list>
+     * @param offset 查询开始行
+     * @param limit  查询行数
+     * @return List<${className}>
+     */
+     List<${className}> list(<#list pkFields as pkField>${pkField.fieldType} ${pkField.field},</#list>int offset, int limit);
+     int count(<#list pkFields as pkField>${pkField.fieldType} ${pkField.field}<#if field_has_next>,</#if></#list>);
+
     <#list fields as field>
     <#if field.checkDate>
     /**

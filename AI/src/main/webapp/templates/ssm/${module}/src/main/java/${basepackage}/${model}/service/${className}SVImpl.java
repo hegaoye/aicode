@@ -39,8 +39,7 @@ public class ${className}SVImpl extends BaseMybatisSVImpl<${className},Long> imp
 <#if (pkFields?size>0)>
 	/**
 	 * 加载一个对象${className}
-	 * 通过<#list pkFields as field>${field.field}<#if field_has_next>,</#if></#list>
-	 * <#list pkFields as field>@param ${field.field} ${field.notes}</#list>
+	  <#list pkFields as field>* @param ${field.field} ${field.notes}</#list>
 	 * @return ${className}
 	 */
 	public ${className} load(<#list pkFields as field>${field.fieldType} ${field.field}<#if field_has_next>,</#if></#list>) {
@@ -60,7 +59,7 @@ public class ${className}SVImpl extends BaseMybatisSVImpl<${className},Long> imp
 
      /**
       * 删除对象${className}
-	  * <#list pkFields as pkField>@param ${pkField.field} ${pkField.notes}</#list>
+	   <#list pkFields as pkField>* @param ${pkField.field} ${pkField.notes}</#list>
       * @return ${className}
       */
      public void delete(<#list pkFields as pkField>${pkField.fieldType} ${pkField.field}<#if pkField_has_next>,</#if></#list>) {
@@ -94,7 +93,6 @@ public class ${className}SVImpl extends BaseMybatisSVImpl<${className},Long> imp
 		} else {
 		  map = Maps.newHashMap();
 		}
-		map.put("sortColumns", " createTime desc");
 		return ${classNameLower}DAO.query(map, offset, limit);
 	}
 
@@ -110,6 +108,44 @@ public class ${className}SVImpl extends BaseMybatisSVImpl<${className},Long> imp
 		return ${classNameLower}DAO.count(map);
 	}
 
+
+    /**
+     * 查询${className}分页
+	 *
+     <#list pkFields as pkField>* @param ${pkField.field}  ${pkField.notes}</#list>
+     * @param offset 查询开始行
+     * @param limit  查询行数
+     * @return List<${className}>
+     */
+    @Override
+    public List<${className}> list(<#list pkFields as pkField>${pkField.fieldType} ${pkField.field},</#list>int offset, int limit) {
+		if (offset < 0) {
+		  offset = 0;
+		}
+
+		if (limit < 0) {
+		  limit = Page.limit;
+		}
+
+		Map<String, Object> map = new HashMap();
+        <#list pkFields as pkField>
+		if(${pkField.field}!=null){
+ 		   map.put("${pkField.field}",${pkField.field});
+		}
+        </#list>
+		return ${classNameLower}DAO.query(map, offset, limit);
+	}
+
+    @Override
+    public int count(<#list pkFields as pkField>${pkField.fieldType} ${pkField.field}<#if field_has_next>,</#if></#list>) {
+		Map<String, Object> map = new HashMap();
+      <#list pkFields as pkField>
+		if(${pkField.field}!=null){
+		map.put("${pkField.field}",${pkField.field});
+		}
+      </#list>
+		return ${classNameLower}DAO.count(map);
+	}
 <#list fields as field>
 <#if field.checkDate>
 	/**

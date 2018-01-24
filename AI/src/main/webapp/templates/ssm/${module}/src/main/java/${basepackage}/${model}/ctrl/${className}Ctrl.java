@@ -75,9 +75,9 @@ public class ${className}Ctrl extends BaseCtrl {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "${pkField.field}", value = "${pkField.notes}", paramType = "query")
     })
-    @GetMapping(value = "/load/${pkField.field}")
+    @GetMapping(value = "/load/{${pkField.field}}")
     @ResponseBody
-    public BeanRet loadBy${pkField.field?cap_first}(${pkField.fieldType} ${pkField.field}) {
+    public BeanRet loadBy${pkField.field?cap_first}(@PathVariable ${pkField.fieldType} ${pkField.field}) {
         if(${pkField.field}==null){
           return BeanRet.create();
         }
@@ -110,6 +110,35 @@ public class ${className}Ctrl extends BaseCtrl {
         }
         List<${className}> ${classNameLower}s = ${classNameLower}SV.list(${classNameLower},page.genRowStart(),page.getPageSize());
         int total = ${classNameLower}SV.count(${classNameLower});
+        page.setTotalRow(total);
+        page.setVoList(${classNameLower}s);
+        logger.info(JSON.toJSONString(page));
+        return BeanRet.create(true, "", page);
+    }
+
+
+    /**
+     * 查询${className}信息集合
+     *
+     * @return 分页对象
+     */
+    @ApiOperation(value = "查询${className}信息集合", notes = "查询${className}信息集合")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "curPage", value = "当前页", required = true, paramType = "query"),
+            @ApiImplicitParam(name = "pageSize", value = "分页大小", required = true, paramType = "query"),
+            <#list pkFields as pkField>
+            @ApiImplicitParam(name = "${pkField.field}", value = "${pkField.notes}", paramType = "query")<#if field_has_next>,</#if>
+            </#list>
+
+    })
+    @GetMapping(value = "/list")
+    @ResponseBody
+    public BeanRet list(<#list pkFields as pkField>${pkField.fieldType} ${pkField.field},</#list>@ApiIgnore Page<${className}> page) {
+        if(page==null){
+          return BeanRet.create();
+        }
+        List<${className}> ${classNameLower}s = ${classNameLower}SV.list(<#list pkFields as pkField>${pkField.field},</#list> page.genRowStart(),page.getPageSize());
+        int total = ${classNameLower}SV.count(<#list pkFields as pkField>${pkField.field}<#if field_has_next>,</#if></#list>);
         page.setTotalRow(total);
         page.setVoList(${classNameLower}s);
         logger.info(JSON.toJSONString(page));

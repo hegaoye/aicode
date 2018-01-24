@@ -15,24 +15,33 @@ import ${basePackage}.${model}.entity.${className};
  */
 public interface ${className}SV extends BaseMybatisSV<${className},Long>{
 
+
+<#if (pkFields?size>0)>
+
     /**
      * 加载一个对象${className}
-     * 通过<#list pkFields as field>${field.field}<#if field_has_next>,</#if></#list>
-     * <#list pkFields as field>@param ${field.field} ${field.notes}</#list>
+     * <#list pkFields as pkField>@param ${pkField.field} ${pkField.notes}</#list>
      * @return ${className}
      */
-    public ${className} load(<#list pkFields as field>${field.fieldType} ${field.field}<#if field_has_next>,</#if></#list>);
+     ${className} load(<#list pkFields as pkField>${pkField.fieldType} ${pkField.field}<#if pkField_has_next>,</#if></#list>);
 
-    <#if (pkFields?size>0)>
-    <#list pkFields as field>
+    <#list pkFields as pkField>
     /**
      * 加载一个对象${className} 通过${field.field}
      * @param ${field.field} ${field.notes}
      * @return ${className}
      */
-    public ${className} loadBy${field.field?cap_first}(${field.fieldType} ${field.field});
-    </#list>
-    </#if>
+     ${className} loadBy${pkField.field?cap_first}(${pkField.fieldType} ${pkField.field});
+
+   </#list>
+
+    /**
+     * 删除对象${className}
+     * <#list pkFields as pkField>@param ${pkField.field} ${pkField.notes}</#list>
+     * @return ${className}
+     */
+     void delete(<#list pkFields as pkField>${pkField.fieldType} ${pkField.field}<#if pkField_has_next>,</#if></#list>);
+</#if>
 
 
 
@@ -44,8 +53,8 @@ public interface ${className}SV extends BaseMybatisSV<${className},Long>{
      * @param limit  查询行数
      * @return List<${className}>
      */
-    public List<${className}> list${className}(${className} ${classNameLower}, int offset, int limit);
-    public int count(${className} ${classNameLower});
+     List<${className}> list(${className} ${classNameLower}, int offset, int limit);
+     int count(${className} ${classNameLower});
 
     <#list fields as field>
     <#if field.checkDate>
@@ -54,27 +63,27 @@ public interface ${className}SV extends BaseMybatisSV<${className},Long>{
      * @param ${field.field} ${field.notes}
      * @return List<${className}>
      */
-    public List<${className}> listBy${field.field?cap_first}Begin(${field.fieldType} ${field.field});
+     List<${className}> listBy${field.field?cap_first}Begin(${field.fieldType} ${field.field});
     /**
      * 根据时间查询${className}列表 通过${field.field}
      * @param ${field.field} ${field.notes}
      * @return List<${className}>
      */
-    public List<${className}> listBy${field.field?cap_first}Begin(${field.fieldType} ${field.field},int offset,int limit) ;
+     List<${className}> listBy${field.field?cap_first}Begin(${field.fieldType} ${field.field},int offset,int limit) ;
 
     /**
      * 根据时间查询${className}列表 通过${field.field}
      * @param ${field.field} ${field.notes}
      * @return List<${className}>
      */
-    public List<${className}> listBy${field.field?cap_first}End(${field.fieldType} ${field.field});
+     List<${className}> listBy${field.field?cap_first}End(${field.fieldType} ${field.field});
 
     /**
      * 根据时间查询${className}列表 通过${field.field}
      * @param ${field.field} ${field.notes}
      * @return List<${className}>
      */
-    public List<${className}> listBy${field.field?cap_first}End(${field.fieldType} ${field.field},int offset,int limit);
+     List<${className}> listBy${field.field?cap_first}End(${field.fieldType} ${field.field},int offset,int limit);
 
     /**
      * 根据时间查询${className}列表 通过${field.field}
@@ -82,14 +91,14 @@ public interface ${className}SV extends BaseMybatisSV<${className},Long>{
      * @param ${field.field}End ${field.notes}End
      * @return List<${className}>
      */
-    public List<${className}> listBy${field.field?cap_first}(${field.fieldType} ${field.field}Begin,${field.fieldType} ${field.field}End) ;
+     List<${className}> listBy${field.field?cap_first}(${field.fieldType} ${field.field}Begin,${field.fieldType} ${field.field}End) ;
     /**
      * 根据时间查询${className}列表 通过${field.field}
      * @param ${field.field}Begin ${field.notes}Begin
      * @param ${field.field}End ${field.notes}End
      * @return List<${className}>
      */
-    public List<${className}> listBy${field.field?cap_first}(${field.fieldType} ${field.field}Begin,${field.fieldType} ${field.field}End,int offset,int limit);
+     List<${className}> listBy${field.field?cap_first}(${field.fieldType} ${field.field}Begin,${field.fieldType} ${field.field}End,int offset,int limit);
     </#if>
     </#list>
 }

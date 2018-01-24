@@ -21,6 +21,23 @@ import ${basePackage}.${model}.entity.${className};
 public class ${className}DAO extends BaseMybatisDAOImpl<${className},Long>{
 
 <#if (pkFields?size>0)>
+
+    /**
+     * 加载一个对象${className}
+     * <#list pkFields as pkField>@param ${pkField.field} ${pkField.notes}</#list>
+     * @return ${className}
+     */
+    public ${className} load(<#list pkFields as pkField>${pkField.fieldType} ${pkField.field}<#if pkField_has_next>,</#if></#list>) {
+        Map<String,Object> map= new HashMap<String,Object>;
+        <#list pkFields as pkField>
+        map.put("${pkField.field}",${pkField.field});
+        </#list>
+        return getSqlSession().selectOne(this.sqlmapNamespace+".load",map);
+    }
+
+
+
+
 <#list pkFields as pkField>
     /**
      * 加载一个对象${className} 通过${pkField.field}
@@ -28,25 +45,7 @@ public class ${className}DAO extends BaseMybatisDAOImpl<${className},Long>{
      * @return ${className}
      */
     public ${className} loadBy${pkField.field?cap_first}(${pkField.fieldType} ${pkField.field}) {
-            return getSqlSessionTemplate().selectOne(this.sqlmapNamespace+".loadBy${pkField.field?cap_first}",${pkField.field});
-    }
-
-    /**
-     * 删除对象${className} 通过${pkField.field}
-     * @param ${pkField.field} ${pkField.notes}
-     * @return ${className}
-     */
-    public void deleteBy${pkField.field?cap_first}(${pkField.fieldType} ${pkField.field}) {
-             getSqlSessionTemplate().delete(this.sqlmapNamespace+".delete",${pkField.field});
-    }
-
-    /**
-     * 更新对象${className} 通过${pkField.field}
-     * @param ${pkField.field} ${pkField.notes}
-     * @return ${className}
-     */
-    public void updateBy${pkField.field?cap_first}(${className} ${className?uncap_first}) {
-             getSqlSessionTemplate().update(this.sqlmapNamespace+".update",${className?uncap_first});
+            return getSqlSession().selectOne(this.sqlmapNamespace+".loadBy${pkField.field?cap_first}",${pkField.field});
     }
 
     /**
@@ -64,9 +63,38 @@ public class ${className}DAO extends BaseMybatisDAOImpl<${className},Long>{
      * @return List<${className}>
      */
     public List<${className}> listBy${pkField.field?cap_first}(${pkField.fieldType} ${pkField.field},int offset,int limit) {
-            return getSqlSession().selectList(this.sqlmapNamespace + "query", ${pkField.field}, new RowBounds(offset, limit));
+         return getSqlSession().selectList(this.sqlmapNamespace + "query", ${pkField.field}, new RowBounds(offset, limit));
+    }
+
+    /**
+     * 更新对象${className} 通过${pkField.field}
+     * @param ${pkField.field} ${pkField.notes}
+     * @return ${className}
+     */
+    public void updateBy${pkField.field?cap_first}(${className} ${classNameLower},${pkField.fieldType} ${pkField.field}) {
+        if(${pkField.field}!=null){
+           ${classNameLower}.set${pkField.field?cap_first}(${pkField.field});
+        }
+        getSqlSession().update(this.sqlmapNamespace+".update",${classNameLower});
     }
 </#list>
+
+
+    /**
+     * 删除对象${className}
+     * <#list pkFields as pkField>@param ${pkField.field} ${pkField.notes}</#list>
+     * @return ${className}
+     */
+     public void delete(<#list pkFields as pkField>${pkField.fieldType} ${pkField.field}<#if pkField_has_next>,</#if></#list>) {
+         Map<String,Object> map= new HashMap<String,Object>;
+         <#list pkFields as pkField>
+         if(${pkField.field}!=null){
+            map.put("${pkField.field}",${pkField.field});
+         }
+         </#list>
+         getSqlSession().delete(this.sqlmapNamespace+".delete",map);
+    }
+
 </#if>
 
 

@@ -2,26 +2,29 @@ AI Code  自动生成框架代码 节约30%的时间
 
 模板采用freemarker 
 模板可以拿到如下数据：
+${projectName} //项目英文名
+${model}   //模块中的模型 -> ${basePackage}.${model}.service
+${module} //模块 一个项目的模块化 不参与java的包定义只是项目管理分离办法
 
-basePackage  //包名
+${basePackage}  //包名
 
-table  //表对象
-tableName  //表名
+${table}  //表对象
+${tableName}  //表名
 
-classes  //类信息对象  集合
-class  //类对象
-className  //类名
-classNameLower  //类名小写
+${classes}  //类信息对象  集合
+${class}  //类对象
+${className}  //类名
+${classNameLower}  //类名小写
 
-columns  //列对象  集合
-pkColumns  //主键数据信息
-notPkColumns  //非主键数据信息
+${columns}  //列对象  集合
+${pkColumns}  //主键数据信息
+${notPkColumns}  //非主键数据信息
 
 
-fields  //类属性  集合
-pkFields  //主键数据信息
-notPkFields  //非主键主键数据信息
+${fields}  //类属性  集合
+${pkFields}  //主键数据信息
+${notPkFields}  //非主键主键数据信息
 
-notes  //类注释
-copyright  //项目版权
-author  //作者
+${notes}  //类注释
+${copyright}  //项目版权
+${author}  //作者

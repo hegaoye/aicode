@@ -41,22 +41,24 @@ public class ${className}Ctrl extends BaseCtrl {
 <#if (pkFields?size>0)>
     /**
      * 查询${className}一个详情信息
-     * <#list pkFields as field>@param ${field.field} ${field.notes}</#list>
+     * <#list pkFields as pkField>@param ${pkField.field} ${pkField.notes}</#list>
      * @return BeanRet
      */
     @ApiOperation(value = "查询${className}一个详情信息", notes = "查询${className}一个详情信息")
     @ApiImplicitParams({
-            <#list pkFields as field>
-            @ApiImplicitParam(name = "${field.field}", value = "${field.notes}", paramType = "query")<#if field_has_next>,</#if>
+            <#list pkFields as pkField>
+            @ApiImplicitParam(name = "${pkField.field}", value = "${pkField.notes}", paramType = "query")<#if pkField_has_next>,</#if>
             </#list>
     })
     @GetMapping(value = "/load")
     @ResponseBody
-    public BeanRet load(<#list pkFields as field>${field.fieldType} ${field.field}<#if field_has_next>,</#if></#list>) {
-        <#list pkFields as field>
-        Assert.hasText(${field.field}, BaseException.BaseExceptionEnum.Empty_Param.toString());
+    public BeanRet load(<#list pkFields as pkField>${pkField.fieldType} ${pkField.field}<#if pkField_has_next>,</#if></#list>) {
+        <#list pkFields as pkField>
+        if(${pkField.field}==null){
+          return BeanRet.create();
+        }
         </#list>
-        ${className} ${classNameLower} = ${classNameLower}SV.load(<#list pkFields as field>${field.field}<#if field_has_next>,</#if></#list>);
+        ${className} ${classNameLower} = ${classNameLower}SV.load(<#list pkFields as pkField>${pkField.field}<#if pkField_has_next>,</#if></#list>);
         logger.info(JSON.toJSONString(${classNameLower}));
         return BeanRet.create(true, "查询详情信息", ${classNameLower});
     }
@@ -75,8 +77,10 @@ public class ${className}Ctrl extends BaseCtrl {
     })
     @GetMapping(value = "/load/${pkField.field}")
     @ResponseBody
-    public BeanRet load(${pkField.fieldType} ${pkField.field}) {
-        Assert.hasText(${pkField.field}, BaseException.BaseExceptionEnum.Empty_Param.toString());
+    public BeanRet loadBy${pkField.field?cap_first}(${pkField.fieldType} ${pkField.field}) {
+        if(${pkField.field}==null){
+          return BeanRet.create();
+        }
         ${className} ${classNameLower} = ${classNameLower}SV.loadBy${pkField.field?cap_first}(${pkField.field});
         logger.info(JSON.toJSONString(${classNameLower}));
         return BeanRet.create(true, "查询详情信息", ${classNameLower});
@@ -101,9 +105,11 @@ public class ${className}Ctrl extends BaseCtrl {
     @GetMapping(value = "/list")
     @ResponseBody
     public BeanRet list(@ApiIgnore ${className} ${classNameLower},@ApiIgnore Page<${className}> page) {
-        Assert.notNull(page, BaseException.BaseExceptionEnum.Empty_Param.toString());
+        if(page==null){
+          return BeanRet.create();
+        }
         List<${className}> ${classNameLower}s = ${classNameLower}SV.list(${classNameLower},page.genRowStart(),page.getPageSize());
-        int total = ${classNameLower}SV.count(new HashedMap());
+        int total = ${classNameLower}SV.count(${classNameLower});
         page.setTotalRow(total);
         page.setVoList(${classNameLower}s);
         logger.info(JSON.toJSONString(page));
@@ -125,7 +131,9 @@ public class ${className}Ctrl extends BaseCtrl {
     @ResponseBody
     public BeanRet build(@ApiIgnore ${className} ${classNameLower}) {
         <#list fields as field>
-          Assert.hasText(${field.field}, BaseException.BaseExceptionEnum.Empty_Param.toString());
+        if(${field.field}==null){
+          return BeanRet.create();
+        }
         </#list>
 
         ${classNameLower}SV.saveOrUpdate(${classNameLower});
@@ -148,7 +156,9 @@ public class ${className}Ctrl extends BaseCtrl {
     @ResponseBody
     public BeanRet modify(@ApiIgnore ${className} ${classNameLower}) {
         <#list fields as field>
-         Assert.hasText(${field.field}, BaseException.BaseExceptionEnum.Empty_Param.toString());
+        if(${field.field}==null){
+           return BeanRet.create();
+        }
         </#list>
 
         ${classNameLower}SV.saveOrUpdate(${classNameLower});
@@ -169,11 +179,7 @@ public class ${className}Ctrl extends BaseCtrl {
     @DeleteMapping("/delete")
     @ResponseBody
     public BeanRet delete(<#list pkFields as field>${field.fieldType} ${field.field}<#if field_has_next>,</#if></#list>) {
-        <#list pkFields as field>
-         Assert.hasText(${field.field}, BaseException.BaseExceptionEnum.Empty_Param.toString());
-        </#list>
-
-        ${classNameLower}SV.delete(<#list pkFields as field>${field.field}<#if field_has_next>,</#if></#list>);
+        ${classNameLower}SV.deleteBy${pkField.field?cap_first}(<#list pkFields as pkField>${pkField.field}<#if pkField_has_next>,</#if></#list>);
         return BeanRet.create(true, "删除${className}成功");
     }
 

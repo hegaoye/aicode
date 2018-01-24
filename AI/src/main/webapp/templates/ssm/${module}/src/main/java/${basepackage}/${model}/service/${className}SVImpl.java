@@ -35,6 +35,8 @@ public class ${className}SVImpl extends BaseMybatisSVImpl<${className},Long> imp
 		return ${classNameLower}DAO;
 	}
 
+
+<#if (pkFields?size>0)>
 	/**
 	 * 加载一个对象${className}
 	 * 通过<#list pkFields as field>${field.field}<#if field_has_next>,</#if></#list>
@@ -44,18 +46,27 @@ public class ${className}SVImpl extends BaseMybatisSVImpl<${className},Long> imp
 	public ${className} load(<#list pkFields as field>${field.fieldType} ${field.field}<#if field_has_next>,</#if></#list>) {
 		return ${classNameLower}DAO.load(<#list pkFields as field>${field.field}<#if field_has_next>,</#if></#list>);
 	}
-
-<#if (pkFields?size>0)>
-	<#list pkFields as field>
+	<#list pkFields as pkField>
 	/**
-	 * 加载一个对象${className} 通过${field.field}
-	 * @param ${field.field} ${field.notes}
+	 * 加载一个对象${className} 通过${pkField.field}
+	 * @param ${pkField.field} ${pkField.notes}
 	 * @return ${className}
 	 */
-     public ${className} loadBy${field.field?cap_first}(${field.fieldType} ${field.field}) {
-		return ${classNameLower}DAO.loadBy${field.field?cap_first}(${field.field});
+     public ${className} loadBy${pkField.field?cap_first}(${pkField.fieldType} ${pkField.field}) {
+		return ${classNameLower}DAO.loadBy${pkField.field?cap_first}(${pkField.field});
 	 }
+
 	</#list>
+
+     /**
+      * 删除对象${className}
+	  * <#list pkFields as pkField>@param ${pkField.field} ${pkField.notes}</#list>
+      * @return ${className}
+      */
+     public void delete(<#list pkFields as pkField>${pkField.fieldType} ${pkField.field}<#if pkField_has_next>,</#if></#list>) {
+		${classNameLower}DAO.delete(<#list pkFields as pkField>${pkField.field}<#if pkField_has_next>,</#if></#list>);
+	 }
+
 </#if>
 
 
@@ -68,7 +79,7 @@ public class ${className}SVImpl extends BaseMybatisSVImpl<${className},Long> imp
 	 * @return List<${className}>
 	 */
 	@Override
-	public List<${className}> list${className}(${className} ${classNameLower}, int offset, int limit) {
+	public List<${className}> list(${className} ${classNameLower}, int offset, int limit) {
 		if (offset < 0) {
 		  offset = 0;
 		}
@@ -170,5 +181,7 @@ public class ${className}SVImpl extends BaseMybatisSVImpl<${className},Long> imp
 	}
 </#if>
 </#list>
+
+
 
 }

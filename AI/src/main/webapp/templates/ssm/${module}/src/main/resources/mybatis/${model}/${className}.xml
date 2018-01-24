@@ -3,7 +3,6 @@
                 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <#macro mapperEl value>${r"#{"}${value}}</#macro>
-<#macro sort value>${value}</#macro>
 
 <!-- 不使用namespace的话sql搜索定位会比较方便 -->
 <mapper namespace="${className}">
@@ -137,7 +136,7 @@
         <include refid="where"/>
 
         <if test="sortColumns!=null and sortColumns!=''">
-        ORDER BY <@sort 'sortColumns'/>
+        ORDER BY ${r'${sortColumns}'}
         </if>
       </select>
 

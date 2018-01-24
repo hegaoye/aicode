@@ -1,17 +1,1 @@
-//root 项目引入子项目
-//通用模块
-include 'core'//核心jar包
-include 'base-web'//web前端集成的通用jar包
-include 'base-facade'//基础支持接口定义jar包
-include 'base-sv-mybatis'//mybatis基础支撑包，mybatis全项目集成
-
-//系统基础类及服务接口的定义
-include 'hs-facade'//后端服务项目
-
-//系统 对外暴露 Ctrl 接口
-include 'back-api'  //web项目（后台管理ctrl接口）
-include 'app-api'   // app 项目（手机(android, ios)端用户及其相关动作的接口）
-// 代理商 项目(代理商自主运营管理平台 ctrl接口)
-
-//业务接口 服务项目
-include 'hs-sv'
+include '${projectName}'

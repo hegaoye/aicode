@@ -263,11 +263,12 @@ public class ProjectJobSVImpl extends BaseMybatisSVImpl<ProjectJob, Long> implem
         if (frameworksTemplatePath.contains("/$")) {
             frameworksTemplatePath = frameworksTemplatePath.substring(frameworksTemplatePath.indexOf("/$"));
         } else {
+            frameworksTemplatePath = frameworksTemplatePath.replaceFirst("/", "");
             frameworksTemplatePath = frameworksTemplatePath.substring(frameworksTemplatePath.indexOf("/"));
         }
         String targetFilePath = projectPath + "/" + frameworksTemplatePath.replace("${basepackage}", project.getBasePackage().replace(".", "/")).replace("${className}", mapClassTable.getClassName());
         String templatePath = new HandleFuncs().getCurrentClassPath() + "/" + settingTemplatePath.getV() + "/" + frameworksTemplate.getPath();
 
-        FreemarkerHelper.generate(model, targetFilePath.replace("${module}", "").replace("${model}", modelString), templatePath);
+        FreemarkerHelper.generate(model, targetFilePath.replace("${module}", project.getEnglishName()).replace("${model}", modelString), templatePath);
     }
 }

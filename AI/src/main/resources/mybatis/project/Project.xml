@@ -19,6 +19,7 @@
         <result property="author" column="author"/>
         <result property="phone" column="phone"/>
         <result property="basePackage" column="basePackage"/>
+        <result property="buildNumber" column="buildNumber"/>
         <result property="sqlFile" column="sqlFile"/>
         <result property="downloadUrl" column="downloadUrl"/>
         <result property="isRepository" column="isRepository"/>
@@ -41,7 +42,7 @@
 
     <!-- 用于select查询公用抽取的列 -->
     <sql id="Project.columns">
-		id,code,name,description,englishName,databaseType,language,state,copyright,author,phone,basePackage,sqlFile,downloadUrl,isRepository,isParseTable,isParseClass,accountCode,createTime,updateTime
+		id,code,name,description,englishName,databaseType,language,buildNumber,state,copyright,author,phone,basePackage,sqlFile,downloadUrl,isRepository,isParseTable,isParseClass,accountCode,createTime,updateTime
 	</sql>
 
     <insert id="Project.insert" useGeneratedKeys="true" keyProperty="id" parameterType="Project">
@@ -147,7 +148,6 @@
             </if>
         </trim>
         WHERE
-        id = #{id} AND
         code = #{code}
     </update>
 

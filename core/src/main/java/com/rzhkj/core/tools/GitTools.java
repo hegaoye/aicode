@@ -20,7 +20,8 @@ public class GitTools {
 
     /**
      * 创建仓库
-     * @param repoDir   仓库文件夹
+     *
+     * @param repoDir 仓库文件夹
      * @return 仓库实例
      * 如果仓库不存在就创建仓库
      * 仓库存在，返回存在的仓库
@@ -45,8 +46,9 @@ public class GitTools {
 
     /**
      * 创建仓库
-     * @param dirPath   仓库文件夹路径
-     * @return  仓库实例
+     *
+     * @param dirPath 仓库文件夹路径
+     * @return 仓库实例
      */
     public static Repository createGitRepository(String dirPath) {
         return createGitRepository(new File(dirPath));
@@ -54,7 +56,8 @@ public class GitTools {
 
     /**
      * 删除仓库
-     * @param repoDir   仓库文件夹
+     *
+     * @param repoDir 仓库文件夹
      * @return
      */
     public static boolean deleteGitRepository(File repoDir) {
@@ -68,6 +71,7 @@ public class GitTools {
 
     /**
      * 删除仓库
+     *
      * @param dirPath
      * @return
      */
@@ -77,7 +81,8 @@ public class GitTools {
 
     /**
      * 打开仓库
-     * @param repoDir   仓库文件夹
+     *
+     * @param repoDir 仓库文件夹
      * @return
      */
     public static Repository openGitRepository(File repoDir) {
@@ -91,6 +96,7 @@ public class GitTools {
 
     /**
      * 打开仓库
+     *
      * @param dirPath
      * @return
      */
@@ -101,25 +107,26 @@ public class GitTools {
     /**
      * 克隆远程仓库（私有，需要用户名、密码）
      * 本地不能有相同名的仓库
-     * @param httpsUrl  https地址
-     * @param repoDir   仓库文件夹
-     * @param username  git用户名
-     * @param password  git密码
+     *
+     * @param httpsUrl https地址
+     * @param repoDir  仓库文件夹
+     * @param username git用户名
+     * @param password git密码
      * @return
      */
     public static boolean cloneGit(String httpsUrl, File repoDir, String username, String password) {
         boolean ret = false;
         try {
-           CloneCommand cloneCommand = Git.cloneRepository().setURI(httpsUrl);
-           if (!StringUtils.isBlank(username)) {
-               cloneCommand.setCredentialsProvider(new UsernamePasswordCredentialsProvider(username, password));
-           }
-           if (repoDir != null) {
+            CloneCommand cloneCommand = Git.cloneRepository().setURI(httpsUrl);
+            if (!StringUtils.isBlank(username)) {
+                cloneCommand.setCredentialsProvider(new UsernamePasswordCredentialsProvider(username, password));
+            }
+            if (repoDir != null) {
                 //目录为null则克隆到当前项目下的目录，不建议这样做
                 cloneCommand.setDirectory(repoDir);
-           }
-           cloneCommand.call();
-           ret = true;
+            }
+            cloneCommand.call();
+            ret = true;
         } catch (Exception e) {
             e.printStackTrace();
             return false;
@@ -134,8 +141,9 @@ public class GitTools {
     /**
      * 克隆远程仓库（公共，不需要用户名、密码）
      * 本地不能有相同名的仓库
-     * @param httpsUrl  https地址
-     * @param repoDir   仓库文件夹
+     *
+     * @param httpsUrl https地址
+     * @param repoDir  仓库文件夹
      * @return
      */
     public static boolean cloneGit(String httpsUrl, File repoDir) {
@@ -149,8 +157,9 @@ public class GitTools {
     /**
      * 检出仓库
      * 本地必须有仓库
-     * @param repoDir       仓库文件夹
-     * @param branchName    分支全名
+     *
+     * @param repoDir    仓库文件夹
+     * @param branchName 分支全名
      * @return
      */
     public static boolean checkoutGit(File repoDir, String branchName) {
@@ -199,7 +208,8 @@ public class GitTools {
 
     /**
      * 获取仓库状态
-     * @param repoDir   仓库文件夹
+     *
+     * @param repoDir 仓库文件夹
      * @return
      */
     public static Status getGitStatus(File repoDir) {
@@ -232,6 +242,7 @@ public class GitTools {
 
     /**
      * pull
+     *
      * @param repoDir
      * @return
      */
@@ -263,6 +274,7 @@ public class GitTools {
 
     /**
      * 创建新分支
+     *
      * @param branchName
      * @param repoDir
      * @return
@@ -311,10 +323,11 @@ public class GitTools {
 
     /**
      * 提交并推送远程仓库
-     * @param repoDir   本地仓库文件夹
-     * @param message   提交信息
-     * @param username  用户名
-     * @param password  密码
+     *
+     * @param repoDir  本地仓库文件夹
+     * @param message  提交信息
+     * @param username 用户名
+     * @param password 密码
      * @return
      */
     public static boolean commitAndPush(File repoDir, String username, String password, String message) {
@@ -350,12 +363,13 @@ public class GitTools {
         return ret;
     }
 
-    public static boolean commitAndPush(String repoDir, String username, String password, String message){
+    public static boolean commitAndPush(String repoDir, String username, String password, String message) {
         return commitAndPush(new File(repoDir), username, password, message);
     }
 
     /**
      * 获取git绝对路径
+     *
      * @param repoDir
      * @return
      */
@@ -365,6 +379,7 @@ public class GitTools {
 
     /**
      * 删除文件夹
+     *
      * @param file
      */
     private static void deleteFolder(File file) {

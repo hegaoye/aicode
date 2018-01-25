@@ -6,6 +6,7 @@ import com.rzhkj.core.base.BaseCtrl;
 import com.rzhkj.core.entity.BeanRet;
 import com.rzhkj.core.exceptions.BaseException;
 import com.rzhkj.project.entity.ProjectSql;
+import com.rzhkj.project.service.ProjectSV;
 import com.rzhkj.project.service.ProjectSqlSV;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -39,6 +40,9 @@ public class ProjectSqlCtrl extends BaseCtrl {
 
     @Resource
     private ProjectSqlSV projectSqlSV;
+
+    @Resource
+    private ProjectSV projectSV;
 
     /**
      * 查询一个详情信息
@@ -137,9 +141,17 @@ public class ProjectSqlCtrl extends BaseCtrl {
     public BeanRet modify(@ApiIgnore ProjectSql projectSql) {
         try {
             Assert.hasText(projectSql.getCode(), BaseException.BaseExceptionEnum.Empty_Param.toString());
-            projectSqlSV.delete(projectSql.getCode());
-            projectSqlSV.save(projectSql);
-            return BeanRet.create(true, "修改项目成功", projectSql);
+            Map<String, Object> map = Maps.newHashMap();
+            map.put("code", projectSql.getCode());
+            ProjectSql projectSqlLoad = projectSqlSV.load(map);
+            if (projectSqlLoad != null) {
+                projectSqlSV.delete(projectSql.getCode());
+                projectSqlLoad.setTsql(projectSql.getTsql());
+                projectSqlSV.save(projectSqlLoad);
+                return BeanRet.create(true, "修改项目成功", projectSql);
+            } else {
+                return BeanRet.create(false, "修改项目失败");
+            }
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e.getMessage());

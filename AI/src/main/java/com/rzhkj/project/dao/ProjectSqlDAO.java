@@ -5,9 +5,12 @@
 
 package com.rzhkj.project.dao;
 
+import com.google.common.collect.Maps;
 import com.rzhkj.core.base.BaseMybatisDAOImpl;
 import com.rzhkj.project.entity.ProjectSql;
 import org.springframework.stereotype.Repository;
+
+import java.util.Map;
 
 
 @Repository
@@ -19,6 +22,8 @@ public class ProjectSqlDAO extends BaseMybatisDAOImpl<ProjectSql, Long> {
      * @param code tsql编码
      */
     public void delete(String code) {
-        getSqlSession().delete(sqlmapNamespace + ".delete", code);
+        Map<String,Object> map= Maps.newHashMap();
+        map.put("code",code);
+        getSqlSession().delete(sqlmapNamespace + ".delete", map);
     }
 }

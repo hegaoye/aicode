@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.annotation.Resource;
-import java.util.Date;
 import java.util.Map;
 
 
@@ -78,16 +77,20 @@ public class ProjectJobCtrl extends BaseCtrl {
      */
     @ApiOperation(value = "查询项目任务信息集合 按照时间顺序倒叙排序", notes = "查询项目任务信息集合 按照时间顺序倒叙排序")
     @ApiImplicitParams({
+            @ApiImplicitParam(name = "code", value = "项目编码", paramType = "query"),
             @ApiImplicitParam(name = "curPage", value = "当前页", required = true, paramType = "query"),
             @ApiImplicitParam(name = "pageSize", value = "分页大小", required = true, paramType = "query")
     })
     @GetMapping(value = "/list")
     @ResponseBody
-    public BeanRet list(@ApiIgnore Page<ProjectJob> page) {
+    public BeanRet list(String code, @ApiIgnore Page<ProjectJob> page) {
         try {
             Assert.notNull(page, BaseException.BaseExceptionEnum.Empty_Param.toString());
+            Map<String, Object> map = Maps.newHashMap();
+            map.put("projectCode", code);
+            page.setParams(map);
             page = projectJobSV.getList(page);
-            int count = projectJobSV.count(new HashedMap());
+            int count = projectJobSV.count(map);
             page.setTotalRow(count);
 
             logger.info(JSON.toJSONString(page));

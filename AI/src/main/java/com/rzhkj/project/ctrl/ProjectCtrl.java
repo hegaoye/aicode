@@ -1,6 +1,7 @@
 package com.rzhkj.project.ctrl;
 
 import com.alibaba.fastjson.JSON;
+import com.google.common.collect.Maps;
 import com.rzhkj.core.base.BaseCtrl;
 import com.rzhkj.core.entity.BeanRet;
 import com.rzhkj.core.entity.Page;
@@ -161,8 +162,15 @@ public class ProjectCtrl extends BaseCtrl {
     public BeanRet modify(@ApiIgnore Project project) {
         try {
             Assert.hasText(project.getCode(), BaseException.BaseExceptionEnum.Empty_Param.toString());
-
-            projectSV.saveOrUpdate(project);
+            if (project.getCode() != null) {
+                Map<String, Object> map = Maps.newHashMap();
+                map.put("code", project.getCode());
+                Project projectLoad = projectSV.load(map);
+                if (projectLoad != null) {
+                    project.setId(projectLoad.getId());
+                }
+                projectSV.saveOrUpdate(project);
+            }
             return BeanRet.create(true, "修改项目成功", project);
         } catch (Exception e) {
             e.printStackTrace();

@@ -18,18 +18,18 @@ public class FreemarkerHelper {
         map.put("basePackage", "package\tcom.szh.test.ctrl;");
         map.put("import", "import\tcom.aixin.core.entity.Page;\nimport\torg.apache.commons.lang.builder.ToStringBuilder;\nimport\torg.apache.commons.lang.builder.ToStringStyle;\nimport\tjava.io.Serializable;");
         String targetFilePath = "C:\\workspaces\\AI-Code\\AI\\src\\main\\webapp\\workspace\\szh\\sv\\src\\main\\java\\com\\szh\\test\\ctrl\\" + map.get("fileName").toString() + ".java";
-        generate(map, targetFilePath, "C:\\workspaces\\AI-Code\\AI\\src\\main\\webapp\\templates\\Test.java");
+        generate(null, targetFilePath, "C:\\workspaces\\AI-Code\\AI\\src\\main\\webapp\\templates\\Test.java");
     }
 
 
     /**
      * 生成源文件
      *
-     * @param model          模型数据
+     * @param templateData          模型数据
      * @param targetFilePath 目标路径 /xxxx/xxx/{ClassName.java}
      * @param templatePath   模板路径 [/xxx/xxxx|/xxx/xxxx/]
      */
-    public static void generate(Map<String, Object> model, String targetFilePath, String templatePath) {
+    public static void generate(TemplateData templateData, String targetFilePath, String templatePath) {
         Writer out = null;
         try {
             templatePath = templatePath.replace("//", "/").replace("\\", "/");
@@ -47,7 +47,7 @@ public class FreemarkerHelper {
             configuration.setDirectoryForTemplateLoading(new File(templatePath));
             Template temp = configuration.getTemplate(templateFileName);
             out = new OutputStreamWriter(new FileOutputStream(targetFilePath), Charset.forName("UTF-8"));
-            temp.process(model, out);
+            temp.process(templateData, out);
             out.flush();
             out.close();
         } catch (IOException e) {

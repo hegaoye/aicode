@@ -10,6 +10,7 @@ import com.baidu.fsg.uid.UidGenerator;
 import com.google.common.collect.Maps;
 import com.rzhkj.base.core.FreemarkerHelper;
 import com.rzhkj.base.core.StringHelper;
+import com.rzhkj.base.core.TemplateData;
 import com.rzhkj.core.base.BaseMybatisDAO;
 import com.rzhkj.core.base.BaseMybatisSVImpl;
 import com.rzhkj.core.enums.YNEnum;
@@ -225,41 +226,10 @@ public class ProjectJobSVImpl extends BaseMybatisSVImpl<ProjectJob, Long> implem
             mapFieldColumnList.add(mapFieldColumn);
         });
 
-
-        Map<String, Object> model = Maps.newHashMap();
-        model.put("basePackage", project.getBasePackage());//包名
-        model.put("projectName", project.getEnglishName());//项目英文名
-        model.put("table", mapClassTable);//表对象
-        model.put("tableName", mapClassTable.getTableName());//表名
-
-        model.put("classes", mapClassTableList);//类对象
-        model.put("class", mapClassTable);//类对象
-        model.put("className", mapClassTable.getClassName());//类名
-        model.put("classNameLower", StringHelper.toJavaVariableName(mapClassTable.getClassName()));//类名小写
-
-        model.put("columns", mapFieldColumnList);//列对象集合
-        model.put("pkColumns", mapFieldColumnPks);//主键数据信息
-        model.put("notPkColumns", mapFieldColumnNotPks);//非主键数据信息
-
-//        model.put("relationships", mapClassTable.getMapRelationshipList());//关联关系
-
-        model.put("fields", mapFieldColumnList);//类属性集合
-        model.put("pkFields", mapFieldColumnPks);//主键数据信息
-        model.put("notPkFields", mapFieldColumnNotPks);//非主键主键数据信息
-
-        model.put("notes", mapClassTable.getNotes());//类注释
-        model.put("copyright", project.getCopyright());//项目版权
-        model.put("author", project.getAuthor());//作者
-        String modelString = "";
-        if (mapClassTable.getTableName().contains("_")) {
-            modelString = mapClassTable.getTableName().substring(0, mapClassTable.getTableName().indexOf("_"));
-            model.put("model", mapClassTable.getTableName().substring(0, mapClassTable.getTableName().indexOf("_")));//模块
-        } else {
-            modelString = mapClassTable.getTableName();
-            model.put("model", mapClassTable.getTableName());//模块
-        }
-
+        TemplateData templateData = new TemplateData(project, mapClassTable, mapClassTableList, mapFieldColumnList, mapFieldColumnPks, mapFieldColumnNotPks);
         Setting settingTemplatePath = settingDAO.loadByKey(Setting.Key.Template_Path.name());
+
+        //生成路径处理
         String frameworksTemplatePath = frameworksTemplate.getPath();
         if (frameworksTemplatePath.contains("/$")) {
             frameworksTemplatePath = frameworksTemplatePath.substring(frameworksTemplatePath.indexOf("/$"));
@@ -267,9 +237,17 @@ public class ProjectJobSVImpl extends BaseMybatisSVImpl<ProjectJob, Long> implem
             frameworksTemplatePath = frameworksTemplatePath.replaceFirst("/", "");
             frameworksTemplatePath = frameworksTemplatePath.substring(frameworksTemplatePath.indexOf("/"));
         }
-        String targetFilePath = projectPath + "/" + frameworksTemplatePath.replace("${basepackage}", project.getBasePackage().replace(".", "/")).replace("${className}", mapClassTable.getClassName());
-        String templatePath = new HandleFuncs().getCurrentClassPath() + "/" + settingTemplatePath.getV() + "/" + frameworksTemplate.getPath();
 
-        FreemarkerHelper.generate(model, targetFilePath.replace("${module}", project.getEnglishName()).replace("${model}", modelString), templatePath);
+        String targetFilePath = projectPath + "/" + frameworksTemplatePath
+                .replace("${basepackage}", project.getBasePackage().replace(".", "/"))
+                .replace("${className}", mapClassTable.getClassName())
+                .replace("${module}", project.getEnglishName())
+                .replace("${model}", templateData.getModel());
+
+        String templatePath = new HandleFuncs().getCurrentClassPath()
+                + "/" + settingTemplatePath.getV()
+                + "/" + frameworksTemplate.getPath();
+
+        FreemarkerHelper.generate(templateData, targetFilePath, templatePath);
     }
 }

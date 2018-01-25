@@ -9,6 +9,7 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
+ * 映射模板的输出数据定义
  * Created by lixin on 2018/1/25.
  */
 @Data
@@ -60,7 +61,7 @@ public class TemplateData implements Serializable {
         if (classTable.getTableName().contains("_")) {
             this.model = classTable.getTableName().substring(0, classTable.getTableName().indexOf("_"));
         } else {
-            this.model =  classTable.getTableName();
+            this.model = classTable.getTableName();
         }
     }
 }

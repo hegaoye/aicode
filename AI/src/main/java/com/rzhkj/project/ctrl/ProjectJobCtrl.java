@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.Map;
 
 
@@ -190,7 +191,7 @@ public class ProjectJobCtrl extends BaseCtrl {
     /**
      * 构建任务
      *
-     * @param code 任务编码
+     * @param code 项目编码
      * @return BeanRet
      */
     @ApiOperation(value = "执行任务", notes = "执行任务")
@@ -202,8 +203,8 @@ public class ProjectJobCtrl extends BaseCtrl {
     public BeanRet execute(String code) {
         try {
             Assert.hasText(code, BaseException.BaseExceptionEnum.Empty_Param.toString());
-            projectJobSV.execute(code);
-            return BeanRet.create(true, "执行任务成功");
+            ProjectJob projectJob = projectJobSV.execute(code);
+            return BeanRet.create(true, "执行任务成功", projectJob);
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e.getMessage());

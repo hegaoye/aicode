@@ -131,51 +131,75 @@ public class ProjectJobSVImpl extends BaseMybatisSVImpl<ProjectJob, Long> implem
      * 5.获取模块信息
      * 6.获取版本控制管理信息
      *
-     * @param code 任务编码
+     * @param projectCode 项目编码
      */
     @Override
-    public void execute(String code) {
-        Map<String, Object> map = Maps.newHashMap();
-        map.put("code", code);
-        ProjectJob projectJob = projectJobDAO.load(map);
-        if (projectJob == null) {
-            logger.error(BaseException.BaseExceptionEnum.Result_Not_Exist.toString());
-            throw new ProjectJobException(BaseException.BaseExceptionEnum.Result_Not_Exist);
-        }
-        //1.创建项目
-        map.clear();
-        map.put("projectCode", projectJob.getProjectCode());
-        Project project = projectDAO.load(map);
-        String projectPath = this.buildProject(project);
-        project.setBuildNumber(project.getBuildNumber() == null ? 1 : project.getBuildNumber() + 1);
-        projectDAO.update(project);
-        logger.info("创建工作空间库完成");
+    public ProjectJob execute(String projectCode) {
+        //创建任务追踪
+        ProjectJob projectJob = new ProjectJob();
+        projectJob.setCode(String.valueOf(uidGenerator.getUID()));
+        projectJob.setProjectCode(projectCode);
+        projectJob.setState(ProjectJob.State.Executing.name());
+        projectJob.setNumber(1);
+        projectJob.setCreateTime(new Date());
+        projectJobDAO.insert(projectJob);
+        try {
+            //1.创建项目
+            Map<String, Object> map = Maps.newHashMap();
+            map.put("projectCode", projectCode);
+            Project project = projectDAO.load(map);
+            String projectPath = this.buildProject(project);
+            project.setBuildNumber(project.getBuildNumber() == null ? 1 : project.getBuildNumber() + 1);
+            projectDAO.update(project);
 
-        //2.获取类信息
-        List<ProjectMap> projectMapList = project.getProjectMapList();
-        List<MapClassTable> mapClassTableList = new ArrayList<>();
-        projectMapList.forEach(projectMap -> {
-            mapClassTableList.add(projectMap.getMapClassTable());
-        });
-        //3.获取模板信息
-        List<ProjectFramwork> projectFramworkList = project.getProjectFramworkList();
-        //4.生成源码
-        projectFramworkList.forEach(projectFramwork -> {
-            List<FrameworksTemplate> frameworksTemplateList = projectFramwork.getFrameworks().getFrameworksTemplateList();
-            frameworksTemplateList.forEach(frameworksTemplate -> {
-                projectMapList.forEach(projectMap -> {
-                    this.generator(projectPath, project, projectMap.getMapClassTable(), frameworksTemplate, mapClassTableList);
+            projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "创建工作空间库完成"));
+            logger.info("创建工作空间库完成");
+
+            //2.获取类信息
+            List<ProjectMap> projectMapList = project.getProjectMapList();
+            List<MapClassTable> mapClassTableList = new ArrayList<>();
+            projectMapList.forEach(projectMap -> {
+                mapClassTableList.add(projectMap.getMapClassTable());
+            });
+
+            projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "已经获取类信息"));
+
+            //3.获取模板信息
+            List<ProjectFramwork> projectFramworkList = project.getProjectFramworkList();
+
+            projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "已经获取模板信息"));
+
+            //4.生成源码
+            projectFramworkList.forEach(projectFramwork -> {
+                List<FrameworksTemplate> frameworksTemplateList = projectFramwork.getFrameworks().getFrameworksTemplateList();
+                frameworksTemplateList.forEach(frameworksTemplate -> {
+                    projectMapList.forEach(projectMap -> {
+                        this.generator(projectPath, project, projectMap.getMapClassTable(), frameworksTemplate, mapClassTableList);
+                    });
+                    projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "已经生成 模板" + frameworksTemplate.getPath() + "的相关源码"));
                 });
             });
-        });
 
-        //5.获取模块信息 TODO
+            //5.获取模块信息 TODO
 
-        //6.获取版本控制管理信息
-        map.clear();
-        map.put("projectCode", project.getCode());
-        ProjectRepositoryAccount projectRepositoryAccount = projectRepositoryAccountDAO.load(map);
-        GitTools.commitAndPush(new File(projectPath), projectRepositoryAccount.getAccount(), projectRepositoryAccount.getPassword(), "AI-Code 为您构建代码，享受智慧生活");
+            //6.获取版本控制管理信息
+            projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "获取代码仓库信息"));
+            map.clear();
+            map.put("projectCode", project.getCode());
+            ProjectRepositoryAccount projectRepositoryAccount = projectRepositoryAccountDAO.load(map);
+            projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "代码提交中......"));
+            GitTools.commitAndPush(new File(projectPath), projectRepositoryAccount.getAccount(), projectRepositoryAccount.getPassword(), "AI-Code 为您构建代码，享受智慧生活");
+            projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "代码代码提交完成"));
+            projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "AI-Code 为您构建代码，享受智慧生活!"));
+            projectJob.setState(ProjectJob.State.Completed.name());
+            projectJobDAO.update(projectJob);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            projectJob.setState(ProjectJob.State.Error.name());
+            projectJobDAO.update(projectJob);
+        }
+
+        return projectJob;
     }
 
     /**
@@ -249,5 +273,6 @@ public class ProjectJobSVImpl extends BaseMybatisSVImpl<ProjectJob, Long> implem
                 + "/" + frameworksTemplate.getPath();
 
         FreemarkerHelper.generate(templateData, targetFilePath, templatePath);
+
     }
 }

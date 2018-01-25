@@ -50,10 +50,10 @@
     <update id="ProjectJob.update" parameterType="ProjectJob">
         UPDATE `project_job`
         <trim prefix="set" suffixOverrides=",">
-            <if test="createTime!=null and createTime!=''">
+            <if test="createTime!=null ">
                 createTime = #{createTime} ,
             </if>
-            <if test="projectCode!=null and projectCode!=''">
+            <if test="projectCode!=null">
                 projectCode = #{projectCode} ,
             </if>
             <if test="number!=null and number!=''">
@@ -87,10 +87,10 @@
             <if test="code!=null and code!=''">
                 AND code = #{code}
             </if>
-            <if test="createTime!=null and createTime!=''">
+            <if test="createTime!=null ">
                 AND createTime = #{createTime}
             </if>
-            <if test="projectCode!=null and projectCode!=''">
+            <if test="projectCode!=null ">
                 AND projectCode = #{projectCode}
             </if>
             <if test="number!=null and number!=''">

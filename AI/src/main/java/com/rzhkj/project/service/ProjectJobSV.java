@@ -29,5 +29,5 @@ public interface ProjectJobSV extends BaseMybatisSV<ProjectJob, Long> {
      *
      * @param code 任务编码
      */
-    void execute(String code);
+    ProjectJob execute(String code);
 }

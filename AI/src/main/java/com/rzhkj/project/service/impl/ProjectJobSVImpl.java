@@ -9,6 +9,7 @@ package com.rzhkj.project.service.impl;
 import com.baidu.fsg.uid.UidGenerator;
 import com.google.common.collect.Maps;
 import com.rzhkj.base.core.FreemarkerHelper;
+import com.rzhkj.base.core.StringHelper;
 import com.rzhkj.core.base.BaseMybatisDAO;
 import com.rzhkj.core.base.BaseMybatisSVImpl;
 import com.rzhkj.core.enums.YNEnum;
@@ -234,7 +235,7 @@ public class ProjectJobSVImpl extends BaseMybatisSVImpl<ProjectJob, Long> implem
         model.put("classes", mapClassTableList);//类对象
         model.put("class", mapClassTable);//类对象
         model.put("className", mapClassTable.getClassName());//类名
-        model.put("classNameLower", mapClassTable.getClassName().toLowerCase());//类名小写
+        model.put("classNameLower", StringHelper.toJavaVariableName(mapClassTable.getClassName()));//类名小写
 
         model.put("columns", mapFieldColumnList);//列对象集合
         model.put("pkColumns", mapFieldColumnPks);//主键数据信息

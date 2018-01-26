@@ -17,6 +17,7 @@ import com.rzhkj.core.enums.YNEnum;
 import com.rzhkj.core.exceptions.BaseException;
 import com.rzhkj.core.exceptions.ProjectJobException;
 import com.rzhkj.core.tools.*;
+import com.rzhkj.core.tools.redis.RedisKey;
 import com.rzhkj.project.dao.*;
 import com.rzhkj.project.entity.*;
 import com.rzhkj.project.service.ProjectJobSV;
@@ -132,6 +133,14 @@ public class ProjectJobSVImpl extends BaseMybatisSVImpl<ProjectJob, Long> implem
      */
     @Override
     public ProjectJob execute(String projectCode) {
+        String execute = RedisKey.execute(projectCode);
+        if (redisUtils.hasKey(execute) && redisUtils.get(execute).toString().equals(projectCode)) {
+            throw new ProjectJobException(BaseException.BaseExceptionEnum.Build_Exist);
+        } else {
+            //缓存锁控制
+            redisUtils.set(execute, projectCode, 120/*120s控制*/);
+        }
+
         //创建任务追踪
         ProjectJob projectJob = new ProjectJob();
         projectJob.setCode(String.valueOf(uidGenerator.getUID()));

@@ -56,17 +56,8 @@ public class BaseException extends RuntimeException implements Serializable {
         Account_Error(9010, "There is Error of Account and Password."),
 
         //-----------------上传文件异常定义[9500~9599]--------------------------
-        UPLOAD_FAILED(9500, "Upload failed！"),
+        Build_Exist(9500, "build exist"),;
 
-        //-----------------Zoom异常定义[9600~9699]--------------------------
-        No_Free(9600, "No free resources of zoom"),
-
-        //-----------------Sproutvideo异常定义[9700~9799]--------------------------
-        //-----------------paypal异常定义[9800~9899]--------------------------
-
-        //-----------------notify异常定义[9900~9888]--------------------------
-        No_OpenId_Error(9900, "There is no tutor's openId error."),
-        No_TimeZone_Error(9901, "Tutor's timezone not setting error.");
 
 
         public int code;//错误编码

@@ -77,4 +77,14 @@ public class RedisKey {
     public static String WXMsgToken(String code) {
         return "Wechat:PushMsgAccessToken:" + code;
     }
+
+    /**
+     * 执行项目锁key
+     *
+     * @param projectCode 项目编码
+     * @return
+     */
+    public static String execute(String projectCode) {
+        return "execute:" + projectCode;
+    }
 }

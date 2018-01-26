@@ -5,11 +5,10 @@
 
 package com.rzhkj.project.service.impl;
 
-
+import com.alibaba.fastjson.JSON;
 import com.baidu.fsg.uid.UidGenerator;
 import com.google.common.collect.Maps;
 import com.rzhkj.base.core.FreemarkerHelper;
-import com.rzhkj.base.core.StringHelper;
 import com.rzhkj.base.core.TemplateData;
 import com.rzhkj.core.base.BaseMybatisDAO;
 import com.rzhkj.core.base.BaseMybatisSVImpl;
@@ -134,11 +133,9 @@ public class ProjectJobSVImpl extends BaseMybatisSVImpl<ProjectJob, Long> implem
     @Override
     public ProjectJob execute(String projectCode) {
         String execute = RedisKey.execute(projectCode);
-        if (redisUtils.hasKey(execute) && redisUtils.get(execute).toString().equals(projectCode)) {
-            throw new ProjectJobException(BaseException.BaseExceptionEnum.Build_Exist);
-        } else {
-            //缓存锁控制
-            redisUtils.set(execute, projectCode, 120/*120s控制*/);
+        if (redisUtils.hasKey(execute)) {
+            String json = redisUtils.get(execute).toString();
+            return JSON.parseObject(json, ProjectJob.class);
         }
 
         //创建任务追踪
@@ -148,11 +145,13 @@ public class ProjectJobSVImpl extends BaseMybatisSVImpl<ProjectJob, Long> implem
         projectJob.setState(ProjectJob.State.Executing.name());
         projectJob.setNumber(1);
         projectJob.setCreateTime(new Date());
+        projectJobDAO.insert(projectJob);
+        //缓存锁控制
+        redisUtils.set(execute, JSON.toJSONString(projectJob), 120/*120s控制*/);
 
         Executors.singleThreadExecutor(new Runnable() {
             @Override
             public void run() {
-                projectJobDAO.insert(projectJob);
                 try {
                     //1.创建项目
                     Map<String, Object> map = Maps.newHashMap();

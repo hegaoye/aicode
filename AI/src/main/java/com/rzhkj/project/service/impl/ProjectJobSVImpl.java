@@ -154,6 +154,7 @@ public class ProjectJobSVImpl extends BaseMybatisSVImpl<ProjectJob, Long> implem
             public void run() {
                 try {
                     //1.创建项目
+                    projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "Start By AI-Code"));
                     Map<String, Object> map = Maps.newHashMap();
                     map.put("projectCode", projectCode);
                     Project project = projectDAO.load(map);
@@ -198,7 +199,8 @@ public class ProjectJobSVImpl extends BaseMybatisSVImpl<ProjectJob, Long> implem
                     projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "代码提交中......"));
                     GitTools.commitAndPush(new File(projectPath), projectRepositoryAccount.getAccount(), projectRepositoryAccount.getPassword(), "AI-Code 为您构建代码，享受智慧生活");
                     projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "代码代码提交完成"));
-                    projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "AI-Code 为您构建代码，享受智慧生活!"));
+                    projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "End By AI-Code 为您构建代码，享受智慧生活!"));
+                    projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "End"));
                     projectJob.setState(ProjectJob.State.Completed.name());
                     projectJobDAO.update(projectJob);
                 } catch (Exception e) {

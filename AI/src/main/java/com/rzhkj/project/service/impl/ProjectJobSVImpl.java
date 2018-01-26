@@ -16,10 +16,7 @@ import com.rzhkj.core.base.BaseMybatisSVImpl;
 import com.rzhkj.core.enums.YNEnum;
 import com.rzhkj.core.exceptions.BaseException;
 import com.rzhkj.core.exceptions.ProjectJobException;
-import com.rzhkj.core.tools.FileUtil;
-import com.rzhkj.core.tools.GitTools;
-import com.rzhkj.core.tools.HandleFuncs;
-import com.rzhkj.core.tools.StringTools;
+import com.rzhkj.core.tools.*;
 import com.rzhkj.project.dao.*;
 import com.rzhkj.project.entity.*;
 import com.rzhkj.project.service.ProjectJobSV;
@@ -142,62 +139,67 @@ public class ProjectJobSVImpl extends BaseMybatisSVImpl<ProjectJob, Long> implem
         projectJob.setState(ProjectJob.State.Executing.name());
         projectJob.setNumber(1);
         projectJob.setCreateTime(new Date());
-        projectJobDAO.insert(projectJob);
-        try {
-            //1.创建项目
-            Map<String, Object> map = Maps.newHashMap();
-            map.put("projectCode", projectCode);
-            Project project = projectDAO.load(map);
-            String projectPath = this.buildProject(project);
-            projectDAO.update(projectCode, project.getBuildNumber() != null ? project.getBuildNumber() + 1 : 1);
 
-            projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "创建工作空间库完成"));
-            logger.info("创建工作空间库完成");
+        Executors.singleThreadExecutor(new Runnable() {
+            @Override
+            public void run() {
+                projectJobDAO.insert(projectJob);
+                try {
+                    //1.创建项目
+                    Map<String, Object> map = Maps.newHashMap();
+                    map.put("projectCode", projectCode);
+                    Project project = projectDAO.load(map);
+                    String projectPath = buildProject(project);
+                    projectDAO.update(projectCode, project.getBuildNumber() != null ? project.getBuildNumber() + 1 : 1);
 
-            //2.获取类信息
-            List<ProjectMap> projectMapList = project.getProjectMapList();
-            List<MapClassTable> mapClassTableList = new ArrayList<>();
-            projectMapList.forEach(projectMap -> {
-                mapClassTableList.add(projectMap.getMapClassTable());
-            });
+                    projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "创建工作空间库完成"));
+                    logger.info("创建工作空间库完成");
 
-            projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "已经获取类信息"));
-
-            //3.获取模板信息
-            List<ProjectFramwork> projectFramworkList = project.getProjectFramworkList();
-
-            projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "已经获取模板信息"));
-
-            //4.生成源码
-            projectFramworkList.forEach(projectFramwork -> {
-                List<FrameworksTemplate> frameworksTemplateList = projectFramwork.getFrameworks().getFrameworksTemplateList();
-                frameworksTemplateList.forEach(frameworksTemplate -> {
+                    //2.获取类信息
+                    List<ProjectMap> projectMapList = project.getProjectMapList();
+                    List<MapClassTable> mapClassTableList = new ArrayList<>();
                     projectMapList.forEach(projectMap -> {
-                        this.generator(projectPath, project, projectMap.getMapClassTable(), frameworksTemplate, mapClassTableList);
+                        mapClassTableList.add(projectMap.getMapClassTable());
                     });
-                    projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "已经生成 模板" + frameworksTemplate.getPath() + "的相关源码"));
-                });
-            });
 
-            //5.获取模块信息 TODO
+                    projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "已经获取类信息"));
 
-            //6.获取版本控制管理信息
-            projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "获取代码仓库信息"));
-            map.clear();
-            map.put("projectCode", project.getCode());
-            ProjectRepositoryAccount projectRepositoryAccount = projectRepositoryAccountDAO.load(map);
-            projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "代码提交中......"));
-            GitTools.commitAndPush(new File(projectPath), projectRepositoryAccount.getAccount(), projectRepositoryAccount.getPassword(), "AI-Code 为您构建代码，享受智慧生活");
-            projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "代码代码提交完成"));
-            projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "AI-Code 为您构建代码，享受智慧生活!"));
-            projectJob.setState(ProjectJob.State.Completed.name());
-            projectJobDAO.update(projectJob);
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-            projectJob.setState(ProjectJob.State.Error.name());
-            projectJobDAO.update(projectJob);
-        }
+                    //3.获取模板信息
+                    List<ProjectFramwork> projectFramworkList = project.getProjectFramworkList();
 
+                    projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "已经获取模板信息"));
+
+                    //4.生成源码
+                    projectFramworkList.forEach(projectFramwork -> {
+                        List<FrameworksTemplate> frameworksTemplateList = projectFramwork.getFrameworks().getFrameworksTemplateList();
+                        frameworksTemplateList.forEach(frameworksTemplate -> {
+                            projectMapList.forEach(projectMap -> {
+                                generator(projectPath, project, projectMap.getMapClassTable(), frameworksTemplate, mapClassTableList);
+                            });
+                            projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "已经生成 模板" + frameworksTemplate.getPath() + "的相关源码"));
+                        });
+                    });
+
+                    //5.获取模块信息 TODO
+
+                    //6.获取版本控制管理信息
+                    projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "获取代码仓库信息"));
+                    map.clear();
+                    map.put("projectCode", project.getCode());
+                    ProjectRepositoryAccount projectRepositoryAccount = projectRepositoryAccountDAO.load(map);
+                    projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "代码提交中......"));
+                    GitTools.commitAndPush(new File(projectPath), projectRepositoryAccount.getAccount(), projectRepositoryAccount.getPassword(), "AI-Code 为您构建代码，享受智慧生活");
+                    projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "代码代码提交完成"));
+                    projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "AI-Code 为您构建代码，享受智慧生活!"));
+                    projectJob.setState(ProjectJob.State.Completed.name());
+                    projectJobDAO.update(projectJob);
+                } catch (Exception e) {
+                    logger.error(e.getMessage());
+                    projectJob.setState(ProjectJob.State.Error.name());
+                    projectJobDAO.update(projectJob);
+                }
+            }
+        });
         return projectJob;
     }
 

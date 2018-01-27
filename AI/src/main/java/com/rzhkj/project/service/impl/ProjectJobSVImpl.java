@@ -185,7 +185,7 @@ public class ProjectJobSVImpl extends BaseMybatisSVImpl<ProjectJob, Long> implem
                             projectMapList.forEach(projectMap -> {
                                 generator(projectPath, project, projectMap.getMapClassTable(), frameworksTemplate, mapClassTableList);
                             });
-                            projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "已经生成 模板" + frameworksTemplate.getPath() + "的相关源码"));
+                            projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "[<span style='color:green;'>✔</span>" + DateTools.yyyyMMddHHmmss(new Date()) + "] [已经生成] 模板 " + frameworksTemplate.getPath() + " 的相关源码"));
                         });
                     });
 
@@ -196,10 +196,10 @@ public class ProjectJobSVImpl extends BaseMybatisSVImpl<ProjectJob, Long> implem
                     map.clear();
                     map.put("projectCode", project.getCode());
                     ProjectRepositoryAccount projectRepositoryAccount = projectRepositoryAccountDAO.load(map);
-                    projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "代码向仓库 ===> " + projectRepositoryAccount.getHome() + " 提交中......"));
+                    projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "代码向仓库 ⇛⇛⇛ <a style='text-decoration:underline;' href='" + projectRepositoryAccount.getHome() + "' target='_blank'>" + projectRepositoryAccount.getHome() + " 提交中......"));
                     GitTools.commitAndPush(new File(projectPath), projectRepositoryAccount.getAccount(), projectRepositoryAccount.getPassword(), "AI-Code 为您构建代码，享受智慧生活");
                     projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "代码代码提交完成"));
-                    projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "End By AI-Code 为您构建代码，享受智慧生活!"));
+                    projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "End By <span style='color:green;'>☺</span> AI-Code 为您构建代码，享受智慧生活!"));
                     projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "End"));
                     projectJob.setState(ProjectJob.State.Completed.name());
                     projectJobDAO.update(projectJob);

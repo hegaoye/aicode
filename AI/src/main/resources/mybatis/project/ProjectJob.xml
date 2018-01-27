@@ -115,9 +115,7 @@
         FROM `project_job`
         <include refid="ProjectJob.where"/>
 
-        <if test="sortColumns!=null and sortColumns!=''">
-            ORDER BY ${sortColumns}
-        </if>
+        ORDER BY createTime DESC
     </select>
 
 

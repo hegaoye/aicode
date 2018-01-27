@@ -7,6 +7,8 @@ import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,6 +19,7 @@ import java.util.Set;
  * Created by liuyang on 2017/12/27.
  */
 public class GitTools {
+    protected final static Logger logger = LoggerFactory.getLogger(GitTools.class);
 
     /**
      * 创建仓库
@@ -334,7 +337,7 @@ public class GitTools {
         boolean ret = false;
         File repoGitDir = getGitAbsolutePath(repoDir);
         if (!repoGitDir.exists()) {
-            System.out.println("仓库不存在");
+            logger.info("仓库不存在");
             return false;
         } else {
             Repository repository = null;

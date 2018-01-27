@@ -196,7 +196,7 @@ public class ProjectJobSVImpl extends BaseMybatisSVImpl<ProjectJob, Long> implem
                     map.clear();
                     map.put("projectCode", project.getCode());
                     ProjectRepositoryAccount projectRepositoryAccount = projectRepositoryAccountDAO.load(map);
-                    projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "代码提交中......"));
+                    projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "代码向仓库 ===> " + projectRepositoryAccount.getHome() + " 提交中......"));
                     GitTools.commitAndPush(new File(projectPath), projectRepositoryAccount.getAccount(), projectRepositoryAccount.getPassword(), "AI-Code 为您构建代码，享受智慧生活");
                     projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "代码代码提交完成"));
                     projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "End By AI-Code 为您构建代码，享受智慧生活!"));

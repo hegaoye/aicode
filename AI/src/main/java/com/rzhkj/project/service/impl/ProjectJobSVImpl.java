@@ -132,12 +132,6 @@ public class ProjectJobSVImpl extends BaseMybatisSVImpl<ProjectJob, Long> implem
      */
     @Override
     public ProjectJob execute(String projectCode) {
-        String execute = RedisKey.execute(projectCode);
-        if (redisUtils.hasKey(execute)) {
-            String json = redisUtils.get(execute).toString();
-            return JSON.parseObject(json, ProjectJob.class);
-        }
-
         //创建任务追踪
         ProjectJob projectJob = new ProjectJob();
         projectJob.setCode(String.valueOf(uidGenerator.getUID()));
@@ -146,8 +140,6 @@ public class ProjectJobSVImpl extends BaseMybatisSVImpl<ProjectJob, Long> implem
         projectJob.setNumber(1);
         projectJob.setCreateTime(new Date());
         projectJobDAO.insert(projectJob);
-        //缓存锁控制
-        redisUtils.set(execute, JSON.toJSONString(projectJob), 120/*120s控制*/);
 
         Executors.singleThreadExecutor(new Runnable() {
             @Override

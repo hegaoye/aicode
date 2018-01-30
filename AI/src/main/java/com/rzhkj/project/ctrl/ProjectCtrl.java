@@ -124,7 +124,6 @@ public class ProjectCtrl extends BaseCtrl {
             Assert.hasText(project.getBasePackage(), BaseException.BaseExceptionEnum.Empty_Param.toString());
             Assert.hasText(project.getCopyright(), BaseException.BaseExceptionEnum.Empty_Param.toString());
             Assert.hasText(project.getDatabaseType(), BaseException.BaseExceptionEnum.Empty_Param.toString());
-            Assert.hasText(project.getDescription(), BaseException.BaseExceptionEnum.Empty_Param.toString());
             Assert.hasText(project.getPhone(), BaseException.BaseExceptionEnum.Empty_Param.toString());
             Assert.hasText(project.getLanguage(), BaseException.BaseExceptionEnum.Empty_Param.toString());
 

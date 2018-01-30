@@ -228,4 +228,14 @@ public class ProjectCtrl extends BaseCtrl {
         }
     }
 
+    /**
+     * 进入首页
+     *
+     * @return index页面
+     */
+    @RequestMapping("/index")
+    public String index() {
+        return "/index";
+    }
+
 }

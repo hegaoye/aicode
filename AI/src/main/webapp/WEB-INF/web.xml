@@ -55,7 +55,7 @@
 
     <servlet-mapping>
         <servlet-name>springMVC</servlet-name>
-        <url-pattern>/</url-pattern>
+        <url-pattern>*.shtml</url-pattern>
     </servlet-mapping>
 
 

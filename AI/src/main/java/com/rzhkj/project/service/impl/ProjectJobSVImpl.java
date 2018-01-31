@@ -5,7 +5,6 @@
 
 package com.rzhkj.project.service.impl;
 
-import com.alibaba.fastjson.JSON;
 import com.baidu.fsg.uid.UidGenerator;
 import com.google.common.collect.Maps;
 import com.rzhkj.base.core.FreemarkerHelper;
@@ -16,7 +15,6 @@ import com.rzhkj.core.enums.YNEnum;
 import com.rzhkj.core.exceptions.BaseException;
 import com.rzhkj.core.exceptions.ProjectJobException;
 import com.rzhkj.core.tools.*;
-import com.rzhkj.core.tools.redis.RedisKey;
 import com.rzhkj.project.dao.*;
 import com.rzhkj.project.entity.*;
 import com.rzhkj.project.service.ProjectJobSV;
@@ -284,14 +282,18 @@ public class ProjectJobSVImpl extends BaseMybatisSVImpl<ProjectJob, Long> implem
                 + "/" + settingTemplatePath.getV()
                 + "/" + frameworksTemplate.getPath();
 
-        if (!templatePath.contains(".jar")) {
-            FreemarkerHelper.generate(templateData, targetFilePath, templatePath);
-        } else {
-            try {
-                FileUtils.copyFileToDirectory(new File(templatePath), new File(targetFilePath.substring(0, targetFilePath.lastIndexOf("/"))));
-            } catch (IOException e) {
-                e.printStackTrace();
+        if (new File(templatePath).exists()) {
+            if (!templatePath.contains(".jar")) {
+                FreemarkerHelper.generate(templateData, targetFilePath, templatePath);
+            } else {
+                try {
+                    FileUtils.copyFileToDirectory(new File(templatePath), new File(targetFilePath.substring(0, targetFilePath.lastIndexOf("/"))));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
+        } else {
+            logger.error("文件不存在 ===> " + templatePath);
         }
 
     }

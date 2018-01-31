@@ -54,18 +54,12 @@ public class ProjectCtrl extends BaseCtrl {
     @GetMapping(value = "/load")
     @ResponseBody
     public BeanRet load(String code) {
-        try {
-            Assert.hasText(code, BaseException.BaseExceptionEnum.Empty_Param.toString());
-            Map<String, Object> map = new HashedMap();
-            map.put("code", code);
-            Project project = projectSV.load(map);
-            logger.info(JSON.toJSONString(project));
-            return BeanRet.create(true, "查询一个详情信息", project);
-        } catch (Exception e) {
-            e.printStackTrace();
-            logger.error(e.getMessage());
-            return BeanRet.create("未查到需要的内容");
-        }
+        Assert.hasText(code, BaseException.BaseExceptionEnum.Empty_Param.toString());
+        Map<String, Object> map = new HashedMap();
+        map.put("code", code);
+        Project project = projectSV.load(map);
+        logger.info(JSON.toJSONString(project));
+        return BeanRet.create(true, "查询一个详情信息", project);
     }
 
 
@@ -82,19 +76,12 @@ public class ProjectCtrl extends BaseCtrl {
     @GetMapping(value = "/list")
     @ResponseBody
     public BeanRet list(@ApiIgnore Page<Project> page) {
-        try {
-            Assert.notNull(page, BaseException.BaseExceptionEnum.Empty_Param.toString());
-            page = projectSV.getList(page);
-            int count = projectSV.count(new HashedMap());
-            page.setTotalRow(count);
-
-            logger.info(JSON.toJSONString(page));
-            return BeanRet.create(true, "", page);
-        } catch (Exception e) {
-            e.printStackTrace();
-            logger.error(e.getMessage());
-            return BeanRet.create("未查到需要的内容");
-        }
+        Assert.notNull(page, BaseException.BaseExceptionEnum.Empty_Param.toString());
+        page = projectSV.getList(page);
+        int count = projectSV.count(new HashedMap());
+        page.setTotalRow(count);
+        logger.info(JSON.toJSONString(page));
+        return BeanRet.create(true, "", page);
     }
 
     /**
@@ -117,23 +104,16 @@ public class ProjectCtrl extends BaseCtrl {
     @PostMapping("/build")
     @ResponseBody
     public BeanRet build(@ApiIgnore Project project) {
-        try {
-            Assert.hasText(project.getName(), BaseException.BaseExceptionEnum.Empty_Param.toString());
-            Assert.hasText(project.getEnglishName(), BaseException.BaseExceptionEnum.Empty_Param.toString());
-            Assert.hasText(project.getAuthor(), BaseException.BaseExceptionEnum.Empty_Param.toString());
-            Assert.hasText(project.getBasePackage(), BaseException.BaseExceptionEnum.Empty_Param.toString());
-            Assert.hasText(project.getCopyright(), BaseException.BaseExceptionEnum.Empty_Param.toString());
-            Assert.hasText(project.getDatabaseType(), BaseException.BaseExceptionEnum.Empty_Param.toString());
-            Assert.hasText(project.getPhone(), BaseException.BaseExceptionEnum.Empty_Param.toString());
-            Assert.hasText(project.getLanguage(), BaseException.BaseExceptionEnum.Empty_Param.toString());
-
-            projectSV.build(project);
-            return BeanRet.create(true, "创建项目成功", project);
-        } catch (Exception e) {
-            e.printStackTrace();
-            logger.error(e.getMessage());
-            return BeanRet.create(false, "创建项目失败");
-        }
+        Assert.hasText(project.getName(), BaseException.BaseExceptionEnum.Empty_Param.toString());
+        Assert.hasText(project.getEnglishName(), BaseException.BaseExceptionEnum.Empty_Param.toString());
+        Assert.hasText(project.getAuthor(), BaseException.BaseExceptionEnum.Empty_Param.toString());
+        Assert.hasText(project.getBasePackage(), BaseException.BaseExceptionEnum.Empty_Param.toString());
+        Assert.hasText(project.getCopyright(), BaseException.BaseExceptionEnum.Empty_Param.toString());
+        Assert.hasText(project.getDatabaseType(), BaseException.BaseExceptionEnum.Empty_Param.toString());
+        Assert.hasText(project.getPhone(), BaseException.BaseExceptionEnum.Empty_Param.toString());
+        Assert.hasText(project.getLanguage(), BaseException.BaseExceptionEnum.Empty_Param.toString());
+        projectSV.build(project);
+        return BeanRet.create(true, "创建项目成功", project);
     }
 
 
@@ -159,23 +139,23 @@ public class ProjectCtrl extends BaseCtrl {
     @PutMapping("/modify")
     @ResponseBody
     public BeanRet modify(@ApiIgnore Project project) {
-        try {
-            Assert.hasText(project.getCode(), BaseException.BaseExceptionEnum.Empty_Param.toString());
-            if (project.getCode() != null) {
-                Map<String, Object> map = Maps.newHashMap();
-                map.put("code", project.getCode());
-                Project projectLoad = projectSV.load(map);
-                if (projectLoad != null) {
-                    project.setId(projectLoad.getId());
-                }
-                projectSV.saveOrUpdate(project);
+        Assert.hasText(project.getCode(), BaseException.BaseExceptionEnum.Empty_Param.toString());
+        if (project.getCode() != null) {
+            Map<String, Object> map = Maps.newHashMap();
+            map.put("code", project.getCode());
+            Project projectLoad = projectSV.load(map);
+            if (projectLoad != null) {
+                project.setId(projectLoad.getId());
             }
-            return BeanRet.create(true, "修改项目成功", project);
-        } catch (Exception e) {
-            e.printStackTrace();
-            logger.error(e.getMessage());
-            return BeanRet.create(false, "修改项目失败");
+            map.clear();
+            map.put("englishName", project.getEnglishName());
+            projectLoad = projectSV.load(map);
+            if (projectLoad != null && !projectLoad.getCode().equals(project.getCode())) {
+                return BeanRet.create(false, "修改项目失败,已经存在相同名称");
+            }
+            projectSV.saveOrUpdate(project);
         }
+        return BeanRet.create(true, "修改项目成功", project);
     }
 
     /**
@@ -190,16 +170,9 @@ public class ProjectCtrl extends BaseCtrl {
     @DeleteMapping("/delete")
     @ResponseBody
     public BeanRet delete(String code) {
-        try {
-            Assert.hasText(code, BaseException.BaseExceptionEnum.Empty_Param.toString());
-
-            projectSV.delete(code);
-            return BeanRet.create(true, "修改项目成功");
-        } catch (Exception e) {
-            e.printStackTrace();
-            logger.error(e.getMessage());
-            return BeanRet.create(false, "修改项目失败");
-        }
+        Assert.hasText(code, BaseException.BaseExceptionEnum.Empty_Param.toString());
+        projectSV.delete(code);
+        return BeanRet.create(true, "修改项目成功");
     }
 
 
@@ -215,16 +188,9 @@ public class ProjectCtrl extends BaseCtrl {
     @PutMapping("/init")
     @ResponseBody
     public BeanRet init(String code) {
-        try {
-            Assert.hasText(code, BaseException.BaseExceptionEnum.Empty_Param.toString());
-
-            projectSV.execute(code);
-            return BeanRet.create(true, "执行脚本成功");
-        } catch (Exception e) {
-            e.printStackTrace();
-            logger.error(e.getMessage());
-            return BeanRet.create(false, "执行脚本失败");
-        }
+        Assert.hasText(code, BaseException.BaseExceptionEnum.Empty_Param.toString());
+        projectSV.execute(code);
+        return BeanRet.create(true, "执行脚本成功");
     }
 
     /**
@@ -232,7 +198,7 @@ public class ProjectCtrl extends BaseCtrl {
      *
      * @return index页面
      */
-    @RequestMapping("/index")
+    @GetMapping(value = "/index")
     public String index() {
         return "/index";
     }

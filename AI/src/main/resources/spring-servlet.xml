@@ -159,7 +159,6 @@
         <mvc:interceptor>
             <mvc:mapping path="/**/**"/>
             <mvc:exclude-mapping path="/swagger-resources/**"/>
-            <mvc:exclude-mapping path="/hooks/**"/>
             <bean class="com.rzhkj.core.interceptor.ContextInterceptor">
             </bean>
         </mvc:interceptor>

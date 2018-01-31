@@ -51,6 +51,8 @@ public class ProjectSVImpl extends BaseMybatisSVImpl<Project, Long> implements P
     @Resource
     private MapFieldColumnDAO mapFieldColumnDAO;
     @Resource
+    private MapRelationshipDAO mapRelationshipDAO;
+    @Resource
     private ProjectMapDAO projectMapDAO;
     @Resource
     private UidGenerator uidGenerator;
@@ -86,6 +88,13 @@ public class ProjectSVImpl extends BaseMybatisSVImpl<Project, Long> implements P
                 ) {
             logger.error(BaseException.BaseExceptionEnum.Empty_Param.toString());
             throw new ProjectException(BaseException.BaseExceptionEnum.Empty_Param);
+        }
+        Map<String, Object> map = Maps.newHashMap();
+        map.put("englishName", project.getEnglishName());
+        Project projectLoad = projectDAO.load(map);
+        if (projectLoad != null) {
+            logger.error(BaseException.BaseExceptionEnum.Exists.toString());
+            throw new ProjectException(BaseException.BaseExceptionEnum.Exists);
         }
 
         //2.设定默认参数
@@ -225,6 +234,15 @@ public class ProjectSVImpl extends BaseMybatisSVImpl<Project, Long> implements P
             logger.error(BaseException.BaseExceptionEnum.Result_Not_Exist.toString());
             throw new ProjectException(BaseException.BaseExceptionEnum.Result_Not_Exist);
         }
+        List<ProjectMap> projectMapList = project.getProjectMapList();
+        for (ProjectMap projectMap : projectMapList) {
+            mapClassTableDAO.delete(projectMap.getMapClassTableCode());
+            mapFieldColumnDAO.delete(projectMap.getMapClassTableCode());
+            mapRelationshipDAO.delete(projectMap.getMapClassTableCode());
+        }
+        map.clear();
+        map.put("projectCode", code);
+        projectMapDAO.delete(map);
 
         //2.查询数据库信息
         map.clear();

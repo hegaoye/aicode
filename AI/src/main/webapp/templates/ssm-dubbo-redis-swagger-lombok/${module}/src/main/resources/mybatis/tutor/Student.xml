@@ -1,0 +1,330 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<mapper namespace="Student">
+
+    <resultMap id="rs_base" type="Student">
+        <result property="id" column="id"/>
+        <result property="userId" column="userId"/>
+        <result property="studentCode" column="studentCode"/>
+        <result property="lastName" column="lastName"/>
+        <result property="firstName" column="firstName"/>
+        <result property="age" column="age"/>
+        <result property="email" column="email"/>
+        <result property="password" column="password"/>
+        <result property="sex" column="sex"/>
+        <result property="avatar" column="avatar"/>
+        <result property="introduction" column="introduction"/>
+        <result property="nativeLanguage" column="nativeLanguage"/>
+        <result property="countryCode" column="countryCode"/>
+        <result property="timeZone" column="timeZone"/>
+        <result property="type" column="type"/>
+        <result property="state" column="state"/>
+        <result property="chineseLevel" column="chineseLevel"/>
+        <result property="studyType" column="studyType"/>
+        <result property="assessmentSummary" column="assessmentSummary"/>
+        <result property="createTime" column="createTime"/>
+        <result property="updateTime" column="updateTime"/>
+    </resultMap>
+
+    <!--查看学生的课时-->
+    <resultMap id="rs_base_hour" type="Student" extends="rs_base">
+        <association property="courseHour" column="{studentCode=studentCode}" select="CourseHour.load"/>
+        <association property="courseHourStage" column="{studentCode=studentCode}" select="CourseHourStage.load"/>
+        <association property="courseHourShareStudent" column="{acceptStudentCode=studentCode}" select="CourseHourShareStudent.load"/>
+        <association property="courseHourShare" column="{studentCode=studentCode}" select="CourseHourShare.load"/>
+        <collection property="courseHourShares" column="{studentCode=studentCode}" select="CourseHourShare.query"/>
+    </resultMap>
+
+    <!--查看学生的所有信息(包含：收藏的老师集合，课时，共享课时，阶段课时)-->
+    <resultMap id="rs_base_all" type="Student" extends="rs_base">
+        <association property="courseHour" column="{studentCode=studentCode}" select="CourseHour.load"/>
+        <association property="courseHourStage" column="{studentCode=studentCode}" select="CourseHourStage.load"/>
+        <association property="courseHourShareStudent" column="{acceptStudentCode=studentCode}" select="CourseHourShareStudent.load"/>
+        <association property="courseHourShare" column="{studentCode=studentCode}" select="CourseHourShare.load"/>
+        <collection property="tutorFavorites" column="{studentCode=studentCode}" select="TutorFavorite.query"/>
+    </resultMap>
+
+    <resultMap id="rs_base_all4classroom" type="Student" extends="rs_base">
+        <collection property="classrooms" column="{studentCode=studentCode,states=states}" select="Classroom.query4Student"/>
+    </resultMap>
+
+
+    <!-- 用于select查询公用抽取的列 -->
+    <sql id="Student.columns">
+		id,userId,studentCode,lastName,firstName,age,email,password,sex,avatar,introduction,nativeLanguage,countryCode,timeZone,type,state,chineseLevel,studyType,assessmentSummary,createTime,updateTime
+	</sql>
+
+    <insert id="Student.insert" useGeneratedKeys="true" keyProperty="id" parameterType="Student">
+        INSERT INTO Student (
+        id ,
+        userId ,
+        studentCode ,
+        lastName ,
+        firstName ,
+        age ,
+        email ,
+        password ,
+        sex ,
+        avatar ,
+        introduction ,
+        nativeLanguage ,
+        countryCode ,
+        timeZone ,
+        `type` ,
+        state ,
+        chineseLevel,
+        studyType,
+        assessmentSummary,
+        createTime ,
+        updateTime
+        ) VALUES (
+        #{id} ,
+        #{userId} ,
+        #{studentCode} ,
+        #{lastName} ,
+        #{firstName} ,
+        #{age} ,
+        #{email} ,
+        #{password} ,
+        #{sex} ,
+        #{avatar} ,
+        #{introduction} ,
+        #{nativeLanguage} ,
+        #{countryCode} ,
+        #{timeZone} ,
+        #{type} ,
+        #{state} ,
+        #{chineseLevel} ,
+        #{studyType} ,
+        #{assessmentSummary} ,
+        #{createTime} ,
+        #{updateTime}
+        )
+        <selectKey keyProperty="id" resultType="long">
+            select LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+
+    <update id="Student.update" parameterType="Student">
+        UPDATE Student
+        <trim prefix="set" suffixOverrides=",">
+            <if test="studentCode!=null and studentCode!=''">
+                studentCode = #{studentCode} ,
+            </if>
+            <if test="userId!=null and userId!=''">
+                userId = #{userId} ,
+            </if>
+            <if test="lastName!=null and lastName!=''">
+                lastName = #{lastName} ,
+            </if>
+            <if test="firstName!=null and firstName!=''">
+                firstName = #{firstName} ,
+            </if>
+            <if test="age!=null and age!=''">
+                age = #{age} ,
+            </if>
+            <if test="email!=null and email!=''">
+                email = #{email} ,
+            </if>
+            <if test="password!=null and password!=''">
+                password = #{password} ,
+            </if>
+            <if test="sex!=null and sex!=''">
+                sex = #{sex} ,
+            </if>
+            <if test="avatar!=null and avatar!=''">
+                avatar = #{avatar} ,
+            </if>
+            <if test="introduction!=null and introduction!=''">
+                introduction = #{introduction} ,
+            </if>
+            <if test="nativeLanguage!=null and nativeLanguage!=''">
+                nativeLanguage = #{nativeLanguage} ,
+            </if>
+            <if test="countryCode!=null and countryCode!=''">
+                countryCode = #{countryCode} ,
+            </if>
+            <if test="timeZone!=null and timeZone!=''">
+                timeZone = #{timeZone} ,
+            </if>
+            <if test="type!=null and type!=''">
+                `type` = #{type} ,
+            </if>
+            <if test="state!=null and state!=''">
+                state = #{state} ,
+            </if>
+            <if test="chineseLevel!=null and chineseLevel!=''">
+                chineseLevel = #{chineseLevel} ,
+            </if>
+            <if test="studyType!=null and studyType!=''">
+                studyType = #{studyType} ,
+            </if>
+            <if test="assessmentSummary!=null and assessmentSummary!=''">
+                assessmentSummary = #{assessmentSummary} ,
+            </if>
+            <if test="createTime!=null ">
+                createTime = #{createTime} ,
+            </if>
+            <if test="updateTime!=null ">
+                updateTime = #{updateTime}
+            </if>
+        </trim>
+
+        WHERE
+        studentCode = #{studentCode}
+    </update>
+
+    <delete id="Student.delete">
+        DELETE FROM Student WHERE
+        id = #{id} 
+    </delete>
+
+    <select id="Student.load" resultMap="rs_base">
+        SELECT
+        <include refid="Student.columns"/>
+        FROM Student
+        <include refid="Student.where"/>
+    </select>
+
+    <sql id="Student.where">
+        <where>
+            <if test="id!=null and id!=''">
+                AND id = #{id}
+            </if>
+            <if test="userId!=null and userId!=''">
+                AND userId = #{userId}
+            </if>
+            <if test="studentCode!=null and studentCode!=''">
+                AND studentCode = #{studentCode}
+            </if>
+            <if test="lastName!=null and lastName!=''">
+                AND lastName = #{lastName}
+            </if>
+            <if test="firstName!=null and firstName!=''">
+                AND firstName = #{firstName}
+            </if>
+            <if test="age!=null and age!=''">
+                AND age = #{age}
+            </if>
+            <if test="email!=null and email!=''">
+                AND email = #{email}
+            </if>
+            <if test="password!=null and password!=''">
+                AND password = #{password}
+            </if>
+            <if test="sex!=null and sex!=''">
+                AND sex = #{sex}
+            </if>
+            <if test="avatar!=null and avatar!=''">
+                AND avatar = #{avatar}
+            </if>
+            <if test="introduction!=null and introduction!=''">
+                AND introduction = #{introduction}
+            </if>
+            <if test="nativeLanguage!=null and nativeLanguage!=''">
+                AND nativeLanguage = #{nativeLanguage}
+            </if>
+            <if test="countryCode!=null and countryCode!=''">
+                AND countryCode = #{countryCode}
+            </if>
+            <if test="timeZone!=null and timeZone!=''">
+                AND timeZone = #{timeZone}
+            </if>
+            <if test="type!=null and type!=''">
+                AND `type` = #{type}
+            </if>
+            <if test="state!=null and state!=''">
+                AND state = #{state}
+            </if>
+            <if test="studyType!=null and studyType!=''">
+                AND studyType = #{studyType}
+            </if>
+            <if test="assessmentSummary!=null and assessmentSummary!=''">
+                AND assessmentSummary = #{assessmentSummary}
+            </if>
+            <if test="chineseLevel!=null and chineseLevel!=''">
+                AND chineseLevel = #{chineseLevel}
+            </if>
+            <if test="createTimeBegin!=null ">
+                AND createTime >= #{createTimeBegin}
+            </if>
+            <if test="createTimeEnd!=null ">
+                AND createTime &lt;= #{createTimeEnd}
+            </if>
+            <if test="updateTimeBegin!=null ">
+                AND updateTime >= #{updateTimeBegin}
+            </if>
+            <if test="updateTimeEnd!=null ">
+                AND updateTime &lt;= #{updateTimeEnd}
+            </if>
+            <if test="name!=null ">
+                AND
+                (
+                firstName like CONCAT('%','${name}','%' )
+                or lastName like CONCAT('%','${name}','%' )
+                )
+            </if>
+            <if test="likeEmail!=null ">
+                AND email like CONCAT('%','${likeEmail}','%' )
+            </if>
+
+        </where>
+    </sql>
+
+
+    <select id="Student.count" resultType="int">
+        SELECT count(1) FROM Student
+        <include refid="Student.where"/>
+    </select>
+
+
+    <select id="Student.query" resultMap="rs_base">
+        SELECT
+        <include refid="Student.columns"/>
+        FROM Student
+        <include refid="Student.where"/>
+        ORDER BY studentCode DESC
+    </select>
+
+
+    <!--查看学生的课时-->
+    <select id="Student.loadStudentHour" resultMap="rs_base_hour">
+        SELECT
+        <include refid="Student.columns"/>
+        FROM Student
+        WHERE
+        studentCode = #{studentCode}
+    </select>
+
+    <!--查看学生的所有信息(包含：收藏的老师集合，课时，共享课时，阶段课时)-->
+    <select id="Student.loadStudentDetail" resultMap="rs_base_all">
+        SELECT
+        <include refid="Student.columns"/>
+        FROM Student
+        WHERE
+        studentCode = #{studentCode}
+    </select>
+
+
+    <!--加载一个学生（包含，课堂信息，评语信息，选课信息,留言信息）-->
+    <select id="Student.loadAll4Classroom" resultMap="rs_base_all4classroom">
+        select *,
+        <foreach collection="states" item="state_in" index="index" open="(" close=")" separator=",">
+            #{state_in}
+        </foreach>
+        as states
+        from Student where studentCode=#{studentCode}
+    </select>
+
+    <!--查询企业列表-->
+    <select id="Student.enterpriseList" resultMap="rs_base_all">
+        select * from Student
+        <include refid="Student.where"/>
+    </select>
+
+</mapper>
+

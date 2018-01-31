@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~  Copyright (c) 2017. 郑州仁中和科技有限公司.保留所有权利.
+  ~                        http://www.rzhkj.com/
+  ~        郑州仁中和科技有限公司保留所有代码著作权.如有任何疑问请访问官方网站与我们联系.
+  ~        代码只针对特定客户使用，不得在未经允许或授权的情况下对外传播扩散.恶意传播者，法律后果自行承担.
+  ~        本代码仅用于龐帝業務系统.
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- Count: 统计对象-->
+<mapper namespace="Count">
+    <resultMap id="countClassroomGroupByCourseTime_base" type="Count">
+        <result property="month" column="month"/>
+        <result property="num" column="num"/>
+    </resultMap>
+
+    <resultMap id="countOrderGroupByState_base" type="Count">
+        <result property="state" column="state"/>
+        <result property="num" column="num"/>
+    </resultMap>
+
+    <!--统计最近六个月，每个月的课程数（绘制图表）-->
+    <select id="countClassroomGroupByCourseTime" parameterType="map" resultMap="countClassroomGroupByCourseTime_base">
+        select DATE_FORMAT(courseTime,'%Y-%m') month, count(1) num from `Classroom`
+        <where>
+            <if test="qst!=null ">and courseTime >#{qst}</if>
+            <if test="qend!=null ">and courseTime &lt;=#{qend}</if>
+            <if test="state!=null and state!=''">
+                and state in
+                <foreach collection="states" item="state_in" index="index" open="(" close=")" separator=",">
+                    #{state_in}
+                </foreach>
+            </if>
+        </where>
+        GROUP BY DATE_FORMAT(courseTime,'%Y-%m')
+    </select>
+
+
+    <!--按照状态分组统计贷款单数量-->
+    <select id="countOrderGroupByState" parameterType="map" resultMap="countOrderGroupByState_base">
+        select state,count(1) num from `Order`
+        GROUP BY state
+    </select>
+
+    <!--根据订单状态数组统计总数-->
+    <select id="countOrderreByState" parameterType="map" resultType="int">
+        select count(1) from `Order`
+        <where>
+            <if test="states!=null and states!=''">
+                and state in
+                <foreach collection="states" item="state_in" index="index" open="(" close=")" separator=",">
+                    #{state_in}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+    <!--统计老师针对课程的上课数-->
+    <select id="countTutorCourseClassroomTotal" parameterType="map" resultType="int">
+       SELECT count(1)
+        FROM
+            Classroom cr,
+            Course c,
+            course_timetable ct,
+            classroom_tutor ctt
+        WHERE
+            cr.timetableCode = ct.timetableCode
+        AND c.courseCode = ct.courseCode
+        AND cr.classroomCode = ctt.classroomCode
+        AND ctt.tutorCode = #{tutorCode}
+        AND c.courseCode = #{courseCode}
+
+    </select>
+
+    <!--统计老师针对课程的上课数-->
+    <select id="countTutorClassroomTotal" parameterType="map" resultType="int">
+       SELECT count(1)
+       FROM
+            classroom_tutor
+       WHERE
+            tutorCode = #{tutorCode}
+
+    </select>
+
+    <!--统计老师针对课程的评论数-->
+    <select id="countTutorCourseFeedbackTotal" parameterType="map" resultType="int">
+        SELECT
+            count(1)
+        FROM
+            Classroom classroom,
+            classroom_feedback feedback,
+            Course course,
+            course_timetable timetable,
+            classroom_tutor tutor
+        WHERE
+            classroom.timetableCode = timetable.timetableCode
+        AND feedback.classroomCode=classroom.classroomCode
+        AND course.courseCode = timetable.courseCode
+        AND feedback.classroomCode = tutor.classroomCode
+        AND tutor.tutorCode = #{tutorCode}
+        AND course.courseCode = #{courseCode}
+
+    </select>
+
+    <!--统计老师针对课程的评论数-->
+    <select id="countTutorFeedbackTotal" parameterType="map" resultType="int">
+        SELECT
+            count(1)
+        FROM
+            classroom_feedback
+        WHERE
+            tutorCode = #{tutorCode}
+
+    </select>
+
+    <!--统计老师被收藏数-->
+    <select id="countTutorFavoriteTotal" parameterType="map" resultType="int">
+        SELECT
+	       count(1)
+        FROM
+         Tutor tutor,
+         tutor_favorite favorite
+        WHERE
+        favorite.tutorCode=tutor.tutorCode
+        AND tutor.tutorCode = #{tutorCode}
+
+    </select>
+
+    <!--统计学生课时-->
+    <select id="countStudentCourseHourYearTotal" parameterType="map" resultType="int">
+        SELECT
+	       sum(courseHour)
+        FROM course_hour
+        WHERE
+        studentCode=#{studentCode}
+    </select>
+
+    <!--统计学生课时-->
+    <select id="countStudentCourseHourStageTotal" parameterType="map" resultType="int">
+        SELECT
+	       sum(courseHour)
+        FROM course_hour_stage
+        WHERE
+        studentCode=#{studentCode}
+    </select>
+
+    <!--统计学生课时-->
+    <select id="countStudentCourseHourEnterpriseTotal" parameterType="map" resultType="int">
+        SELECT
+	       (upperLimit-usedHours)
+        FROM course_hour_share_student
+        WHERE
+        acceptStudentCode=#{acceptStudentCode}
+    </select>
+
+</mapper>

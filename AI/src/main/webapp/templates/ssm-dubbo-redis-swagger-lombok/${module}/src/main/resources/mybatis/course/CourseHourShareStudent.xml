@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<mapper namespace="CourseHourShareStudent">
+
+    <resultMap id="rs_base" type="CourseHourShareStudent">
+        <result property="id" column="id"/>
+        <result property="courseHourCode" column="courseHourCode"/>
+        <result property="sharedStudentCode" column="sharedStudentCode"/>
+        <result property="sharedStudentName" column="sharedStudentName"/>
+        <result property="sharedStudentEmail" column="sharedStudentEmail"/>
+        <result property="acceptStudentCode" column="acceptStudentCode"/>
+        <result property="acceptStudentName" column="acceptStudentName"/>
+        <result property="acceptStudentEmail" column="acceptStudentEmail"/>
+        <result property="usedHours" column="usedHours"/>
+        <result property="upperLimit" column="upperLimit"/>
+        <result property="state" column="state"/>
+    </resultMap>
+
+
+    <!--所有信息-->
+    <resultMap id="rs_base_all" type="CourseHourShareStudent" extends="rs_base">
+        <association property="courseHourShare" column="{courseHourCode=courseHourCode}" select="CourseHourShare.load"/>
+        <collection property="student" column="{studentCode=acceptStudentCode}" select="Student.load"/>
+    </resultMap>
+    <resultMap id="rs_base_all4load" type="CourseHourShareStudent" extends="rs_base">
+        <association property="courseHourShare" column="{courseHourCode=courseHourCode}" select="CourseHourShare.load"/>
+    </resultMap>
+
+    <!--查询企业下学生列表-->
+    <resultMap id="rs_base_all4CourseHourShare" type="CourseHourShareStudent" extends="rs_base">
+        <collection property="student" column="{studentCode=acceptStudentCode}" select="Student.load"/>
+    </resultMap>
+
+
+    <!-- 用于select查询公用抽取的列 -->
+    <sql id="CourseHourShareStudent.columns">
+		id,courseHourCode,sharedStudentCode,sharedStudentName,sharedStudentEmail,acceptStudentCode,acceptStudentName,acceptStudentEmail,usedHours,upperLimit,state
+	</sql>
+
+    <insert id="CourseHourShareStudent.insert" useGeneratedKeys="true" keyProperty="id" parameterType="CourseHourShareStudent">
+        INSERT INTO course_hour_share_student (
+        id ,
+        courseHourCode ,
+        sharedStudentCode ,
+        sharedStudentName ,
+        sharedStudentEmail ,
+        acceptStudentCode ,
+        acceptStudentName ,
+        acceptStudentEmail ,
+        usedHours ,
+        upperLimit ,
+        state
+        ) VALUES (
+        #{id} ,
+        #{courseHourCode} ,
+        #{sharedStudentCode} ,
+        #{sharedStudentName} ,
+        #{sharedStudentEmail} ,
+        #{acceptStudentCode} ,
+        #{acceptStudentName} ,
+        #{acceptStudentEmail} ,
+        #{usedHours} ,
+        #{upperLimit} ,
+        #{state}
+        )
+        <selectKey keyProperty="id" resultType="long">
+            select LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+
+    <update id="CourseHourShareStudent.update" parameterType="CourseHourShareStudent">
+        UPDATE course_hour_share_student
+        <trim prefix="set" suffixOverrides=",">
+            <if test="sharedStudentCode!=null and sharedStudentCode!=''">
+                sharedStudentCode = #{sharedStudentCode} ,
+            </if>
+            <if test="sharedStudentName!=null and sharedStudentName!=''">
+                sharedStudentName = #{sharedStudentName} ,
+            </if>
+            <if test="sharedStudentEmail!=null and sharedStudentEmail!=''">
+                sharedStudentEmail = #{sharedStudentEmail} ,
+            </if>
+            <if test="acceptStudentCode!=null and acceptStudentCode!=''">
+                acceptStudentCode = #{acceptStudentCode} ,
+            </if>
+
+            <if test="acceptStudentName!=null and acceptStudentName!=''">
+                acceptStudentName = #{acceptStudentName} ,
+            </if>
+            <if test="acceptStudentEmail!=null and acceptStudentEmail!=''">
+                acceptStudentEmail = #{acceptStudentEmail} ,
+            </if>
+            <if test="usedHours!=null and usedHours!=''">
+                usedHours = #{usedHours} ,
+            </if>
+            <if test="upperLimit!=null and upperLimit!=''">
+                upperLimit = #{upperLimit} ,
+            </if>
+            <if test="state!=null and state!=''">
+                state = #{state},
+            </if>
+        </trim>
+
+        <where>
+            <if test="id!=null and id!=''">
+                AND id = #{id}
+            </if>
+            <if test="courseHourCode!=null and courseHourCode!=''">
+                AND courseHourCode = #{courseHourCode}
+            </if>
+            <if test="sharedStudentCode!=null and sharedStudentCode!=''">
+                AND sharedStudentCode = #{sharedStudentCode}
+            </if>
+
+            <if test="sharedStudentEmail!=null and sharedStudentEmail!=''">
+                AND sharedStudentEmail = #{sharedStudentEmail}
+            </if>
+            <if test="acceptStudentCode!=null and acceptStudentCode!=''">
+                AND acceptStudentCode = #{acceptStudentCode}
+            </if>
+
+            <if test="acceptStudentEmail!=null and acceptStudentEmail!=''">
+                AND acceptStudentEmail = #{acceptStudentEmail}
+            </if>
+        </where>
+    </update>
+
+    <delete id="CourseHourShareStudent.delete">
+        DELETE FROM course_hour_share_student
+        <where>
+            <if test="id!=null and id!=''">
+                AND id = #{id}
+            </if>
+            <if test="courseHourCode!=null and courseHourCode!=''">
+                AND courseHourCode = #{courseHourCode}
+            </if>
+            <if test="sharedStudentCode!=null and sharedStudentCode!=''">
+                AND sharedStudentCode = #{sharedStudentCode}
+            </if>
+            <if test="sharedStudentEmail!=null and sharedStudentEmail!=''">
+                AND sharedStudentEmail = #{sharedStudentEmail}
+            </if>
+            <if test="acceptStudentCode!=null and acceptStudentCode!=''">
+                AND acceptStudentCode = #{acceptStudentCode}
+            </if>
+            <if test="acceptStudentEmail!=null and acceptStudentEmail!=''">
+                AND acceptStudentEmail = #{acceptStudentEmail}
+            </if>
+        </where>
+    </delete>
+
+    <select id="CourseHourShareStudent.load" resultMap="rs_base_all4load">
+        SELECT
+        <include refid="CourseHourShareStudent.columns"/>
+        FROM course_hour_share_student
+        <include refid="CourseHourShareStudent.where"/>
+    </select>
+
+    <sql id="CourseHourShareStudent.where">
+        <where>
+            <if test="id!=null and id!=''">
+                AND id = #{id}
+            </if>
+            <if test="courseHourCode!=null and courseHourCode!=''">
+                AND courseHourCode = #{courseHourCode}
+            </if>
+            <if test="sharedStudentCode!=null and sharedStudentCode!=''">
+                AND sharedStudentCode = #{sharedStudentCode}
+            </if>
+            <if test="sharedStudentName!=null and sharedStudentName!=''">
+                AND sharedStudentName = #{sharedStudentName}
+            </if>
+            <if test="sharedStudentEmail!=null and sharedStudentEmail!=''">
+                AND sharedStudentEmail = #{sharedStudentEmail}
+            </if>
+            <if test="acceptStudentCode!=null and acceptStudentCode!=''">
+                AND acceptStudentCode = #{acceptStudentCode}
+            </if>
+            <if test="acceptStudentName!=null and acceptStudentName!=''">
+                AND acceptStudentName = #{acceptStudentName}
+            </if>
+            <if test="acceptStudentEmail!=null and acceptStudentEmail!=''">
+                AND acceptStudentEmail = #{acceptStudentEmail}
+            </if>
+            <if test="usedHours!=null and usedHours!=''">
+                AND usedHours = #{usedHours}
+            </if>
+            <if test="upperLimit!=null and upperLimit!=''">
+                AND upperLimit = #{upperLimit}
+            </if>
+            <if test="state!=null and state!=''">
+                AND state = #{state}
+            </if>
+        </where>
+    </sql>
+
+
+    <select id="CourseHourShareStudent.count" resultType="int">
+        SELECT count(1) FROM course_hour_share_student
+        <include refid="CourseHourShareStudent.where"/>
+    </select>
+
+
+    <select id="CourseHourShareStudent.query" resultMap="rs_base_all">
+        SELECT
+        <include refid="CourseHourShareStudent.columns"/>
+        FROM course_hour_share_student
+        <include refid="CourseHourShareStudent.where"/>
+
+        <if test="sortColumns!=null and sortColumns!=''">
+            ORDER BY ${sortColumns}
+        </if>
+    </select>
+
+    <select id="CourseHourShareStudent.queryAll" resultMap="rs_base_all4CourseHourShare">
+        SELECT
+        <include refid="CourseHourShareStudent.columns"/>
+        FROM course_hour_share_student
+        <include refid="CourseHourShareStudent.where"/>
+
+        <if test="sortColumns!=null and sortColumns!=''">
+            ORDER BY ${sortColumns}
+        </if>
+    </select>
+
+    <!--查询一个可用的课时记录-->
+    <select id="CourseHourShareStudent.loadBystudentCode" resultMap="rs_base_all">
+    	SELECT * FROM course_hour_share_student where sharedStudentCode=#{sharedStudentCode} AND state=#{state}
+    </select>
+
+
+    <!--关闭所有分享学生-->
+    <update id="CourseHourShareStudent.updateCourseHourShareStudent" parameterType="CourseHourShareStudent">
+        UPDATE course_hour_share_student SET
+        state = #{state}
+        WHERE
+        courseHourCode = #{courseHourCode}
+    </update>
+
+    <!--增加已用课时-->
+    <update id="CourseHourShareStudent.addUsedCourseHour" parameterType="CourseHourShareStudent">
+        UPDATE course_hour_share_student SET
+        usedHours = usedHours + #{usedHours}
+        WHERE
+        acceptStudentCode = #{acceptStudentCode}
+        AND state=#{state}
+    </update>
+
+</mapper>
+

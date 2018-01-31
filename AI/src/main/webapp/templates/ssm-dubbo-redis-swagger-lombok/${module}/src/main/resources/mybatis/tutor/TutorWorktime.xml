@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~  Copyright (c) 2017. 郑州仁中和科技有限公司.保留所有权利.
+  ~                        http://www.rzhkj.com/
+  ~        郑州仁中和科技有限公司保留所有代码著作权.如有任何疑问请访问官方网站与我们联系.
+  ~        代码只针对特定客户使用，不得在未经允许或授权的情况下对外传播扩散.恶意传播者，法律后果自行承担.
+  ~        本代码仅用于龐帝業務系统.
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<mapper namespace="TutorWorktime">
+
+    <resultMap id="rs_base" type="TutorWorktime">
+        <result property="id" column="id"/>
+        <result property="worktimeCode" column="worktimeCode"/>
+        <result property="tutorCode" column="tutorCode"/>
+        <result property="week" column="week"/>
+        <result property="startTime" column="startTime"/>
+        <result property="endTime" column="endTime"/>
+        <result property="state" column="state"/>
+    </resultMap>
+
+    <!-- 用于select查询公用抽取的列 -->
+    <sql id="TutorWorktime.columns">
+		id,worktimeCode,tutorCode,week,startTime,endTime,state
+	</sql>
+
+    <insert id="TutorWorktime.insert" useGeneratedKeys="true" keyProperty="id" parameterType="TutorWorktime">
+        INSERT INTO `tutor_worktime` (
+        id ,
+        worktimeCode ,
+        tutorCode ,
+        week ,
+        startTime ,
+        endTime ,
+        state
+        ) VALUES (
+        #{id} ,
+        #{worktimeCode} ,
+        #{tutorCode} ,
+        #{week} ,
+        #{startTime} ,
+        #{endTime} ,
+        #{state}
+        )
+        <selectKey keyProperty="id" resultType="long">
+            select LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+
+    <update id="TutorWorktime.update" parameterType="TutorWorktime">
+
+        UPDATE `tutor_worktime`
+
+        <trim prefix="set" suffixOverrides=",">
+            <if test="worktimeCode!=null and worktimeCode!=''">
+                worktimeCode = #{worktimeCode} ,
+            </if>
+            <if test="tutorCode!=null and tutorCode!=''">
+                tutorCode = #{tutorCode} ,
+            </if>
+            <if test="week!=null and week!=''">
+                week = #{week} ,
+            </if>
+            <if test="startTime!=null and startTime!=''">
+                startTime = #{startTime} ,
+            </if>
+            <if test="endTime!=null and endTime!=''">
+                endTime = #{endTime} ,
+            </if>
+            <if test="state!=null and state!=''">
+                state = #{state}
+            </if>
+        </trim>
+
+        WHERE
+        id = #{id}
+    </update>
+
+    <!--删除老师的工作时间-->
+    <delete id="TutorWorktime.delete">
+        DELETE FROM `tutor_worktime`
+        WHERE
+        <if test="worktimeCodes!=null and worktimeCodes!=''">
+            worktimeCode in
+            <foreach collection="worktimeCodes" item="worktimeCode_in" index="index" open="(" close=")" separator=",">
+                #{worktimeCode_in}
+            </foreach>
+        </if>
+    </delete>
+
+    <select id="TutorWorktime.load" resultMap="rs_base">
+        SELECT
+        <include refid="TutorWorktime.columns"/>
+        FROM `tutor_worktime`
+        WHERE
+        worktimeCode = #{worktimeCode}
+    </select>
+
+    <sql id="TutorWorktime.where">
+        <where>
+            <if test="worktimeCode!=null and worktimeCode!=''">
+                AND worktimeCode = #{worktimeCode}
+            </if>
+            <if test="tutorCode!=null and tutorCode!=''">
+                AND tutorCode = #{tutorCode}
+            </if>
+            <if test="week!=null and week!=''">
+                AND week = #{week}
+            </if>
+            <if test="startTimeBegin!=null ">
+                AND startTime >= #{startTimeBegin}
+            </if>
+            <if test="startTimeEnd!=null ">
+                AND startTime &lt;= #{startTimeEnd}
+            </if>
+            <if test="endTimeBegin!=null ">
+                AND endTime >= #{endTimeBegin}
+            </if>
+            <if test="endTimeEnd!=null ">
+                AND endTime &lt;= #{endTimeEnd}
+            </if>
+            <if test="state!=null and state!=''">
+                AND state = #{state}
+            </if>
+        </where>
+    </sql>
+
+
+    <select id="TutorWorktime.count" resultType="long">
+        SELECT count(*) FROM `tutor_worktime`
+        <include refid="TutorWorktime.where"/>
+    </select>
+
+
+    <select id="TutorWorktime.query" resultMap="rs_base">
+        SELECT
+        <include refid="TutorWorktime.columns"/>
+        FROM `tutor_worktime`
+        <include refid="TutorWorktime.where"/>
+
+        <if test="sortColumns!=null and sortColumns!=''">
+            ORDER BY ${sortColumns}
+        </if>
+    </select>
+
+
+</mapper>
+

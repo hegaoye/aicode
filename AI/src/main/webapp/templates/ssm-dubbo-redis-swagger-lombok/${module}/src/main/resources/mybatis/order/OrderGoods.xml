@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<mapper namespace="OrderGoods">
+
+    <resultMap id="rs_base" type="OrderGoods">
+        <result property="id" column="id"/>
+        <result property="orderNo" column="orderNo"/>
+        <result property="goodsCode" column="goodsCode"/>
+        <result property="goodsName" column="goodsName"/>
+        <result property="goodsPrice" column="goodsPrice"/>
+        <result property="goodsRealPrice" column="goodsRealPrice"/>
+        <result property="goodsNum" column="goodsNum"/>
+        <result property="goodsImage" column="goodsImage"/>
+        <result property="goodsType" column="goodsType"/>
+        <result property="courseHour" column="courseHour"/>
+        <result property="courseHourType" column="courseHourType"/>
+        <result property="validityPeriod" column="validityPeriod"/>
+        <result property="validityPeriodStartTime" column="validityPeriodStartTime"/>
+        <result property="validityPeriodEndTime" column="validityPeriodEndTime"/>
+    </resultMap>
+
+
+    <!--所有信息-->
+    <resultMap id="rs_base_all" type="OrderGoods" extends="rs_base">
+        <association property="goods" column="{goodsCode=goodsCode}" select="Goods.load"/>
+    </resultMap>
+
+    <!-- 用于select查询公用抽取的列 -->
+    <sql id="OrderGoods.columns">
+		id,orderNo,goodsCode,goodsName,goodsPrice,goodsRealPrice,goodsNum,goodsImage,goodsType,courseHour,courseHourType,validityPeriod,validityPeriodStartTime,validityPeriodEndTime
+	</sql>
+
+    <insert id="OrderGoods.insert" useGeneratedKeys="true" keyProperty="id" parameterType="OrderGoods">
+        INSERT INTO order_goods (
+        id ,
+        orderNo ,
+        goodsCode ,
+        goodsName ,
+        goodsPrice ,
+        goodsRealPrice ,
+        goodsNum ,
+        goodsImage ,
+        goodsType ,
+        courseHour ,
+        courseHourType ,
+        validityPeriod ,
+        validityPeriodStartTime ,
+        validityPeriodEndTime
+        ) VALUES (
+        #{id} ,
+        #{orderNo} ,
+        #{goodsCode} ,
+        #{goodsName} ,
+        #{goodsPrice} ,
+        #{goodsRealPrice} ,
+        #{goodsNum} ,
+        #{goodsImage} ,
+        #{goodsType} ,
+        #{courseHour} ,
+        #{courseHourType} ,
+        #{validityPeriod} ,
+        #{validityPeriodStartTime} ,
+        #{validityPeriodEndTime}
+        )
+        <selectKey keyProperty="id" resultType="long">
+            select LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+
+    <update id="OrderGoods.update" parameterType="OrderGoods">
+
+        UPDATE order_goods
+
+        <trim prefix="set" suffixOverrides=",">
+            <if test="goodsName!=null and goodsName!=''">
+                goodsName = #{goodsName} ,
+            </if>
+            <if test="goodsPrice!=null and goodsPrice!=''">
+                goodsPrice = #{goodsPrice} ,
+            </if>
+            <if test="goodsRealPrice!=null and goodsRealPrice!=''">
+                goodsRealPrice = #{goodsRealPrice} ,
+            </if>
+            <if test="goodsNum!=null and goodsNum!=''">
+                goodsNum = #{goodsNum} ,
+            </if>
+            <if test="goodsImage!=null and goodsImage!=''">
+                goodsImage = #{goodsImage} ,
+            </if>
+            <if test="goodsType!=null and goodsType!=''">
+                goodsType = #{goodsType} ,
+            </if>
+            <if test="courseHour!=null ">
+                courseHour = #{courseHour} ,
+            </if>
+            <if test="courseHourType!=null and courseHourType!=''">
+                courseHourType = #{courseHourType} ,
+            </if>
+            <if test="validityPeriod!=null and validityPeriod!=''">
+                validityPeriod = #{validityPeriod} ,
+            </if>
+            <if test="validityPeriodStartTime!=null ">
+                validityPeriodStartTime = #{validityPeriodStartTime} ,
+            </if>
+            <if test="validityPeriodEndTime!=null ">
+                validityPeriodEndTime = #{validityPeriodEndTime}
+            </if>
+        </trim>
+
+        WHERE
+        orderNo = #{orderNo} AND
+        goodsCode = #{goodsCode}
+    </update>
+
+    <delete id="OrderGoods.delete">
+        DELETE FROM order_goods WHERE
+        orderNo = #{orderNo}  AND
+        goodsCode = #{goodsCode}
+    </delete>
+
+    <select id="OrderGoods.load" resultMap="rs_base">
+        SELECT
+        <include refid="OrderGoods.columns"/>
+        FROM order_goods
+        <include refid="OrderGoods.where"/>
+    </select>
+
+    <sql id="OrderGoods.where">
+        <where>
+            <if test="id!=null and id!=''">
+                AND id = #{id}
+            </if>
+            <if test="orderNo!=null and orderNo!=''">
+                AND orderNo = #{orderNo}
+            </if>
+            <if test="goodsCode!=null and goodsCode!=''">
+                AND goodsCode = #{goodsCode}
+            </if>
+            <if test="goodsName!=null and goodsName!=''">
+                AND goodsName = #{goodsName}
+            </if>
+            <if test="goodsPrice!=null and goodsPrice!=''">
+                AND goodsPrice = #{goodsPrice}
+            </if>
+            <if test="goodsRealPrice!=null and goodsRealPrice!=''">
+                AND goodsRealPrice = #{goodsRealPrice}
+            </if>
+            <if test="goodsNum!=null and goodsNum!=''">
+                AND goodsNum = #{goodsNum}
+            </if>
+            <if test="goodsImage!=null and goodsImage!=''">
+                AND goodsImage = #{goodsImage}
+            </if>
+            <if test="goodsType!=null and goodsType!=''">
+                AND goodsType = #{goodsType}
+            </if>
+            <if test="courseHour!=null ">
+                AND courseHour = #{courseHour}
+            </if>
+            <if test="courseHourType!=null and courseHourType!=''">
+                AND courseHourType = #{courseHourType}
+            </if>
+            <if test="validityPeriod!=null and validityPeriod!=''">
+                AND validityPeriod = #{validityPeriod}
+            </if>
+            <if test="validityPeriodStartTimeBegin!=null ">
+                AND validityPeriodStartTime >= #{validityPeriodStartTimeBegin}
+            </if>
+            <if test="validityPeriodStartTimeEnd!=null ">
+                AND validityPeriodStartTime &lt;= #{validityPeriodStartTimeEnd}
+            </if>
+            <if test="validityPeriodEndTimeBegin!=null ">
+                AND validityPeriodEndTime >= #{validityPeriodEndTimeBegin}
+            </if>
+            <if test="validityPeriodEndTimeEnd!=null ">
+                AND validityPeriodEndTime &lt;= #{validityPeriodEndTimeEnd}
+            </if>
+        </where>
+    </sql>
+
+
+    <select id="OrderGoods.count" resultType="long">
+        SELECT count(1) FROM order_goods
+        <include refid="OrderGoods.where"/>
+    </select>
+
+
+    <select id="OrderGoods.query" resultMap="rs_base_all">
+        SELECT
+        <include refid="OrderGoods.columns"/>
+        FROM order_goods
+        <include refid="OrderGoods.where"/>
+        ORDER BY goodsCode DESC
+    </select>
+
+
+</mapper>
+

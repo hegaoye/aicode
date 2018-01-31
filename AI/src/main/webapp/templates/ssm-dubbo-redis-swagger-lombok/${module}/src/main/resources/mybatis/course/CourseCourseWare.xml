@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<mapper namespace="CourseCourseWare">
+
+	<resultMap id="rs_base" type="CourseCourseWare">
+        <result property="id" column="id"/>
+        <result property="courseCode" column="courseCode"/>
+        <result property="coursewareCode" column="coursewareCode"/>
+	</resultMap>
+
+
+	<!--所有信息-->
+	<resultMap id="rs_base_all" type="CourseCourseWare" extends="rs_base">
+		<collection property="courseWare" column="{coursewareCode=coursewareCode}" select="CourseWare.load"/>
+	</resultMap>
+
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="CourseCourseWare.columns">
+		id,courseCode,coursewareCode
+	</sql>
+
+	<insert id="CourseCourseWare.insert" useGeneratedKeys="true" keyProperty="id" parameterType="CourseCourseWare">
+        INSERT INTO `course_course_ware` (
+        	id ,
+        	courseCode ,
+        	coursewareCode 
+        ) VALUES (
+        	#{id} ,
+        	#{courseCode} ,
+        	#{coursewareCode} 
+        )
+		<selectKey keyProperty="id" resultType="long">
+			select LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+
+	<update id="CourseCourseWare.update" parameterType="CourseCourseWare">
+        UPDATE `course_course_ware`
+		<trim prefix="set" suffixOverrides=",">
+			<if test="courseCode!=null and courseCode!=''">
+	        courseCode = #{courseCode} ,
+		    </if>
+			<if test="coursewareCode!=null and coursewareCode!=''">
+	        coursewareCode = #{coursewareCode} 
+		    </if>
+		</trim>
+        WHERE
+	        id = #{id} 
+	</update>
+
+    <delete id="CourseCourseWare.delete">
+        DELETE FROM `course_course_ware`
+		<include refid="CourseCourseWare.where"/>
+    </delete>
+
+    <select id="CourseCourseWare.load" resultMap="rs_base_all">
+		SELECT <include refid="CourseCourseWare.columns" />
+		    FROM `course_course_ware`
+		<include refid="CourseCourseWare.where"/>
+	</select>
+
+	<sql id="CourseCourseWare.where">
+		<where>
+			<if test="courseCode!=null and courseCode!=''">
+				AND courseCode = #{courseCode}
+			</if>
+			<if test="coursewareCode!=null and coursewareCode!=''">
+				AND coursewareCode = #{coursewareCode}
+			</if>
+		</where>
+	</sql>
+
+
+
+    <select id="CourseCourseWare.count" resultType="long">
+        SELECT count(*) FROM `course_course_ware`
+		<include refid="CourseCourseWare.where"/>
+    </select>
+
+
+    <select id="CourseCourseWare.query" resultMap="rs_base_all">
+    	SELECT <include refid="CourseCourseWare.columns" />
+	    FROM `course_course_ware`
+		<include refid="CourseCourseWare.where"/>
+
+		<if test="sortColumns!=null and sortColumns!=''">
+			ORDER BY ${sortColumns}
+		</if>
+    </select>
+
+
+</mapper>
+

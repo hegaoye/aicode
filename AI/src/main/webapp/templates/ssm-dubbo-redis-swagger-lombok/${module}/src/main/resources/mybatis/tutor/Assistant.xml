@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<mapper namespace="Assistant">
+
+    <resultMap id="rs_base" type="Assistant">
+        <result property="id" column="id"/>
+        <result property="assistantCode" column="assistantCode"/>
+        <result property="name" column="name"/>
+        <result property="avatar" column="avatar"/>
+        <result property="email" column="email"/>
+        <result property="phone" column="phone"/>
+        <result property="password" column="password"/>
+        <result property="state" column="state"/>
+        <result property="manageState" column="manageState"/>
+        <result property="timeZone" column="timeZone"/>
+        <result property="createTime" column="createTime"/>
+        <result property="updateTime" column="updateTime"/>
+    </resultMap>
+
+
+    <!--所有信息-->
+    <resultMap id="rs_base_all" type="Assistant" extends="rs_base">
+        <collection property="courseHourTraces" column="{optCode=assistantCode}" select="CourseHourTrace.query"/>
+        <collection property="classrooms" column="{assistantCode=assistantCode}" select="Classroom.query"/>
+        <collection property="assistantTutorses" column="{assistantCode=assistantCode,state=assistantTutorsState}" select="AssistantTutors.query"/>
+    </resultMap>
+
+    <!-- 用于select查询公用抽取的列 -->
+    <sql id="Assistant.columns">
+		id,assistantCode,name,avatar,email,phone,password,state,manageState,timeZone,createTime,updateTime
+	</sql>
+
+    <insert id="Assistant.insert" useGeneratedKeys="true" keyProperty="id" parameterType="Assistant">
+        INSERT INTO Assistant (
+        id ,
+        assistantCode ,
+        name ,
+        avatar ,
+        email ,
+        phone ,
+        password ,
+        state ,
+        manageState ,
+        timeZone ,
+        createTime ,
+        updateTime
+        ) VALUES (
+        #{id} ,
+        #{assistantCode} ,
+        #{name} ,
+        #{avatar} ,
+        #{email} ,
+        #{phone} ,
+        #{password} ,
+        #{state} ,
+        #{manageState} ,
+        #{timeZone} ,
+        #{createTime} ,
+        #{updateTime}
+        )
+        <selectKey keyProperty="id" resultType="long">
+            select LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+
+    <update id="Assistant.update" parameterType="Assistant">
+        UPDATE Assistant
+        <trim prefix="set" suffixOverrides=",">
+            <if test="name!=null and name!=''">
+                name = #{name} ,
+            </if>
+            <if test="email!=null and email!=''">
+                email = #{email} ,
+            </if>
+            <if test="avatar!=null and avatar!=''">
+                avatar = #{avatar} ,
+            </if>
+            <if test="phone!=null and phone!=''">
+                phone = #{phone} ,
+            </if>
+            <if test="password!=null and password!=''">
+                password = #{password} ,
+            </if>
+            <if test="state!=null and state!=''">
+                state = #{state},
+            </if>
+            <if test="manageState!=null and manageState!=''">
+                manageState = #{manageState} ,
+            </if>
+            <if test="timeZone!=null and timeZone!=''">
+                timeZone = #{timeZone} ,
+            </if>
+            <if test="updateTime!=null ">
+                updateTime= #{updateTime} ,
+            </if>
+        </trim>
+
+        WHERE
+        assistantCode = #{assistantCode}
+
+    </update>
+
+    <delete id="Assistant.delete">
+        DELETE FROM Assistant WHERE
+        id = #{id}  AND 
+        assistantCode = #{id} 
+    </delete>
+
+    <select id="Assistant.load" resultMap="rs_base">
+        SELECT
+        <include refid="Assistant.columns"/>
+        FROM Assistant
+
+        <include refid="Assistant.where"/>
+    </select>
+
+    <sql id="Assistant.where">
+        <where>
+            <if test="id!=null and id!=''">
+                AND id = #{id}
+            </if>
+            <if test="assistantCode!=null and assistantCode!=''">
+                AND assistantCode = #{assistantCode}
+            </if>
+            <if test="name!=null and name!=''">
+                AND name = #{name}
+            </if>
+            <if test="email!=null and email!=''">
+                AND email = #{email}
+            </if>
+            <if test="avatar!=null and avatar!=''">
+                AND avatar = #{avatar}
+            </if>
+            <if test="phone!=null and phone!=''">
+                AND phone = #{phone}
+            </if>
+            <if test="password!=null and password!=''">
+                AND password = #{password}
+            </if>
+            <if test="state!=null and state!=''">
+                AND state = #{state}
+            </if>
+            <if test="manageState!=null and manageState!=''">
+                AND manageState = #{manageState}
+            </if>
+            <if test="timeZone!=null and timeZone!=''">
+                AND timeZone = #{timeZone}
+            </if>
+            <if test="createTimeBegin!=null ">
+                AND createTime >= #{createTimeBegin}
+            </if>
+            <if test="createTimeEnd!=null ">
+                AND createTime &lt;= #{createTimeEnd}
+            </if>
+            <if test="updateTimeBegin!=null ">
+                AND updateTime >= #{updateTimeBegin}
+            </if>
+            <if test="updateTimeEnd!=null ">
+                AND updateTime &lt;= #{updateTimeEnd}
+            </if>
+        </where>
+    </sql>
+
+
+    <select id="Assistant.count" resultType="int">
+        SELECT count(1) FROM Assistant
+        <include refid="Assistant.where"/>
+    </select>
+
+
+    <select id="Assistant.query" resultMap="rs_base">
+        SELECT
+        <include refid="Assistant.columns"/>
+        FROM Assistant
+        <include refid="Assistant.where"/>
+
+        <if test="sortColumns!=null and sortColumns!=''">
+            ORDER BY ${sortColumns}
+        </if>
+    </select>
+
+    <!--查询助教信息-->
+    <select id="Assistant.loadAssistantByTutor" resultMap="rs_base">
+		SELECT 	a.*  FROM Assistant a,assistant_tutors t
+	    WHERE
+	    a.assistantCode=t.assistantCode
+	    AND t.tutorCode=#{tutorCode}
+	    AND t.state=#{state}
+
+	</select>
+
+    <!--查询一个助教所有信息（包含：课时追踪集合，课堂集合，助教的老师集合）-->
+    <select id="Assistant.loadAssistantDetail" resultMap="rs_base_all">
+        SELECT
+        <include refid="Assistant.columns"/>
+        , #{assistantTutors.state} as assistantTutorsState
+        FROM Assistant
+        WHERE
+        assistantCode = #{assistantCode}
+    </select>
+
+
+</mapper>
+

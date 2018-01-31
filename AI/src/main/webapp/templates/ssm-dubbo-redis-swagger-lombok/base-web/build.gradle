@@ -1,0 +1,56 @@
+apply plugin: 'java'
+
+dependencies {
+    //------------spring begin----------------
+    compile rootProject.ext.dependencies["aspectjweaver"]
+    compile rootProject.ext.dependencies["spring-core"]
+    compile rootProject.ext.dependencies["spring-aop"]
+    compile rootProject.ext.dependencies["spring-aspects"]
+    compile rootProject.ext.dependencies["spring-beans"]
+    compile rootProject.ext.dependencies["spring-context"]
+    compile rootProject.ext.dependencies["spring-expression"]
+    compile rootProject.ext.dependencies["spring-jdbc"]
+    compile rootProject.ext.dependencies["spring-jms"]
+    compile rootProject.ext.dependencies["spring-orm"]
+    compile rootProject.ext.dependencies["spring-oxm"]
+    compile rootProject.ext.dependencies["spring-test"]
+    compile rootProject.ext.dependencies["spring-tx"]
+    compile rootProject.ext.dependencies["spring-web"]
+    compile rootProject.ext.dependencies["spring-webmvc"]
+    compile rootProject.ext.dependencies["spring-webmvc-portlet"]
+    //------------spring end----------------
+
+
+    compile rootProject.ext.dependencies["commons-net"]
+
+
+    compile rootProject.ext.dependencies["httpclient"]
+
+    compile rootProject.ext.dependencies["jackson-core"]
+    compile rootProject.ext.dependencies["jackson-core-asl"]
+    compile rootProject.ext.dependencies["jackson-databind"]
+    compile rootProject.ext.dependencies["jackson-annotations"]
+    compile rootProject.ext.dependencies["jackson-jaxrs-base"]
+    compile rootProject.ext.dependencies["jackson-jaxrs-json-provider"]
+    compile rootProject.ext.dependencies["jackson-module-jaxb-annotations"]
+    compile rootProject.ext.dependencies["jackson-mapper-asl"]
+
+    // ----------jwt Nimbus JOSE+JWT begin----------
+    compile rootProject.ext.dependencies["java-jwt"]
+    //----------jwt Nimbus JOSE+JWT end------------
+
+    //-----------jsch ssh start--------------
+    compile rootProject.ext.dependencies["jsch"]
+    //-----------jsch ssh end--------------
+
+    //------------swagger start-------------------
+    compile rootProject.ext.dependencies["swagger2"]
+    compile rootProject.ext.dependencies["swagger-ui"]
+    //------------swagger end-------------------
+
+    compile fileTree(dir: '../libs', include: ['*.jar'])
+    compile project(":core")
+    compile project(":base-facade")
+    compile project(":facade")
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+}

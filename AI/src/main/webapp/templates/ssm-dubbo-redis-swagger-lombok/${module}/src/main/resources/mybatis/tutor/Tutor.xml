@@ -1,0 +1,454 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<mapper namespace="Tutor">
+
+    <resultMap id="rs_base" type="Tutor">
+        <result property="id" column="id"/>
+        <result property="userId" column="userId"/>
+        <result property="tutorCode" column="tutorCode"/>
+        <result property="openId" column="openId"/>
+        <result property="email" column="email"/>
+        <result property="phone" column="phone"/>
+        <result property="password" column="password"/>
+        <result property="sex" column="sex"/>
+        <result property="name" column="name"/>
+        <result property="age" column="age"/>
+        <result property="educationYears" column="educationYears"/>
+        <result property="countryCode" column="countryCode"/>
+        <result property="timeZone" column="timeZone"/>
+        <result property="nativeLanguage" column="nativeLanguage"/>
+        <result property="avatar" column="avatar"/>
+        <result property="introduction" column="introduction"/>
+        <result property="isBind" column="isBind"/>
+        <result property="isAssess" column="isAssess"/>
+        <result property="isConsult" column="isConsult"/>
+        <result property="state" column="state"/>
+        <result property="createTime" column="createTime"/>
+        <result property="updateTime" column="updateTime"/>
+    </resultMap>
+
+    <!--所有信息-->
+    <resultMap id="rs_base_all" type="Tutor" extends="rs_base">
+        <collection property="classroomFeedbacks" column="{tutorCode=tutorCode}" select="ClassroomFeedback.classroomFeedbacks"/>
+        <collection property="tutorCourses" column="{tutorCode=tutorCode}" select="TutorCourse.tutorCourses"/>
+        <collection property="tutorWorktimes" column="{tutorCode=tutorCode}" select="TutorWorktime.query"/>
+    </resultMap>
+
+    <resultMap id="rs_base_all4classroom" type="Tutor" extends="rs_base">
+        <collection property="classrooms" column="{tutorCode=tutorCode,states=states}" select="Classroom.query4Tutor"/>
+    </resultMap>
+    <!--查询可以自定义课程的教师分页-->
+    <resultMap id="rs_base_all4custom" type="Tutor" extends="rs_base">
+        <association property="tutorFavorite" column="{tutorCode=tutorCode,studentCode=studentCode}" select="TutorFavorite.load"/>
+    </resultMap>
+
+
+    <!--加载一个教师（包含，课时数，评语数，收藏数）-->
+    <resultMap id="rs_base_loadTutor4ClassroomFavoriteFeedbackTotal" type="Tutor" extends="rs_base">
+        <association property="classroomFeedback" column="{tutorCode=tutorCode}" select="ClassroomFeedback.countFeedbackTotal"/>
+        <association property="tutorFavorite" column="{tutorCode=tutorCode}" select="TutorFavorite.countFavoriteTotal"/>
+        <association property="classroomTutor" column="{tutorCode=tutorCode}" select="ClassroomTutor.countClassroomTotal"/>
+    </resultMap>
+
+    <!-- 用于select查询公用抽取的列 -->
+    <sql id="Tutor.columns">
+		id,userId,tutorCode,openId,email,phone,password,sex,name,age,educationYears,countryCode,timeZone,nativeLanguage,avatar,introduction,isBind,isAssess,isConsult,state,createTime,updateTime
+	</sql>
+
+    <insert id="Tutor.insert" useGeneratedKeys="true" keyProperty="id" parameterType="Tutor">
+        INSERT INTO Tutor (
+        id ,
+        userId,
+        tutorCode ,
+        openId ,
+        email ,
+        phone ,
+        password ,
+        sex ,
+        name ,
+        age ,
+        educationYears ,
+        countryCode ,
+        timeZone ,
+        nativeLanguage ,
+        avatar ,
+        introduction ,
+        isBind ,
+        isAssess ,
+        isConsult ,
+        state ,
+        createTime ,
+        updateTime
+        ) VALUES (
+        #{id} ,
+        #{userId} ,
+        #{tutorCode} ,
+        #{openId} ,
+        #{email} ,
+        #{phone} ,
+        #{password} ,
+        #{sex} ,
+        #{name} ,
+        #{age} ,
+        #{educationYears} ,
+        #{countryCode} ,
+        #{timeZone} ,
+        #{nativeLanguage} ,
+        #{avatar} ,
+        #{introduction} ,
+        #{isBind} ,
+        #{isAssess} ,
+        #{isConsult} ,
+        #{state} ,
+        #{createTime} ,
+        #{updateTime}
+        )
+        <selectKey keyProperty="id" resultType="long">
+            select LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+
+    <update id="Tutor.update" parameterType="Tutor">
+        UPDATE Tutor
+        <trim prefix="set" suffixOverrides=",">
+
+            <if test="openId!=null and openId!=''">
+                openId = #{openId} ,
+            </if>
+            <if test="userId!=null and userId!=''">
+                userId = #{userId} ,
+            </if>
+            <if test="phone!=null and phone!=''">
+                phone = #{phone} ,
+            </if>
+            <if test="password!=null and password!=''">
+                password = #{password} ,
+            </if>
+            <if test="sex!=null and sex!=''">
+                sex = #{sex} ,
+            </if>
+            <if test="name!=null and name!=''">
+                name = #{name} ,
+            </if>
+            <if test="age!=null and age!=''">
+                age = #{age} ,
+            </if>
+            <if test="educationYears!=null and educationYears!=''">
+                educationYears = #{educationYears} ,
+            </if>
+            <if test="countryCode!=null and countryCode!=''">
+                countryCode = #{countryCode} ,
+            </if>
+            <if test="timeZone!=null and timeZone!=''">
+                timeZone = #{timeZone} ,
+            </if>
+            <if test="nativeLanguage!=null and nativeLanguage!=''">
+                nativeLanguage = #{nativeLanguage} ,
+            </if>
+            <if test="avatar!=null and avatar!=''">
+                avatar = #{avatar} ,
+            </if>
+            <if test="introduction!=null and introduction!=''">
+                introduction = #{introduction} ,
+            </if>
+            <if test="state!=null and state!=''">
+                state = #{state} ,
+            </if>
+            <if test="isBind!=null and isBind!=''">
+                isBind = #{isBind} ,
+            </if>
+            <if test="isAssess!=null and isAssess!=''">
+                isAssess = #{isAssess} ,
+            </if>
+            <if test="isConsult!=null and isConsult!=''">
+                isConsult = #{isConsult} ,
+            </if>
+            <if test="updateTime!=null ">
+                updateTime = #{updateTime}
+            </if>
+        </trim>
+
+        <where>
+            <if test="tutorCode!=null and tutorCode!=''">
+                AND tutorCode = #{tutorCode}
+            </if>
+            <if test="email!=null and email!=''">
+                AND email = #{email}
+            </if>
+        </where>
+
+    </update>
+
+    <delete id="Tutor.delete">
+        DELETE FROM Tutor WHERE
+        id = #{id}  AND 
+        tutorCode = #{id}  AND 
+        email = #{id} 
+    </delete>
+
+    <select id="Tutor.load" resultMap="rs_base">
+        SELECT
+        <include refid="Tutor.columns"/>
+        FROM Tutor
+        <include refid="Tutor.where"/>
+    </select>
+
+    <!--查询一个助教所有信息（包含：课时追踪集合，课堂集合，助教的老师集合）-->
+    <select id="Tutor.loadTutorCode" parameterType="String" resultMap="rs_base">
+        SELECT
+        <include refid="Tutor.columns"/>
+        FROM Tutor
+        WHERE
+        tutorCode = #{tutorCode}
+    </select>
+
+    <sql id="Tutor.where">
+        <where>
+            <if test="id!=null and id!=''">
+                AND id = #{id}
+            </if>
+            <if test="userId!=null and userId!=''">
+                AND userId = #{userId}
+            </if>
+            <if test="tutorCode!=null and tutorCode!=''">
+                AND tutorCode = #{tutorCode}
+            </if>
+            <if test="openId!=null and openId!=''">
+                AND openId = #{openId}
+            </if>
+            <if test="email!=null and email!=''">
+                AND email = #{email}
+            </if>
+            <if test="phone!=null and phone!=''">
+                AND phone = #{phone}
+            </if>
+            <if test="password!=null and password!=''">
+                AND password = #{password}
+            </if>
+            <if test="sex!=null and sex!=''">
+                AND sex = #{sex}
+            </if>
+            <if test="name!=null and name!=''">
+                AND name = #{name}
+            </if>
+            <if test="age!=null and age!=''">
+                AND age = #{age}
+            </if>
+            <if test="educationYears!=null and educationYears!=''">
+                AND educationYears = #{educationYears}
+            </if>
+            <if test="countryCode!=null and countryCode!=''">
+                AND countryCode = #{countryCode}
+            </if>
+            <if test="timeZone!=null and timeZone!=''">
+                AND timeZone = #{timeZone}
+            </if>
+            <if test="nativeLanguage!=null and nativeLanguage!=''">
+                AND nativeLanguage = #{nativeLanguage}
+            </if>
+            <if test="avatar!=null and avatar!=''">
+                AND avatar = #{avatar}
+            </if>
+            <if test="introduction!=null and introduction!=''">
+                AND introduction = #{introduction}
+            </if>
+            <if test="state!=null and state!=''">
+                AND state = #{state}
+            </if>
+            <if test="isBind!=null and isBind!=''">
+                AND isBind = #{isBind}
+            </if>
+            <if test="isAssess!=null and isAssess!=''">
+                AND isAssess = #{isAssess}
+            </if>
+            <if test="isConsult!=null and isConsult!=''">
+                AND isConsult = #{isConsult}
+            </if>
+            <if test="limitState!=null and limitState!=''">
+                AND state != #{limitState}
+            </if>
+            <if test="createTimeBegin!=null ">
+                AND createTime >= #{createTimeBegin}
+            </if>
+            <if test="createTimeEnd!=null ">
+                AND createTime &lt;= #{createTimeEnd}
+            </if>
+            <if test="updateTimeBegin!=null ">
+                AND updateTime >= #{updateTimeBegin}
+            </if>
+            <if test="updateTimeEnd!=null ">
+                AND updateTime &lt;= #{updateTimeEnd}
+            </if>
+        </where>
+    </sql>
+
+
+    <select id="Tutor.count" resultType="int">
+        SELECT count(1) FROM Tutor
+        <include refid="Tutor.where"/>
+    </select>
+
+
+    <select id="Tutor.query" resultMap="rs_base">
+        SELECT
+        <include refid="Tutor.columns"/>
+        FROM Tutor
+        <include refid="Tutor.where"/>
+        ORDER BY tutorCode DESC
+    </select>
+
+    <!--加载一个教师（包含，课堂信息，评语信息，选课信息）-->
+    <select id="Tutor.loadTutorAll" resultMap="rs_base_all">
+        SELECT * FROM Tutor
+        <where>
+            <if test="tutorCode!=null and tutorCode!=''">
+                AND tutorCode = #{tutorCode}
+            </if>
+            <if test="openId!=null and openId!=''">
+                AND openId = #{openId}
+            </if>
+            <if test="email!=null and email!=''">
+                AND email = #{email}
+            </if>
+            <if test="phone!=null and phone!=''">
+                AND phone = #{phone}
+            </if>
+            <if test="states!=null and states!=''">
+                AND state in
+                <foreach collection="states" item="state_in" index="index" open="(" close=")" separator=",">
+                    #{state_in}
+                </foreach>
+            </if>
+        </where>
+        limit 1
+    </select>
+
+    <!--加载一个教师基本信息-->
+    <select id="Tutor.loadTutor" resultMap="rs_base">
+        SELECT * FROM Tutor
+        <where>
+            <if test="tutorCode!=null and tutorCode!=''">
+                AND tutorCode = #{tutorCode}
+            </if>
+            <if test="openId!=null and openId!=''">
+                AND openId = #{openId}
+            </if>
+            <if test="email!=null and email!=''">
+                AND email = #{email}
+            </if>
+            <if test="phone!=null and phone!=''">
+                AND phone = #{phone}
+            </if>
+            <if test="state!=null and state!=''">
+                AND state in
+                <foreach collection="states" item="state_in" index="index" open="(" close=")" separator=",">
+                    #{state_in}
+                </foreach>
+            </if>
+        </where>
+        limit 1
+    </select>
+
+    <!--修改密码-->
+    <update id="Tutor.modifyPassword" parameterType="map">
+        UPDATE Tutor SET
+        password = #{password} ,
+        state = #{state},
+        updateTime = #{updateTime}
+        <where>
+            <if test="email!=null and email!=''">
+                AND email = #{email}
+            </if>
+            <if test="phone!=null and phone!=''">
+                AND phone = #{phone}
+            </if>
+            and password=#{oldpwd}
+            and state in
+            <foreach collection="states" item="state_in" index="index" open="(" close=")" separator=",">
+                #{state_in}
+            </foreach>
+        </where>
+    </update>
+
+    <!--修改教师状态-->
+    <update id="Tutor.modifyTutorState" parameterType="map">
+        UPDATE Tutor SET
+        state = #{state} ,
+        updateTime = #{updateTime}
+        WHERE
+        tutorCode = #{tutorCode}
+        OR
+        email = #{email}
+        and state in
+        <foreach collection="states" item="state_in" index="index" open="(" close=")" separator=",">
+            #{state_in}
+        </foreach>
+    </update>
+
+    <!--加载一个教师（包含，课堂信息，评语信息，选课信息,留言信息）-->
+    <select id="Tutor.loadTutorAll4Classroom" resultMap="rs_base_all4classroom">
+        select *,
+        <foreach collection="states" item="state_in" index="index" open="(" close=")" separator=",">
+            #{state_in}
+        </foreach>
+        as states
+        from Tutor where tutorCode=#{tutorCode}
+    </select>
+
+    <!--加载一个教师（包含，课时数，评语数，收藏数）-->
+    <select id="Tutor.loadTutor4ClassroomFavoriteFeedbackTotal" resultMap="rs_base_loadTutor4ClassroomFavoriteFeedbackTotal">
+        select *
+        from Tutor where tutorCode=#{tutorCode}
+    </select>
+
+
+    <!--查询可以自定义课程的教师分页-->
+    <select id="Tutor.tutorCustomList" resultMap="rs_base_all4custom">
+        SELECT DISTINCT tutor.*,#{studentCode} as studentCode,#{courseTimeBegin} as courseTimeBegin,#{courseTimeEnd} as courseTimeBegin FROM
+        Tutor tutor,
+        tutor_worktime tw,
+        tutor_course tc
+        WHERE
+        tutor.tutorCode=tw.tutorCode
+        AND tutor.tutorCode=tc.tutorCode
+        <if test="courseCodes!=null and courseCodes!=''">
+            AND tc.courseCode in
+            <foreach collection="courseCodes" item="courseCode_in" index="index" open="(" close=")" separator=",">
+                #{courseCode_in}
+            </foreach>
+        </if>
+        AND tw.state = #{workState}
+        AND tw.week = #{week}
+        AND tw.startTime &lt;= date_format(#{courseTimeBegin}, '%H:%i:%s')
+        AND tw.endTime >= date_format(#{courseTimeBegin}, '%H:%i:%s')
+        AND tw.startTime &lt;=date_format(#{courseTimeEnd},'%H:%i:%s')
+        AND tw.endTime >=date_format(#{courseTimeEnd},'%H:%i:%s')
+    </select>
+
+    <select id="Tutor.counttutorCustom" resultType="int">
+        SELECT count(1) FROM
+        Tutor tutor,
+        tutor_worktime tw,
+        tutor_course tc
+        WHERE
+        tutor.tutorCode=tw.tutorCode
+        AND tutor.tutorCode=tc.tutorCode
+        <if test="courseCodes!=null and courseCodes!=''">
+            AND tc.courseCode in
+            <foreach collection="courseCodes" item="courseCode_in" index="index" open="(" close=")" separator=",">
+                #{courseCode_in}
+            </foreach>
+        </if>
+        AND tw.state = #{workState}
+        AND tw.week = #{week}
+        AND tw.startTime &lt;= date_format(#{courseTimeBegin}, '%H:%i:%s')
+        AND tw.endTime >=date_format(#{courseTimeEnd},'%H:%i:%s')
+    </select>
+
+
+</mapper>
+

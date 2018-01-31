@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<mapper namespace="ClassroomNotify">
+
+    <resultMap id="rs_base" type="ClassroomNotify">
+        <result property="id" column="id"/>
+        <result property="classroomCode" column="classroomCode"/>
+        <result property="notifyCode" column="notifyCode"/>
+        <result property="title" column="title"/>
+        <result property="notifyType" column="notifyType"/>
+        <result property="partyCode" column="partyCode"/>
+        <result property="partyType" column="partyType"/>
+        <result property="content" column="content"/>
+        <result property="createTime" column="createTime"/>
+    </resultMap>
+
+    <!-- 用于select查询公用抽取的列 -->
+    <sql id="ClassroomNotify.columns">
+	    
+		id,classroomCode,notifyCode,title,notifyType,partyCode,partyType,content,createTime
+	    
+	</sql>
+
+    <insert id="ClassroomNotify.insert" useGeneratedKeys="true" keyProperty="id" parameterType="ClassroomNotify">
+        INSERT INTO classroom_notify (
+        id ,
+        classroomCode ,
+        notifyCode ,
+        title ,
+        notifyType ,
+        partyCode ,
+        partyType ,
+        content ,
+        createTime
+        ) VALUES (
+        #{id} ,
+        #{classroomCode} ,
+        #{notifyCode} ,
+        #{title} ,
+        #{notifyType} ,
+        #{partyCode} ,
+        #{partyType} ,
+        #{content} ,
+        #{createTime}
+        )
+        <selectKey keyProperty="id" resultType="long">
+            select LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+
+    <update id="ClassroomNotify.update" parameterType="ClassroomNotify">
+    
+        UPDATE classroom_notify SET
+	        classroomCode = #{classroomCode} ,
+	        notifyCode = #{notifyCode} ,
+	        title = #{title} ,
+	        notifyType = #{notifyType} ,
+	        partyCode = #{partyCode} ,
+	        partyType = #{partyType} ,
+	        content = #{content} ,
+	        createTime = #{createTime} 
+        WHERE 
+	        id = #{id} 
+	</update>
+
+    <delete id="ClassroomNotify.delete">
+        DELETE FROM classroom_notify WHERE
+        id = #{id}
+    </delete>
+
+    <select id="ClassroomNotify.load" resultMap="rs_base">
+        SELECT
+        <include refid="ClassroomNotify.columns"/>
+        FROM classroom_notify
+        WHERE
+        id = #{id}
+    </select>
+
+    <sql id="ClassroomNotify.where">
+        <where>
+            <if test="id!=null and id!=''">
+                AND id = #{id}
+            </if>
+            <if test="classroomCode!=null and classroomCode!=''">
+                AND classroomCode = #{classroomCode}
+            </if>
+            <if test="notifyCode!=null and notifyCode!=''">
+                AND notifyCode = #{notifyCode}
+            </if>
+            <if test="title!=null and title!=''">
+                AND title = #{title}
+            </if>
+            <if test="notifyType!=null and notifyType!=''">
+                AND notifyType = #{notifyType}
+            </if>
+            <if test="partyCode!=null and partyCode!=''">
+                AND partyCode = #{partyCode}
+            </if>
+            <if test="partyType!=null and partyType!=''">
+                AND partyType = #{partyType}
+            </if>
+            <if test="content!=null and content!=''">
+                AND content = #{content}
+            </if>
+            <if test="createTimeBegin!=null ">
+                AND createTime >= #{createTimeBegin}
+            </if>
+            <if test="createTimeEnd!=null ">
+                AND createTime &lt;= #{createTimeEnd}
+            </if>
+        </where>
+    </sql>
+
+
+    <select id="ClassroomNotify.count" resultType="int">
+        SELECT count(1) FROM classroom_notify
+        <include refid="ClassroomNotify.where"/>
+    </select>
+
+
+    <select id="ClassroomNotify.query" resultMap="rs_base">
+        SELECT
+        <include refid="ClassroomNotify.columns"/>
+        FROM classroom_notify
+        <include refid="ClassroomNotify.where"/>
+
+        <if test="sortColumns!=null and sortColumns!=''">
+            ORDER BY ${sortColumns}
+        </if>
+    </select>
+
+
+    <!--查询通知信息集合-->
+    <select id="ClassroomNotify.classroomNotifys" resultMap="rs_base">
+        SELECT
+        <include refid="ClassroomNotify.columns"/>
+        FROM classroom_notify
+        <include refid="ClassroomNotify.where"/>
+        ORDER BY createTime DESC
+    </select>
+
+
+    <!--获取通知学生的信息数量-->
+    <select id="ClassroomNotify.countSudentNotify" resultType="int">
+      SELECT
+	    count(*)
+      FROM
+	    classroom_notify cn
+      , classroom_students cs
+      , Student s
+      , classroom c
+      WHERE
+	    c.classroomCode = cs.classroomCode
+      AND cs.studentCode = s.studentCode
+      AND cn.classroomCode=c.classroomCode
+      AND s.userId =#{userId}
+    </select>
+
+
+</mapper>
+

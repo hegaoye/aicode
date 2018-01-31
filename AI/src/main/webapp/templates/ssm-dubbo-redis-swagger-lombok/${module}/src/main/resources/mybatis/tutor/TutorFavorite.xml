@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<mapper namespace="TutorFavorite">
+
+    <resultMap id="rs_base" type="TutorFavorite">
+        <result property="id" column="id"/>
+        <result property="tutorCode" column="tutorCode"/>
+        <result property="studentCode" column="studentCode"/>
+        <result property="state" column="state"/>
+        <result property="createTime" column="createTime"/>
+        <result property="updateTime" column="updateTime"/>
+    </resultMap>
+
+
+    <!--查询所有-->
+    <resultMap id="rs_base_all" type="TutorFavorite" extends="rs_base">
+        <association property="tutor" column="{tutorCode=tutorCode}" select="Tutor.load"/>
+        <association property="classroomFeedback" column="{tutorCode=tutorCode}" select="ClassroomFeedback.countFeedbackTotal"/>
+        <association property="tutorFavorite" column="{tutorCode=tutorCode}" select="TutorFavorite.countFavoriteTotal"/>
+        <association property="classroomTutor" column="{tutorCode=tutorCode}" select="ClassroomTutor.countClassroomTotal"/>
+    </resultMap>
+
+    <resultMap id="rs_base_favoriteTotal" type="TutorFavorite">
+        <result property="favoriteTotal" column="favoriteTotal"/>
+    </resultMap>
+
+    <!-- 用于select查询公用抽取的列 -->
+    <sql id="TutorFavorite.columns">
+		id,tutorCode,studentCode,state,createTime,updateTime
+	</sql>
+
+    <insert id="TutorFavorite.insert" useGeneratedKeys="true" keyProperty="id" parameterType="TutorFavorite">
+        INSERT INTO tutor_favorite (
+        id ,
+        tutorCode ,
+        studentCode ,
+        state ,
+        createTime ,
+        updateTime
+        ) VALUES (
+        #{id} ,
+        #{tutorCode} ,
+        #{studentCode} ,
+        #{state} ,
+        #{createTime} ,
+        #{updateTime}
+        )
+        <selectKey keyProperty="id" resultType="long">
+            select LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+
+    <update id="TutorFavorite.update" parameterType="TutorFavorite">
+        UPDATE tutor_favorite SET
+	        state = #{state} ,
+	        updateTime = #{updateTime}
+        WHERE 
+	        tutorCode = #{tutorCode} AND
+	        studentCode = #{studentCode}
+	</update>
+
+    <delete id="TutorFavorite.delete">
+        DELETE FROM tutor_favorite
+        <include refid="TutorFavorite.where"/>
+    </delete>
+
+    <select id="TutorFavorite.load" resultMap="rs_base">
+        SELECT
+        <include refid="TutorFavorite.columns"/>
+        FROM tutor_favorite
+        <include refid="TutorFavorite.where"/>
+    </select>
+
+    <sql id="TutorFavorite.where">
+        <where>
+            <if test="id!=null and id!=''">
+                AND id = #{id}
+            </if>
+            <if test="tutorCode!=null and tutorCode!=''">
+                AND tutorCode = #{tutorCode}
+            </if>
+            <if test="studentCode!=null and studentCode!=''">
+                AND studentCode = #{studentCode}
+            </if>
+            <if test="state!=null and state!=''">
+                AND state = #{state}
+            </if>
+            <if test="createTimeBegin!=null ">
+                AND createTime >= #{createTimeBegin}
+            </if>
+            <if test="createTimeEnd!=null ">
+                AND createTime &lt;= #{createTimeEnd}
+            </if>
+            <if test="updateTimeBegin!=null ">
+                AND updateTime >= #{updateTimeBegin}
+            </if>
+            <if test="updateTimeEnd!=null ">
+                AND updateTime &lt;= #{updateTimeEnd}
+            </if>
+        </where>
+    </sql>
+
+
+    <select id="TutorFavorite.count" resultType="int">
+        SELECT count(1) FROM tutor_favorite
+        <include refid="TutorFavorite.where"/>
+    </select>
+
+    <select id="TutorFavorite.countFavoriteTotal" resultMap="rs_base_favoriteTotal">
+        SELECT count(1) as favoriteTotal FROM tutor_favorite
+        <include refid="TutorFavorite.where"/>
+    </select>
+
+
+    <select id="TutorFavorite.query" resultMap="rs_base">
+        SELECT
+        <include refid="TutorFavorite.columns"/>
+        FROM tutor_favorite
+        <include refid="TutorFavorite.where"/>
+
+        <if test="sortColumns!=null and sortColumns!=''">
+            ORDER BY ${sortColumns}
+        </if>
+    </select>
+
+    <!--查询学生收藏的老师列表-->
+    <select id="TutorFavorite.listTutorFavorite" resultMap="rs_base_all">
+        SELECT
+        <include refid="TutorFavorite.columns"/>
+        FROM tutor_favorite
+        <include refid="TutorFavorite.where"/>
+
+        <if test="sortColumns!=null and sortColumns!=''">
+            ORDER BY ${sortColumns}
+        </if>
+    </select>
+
+    <!--查询一条学生收藏的老师详情-->
+    <select id="TutorFavorite.loadFavoriteTutorDetail" resultMap="rs_base_all">
+        SELECT
+        <include refid="TutorFavorite.columns"/>
+        FROM tutor_favorite
+        <include refid="TutorFavorite.where"/>
+
+        <if test="sortColumns!=null and sortColumns!=''">
+            ORDER BY ${sortColumns}
+        </if>
+    </select>
+
+
+</mapper>
+

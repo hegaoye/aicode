@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<mapper namespace="OrderPayment">
+
+    <resultMap id="rs_base" type="OrderPayment">
+        <result property="id" column="id"/>
+        <result property="paymentCode" column="paymentCode"/>
+        <result property="orderNo" column="orderNo"/>
+        <result property="orderPrice" column="orderPrice"/>
+        <result property="subjects" column="subjects"/>
+        <result property="payType" column="payType"/>
+        <result property="orderState" column="orderState"/>
+        <result property="payTime" column="payTime"/>
+        <result property="createTime" column="createTime"/>
+    </resultMap>
+
+    <!-- 用于select查询公用抽取的列 -->
+    <sql id="OrderPayment.columns">
+	    <![CDATA[
+
+
+		id,paymentCode,orderNo,orderPrice,subjects,payType,orderState,payTime,createTime
+
+
+        ]]>
+	</sql>
+
+    <insert id="OrderPayment.insert" useGeneratedKeys="true" keyProperty="id" parameterType="OrderPayment">
+        INSERT INTO order_payment (
+        id ,
+        paymentCode ,
+        orderNo ,
+        orderPrice ,
+        subjects ,
+        payType ,
+        orderState ,
+        payTime ,
+        createTime
+        ) VALUES (
+        #{id} ,
+        #{paymentCode} ,
+        #{orderNo} ,
+        #{orderPrice} ,
+        #{subjects} ,
+        #{payType} ,
+        #{orderState} ,
+        #{payTime} ,
+        #{createTime}
+        )
+        <selectKey keyProperty="id" resultType="long">
+            select LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+
+    <update id="OrderPayment.update" parameterType="OrderPayment">
+    <![CDATA[
+
+
+        UPDATE order_payment SET
+	        orderNo = #{orderNo} ,
+	        orderPrice = #{orderPrice} ,
+	        subjects = #{subjects} ,
+	        payType = #{payType} ,
+	        orderState = #{orderState} ,
+	        payTime = #{payTime} ,
+	        createTime = #{createTime} 
+        WHERE 
+	        id = #{id}  AND 
+	        paymentCode = #{paymentCode} 
+
+
+        ]]>
+	</update>
+
+    <delete id="OrderPayment.delete">
+    <![CDATA[
+
+
+        DELETE FROM order_payment WHERE
+        id = #{id}  AND 
+        paymentCode = #{id} 
+
+
+        ]]>
+    </delete>
+
+    <select id="OrderPayment.load" resultMap="rs_base">
+        SELECT
+        <include refid="OrderPayment.columns"/>
+        <![CDATA[
+		    FROM order_payment 
+	        WHERE 
+		        paymentCode = #{paymentCode}
+	    ]]>
+    </select>
+
+    <sql id="OrderPayment.where">
+        <where>
+            <if test="id!=null and id!=''">
+                AND id = #{id}
+            </if>
+            <if test="paymentCode!=null and paymentCode!=''">
+                AND paymentCode = #{paymentCode}
+            </if>
+            <if test="orderNo!=null and orderNo!=''">
+                AND orderNo = #{orderNo}
+            </if>
+            <if test="orderPrice!=null and orderPrice!=''">
+                AND orderPrice = #{orderPrice}
+            </if>
+            <if test="subjects!=null and subjects!=''">
+                AND subjects = #{subjects}
+            </if>
+            <if test="payType!=null and payType!=''">
+                AND payType = #{payType}
+            </if>
+            <if test="orderState!=null and orderState!=''">
+                AND orderState = #{orderState}
+            </if>
+            <if test="payTimeBegin!=null ">
+                AND payTime >= #{payTimeBegin}
+            </if>
+            <if test="payTimeEnd!=null ">
+                AND payTime &lt;= #{payTimeEnd}
+            </if>
+            <if test="createTimeBegin!=null ">
+                AND createTime >= #{createTimeBegin}
+            </if>
+            <if test="createTimeEnd!=null ">
+                AND createTime &lt;= #{createTimeEnd}
+            </if>
+        </where>
+    </sql>
+
+
+    <select id="OrderPayment.count" resultType="int">
+        SELECT count(1) FROM order_payment
+        <include refid="OrderPayment.where"/>
+    </select>
+
+
+    <select id="OrderPayment.query" resultMap="rs_base">
+        SELECT
+        <include refid="OrderPayment.columns"/>
+        FROM order_payment
+        <include refid="OrderPayment.where"/>
+        ORDER BY orderNo DESC
+    </select>
+
+
+</mapper>
+

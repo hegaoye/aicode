@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<mapper namespace="ClassroomCourseware">
+
+    <resultMap id="rs_base" type="ClassroomCourseware">
+        <result property="id" column="id"/>
+        <result property="classroomCode" column="classroomCode"/>
+        <result property="courseCode" column="courseCode"/>
+        <result property="coursewareCode" column="coursewareCode"/>
+    </resultMap>
+
+    <!--所有信息-->
+    <resultMap id="rs_base_all" type="ClassroomCourseware" extends="rs_base">
+        <collection property="courseWare" column="{coursewareCode=coursewareCode}" select="CourseWare.load"/>
+    </resultMap>
+
+    <!-- 用于select查询公用抽取的列 -->
+    <sql id="ClassroomCourseware.columns">
+		id,classroomCode,courseCode,coursewareCode
+	</sql>
+
+    <insert id="ClassroomCourseware.insert" useGeneratedKeys="true" keyProperty="id" parameterType="ClassroomCourseware">
+        INSERT INTO `classroom_courseware` (
+        id ,
+        classroomCode ,
+        courseCode ,
+        coursewareCode
+        ) VALUES (
+        #{id} ,
+        #{classroomCode} ,
+        #{courseCode} ,
+        #{coursewareCode}
+        )
+        <selectKey keyProperty="id" resultType="long">
+            select LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+
+    <update id="ClassroomCourseware.update" parameterType="ClassroomCourseware">
+        UPDATE `classroom_courseware`
+        <trim prefix="set" suffixOverrides=",">
+            <if test="classroomCode!=null and classroomCode!=''">
+                classroomCode = #{classroomCode} ,
+            </if>
+            <if test="courseCode!=null and courseCode!=''">
+                courseCode = #{courseCode} ,
+            </if>
+            <if test="coursewareCode!=null and coursewareCode!=''">
+                coursewareCode = #{coursewareCode}
+            </if>
+        </trim>
+        WHERE
+        id = #{id}
+    </update>
+
+    <delete id="ClassroomCourseware.delete">
+        DELETE FROM `classroom_courseware`
+        <include refid="ClassroomCourseware.where"/>
+    </delete>
+
+    <select id="ClassroomCourseware.load" resultMap="rs_base_all">
+        SELECT
+        <include refid="ClassroomCourseware.columns"/>
+        FROM `classroom_courseware`
+        <include refid="ClassroomCourseware.where"/>
+    </select>
+
+    <sql id="ClassroomCourseware.where">
+        <where>
+            <if test="id!=null and id!=''">
+                AND id = #{id}
+            </if>
+            <if test="classroomCode!=null and classroomCode!=''">
+                AND classroomCode = #{classroomCode}
+            </if>
+            <if test="courseCode!=null and courseCode!=''">
+                AND courseCode = #{courseCode}
+            </if>
+            <if test="coursewareCode!=null and coursewareCode!=''">
+                AND coursewareCode = #{coursewareCode}
+            </if>
+        </where>
+    </sql>
+
+
+    <select id="ClassroomCourseware.count" resultType="long">
+        SELECT count(*) FROM `classroom_courseware`
+        <include refid="ClassroomCourseware.where"/>
+    </select>
+
+
+    <select id="ClassroomCourseware.query" resultMap="rs_base_all">
+        SELECT
+        <include refid="ClassroomCourseware.columns"/>
+        FROM `classroom_courseware`
+        <include refid="ClassroomCourseware.where"/>
+
+        <if test="sortColumns!=null and sortColumns!=''">
+            ORDER BY ${sortColumns}
+        </if>
+    </select>
+
+
+</mapper>
+

@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<mapper namespace="CourseHourShare">
+    <resultMap id="rs_base" type="CourseHourShare">
+        <result property="id" column="id"/>
+        <result property="courseHourCode" column="courseHourCode"/>
+        <result property="studentCode" column="studentCode"/>
+        <result property="courseHour" column="courseHour"/>
+        <result property="upperLimit" column="upperLimit"/>
+        <result property="state" column="state"/>
+        <result property="startTime" column="startTime"/>
+        <result property="endTime" column="endTime"/>
+        <result property="createTime" column="createTime"/>
+        <result property="updateTime" column="updateTime"/>
+        <result property="vn" column="vn"/>
+    </resultMap>
+
+    <!--所有信息-->
+    <resultMap id="rs_base_all" type="CourseHourShare" extends="rs_base">
+        <association property="courseHourShareStudents" column="{courseHourCode=courseHourCode}" select="CourseHourShareStudent.queryAll"/>
+    </resultMap>
+
+    <!-- 用于select查询公用抽取的列 -->
+    <sql id="CourseHourShare.columns">
+		id,courseHourCode,studentCode,courseHour,upperLimit,state,startTime,endTime,createTime,updateTime,vn
+	</sql>
+
+    <insert id="CourseHourShare.insert" useGeneratedKeys="true" keyProperty="id" parameterType="CourseHourShare">
+        INSERT INTO course_hour_share (
+        id ,
+        courseHourCode ,
+        studentCode ,
+        courseHour ,
+        upperLimit ,
+        state ,
+        startTime ,
+        endTime ,
+        createTime ,
+        updateTime,
+        vn
+        ) VALUES (
+        #{id} ,
+        #{courseHourCode} ,
+        #{studentCode} ,
+        #{courseHour} ,
+        #{upperLimit} ,
+        #{state} ,
+        #{startTime} ,
+        #{endTime} ,
+        #{createTime} ,
+        #{updateTime} ,
+        #{vn}
+        )
+        <selectKey keyProperty="id" resultType="long">
+            select LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+
+    <update id="CourseHourShare.update" parameterType="CourseHourShare">
+        UPDATE course_hour_share
+        <trim prefix="set" suffixOverrides=",">
+            <if test="studentCode!=null and studentCode!=''">
+                studentCode = #{studentCode} ,
+            </if>
+            <if test="courseHour!=null ">
+                courseHour = #{courseHour} ,
+            </if>
+            <if test="upperLimit!=null and upperLimit!=''">
+                upperLimit = #{upperLimit} ,
+            </if>
+            <if test="state!=null and state!=''">
+                state = #{state} ,
+            </if>
+            <if test="startTime!=null">
+                startTime = #{startTime} ,
+            </if>
+            <if test="endTime!=null ">
+                endTime = #{endTime} ,
+            </if>
+            <if test="updateTime!=null ">
+                updateTime = #{updateTime},
+            </if>
+            <if test="vn!=null ">
+                vn = vn+1,
+            </if>
+        </trim>
+
+        WHERE
+
+        courseHourCode = #{courseHourCode} and vn=#{vn}
+
+    </update>
+
+    <delete id="CourseHourShare.delete">
+        DELETE FROM course_hour_share WHERE
+        courseHourCode = #{courseHourCode}
+    </delete>
+
+    <select id="CourseHourShare.load" resultMap="rs_base">
+        SELECT
+        <include refid="CourseHourShare.columns"/>
+        FROM course_hour_share
+        <include refid="CourseHourShare.where"/>
+    </select>
+
+    <sql id="CourseHourShare.where">
+        <where>
+            <if test="id!=null and id!=''">
+                AND id = #{id}
+            </if>
+            <if test="courseHourCode!=null and courseHourCode!=''">
+                AND courseHourCode = #{courseHourCode}
+            </if>
+            <if test="studentCode!=null and studentCode!=''">
+                AND studentCode = #{studentCode}
+            </if>
+            <if test="courseHour!=null ">
+                AND courseHour = #{courseHour}
+            </if>
+            <if test="upperLimit!=null and upperLimit!=''">
+                AND upperLimit = #{upperLimit}
+            </if>
+            <if test="state!=null and state!=''">
+                AND state = #{state}
+            </if>
+            <if test="startTimeBegin!=null ">
+                AND startTime >= #{startTimeBegin}
+            </if>
+            <if test="startTimeEnd!=null ">
+                AND startTime &lt;= #{startTimeEnd}
+            </if>
+            <if test="endTimeBegin!=null ">
+                AND endTime >= #{endTimeBegin}
+            </if>
+            <if test="endTimeEnd!=null ">
+                AND endTime &lt;= #{endTimeEnd}
+            </if>
+            <if test="createTimeBegin!=null ">
+                AND createTime >= #{createTimeBegin}
+            </if>
+            <if test="createTimeEnd!=null ">
+                AND createTime &lt;= #{createTimeEnd}
+            </if>
+            <if test="updateTimeBegin!=null ">
+                AND updateTime >= #{updateTimeBegin}
+            </if>
+            <if test="updateTimeEnd!=null ">
+                AND updateTime &lt;= #{updateTimeEnd}
+            </if>
+            <if test="vn!=null and vn!=''">
+                AND vn = #{vn}
+            </if>
+        </where>
+    </sql>
+
+
+    <select id="CourseHourShare.count" resultType="int">
+        SELECT count(1) FROM course_hour_share
+        <include refid="CourseHourShare.where"/>
+    </select>
+
+
+    <select id="CourseHourShare.query" resultMap="rs_base">
+        SELECT
+        <include refid="CourseHourShare.columns"/>
+        FROM course_hour_share
+        <include refid="CourseHourShare.where"/>
+
+        <if test="sortColumns!=null and sortColumns!=''">
+            ORDER BY ${sortColumns}
+        </if>
+    </select>
+
+    <!--查询企业下学生列表-->
+    <select id="CourseHourShare.loadBystudentCode" resultMap="rs_base_all">
+        SELECT
+        <include refid="CourseHourShare.columns"/>
+        FROM course_hour_share
+        <include refid="CourseHourShare.where"/>
+
+        <if test="sortColumns!=null and sortColumns!=''">
+            ORDER BY ${sortColumns}
+        </if>
+    </select>
+
+
+    <!--根据状态更新-->
+    <update id="CourseHourShare.updateByState" parameterType="CourseHourShare">
+		UPDATE course_hour_share SET
+		state = #{state} ,
+		updateTime = #{updateTime},
+		vn = vn+1
+		WHERE
+		courseHourCode = #{courseHourCode}
+		AND vn=#{oldvn}
+	</update>
+
+    <!--扣除分享课时-->
+    <update id="CourseHourShare.deductShareCourseHour" parameterType="CourseHourShare">
+		UPDATE course_hour_share SET
+		courseHour = courseHour - #{courseHour},
+		updateTime = #{updateTime},
+		vn = vn+1
+		WHERE
+		courseHourCode = #{courseHourCode}
+		AND state=#{state}
+		AND vn=#{vn}
+	</update>
+
+
+</mapper>
+

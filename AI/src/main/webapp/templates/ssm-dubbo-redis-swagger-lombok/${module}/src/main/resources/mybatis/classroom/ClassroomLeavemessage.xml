@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<mapper namespace="ClassroomLeavemessage">
+
+    <resultMap id="rs_base" type="ClassroomLeavemessage">
+        <result property="id" column="id"/>
+        <result property="classroomCode" column="classroomCode"/>
+        <result property="studentCode" column="studentCode"/>
+        <result property="leaveMessage" column="leaveMessage"/>
+        <result property="createTime" column="createTime"/>
+    </resultMap>
+
+    <resultMap id="rs_base_all" type="ClassroomLeavemessage" extends="rs_base">
+        <association property="classroomStudents" column="{classroomCode=classroomCode,studentCode=studentCode}" select="ClassroomStudents.load"/>
+    </resultMap>
+
+    <!-- 用于select查询公用抽取的列 -->
+    <sql id="ClassroomLeavemessage.columns">
+
+		id,classroomCode,studentCode,leaveMessage,createTime
+
+	</sql>
+
+    <insert id="ClassroomLeavemessage.insert" useGeneratedKeys="true" keyProperty="id" parameterType="ClassroomLeavemessage">
+        INSERT INTO classroom_leavemessage (
+        id ,
+        classroomCode ,
+        studentCode ,
+        leaveMessage ,
+        createTime
+        ) VALUES (
+        #{id} ,
+        #{classroomCode} ,
+        #{studentCode} ,
+        #{leaveMessage} ,
+        #{createTime}
+        )
+        <selectKey keyProperty="id" resultType="long">
+            select LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+
+    <update id="ClassroomLeavemessage.update" parameterType="ClassroomLeavemessage">
+
+        UPDATE classroom_leavemessage
+
+        <trim prefix="set" suffixOverrides=",">
+            <if test="classroomCode!=null and classroomCode!=''">
+                classroomCode = #{classroomCode} ,
+            </if>
+            <if test="studentCode!=null and studentCode!=''">
+                studentCode = #{studentCode} ,
+            </if>
+            <if test="leaveMessage!=null and leaveMessage!=''">
+                leaveMessage = #{leaveMessage} ,
+            </if>
+            <if test="createTime!=null ">
+                createTime = #{createTime}
+            </if>
+        </trim>
+
+        WHERE
+        id = #{id}
+    </update>
+
+    <delete id="ClassroomLeavemessage.delete">
+
+        DELETE FROM classroom_leavemessage
+        <include refid="ClassroomLeavemessage.where"/>
+
+    </delete>
+
+    <select id="ClassroomLeavemessage.load" resultMap="rs_base_all">
+        SELECT
+        <include refid="ClassroomLeavemessage.columns"/>
+        FROM classroom_leavemessage
+        <include refid="ClassroomLeavemessage.where"/>
+
+    </select>
+
+    <sql id="ClassroomLeavemessage.where">
+        <where>
+            <if test="id!=null and id!=''">
+                AND id = #{id}
+            </if>
+            <if test="classroomCode!=null and classroomCode!=''">
+                AND classroomCode = #{classroomCode}
+            </if>
+            <if test="studentCode!=null and studentCode!=''">
+                AND studentCode = #{studentCode}
+            </if>
+            <if test="leaveMessage!=null and leaveMessage!=''">
+                AND leaveMessage = #{leaveMessage}
+            </if>
+            <if test="createTimeBegin!=null ">
+                AND createTime >= #{createTimeBegin}
+            </if>
+            <if test="createTimeEnd!=null ">
+                AND createTime &lt;= #{createTimeEnd}
+            </if>
+        </where>
+    </sql>
+
+
+    <select id="ClassroomLeavemessage.count" resultType="int">
+        SELECT count(1) FROM classroom_leavemessage
+        <include refid="ClassroomLeavemessage.where"/>
+    </select>
+
+
+    <select id="ClassroomLeavemessage.query" resultMap="rs_base_all">
+        SELECT
+        <include refid="ClassroomLeavemessage.columns"/>
+        FROM classroom_leavemessage
+        <include refid="ClassroomLeavemessage.where"/>
+
+        <if test="sortColumns!=null and sortColumns!=''">
+            ORDER BY ${sortColumns}
+        </if>
+    </select>
+
+
+    <!--加载预约留言-->
+    <select id="ClassroomLeavemessage.loadByClassroomCode" resultMap="rs_base_all">
+		SELECT * FROM classroom_leavemessage
+		WHERE
+			classroomCode = #{classroomCode}
+
+	</select>
+
+
+</mapper>
+

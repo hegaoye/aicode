@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<mapper namespace="CourseHourStage">
+
+    <resultMap id="rs_base" type="CourseHourStage">
+        <result property="id" column="id"/>
+        <result property="courseHourCode" column="courseHourCode"/>
+        <result property="studentCode" column="studentCode"/>
+        <result property="courseHour" column="courseHour"/>
+        <result property="state" column="state"/>
+        <result property="startTime" column="startTime"/>
+        <result property="endTime" column="endTime"/>
+        <result property="createTime" column="createTime"/>
+        <result property="updateTime" column="updateTime"/>
+    </resultMap>
+
+    <!-- 用于select查询公用抽取的列 -->
+    <sql id="CourseHourStage.columns">
+		id,courseHourCode,studentCode,courseHour,state,startTime,endTime,createTime,updateTime
+	</sql>
+
+    <insert id="CourseHourStage.insert" useGeneratedKeys="true" keyProperty="id" parameterType="CourseHourStage">
+        INSERT INTO course_hour_stage (
+        id ,
+        courseHourCode ,
+        studentCode ,
+        courseHour ,
+        state ,
+        startTime ,
+        endTime ,
+        createTime ,
+        updateTime
+        ) VALUES (
+        #{id} ,
+        #{courseHourCode} ,
+        #{studentCode} ,
+        #{courseHour} ,
+        #{state} ,
+        #{startTime} ,
+        #{endTime} ,
+        #{createTime} ,
+        #{updateTime}
+        )
+        <selectKey keyProperty="id" resultType="long">
+            select LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+
+    <update id="CourseHourStage.update" parameterType="CourseHourStage">
+        UPDATE course_hour_stage
+        <trim prefix="set" suffixOverrides=",">
+            <if test="studentCode!=null and studentCode!=''">
+                studentCode = #{studentCode} ,
+            </if>
+            <if test="courseHour!=null ">
+                courseHour = #{courseHour} ,
+            </if>
+            <if test="state!=null and state!=''">
+                state = #{state} ,
+            </if>
+            <if test="startTime!=null ">
+                startTime = #{startTime} ,
+            </if>
+            <if test="endTime!=null ">
+                endTime = #{endTime} ,
+            </if>
+            <if test="createTime!=null ">
+                createTime = #{createTime} ,
+            </if>
+            <if test="updateTime!=null ">
+                updateTime = #{updateTime}
+            </if>
+        </trim>
+
+        WHERE
+        courseHourCode = #{courseHourCode}
+    </update>
+
+    <delete id="CourseHourStage.delete">
+        DELETE FROM course_hour_stage WHERE
+        courseHourCode = #{courseHourCode}
+    </delete>
+
+    <select id="CourseHourStage.load" resultMap="rs_base">
+        SELECT
+        <include refid="CourseHourStage.columns"/>
+        FROM course_hour_stage
+        <include refid="CourseHourStage.where"/>
+
+    </select>
+
+    <sql id="CourseHourStage.where">
+        <where>
+            <if test="id!=null and id!=''">
+                AND id = #{id}
+            </if>
+            <if test="courseHourCode!=null and courseHourCode!=''">
+                AND courseHourCode = #{courseHourCode}
+            </if>
+            <if test="studentCode!=null and studentCode!=''">
+                AND studentCode = #{studentCode}
+            </if>
+            <if test="courseHour!=null ">
+                AND courseHour = #{courseHour}
+            </if>
+            <if test="state!=null and state!=''">
+                AND state = #{state}
+            </if>
+            <if test="startTimeBegin!=null ">
+                AND startTime >= #{startTimeBegin}
+            </if>
+            <if test="startTimeEnd!=null ">
+                AND startTime &lt;= #{startTimeEnd}
+            </if>
+            <if test="endTimeBegin!=null ">
+                AND endTime >= #{endTimeBegin}
+            </if>
+            <if test="endTimeEnd!=null ">
+                AND endTime &lt;= #{endTimeEnd}
+            </if>
+            <if test="createTimeBegin!=null ">
+                AND createTime >= #{createTimeBegin}
+            </if>
+            <if test="createTimeEnd!=null ">
+                AND createTime &lt;= #{createTimeEnd}
+            </if>
+            <if test="updateTimeBegin!=null ">
+                AND updateTime >= #{updateTimeBegin}
+            </if>
+            <if test="updateTimeEnd!=null ">
+                AND updateTime &lt;= #{updateTimeEnd}
+            </if>
+        </where>
+    </sql>
+
+
+    <select id="CourseHourStage.count" resultType="int">
+        SELECT count(1) FROM course_hour_stage
+        <include refid="CourseHourStage.where"/>
+    </select>
+
+
+    <select id="CourseHourStage.query" resultMap="rs_base">
+        SELECT
+        <include refid="CourseHourStage.columns"/>
+        FROM course_hour_stage
+        <include refid="CourseHourStage.where"/>
+
+        <if test="sortColumns!=null and sortColumns!=''">
+            ORDER BY ${sortColumns}
+        </if>
+    </select>
+
+    <!--扣除阶段课时-->
+    <update id="CourseHourStage.deductStageCourseHour" parameterType="CourseHourStage">
+		UPDATE course_hour_stage SET
+		courseHour = courseHour - #{courseHour} ,
+		updateTime = #{updateTime}
+		WHERE
+		studentCode = #{studentCode}
+		AND state=#{state}
+	</update>
+
+
+</mapper>
+

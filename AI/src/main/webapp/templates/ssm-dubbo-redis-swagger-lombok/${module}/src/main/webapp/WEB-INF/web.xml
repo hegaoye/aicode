@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
+    http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+    <display-name>tutors</display-name>
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>classpath:/framework/spring-back.xml</param-value>
+    </context-param>
+
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+    <!--如果用到了异步分页查询，需要加入清理监听器，以便在停止服务时关闭线程池-->
+    <listener>
+        <listener-class>com.github.miemiedev.mybatis.paginator.CleanupMybatisPaginatorListener</listener-class>
+    </listener>
+
+
+</web-app>

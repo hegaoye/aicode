@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<mapper namespace="ClassroomTrace">
+
+	<resultMap id="rs_base" type="ClassroomTrace">
+        <result property="id" column="id"/>
+        <result property="classroomCode" column="classroomCode"/>
+        <result property="summary" column="summary"/>
+        <result property="event" column="event"/>
+        <result property="opttype" column="opttype"/>
+        <result property="optCode" column="optCode"/>
+        <result property="optName" column="optName"/>
+        <result property="createTime" column="createTime"/>
+	</resultMap>
+
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="ClassroomTrace.columns">
+	    <![CDATA[
+		id,classroomCode,summary,event,opttype,optCode,optName,createTime
+	    ]]>
+	</sql>
+
+	<insert id="ClassroomTrace.insert" useGeneratedKeys="true" keyProperty="id" parameterType="ClassroomTrace">
+        INSERT INTO classroom_trace (
+        	id ,
+        	classroomCode ,
+        	summary ,
+        	event ,
+        	opttype ,
+        	optCode ,
+        	optName ,
+        	createTime 
+        ) VALUES (
+        	#{id} ,
+        	#{classroomCode} ,
+        	#{summary} ,
+        	#{event} ,
+        	#{opttype} ,
+        	#{optCode} ,
+        	#{optName} ,
+        	#{createTime} 
+        )
+		<selectKey keyProperty="id" resultType="long">
+			select LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+
+	<update id="ClassroomTrace.update" parameterType="ClassroomTrace">
+    <![CDATA[
+        UPDATE classroom_trace SET
+	        classroomCode = #{classroomCode} ,
+	        summary = #{summary} ,
+	        event = #{event} ,
+	        opttype = #{opttype} ,
+	        optCode = #{optCode} ,
+	        optName = #{optName} ,
+	        createTime = #{createTime} 
+        WHERE 
+	        id = #{id} 
+    ]]>
+	</update>
+
+    <delete id="ClassroomTrace.delete">
+    <![CDATA[
+        DELETE FROM classroom_trace WHERE
+        id = #{id} 
+    ]]>
+    </delete>
+
+    <select id="ClassroomTrace.load" resultMap="rs_base">
+		SELECT <include refid="ClassroomTrace.columns" />
+	    <![CDATA[
+		    FROM classroom_trace 
+	        WHERE 
+		        id = #{id} 
+	    ]]>
+	</select>
+
+	<sql id="ClassroomTrace.where">
+		<where>
+			<if test="id!=null and id!=''">
+				AND id = #{id}
+			</if>
+			<if test="classroomCode!=null and classroomCode!=''">
+				AND classroomCode = #{classroomCode}
+			</if>
+			<if test="summary!=null and summary!=''">
+				AND summary = #{summary}
+			</if>
+			<if test="event!=null and event!=''">
+				AND event = #{event}
+			</if>
+			<if test="opttype!=null and opttype!=''">
+				AND opttype = #{opttype}
+			</if>
+			<if test="optCode!=null and optCode!=''">
+				AND optCode = #{optCode}
+			</if>
+			<if test="optName!=null and optName!=''">
+				AND optName = #{optName}
+			</if>
+			<if test="createTimeBegin!=null ">
+				AND createTime >= #{createTimeBegin}
+		   </if>
+			<if test="createTimeEnd!=null ">
+				AND createTime &lt;= #{createTimeEnd}
+		   </if>
+		</where>
+	</sql>
+
+
+
+    <select id="ClassroomTrace.count" resultType="int">
+        SELECT count(1) FROM classroom_trace
+		<include refid="ClassroomTrace.where"/>
+    </select>
+
+
+    <select id="ClassroomTrace.query" resultMap="rs_base">
+    	SELECT <include refid="ClassroomTrace.columns" />
+	    FROM classroom_trace
+		<include refid="ClassroomTrace.where"/>
+
+		<if test="sortColumns!=null and sortColumns!=''">
+			ORDER BY ${sortColumns}
+		</if>
+    </select>
+
+
+</mapper>
+

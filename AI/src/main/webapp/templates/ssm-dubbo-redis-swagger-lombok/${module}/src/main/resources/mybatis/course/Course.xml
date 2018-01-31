@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<mapper namespace="Course">
+
+    <resultMap id="rs_base" type="Course">
+        <result property="id" column="id"/>
+        <result property="courseCode" column="courseCode"/>
+        <result property="ponddyletId" column="ponddyletId"/>
+        <result property="course" column="course"/>
+        <result property="categoryCode" column="categoryCode"/>
+        <result property="duration" column="duration"/>
+        <result property="studentNum" column="studentNum"/>
+        <result property="courseHour" column="courseHour"/>
+        <result property="state" column="state"/>
+        <result property="summary" column="summary"/>
+    </resultMap>
+
+
+    <!--所有信息-->
+    <resultMap id="rs_base_all" type="Course" extends="rs_base">
+        <collection property="courseCourseWares" column="{courseCode=courseCode}" select="CourseCourseWare.query"/>
+    </resultMap>
+    <resultMap id="rs_base_courseCategory" type="Course" extends="rs_base">
+        <association property="courseCategory" column="{categoryCode=categoryCode}" select="CourseCategory.load"/>
+    </resultMap>
+
+
+    <!-- 用于select查询公用抽取的列 -->
+    <sql id="Course.columns">
+		id,courseCode,ponddyletId,course,categoryCode,duration,studentNum,courseHour,state,summary
+	</sql>
+
+    <insert id="Course.insert" useGeneratedKeys="true" keyProperty="id" parameterType="Course">
+        INSERT INTO Course (
+        id ,
+        courseCode ,
+        ponddyletId ,
+        course ,
+        categoryCode ,
+        duration ,
+        studentNum ,
+        courseHour ,
+        state ,
+        summary
+        ) VALUES (
+        #{id} ,
+        #{courseCode} ,
+        #{ponddyletId} ,
+        #{course} ,
+        #{categoryCode} ,
+        #{duration} ,
+        #{studentNum} ,
+        #{courseHour} ,
+        #{state} ,
+        #{summary}
+        )
+        <selectKey keyProperty="id" resultType="long">
+            select LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+
+    <update id="Course.update" parameterType="Course">
+        UPDATE Course
+        <trim prefix="set" suffixOverrides=",">
+            <if test="course!=null and course!=''">
+                course = #{course} ,
+            </if>
+            <if test="categoryCode!=null and categoryCode!=''">
+                categoryCode = #{categoryCode} ,
+            </if>
+            <if test="ponddyletId!=null and ponddyletId!=''">
+                ponddyletId = #{ponddyletId} ,
+            </if>
+            <if test="duration!=null and duration!=''">
+                duration = #{duration} ,
+            </if>
+            <if test="studentNum!=null">
+                studentNum = #{studentNum} ,
+            </if>
+            <if test="courseHour!=null ">
+                courseHour = #{courseHour} ,
+            </if>
+            <if test="state!=null and state!=''">
+                state = #{state} ,
+            </if>
+            <if test="summary!=null and summary!=''">
+                summary = #{summary},
+            </if>
+        </trim>
+
+        WHERE
+        courseCode = #{courseCode}
+    </update>
+
+    <delete id="Course.delete">
+        DELETE FROM Course
+        <where>
+            <if test="id!=null and id!=''">
+                AND id = #{id}
+            </if>
+            <if test="courseCode!=null and courseCode!=''">
+                AND courseCode = #{courseCode}
+            </if>
+            <if test="categoryCode!=null and categoryCode!=''">
+                AND categoryCode = #{categoryCode}
+            </if>
+        </where>
+    </delete>
+
+    <select id="Course.load" resultMap="rs_base">
+        SELECT
+        <include refid="Course.columns"/>
+        FROM Course
+        <include refid="Course.where"/>
+    </select>
+
+    <sql id="Course.where">
+        <where>
+            <if test="id!=null and id!=''">
+                AND id = #{id}
+            </if>
+            <if test="courseCode!=null and courseCode!=''">
+                AND courseCode = #{courseCode}
+            </if>
+            <if test="ponddyletId!=null and ponddyletId!=''">
+                AND ponddyletId = #{ponddyletId}
+            </if>
+            <if test="course!=null and course!=''">
+                AND course = #{course}
+            </if>
+            <if test="categoryCode!=null and categoryCode!=''">
+                AND categoryCode = #{categoryCode}
+            </if>
+            <if test="duration!=null and duration!=''">
+                AND duration = #{duration}
+            </if>
+            <if test="studentNum!=null and studentNum!=''">
+                AND studentNum = #{studentNum}
+            </if>
+            <if test="courseHour!=null ">
+                AND courseHour = #{courseHour}
+            </if>
+            <if test="state!=null and state!=''">
+                AND state = #{state}
+            </if>
+            <if test="noState!=null and noState!=''">
+                AND state != #{noState}
+            </if>
+            <if test="summary!=null and summary!=''">
+                AND summary = #{summary}
+            </if>
+        </where>
+    </sql>
+
+
+    <select id="Course.count" resultType="int">
+        SELECT count(1) FROM Course
+        <include refid="Course.where"/>
+    </select>
+
+
+    <select id="Course.query" resultMap="rs_base">
+        SELECT
+        <include refid="Course.columns"/>
+        FROM Course
+        <include refid="Course.where"/>
+        ORDER BY courseCode DESC
+    </select>
+
+
+    <!--根据课程名加载 一个课程-->
+    <select id="Course.loadBy" resultMap="rs_base_all">
+        SELECT
+        <include refid="Course.columns"/>
+        FROM Course
+        <where>
+            <if test="courseCode!=null and courseCode!=''">
+                AND courseCode = #{courseCode}
+            </if>
+            <if test="ponddyletId!=null and ponddyletId!=''">
+                AND ponddyletId = #{ponddyletId}
+            </if>
+            <if test="course!=null and course!=''">
+                AND course = #{course}
+            </if>
+            <if test="state!=null and state!=''">
+                AND state = #{state}
+            </if>
+        </where>
+    </select>
+
+    <!--查询详情-->
+    <select id="Course.loadAll" resultMap="rs_base_all">
+        SELECT
+        <include refid="Course.columns"/>
+        FROM Course
+        <where>
+            <if test="courseCode!=null and courseCode!=''">
+                AND courseCode = #{courseCode}
+            </if>
+            <if test="course!=null and course!=''">
+                AND course = #{course}
+            </if>
+            <if test="state!=null and state!=''">
+                AND state = #{state}
+            </if>
+        </where>
+    </select>
+
+    <!--查询课程列表-->
+    <select id="Course.listCourse" resultMap="rs_base_courseCategory">
+        SELECT
+        <include refid="Course.columns"/>
+        FROM Course
+        <include refid="Course.listWhere"/>
+        ORDER BY courseCode DESC
+    </select>
+
+    <select id="Course.countCourse" resultType="int">
+        SELECT COUNT(1)
+        FROM Course
+        <include refid="Course.listWhere"/>
+    </select>
+
+    <sql id="Course.listWhere">
+        <where>
+            <if test="categoryCode!=null and categoryCode!=''">
+                AND categoryCode = #{categoryCode}
+            </if>
+            <if test="ponddyletId!=null and ponddyletId!=''">
+                AND ponddyletId = #{ponddyletId}
+            </if>
+            <if test="duration!=null and duration!=''">
+                AND duration = #{duration}
+            </if>
+            <if test="studentNum!=null and studentNum!=''">
+                AND studentNum = #{studentNum}
+            </if>
+            <if test="courseHour!=null ">
+                AND courseHour = #{courseHour}
+            </if>
+            <if test="state!=null and state!=''">
+                AND state = #{state}
+            </if>
+            <if test="noState!=null and noState!=''">
+                AND state != #{noState}
+            </if>
+        </where>
+    </sql>
+
+    <!--修改课程体系状态-->
+    <update id="Course.modifyCourse" parameterType="Course">
+        UPDATE Course
+        <trim prefix="set" suffixOverrides=",">
+
+            <if test="course!=null and course!=''">
+                course = #{course} ,
+            </if>
+            <if test="categoryCode!=null and categoryCode!=''">
+                categoryCode = #{categoryCode} ,
+            </if>
+            <if test="ponddyletId!=null and ponddyletId!=''">
+                ponddyletId = #{ponddyletId} ,
+            </if>
+            <if test="duration!=null and duration!=''">
+                duration = #{duration} ,
+            </if>
+            <if test="studentNum!=null and studentNum!=''">
+                studentNum = #{studentNum} ,
+            </if>
+            <if test="courseHour!=null ">
+                courseHour = #{courseHour} ,
+            </if>
+            <if test="state!=null and state!=''">
+                state = #{state} ,
+            </if>
+            <if test="summary!=null and summary!=''">
+                summary = #{summary} ,
+            </if>
+        </trim>
+
+        WHERE
+
+        courseCode = #{courseCode}
+    </update>
+
+
+</mapper>
+

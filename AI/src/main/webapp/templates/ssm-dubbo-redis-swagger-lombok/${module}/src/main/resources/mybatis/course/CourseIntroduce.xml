@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<mapper namespace="CourseIntroduce">
+
+	<resultMap id="rs_base" type="CourseIntroduce">
+        <result property="id" column="id"/>
+        <result property="tutorCode" column="tutorCode"/>
+        <result property="courseCode" column="courseCode"/>
+        <result property="course" column="course"/>
+        <result property="introduction" column="introduction"/>
+        <result property="type" column="type"/>
+	</resultMap>
+
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="CourseIntroduce.columns">
+	    <![CDATA[
+		id,tutorCode,courseCode,course,introduction,type
+	    ]]>
+	</sql>
+
+	<insert id="CourseIntroduce.insert" useGeneratedKeys="true" keyProperty="id" parameterType="CourseIntroduce">
+        INSERT INTO course_introduce (
+        	id ,
+        	tutorCode ,
+        	courseCode ,
+        	course ,
+        	introduction ,
+        	type 
+        ) VALUES (
+        	#{id} ,
+        	#{tutorCode} ,
+        	#{courseCode} ,
+        	#{course} ,
+        	#{introduction} ,
+        	#{type} 
+        )
+		<selectKey keyProperty="id" resultType="long">
+			select LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+
+	<update id="CourseIntroduce.update" parameterType="CourseIntroduce">
+    <![CDATA[
+        UPDATE course_introduce SET
+	        tutorCode = #{tutorCode} ,
+	        courseCode = #{courseCode} ,
+	        course = #{course} ,
+	        introduction = #{introduction} ,
+	        type = #{type} 
+        WHERE 
+	        id = #{id} 
+    ]]>
+	</update>
+
+    <delete id="CourseIntroduce.delete">
+    <![CDATA[
+        DELETE FROM course_introduce WHERE
+        id = #{id} 
+    ]]>
+    </delete>
+
+    <select id="CourseIntroduce.load" resultMap="rs_base">
+		SELECT <include refid="CourseIntroduce.columns" />
+	    <![CDATA[
+		    FROM course_introduce 
+	        WHERE 
+		        id = #{id} 
+	    ]]>
+	</select>
+
+	<sql id="CourseIntroduce.where">
+		<where>
+			<if test="id!=null and id!=''">
+				AND id = #{id}
+			</if>
+			<if test="tutorCode!=null and tutorCode!=''">
+				AND tutorCode = #{tutorCode}
+			</if>
+			<if test="courseCode!=null and courseCode!=''">
+				AND courseCode = #{courseCode}
+			</if>
+			<if test="course!=null and course!=''">
+				AND course = #{course}
+			</if>
+			<if test="introduction!=null and introduction!=''">
+				AND introduction = #{introduction}
+			</if>
+			<if test="type!=null and type!=''">
+				AND type = #{type}
+			</if>
+		</where>
+	</sql>
+
+
+
+    <select id="CourseIntroduce.count" resultType="int">
+        SELECT count(1) FROM course_introduce
+		<include refid="CourseIntroduce.where"/>
+    </select>
+
+
+    <select id="CourseIntroduce.query" resultMap="rs_base">
+    	SELECT <include refid="CourseIntroduce.columns" />
+	    FROM course_introduce
+		<include refid="CourseIntroduce.where"/>
+
+		<if test="sortColumns!=null and sortColumns!=''">
+			ORDER BY ${sortColumns}
+		</if>
+    </select>
+
+
+</mapper>
+

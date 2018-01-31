@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<mapper namespace="CourseCategory">
+
+    <resultMap id="rs_base" type="CourseCategory">
+        <result property="id" column="id"/>
+        <result property="categoryCode" column="categoryCode"/>
+        <result property="category" column="category"/>
+        <result property="superCode" column="superCode"/>
+        <result property="state" column="state"/>
+    </resultMap>
+
+    <!-- 用于select查询公用抽取的列 -->
+    <sql id="CourseCategory.columns">
+		id,categoryCode,category,superCode,state
+	</sql>
+
+    <insert id="CourseCategory.insert" useGeneratedKeys="true" keyProperty="id" parameterType="CourseCategory">
+        INSERT INTO course_category (
+        id ,
+        categoryCode ,
+        category ,
+        superCode ,
+        state
+        ) VALUES (
+        #{id} ,
+        #{categoryCode} ,
+        #{category} ,
+        #{superCode} ,
+        #{state}
+        )
+        <selectKey keyProperty="id" resultType="long">
+            select LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+
+    <update id="CourseCategory.update" parameterType="CourseCategory">
+        UPDATE course_category
+        <trim prefix="set" suffixOverrides=",">
+            <if test="category!=null and category!=''">
+                category = #{category} ,
+            </if>
+            <if test="superCode!=null and superCode!=''">
+                superCode = #{superCode} ,
+            </if>
+            <if test="state!=null and state!=''">
+                state = #{state} ,
+            </if>
+        </trim>
+        <where>
+            <if test="categoryCode!=null and categoryCode!=''">
+                AND categoryCode = #{categoryCode}
+            </if>
+
+            <if test="superCode!=null and superCode!=''">
+                AND superCode = #{superCode}
+            </if>
+        </where>
+    </update>
+
+    <delete id="CourseCategory.delete">
+        DELETE FROM course_category WHERE
+        id = #{id}  AND 
+        categoryCode = #{id} 
+    </delete>
+
+    <select id="CourseCategory.load" resultMap="rs_base">
+        SELECT
+        <include refid="CourseCategory.columns"/>
+        FROM course_category
+        WHERE
+        categoryCode = #{categoryCode}
+    </select>
+
+    <sql id="CourseCategory.where">
+        <where>
+            <if test="id!=null and id!=''">
+                AND id = #{id}
+            </if>
+            <if test="categoryCode!=null and categoryCode!=''">
+                AND categoryCode = #{categoryCode}
+            </if>
+            <if test="category!=null and category!=''">
+                AND category = #{category}
+            </if>
+            <if test="superCode!=null and superCode!=''">
+                AND superCode = #{superCode}
+            </if>
+            <if test="state!=null and state!=''">
+                AND state = #{state}
+            </if>
+            <if test="noState!=null and noState!=''">
+                AND state != #{noState}
+            </if>
+        </where>
+    </sql>
+
+
+    <select id="CourseCategory.count" resultType="int">
+        SELECT count(1) FROM course_category
+        <include refid="CourseCategory.where"/>
+    </select>
+
+
+    <select id="CourseCategory.query" resultMap="rs_base">
+        SELECT
+        <include refid="CourseCategory.columns"/>
+        FROM course_category
+        <include refid="CourseCategory.where"/>
+
+        <if test="sortColumns!=null and sortColumns!=''">
+            ORDER BY ${sortColumns}
+        </if>
+    </select>
+
+
+    <!--根据条件查询-->
+    <select id="CourseCategory.loadBy" parameterType="map" resultMap="rs_base">
+        SELECT
+        <include refid="CourseCategory.columns"/>
+        FROM course_category
+        <where>
+            <if test="categoryCode!=null and categoryCode!=''">
+                AND categoryCode = #{categoryCode}
+            </if>
+            <if test="category!=null and category!=''">
+                AND category = #{category}
+            </if>
+            <if test="superCode!=null and superCode!=''">
+                AND superCode = #{superCode}
+            </if>
+            <if test="state!=null and state!=''">
+                AND state = #{state}
+            </if>
+        </where>
+    </select>
+
+
+    <!--查询课程体系列表-->
+    <select id="CourseCategory.listCourseCategory" resultMap="rs_base">
+        SELECT
+        <include refid="CourseCategory.columns"/>
+        FROM course_category
+        <where>
+            <if test="state!=null and state!=''">
+                AND state = #{state}
+            </if>
+        </where>
+        ORDER BY categoryCode DESC
+    </select>
+
+    <select id="CourseCategory.countCourseCategory" resultType="int">
+        SELECT COUNT(1)
+        FROM course_category
+        <where>
+            <if test="state!=null and state!=''">
+                AND state = #{state}
+            </if>
+        </where>
+
+
+    </select>
+
+
+    <!--修改课程体系状态-->
+    <update id="CourseCategory.modifyCategory" parameterType="CourseCategory">
+        UPDATE course_category
+        <trim prefix="set" suffixOverrides=",">
+            <if test="category!=null and category!=''">
+                category = #{category} ,
+            </if>
+            <if test="superCode!=null and superCode!=''">
+                superCode = #{superCode} ,
+            </if>
+            <if test="state!=null and state!=''">
+                state = #{state}
+            </if>
+        </trim>
+        WHERE
+
+        categoryCode = #{categoryCode}
+    </update>
+
+</mapper>
+

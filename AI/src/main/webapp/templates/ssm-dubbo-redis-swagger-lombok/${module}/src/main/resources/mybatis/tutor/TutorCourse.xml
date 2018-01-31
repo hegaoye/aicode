@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<mapper namespace="TutorCourse">
+
+    <resultMap id="rs_base" type="TutorCourse">
+        <result property="id" column="id"/>
+        <result property="tutorCode" column="tutorCode"/>
+        <result property="courseCode" column="courseCode"/>
+        <result property="state" column="state"/>
+        <result property="createTime" column="createTime"/>
+        <result property="updateTime" column="updateTime"/>
+    </resultMap>
+
+
+    <!--所有信息-->
+    <resultMap id="rs_base_all" type="TutorCourse" extends="rs_base">
+        <association property="course" column="{courseCode=courseCode}" select="Course.load"/>
+    </resultMap>
+
+    <!-- 用于select查询公用抽取的列 -->
+    <sql id="TutorCourse.columns">
+		id,tutorCode,courseCode,state,createTime,updateTime
+	</sql>
+
+    <insert id="TutorCourse.insert" useGeneratedKeys="true" keyProperty="id" parameterType="TutorCourse">
+        INSERT INTO tutor_course (
+        id ,
+        tutorCode ,
+        courseCode ,
+        state ,
+        createTime ,
+        updateTime
+        ) VALUES (
+        #{id} ,
+        #{tutorCode} ,
+        #{courseCode} ,
+        #{state} ,
+        #{createTime} ,
+        #{updateTime}
+        )
+        <selectKey keyProperty="id" resultType="long">
+            select LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+
+    <update id="TutorCourse.update" parameterType="TutorCourse">
+        UPDATE tutor_course SET
+	        tutorCode = #{tutorCode} ,
+	        courseCode = #{courseCode} ,
+	        state = #{state} ,
+	        createTime = #{createTime} ,
+	        updateTime = #{updateTime} 
+        WHERE 
+	        id = #{id} 
+	</update>
+
+    <delete id="TutorCourse.delete">
+        DELETE FROM tutor_course
+        <include refid="TutorCourse.where"/>
+    </delete>
+
+    <select id="TutorCourse.load" resultMap="rs_base">
+        SELECT
+        <include refid="TutorCourse.columns"/>
+        FROM tutor_course
+        WHERE
+        id = #{id}
+    </select>
+
+    <sql id="TutorCourse.where">
+        <where>
+            <if test="id!=null and id!=''">
+                AND id = #{id}
+            </if>
+            <if test="tutorCode!=null and tutorCode!=''">
+                AND tutorCode = #{tutorCode}
+            </if>
+            <if test="courseCode!=null and courseCode!=''">
+                AND courseCode = #{courseCode}
+            </if>
+            <if test="state!=null and state!=''">
+                AND state = #{state}
+            </if>
+            <if test="createTimeBegin!=null ">
+                AND createTime >= #{createTimeBegin}
+            </if>
+            <if test="createTimeEnd!=null ">
+                AND createTime &lt;= #{createTimeEnd}
+            </if>
+            <if test="updateTimeBegin!=null ">
+                AND updateTime >= #{updateTimeBegin}
+            </if>
+            <if test="updateTimeEnd!=null ">
+                AND updateTime &lt;= #{updateTimeEnd}
+            </if>
+        </where>
+    </sql>
+
+
+    <select id="TutorCourse.count" resultType="int">
+        SELECT count(1) FROM tutor_course
+        <include refid="TutorCourse.where"/>
+    </select>
+
+
+    <select id="TutorCourse.query" resultMap="rs_base">
+        SELECT
+        <include refid="TutorCourse.columns"/>
+        FROM tutor_course
+        <include refid="TutorCourse.where"/>
+
+        <if test="sortColumns!=null and sortColumns!=''">
+            ORDER BY ${sortColumns}
+        </if>
+    </select>
+
+    <!--查询教师的选课-->
+    <select id="TutorCourse.tutorCourses" resultMap="rs_base_all">
+        SELECT
+        <include refid="TutorCourse.columns"/>
+        FROM tutor_course WHERE tutorCode = #{tutorCode}
+        ORDER BY createTime DESC
+    </select>
+
+</mapper>
+

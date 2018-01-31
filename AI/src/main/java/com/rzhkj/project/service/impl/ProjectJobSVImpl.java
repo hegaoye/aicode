@@ -22,11 +22,13 @@ import com.rzhkj.project.entity.*;
 import com.rzhkj.project.service.ProjectJobSV;
 import com.rzhkj.setting.dao.SettingDAO;
 import com.rzhkj.setting.entity.Setting;
+import org.apache.commons.io.FileUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -275,7 +277,15 @@ public class ProjectJobSVImpl extends BaseMybatisSVImpl<ProjectJob, Long> implem
                 + "/" + settingTemplatePath.getV()
                 + "/" + frameworksTemplate.getPath();
 
-        FreemarkerHelper.generate(templateData, targetFilePath, templatePath);
+        if (!templatePath.contains(".jar")) {
+            FreemarkerHelper.generate(templateData, targetFilePath, templatePath);
+        } else {
+            try {
+                FileUtils.copyFileToDirectory(new File(templatePath), new File(targetFilePath.substring(0, targetFilePath.lastIndexOf("/"))));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
 
     }
 }

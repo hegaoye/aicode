@@ -27,8 +27,6 @@
     <import resource="classpath:frameworks/spring-datasource.xml"/>
     <!-- 导入mybatis配置 -->
     <import resource="classpath:frameworks/spring-mybatis.xml"/>
-    <!-- 导入jdbctemplate配置 -->
-    <import resource="classpath:frameworks/spring-jdbctemplate.xml"/>
     <!--导入uid配置-->
     <import resource="classpath:frameworks/spring-uid.xml"/>
     <!-- 导入redis配置 -->

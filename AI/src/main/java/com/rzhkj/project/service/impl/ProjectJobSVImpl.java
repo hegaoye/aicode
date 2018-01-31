@@ -42,6 +42,8 @@ public class ProjectJobSVImpl extends BaseMybatisSVImpl<ProjectJob, Long> implem
     @Resource
     private ProjectDAO projectDAO;
     @Resource
+    private ProjectSqlDAO projectSqlDAO;
+    @Resource
     private SettingDAO settingDAO;
     @Resource
     private ProjectCodeCatalogDAO projectCodeCatalogDAO;
@@ -182,6 +184,11 @@ public class ProjectJobSVImpl extends BaseMybatisSVImpl<ProjectJob, Long> implem
                             projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "[<span style='color:green;'>✔</span>" + DateTools.yyyyMMddHHmmss(new Date()) + "] [已经生成] 模板 " + frameworksTemplate.getPath() + " 的相关源码"));
                         });
                     });
+
+                    //生成sql脚本到项目下
+                    ProjectSql projectSql = projectSqlDAO.load(map);
+                    String tsql = "-- AI-Code 为您构建代码，享受智慧生活!\n" + projectSql.getTsql();
+                    FileUtils.writeByteArrayToFile(new File(projectPath + "/" + project.getEnglishName() + ".sql"), tsql.getBytes());
 
                     //5.获取模块信息 TODO
 

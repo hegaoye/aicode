@@ -135,9 +135,9 @@ public class ${className}Ctrl {
             </#list>
 
     })
-    @GetMapping(value = "/list")
+    @GetMapping(value = "/listby")
     @ResponseBody
-    public BeanRet list(<#list pkFields as pkField>${pkField.fieldType} ${pkField.field},</#list>@ApiIgnore Page<${className}> page) {
+    public BeanRet listByPk(<#list pkFields as pkField>${pkField.fieldType} ${pkField.field},</#list>@ApiIgnore Page<${className}> page) {
         if(page==null){
           return BeanRet.create();
         }

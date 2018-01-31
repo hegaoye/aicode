@@ -55,7 +55,7 @@
     <!--redis工具-->
     <bean class="${basePackage}.core.tools.redis.RedisUtils"/>
     <!-- 使用中间类解决RedisCache.jedisConnectionFactory的静态注入，从而使MyBatis实现第三方缓存 -->
-    <bean id="redisCacheTransfer" class="${basePackage}.core.cache.RedisCacheTransfer">
+    <bean id="redisCacheTransfer" class="${basePackage}.core.tools.redis.RedisCacheTransfer">
         <property name="jedisConnectionFactory" ref="jedisConnectionFactory"/>
     </bean>
 </beans>

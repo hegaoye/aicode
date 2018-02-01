@@ -24,6 +24,7 @@ import ${basePackage}.${model}.entity.${className};
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.lang.StringUtils;
+import com.core.tools.StringTools;
 
 /**
  * ${notes}
@@ -91,7 +92,7 @@ public class ${className}Ctrl {
         //封装查询参数
 <#list fields as field >
         <#if field.field!='id'  && !field.checkDate>
-        if(StringUtils.isNotBlank(${classNameLower}.get${field.field?cap_first}())){
+        if(StringTools.isNotEmpty(${classNameLower}.get${field.field?cap_first}())){
             paras.put("${field.field}", ${classNameLower}.get${field.field?cap_first}());
         }
         </#if>
@@ -119,7 +120,7 @@ public class ${className}Ctrl {
     public BeanRet build(@ApiIgnore ${className} ${classNameLower}) {
         <#list fields as field>
         <#if field.field!='id'  && !field.checkDate>
-        if(${classNameLower}.get${field.field?cap_first}()==null){
+        if(StringTools.isNotEmpty(${classNameLower}.get${field.field?cap_first}())){
           return BeanRet.create();
         }
         </#if>
@@ -148,7 +149,7 @@ public class ${className}Ctrl {
     public BeanRet modify(@ApiIgnore ${className} ${classNameLower}) {
         <#list fields as field>
         <#if field.field!='id'>
-        if(${classNameLower}.get${field.field?cap_first}()==null){
+        if(StringTools.isNotEmpty(${classNameLower}.get${field.field?cap_first}())){
         return BeanRet.create();
         }
         </#if>

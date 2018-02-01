@@ -9,21 +9,21 @@ import java.util.regex.Pattern;
 
 public class StringTools {
 
-	/**
-     * 判断字符串不为空
+    /**
+     * 判断对象不为空
      *
-     * @param str
+     * @param obj
      * @return boolean
      */
-	public static boolean isNotEmpty(String str){
-		boolean flag=true;
-		if(str==null){
-			flag=false;
-		}else if(str.trim().length()<1){
-			flag=false;
-		}
-		return flag; 
-	}
+    public static boolean isNotEmpty(Object obj){
+        boolean flag=true;
+        if(obj==null){
+            flag=false;
+        }else if(obj.toString().length()<1){
+            flag=false;
+        }
+        return flag;
+    }
 	
 	
 	 /** 

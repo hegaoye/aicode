@@ -9,6 +9,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Column;
+import javax.persistence.GeneratedValue;
 /**
  * ${notes}
  * @author ${author}
@@ -19,6 +20,7 @@ import javax.persistence.Column;
 public class ${className} extends BaseEntity implements java.io.Serializable {
 
 	@Id
+	@GeneratedValue
 	public Long id;
 	<#list fields as field>
 		<#if field.field != 'id'>

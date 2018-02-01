@@ -51,7 +51,9 @@ public class ${className}Ctrl {
     @ApiOperation(value = "查询${className}详情信息", notes = "查询${className}详情信息")
     @ApiImplicitParams({
             <#list pkFields as pkField>
-            @ApiImplicitParam(name = "${pkField.field}", value = "${pkField.notes}", paramType = "query")<#if pkField_has_next>,</#if>
+            <#if !field.checkDate>
+                @ApiImplicitParam(name = "${pkField.field}", value = "${pkField.notes}", paramType = "query")<#if pkField_has_next>,</#if>
+            </#if>
             </#list>
     })
     @GetMapping(value = "/load")
@@ -107,16 +109,20 @@ public class ${className}Ctrl {
     @ApiOperation(value = "创建${className}", notes = "创建${className}")
     @ApiImplicitParams({
             <#list fields as field>
+            <#if field.field!='id'  && !field.checkDate>
             @ApiImplicitParam(name = "${field.field}", value = "${field.notes}", paramType = "query")<#if field_has_next>,</#if>
+            </#if>
             </#list>
     })
     @PostMapping("/build")
     @ResponseBody
     public BeanRet build(@ApiIgnore ${className} ${classNameLower}) {
         <#list fields as field>
+        <#if field.field!='id'  && !field.checkDate>
         if(${classNameLower}.get${field.field?cap_first}()==null){
           return BeanRet.create();
         }
+        </#if>
         </#list>
 
         ${classNameLower}SV.saveOrUpdate(${classNameLower});
@@ -132,7 +138,7 @@ public class ${className}Ctrl {
     @ApiOperation(value = "修改${className}", notes = "修改${className}")
     @ApiImplicitParams({
             <#list fields as field>
-            <#if field.field!='id'>
+            <#if field.field!='id' && !field.checkDate>
             @ApiImplicitParam(name = "${field.field}", value = "${field.notes}", paramType = "query")<#if field_has_next>,</#if>
             </#if>
             </#list>
@@ -160,7 +166,9 @@ public class ${className}Ctrl {
     @ApiOperation(value = "删除${className}", notes = "删除${className}")
     @ApiImplicitParams({
             <#list pkFields as pkField>
+            <#if field.field!='id' && !field.checkDate>
             @ApiImplicitParam(name = "${pkField.field}", value = "${pkField.notes}", paramType = "query")<#if pkField_has_next>,</#if>
+            </#if>
             </#list>
     })
     @DeleteMapping("/delete")

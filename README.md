@@ -1,5 +1,11 @@
 AI Code  自动生成框架代码 节约30%的时间
+###1.运行方法：
+请修改项目中的jdbc.properties 文件将数据库链接修改成自己的数据地址即可
+如:jdbc.url=jdbc:mysql://192.168.10.250:3306/ai_code_simple?useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=round&allowMultiQueries=true
+前提是执行了ai-code.sql 脚本，执行后会有原始数据被导入，用于生成过程中的必要数据，请务必保证数据完整未被修改
 
+
+###2.编写模板说明：
 模板采用freemarker 
 模板可以拿到如下数据：
 ${projectName} //项目英文名

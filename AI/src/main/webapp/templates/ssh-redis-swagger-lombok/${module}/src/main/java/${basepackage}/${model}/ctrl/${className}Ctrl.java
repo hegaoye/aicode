@@ -139,7 +139,7 @@ public class ${className}Ctrl {
     @ApiOperation(value = "修改${className}", notes = "修改${className}")
     @ApiImplicitParams({
             <#list fields as field>
-            <#if field.field!='id' && !field.checkDate>
+            <#if !field.checkDate>
             @ApiImplicitParam(name = "${field.field}", value = "${field.notes}", paramType = "query")<#if field_has_next>,</#if>
             </#if>
             </#list>
@@ -148,7 +148,7 @@ public class ${className}Ctrl {
     @ResponseBody
     public BeanRet modify(@ApiIgnore ${className} ${classNameLower}) {
         <#list fields as field>
-        <#if field.field!='id'>
+        <#if !field.checkDate>
         if(StringTools.isNotEmpty(${classNameLower}.get${field.field?cap_first}())){
         return BeanRet.create();
         }
@@ -167,7 +167,7 @@ public class ${className}Ctrl {
     @ApiOperation(value = "删除${className}", notes = "删除${className}")
     @ApiImplicitParams({
             <#list pkFields as pkField>
-            <#if field.field!='id' && !field.checkDate>
+            <#if !field.checkDate>
             @ApiImplicitParam(name = "${pkField.field}", value = "${pkField.notes}", paramType = "query")<#if pkField_has_next>,</#if>
             </#if>
             </#list>

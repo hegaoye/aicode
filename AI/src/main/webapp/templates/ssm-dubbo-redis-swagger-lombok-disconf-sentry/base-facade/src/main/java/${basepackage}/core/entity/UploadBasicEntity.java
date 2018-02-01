@@ -8,9 +8,7 @@
 
 package ${basePackage}.core.entity;
 
-import lombok.Getter;
-import lombok.Setter;
-
+import lombok.Data;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;

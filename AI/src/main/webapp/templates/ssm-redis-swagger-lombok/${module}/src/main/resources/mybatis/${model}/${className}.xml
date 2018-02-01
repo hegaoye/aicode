@@ -73,9 +73,15 @@
        <trim prefix="set" suffixOverrides=",">
         <#if (notPkFields?size>0)>
          <#list notPkFields as field>
-          <if test="${field.field}!=null and ${field.field}!=''">
-            ${field.column} = <@mapperEl field.field/> <#if field_has_next>,</#if>
-          </if>
+           <#if field.checkDate>
+           <if test="${field.field}!=null">
+               ${field.column} = <@mapperEl field.field/> <#if field_has_next>,</#if>
+           </if>
+           <#else>
+           <if test="${field.field}!=null and ${field.field}!=''">
+               ${field.column} = <@mapperEl field.field/> <#if field_has_next>,</#if>
+           </if>
+           </#if>
          </#list>
          </#if>
        </trim>

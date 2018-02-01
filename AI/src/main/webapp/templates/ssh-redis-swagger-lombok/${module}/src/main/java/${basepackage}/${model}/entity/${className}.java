@@ -8,6 +8,7 @@ import lombok.Data;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Column;
 /**
  * ${notes}
  * @author ${author}

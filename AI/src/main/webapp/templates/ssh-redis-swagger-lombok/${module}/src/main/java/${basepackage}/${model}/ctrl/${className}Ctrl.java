@@ -87,9 +87,11 @@ public class ${className}Ctrl {
         }
         Map<String, Object> paras = new HashMap<>();
         //封装查询参数
-<#list fields as field  && !field.checkDate>
-        <#if field.field!='id'>
-        if (StringUtils.isNotBlank(${classNameLower}.get${field.field?cap_first}())) paras.put("${field.field}", ${classNameLower}.get${field.field?cap_first}());
+<#list fields as field >
+        <#if field.field!='id'  && !field.checkDate>
+        if(StringUtils.isNotBlank(${classNameLower}.get${field.field?cap_first}())){
+            paras.put("${field.field}", ${classNameLower}.get${field.field?cap_first}());
+        }
         </#if>
 </#list>
         page.setParams(paras);

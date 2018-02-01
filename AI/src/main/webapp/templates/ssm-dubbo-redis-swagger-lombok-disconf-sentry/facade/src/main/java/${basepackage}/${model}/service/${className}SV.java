@@ -1,7 +1,7 @@
 /*
  * ${copyright}
  */
-package ${basePackage}.${model}.facade;
+package ${basePackage}.${model}.service;
 
 import java.util.List;
 

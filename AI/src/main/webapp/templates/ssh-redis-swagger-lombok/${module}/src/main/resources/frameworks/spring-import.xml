@@ -26,7 +26,7 @@
     <!-- 导入数据源配置 -->
     <import resource="classpath:frameworks/spring-datasource.xml"/>
     <!-- 导入mybatis配置 -->
-    <import resource="classpath:frameworks/spring-mybatis.xml"/>
+    <import resource="classpath:frameworks/spring-hibernate.xml"/>
     <!--导入uid配置-->
     <import resource="classpath:frameworks/spring-uid.xml"/>
     <!-- 导入redis配置 -->

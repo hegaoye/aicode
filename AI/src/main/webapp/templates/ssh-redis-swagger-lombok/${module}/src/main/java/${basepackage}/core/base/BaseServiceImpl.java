@@ -8,11 +8,7 @@
 package com.zygh.zhlk.service.base.impl;
 
 import com.zygh.zhlk.dao.BaseDao;
-import com.zygh.zhlk.dao.LogDao;
-import com.zygh.zhlk.dao.StorageDao;
 import com.zygh.zhlk.entity.base.Page;
-import com.zygh.zhlk.entity.gain.LaStorageEntity;
-import com.zygh.zhlk.entity.sys.BssLogMdlEntity;
 import com.zygh.zhlk.service.base.BaseService;
 import org.springframework.beans.factory.annotation.Autowired;
 

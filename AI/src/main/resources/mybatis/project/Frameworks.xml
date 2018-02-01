@@ -15,7 +15,7 @@
 
     <!--查询表信息关联信息-->
     <resultMap id="rs_base_all" type="Frameworks" extends="rs_base">
-        <collection property="frameworksTemplateList" column="{frameworksCode=code}" select="FrameworksTemplate.query"/>
+        <collection property="frameworksTemplateList" column="{frameworkCode=code}" select="FrameworksTemplate.query"/>
     </resultMap>
 
 

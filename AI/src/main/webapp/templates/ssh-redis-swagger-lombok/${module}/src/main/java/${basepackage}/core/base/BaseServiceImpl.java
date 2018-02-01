@@ -1,17 +1,7 @@
-/*
- * Copyright (c) 2016. 郑州仁中和科技有限公司.保留所有权利.
- *                       http://www.rzhkj.com/
- *      郑州仁中和科技有限公司保留所有代码著作权.如有任何疑问请访问官方网站与我们联系.
- *      代码只针对特定客户使用，不得在未经允许或授权的情况下对外传播扩散.恶意传播者，法律后果自行承担.
- *      本代码仅用于河南中裕广恒科技股份有限公司的智慧粮仓项目.
- */
-package com.zygh.zhlk.service.base.impl;
+package ${basePackage}.core.base;
 
-import com.zygh.zhlk.dao.BaseDao;
-import com.zygh.zhlk.entity.base.Page;
-import com.zygh.zhlk.service.base.BaseService;
 import org.springframework.beans.factory.annotation.Autowired;
-
+import com.alibaba.fastjson.JSON;
 import java.util.List;
 import java.util.Map;
 

@@ -21,8 +21,9 @@ import ${basePackage}.core.base.BeanRet;
 import ${basePackage}.core.base.Page;
 import ${basePackage}.${model}.facade.${className}SV;
 import ${basePackage}.${model}.entity.${className};
-
-
+import java.util.HashMap;
+import java.util.Map;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * ${notes}
@@ -45,7 +46,6 @@ public class ${className}Ctrl {
 <#if (pkFields?size>0)>
     /**
      * 查询${className}一个详情信息
-     * <#list pkFields as pkField>@param ${pkField.field} ${pkField.notes}</#list>
      * @return BeanRet
      */
     @ApiOperation(value = "查询${className}详情信息", notes = "查询${className}详情信息")
@@ -57,7 +57,7 @@ public class ${className}Ctrl {
     @GetMapping(value = "/load")
     @ResponseBody
     public BeanRet load(${className} ${classNameLower}) {
-        ${className} ${classNameLower} = ${classNameLower}SV.query(${className}.class,${classNameLower});
+        ${classNameLower} = ${classNameLower}SV.query(${className}.class,${classNameLower});
         logger.info(JSON.toJSONString(${classNameLower}));
         return BeanRet.create(true, "查询详情信息", ${classNameLower});
     }
@@ -74,7 +74,9 @@ public class ${className}Ctrl {
             @ApiImplicitParam(name = "curPage", value = "当前页", required = true, paramType = "query"),
             @ApiImplicitParam(name = "pageSize", value = "分页大小", required = true, paramType = "query"),
             <#list fields as field>
-            @ApiImplicitParam(name = "${field.field}", value = "${field.notes}", paramType = "query")<#if field_has_next>,</#if>
+            <#if field.field!='id' && !field.checkDate>
+                @ApiImplicitParam(name = "${field.field}", value = "${field.notes}", paramType = "query")<#if field_has_next>,</#if>
+            </#if>
             </#list>
     })
     @GetMapping(value = "/list")
@@ -83,10 +85,12 @@ public class ${className}Ctrl {
         if(page==null){
           return BeanRet.create();
         }
-        Map<String, Object> paras = new HashMap<String, Object>();
+        Map<String, Object> paras = new HashMap<>();
         //封装查询参数
-<#list fields as field>
+<#list fields as field  && !field.checkDate>
+        <#if field.field!='id'>
         if (StringUtils.isNotBlank(${classNameLower}.get${field.field?cap_first}())) paras.put("${field.field}", ${classNameLower}.get${field.field?cap_first}());
+        </#if>
 </#list>
         page.setParams(paras);
         page = ${classNameLower}SV.queryPage(${className}.class,page);
@@ -126,16 +130,20 @@ public class ${className}Ctrl {
     @ApiOperation(value = "修改${className}", notes = "修改${className}")
     @ApiImplicitParams({
             <#list fields as field>
+            <#if field.field!='id'>
             @ApiImplicitParam(name = "${field.field}", value = "${field.notes}", paramType = "query")<#if field_has_next>,</#if>
+            </#if>
             </#list>
     })
     @PutMapping("/modify")
     @ResponseBody
     public BeanRet modify(@ApiIgnore ${className} ${classNameLower}) {
         <#list fields as field>
+        <#if field.field!='id'>
         if(${classNameLower}.get${field.field?cap_first}()==null){
         return BeanRet.create();
         }
+        </#if>
         </#list>
 
         ${classNameLower}SV.saveOrUpdate(${classNameLower});
@@ -156,7 +164,7 @@ public class ${className}Ctrl {
     @DeleteMapping("/delete")
     @ResponseBody
     public BeanRet delete(${className} ${classNameLower}) {
-        ${classNameLower} = ${classNameLower}SV.query(${classNameLower});
+        ${classNameLower} = ${classNameLower}SV.query(${className}.class,${classNameLower});
         ${classNameLower}SV.delete(${classNameLower});
         return BeanRet.create(true, "删除${className}成功");
     }

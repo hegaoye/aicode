@@ -1,8 +1,4 @@
-package com.zygh.zhlk.dao;
-
-import com.zygh.zhlk.entity.base.Page;
-import com.zygh.zhlk.entity.gain.LaGrainInspectionEntity;
-
+package ${basePackage}.core.base;
 import java.util.List;
 import java.util.Map;
 
@@ -67,11 +63,6 @@ public interface BaseDao<T> {
 	 */
 	public T select(Class<T> clazz,Map<String,Object> paras);
 
-	/**
-	 * 根据paras返回对象 LaGrainInspectionEntity
-	 * @return
-	 */
-	public LaGrainInspectionEntity selectLaGrainInspection(Map<String,Object> paras);
 
 	/**
 	 * 根据id返回对象

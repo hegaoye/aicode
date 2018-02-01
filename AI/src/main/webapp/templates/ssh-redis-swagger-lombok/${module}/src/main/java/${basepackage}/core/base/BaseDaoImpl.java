@@ -1,10 +1,5 @@
-package com.zygh.zhlk.dao.impl;
-
-
-import com.zygh.zhlk.dao.BaseDao;
-import com.zygh.zhlk.entity.base.Page;
-import com.zygh.zhlk.entity.gain.LaGrainInspectionEntity;
-import com.zygh.zhlk.tools.StringTools;
+package ${basePackage}.core.base;
+import ${basePackage}.core.tools.StringTools;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Query;
@@ -14,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.orm.hibernate4.support.HibernateDaoSupport;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.*;
 
 /**
  * 2016-3-24 10:07:18
@@ -77,17 +74,6 @@ public class BaseDaoImpl<T> extends HibernateDaoSupport implements BaseDao<T> {
     @Override
     public T select(Class<T> clazz, Map<String, Object> paras) {
         List<T> list = this.selectAll(clazz, paras);
-        if (list == null || list.size() == 0) return null;
-        return list.get(0);
-    }
-
-    @Override
-    public LaGrainInspectionEntity selectLaGrainInspection(Map<String, Object> paras) {
-        String hsql = this.packHsql(LaGrainInspectionEntity.class, paras);
-        Session session = getHibernateTemplate().getSessionFactory().openSession();
-        Query query = session.createQuery(hsql);
-        List<LaGrainInspectionEntity> list = query.list();
-        session.close();
         if (list == null || list.size() == 0) return null;
         return list.get(0);
     }
@@ -180,7 +166,7 @@ public class BaseDaoImpl<T> extends HibernateDaoSupport implements BaseDao<T> {
                 }
             }
             List<Object[]> list = query.list();
-            return convertToMap(hql,list);
+            return convertToMap(hql, list);
         } else {
             throw new Exception("未检测到SELECT命令");
         }
@@ -242,7 +228,7 @@ public class BaseDaoImpl<T> extends HibernateDaoSupport implements BaseDao<T> {
         //分页操作;
         query.setFirstResult(startRow);
         query.setMaxResults(pageSize);
-        page.setVoList(convertToMap(hql,query.list()));
+        page.setVoList(convertToMap(hql, query.list()));
         session.close();
         return page;
     }
@@ -280,7 +266,7 @@ public class BaseDaoImpl<T> extends HibernateDaoSupport implements BaseDao<T> {
         return page;
     }
 
-    private static List<Map> convertToMap(String shql,List<Object[]> list){
+    private static List<Map> convertToMap(String shql, List<Object[]> list) {
         List<Map> resultList = new ArrayList<>();
         shql = shql.toLowerCase().trim();
         String key = shql.substring(shql.indexOf("select") + 6, shql.indexOf("from"));

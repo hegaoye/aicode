@@ -1,72 +1,78 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-  ~  Copyright (c) 2017. 郑州仁中和科技有限公司.保留所有权利.
-  ~                        http://www.rzhkj.com/
-  ~        郑州仁中和科技有限公司保留所有代码著作权.如有任何疑问请访问官方网站与我们联系.
-  ~        代码只针对特定客户使用，不得在未经允许或授权的情况下对外传播扩散.恶意传播者，法律后果自行承担.
-  ~        本代码仅用于AI-Code.
-  ~
-  -->
-
 <beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:tx="http://www.springframework.org/schema/tx"
-       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:context="http://www.springframework.org/schema/context"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
-            http://www.springframework.org/schema/beans/spring-beans.xsd
-            http://www.springframework.org/schema/tx
-            http://www.springframework.org/schema/tx/spring-tx.xsd
-            http://www.springframework.org/schema/aop
-            http://www.springframework.org/schema/aop/spring-aop.xsd"
+        http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
+        http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx-4.1.xsd
+		http://www.springframework.org/schema/context
+		http://www.springframework.org/schema/context/spring-context-4.1.xsd"
        default-autowire="byName">
 
-    <!-- 定义SqlSessionFactory -->
-    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
-        <property name="configLocation" value="classpath:mybatis/mybatis-config.xml"/>
-        <property name="mapperLocations">
+    <context:component-scan base-package="com"/>
+    <!-- 自动扫描所有注解该路径 -->
+    <context:property-placeholder location="classpath:/jdbc.properties"/>
+    <!-- 配置数据源 使用的是Druid数据源 -->
+    <bean name="dataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+        <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+        <property name="url" value="${r'${jdbc.url}'}"/>
+        <property name="username" value="${r'${jdbc.username}'}"/>
+        <property name="password" value="${r'${jdbc.password}'}"/>
+        <property name="validationQuery" value="${r'${jdbc.validationQuery}'}"/>
+        <property name="maxActive" value="${r'${jdbc.maxActive}'}"/>
+        <property name="initialSize" value="${r'${jdbc.initialSize}'}"/>
+        <property name="maxWait" value="${r'${jdbc.maxWait}'}"/>
+        <property name="minIdle" value="${r'${jdbc.minIdle}'}"/>
+        <property name="timeBetweenEvictionRunsMillis" value="${r'${jdbc.timeBetweenEvictionRunsMillis}'}"/>
+        <property name="minEvictableIdleTimeMillis" value="${r'${jdbc.minEvictableIdleTimeMillis}'}"/>
+        <property name="testWhileIdle" value="${r'${jdbc.testWhileIdle}'}"/>
+        <property name="testOnBorrow" value="${r'${jdbc.testOnBorrow}'}"/>
+        <property name="testOnReturn" value="${r'${jdbc.testOnReturn}'}"/>
+        <!-- mysql 不支持 poolPreparedStatements-->
+        <!--<property name="poolPreparedStatements" value="true" />-->
+        <!--<property name="maxPoolPreparedStatementPerConnectionSize" value="20" />-->
+        <!-- 开启Druid的监控统计功能 -->
+        <property name="filters" value="stat"/>
+    </bean>
+
+
+    <bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="hibernateProperties">
+            <props>
+                <!-- 自动验证数据库表结构 -->
+                <!--注意，这句-->
+                <!--一般来讲是先用create，然后再修改为update，这样开发起来会很方便-->
+                <!--如果要自动建表,必须为以下-->
+                <!--<prop key="hibernate.hbm2ddl.auto">create</prop>-->
+                <!--<prop key="hibernate.hbm2ddl.auto">update</prop>-->
+                <!--上面不是自动建表，而是更新表结构-->
+                <!--<prop key="hibernate.dialect">org.hibernate.dialect.MySQLInnoDBDialect</prop>-->
+                <!--<prop key="hibernate.show_sql">true</prop>-->
+                <!--<prop key="hibernate.format_sql">true</prop>-->
+                <!--&lt;!&ndash;一次读的数据库记录数&ndash;&gt;-->
+                <!--<prop key="hibernate.jdbc.fetch_size">50</prop>-->
+                <!--&lt;!&ndash; 设定对数据库进行批量删除 &ndash;&gt;-->
+                <!--<prop key="hibernate.jdbc.batch_size">30</prop>-->
+            </props>
+        </property>
+        <property name="packagesToScan">
             <list>
-                <value>classpath:mybatis/*/*.xml</value>
-                <value>classpath:/META-INF/mybatis/mapper/WORKER*.xml</value>
+                <!-- 扫描实体类 -->
+                <#list classes as class>
+                <!--${class.notes} 对应数据库表名 ${class.tableName}-->
+                <value>${basePackage}.${class.classModel}.entity</value>
+                </#list>
             </list>
         </property>
+    </bean>
+
+        <!-- 配置事务管理器 -->
+    <bean id="transactionManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+        <property name="sessionFactory" ref="sessionFactory"/>
         <property name="dataSource" ref="dataSource"/>
     </bean>
-
-    <bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
-        <constructor-arg ref="sqlSessionFactory"/>
-    </bean>
-
-    <!--定义事务 -->
-    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
-        <property name="dataSource" ref="dataSource"/>
-    </bean>
-
-    <!-- AOP配置数据事务管理，也可以采用注解方式，也可以写在LoggerAspect里面 -->
-    <tx:advice id="txAdvice" transaction-manager="transactionManager">
-        <tx:attributes>
-            <tx:method name="select*" read-only="true"/>
-            <tx:method name="count*" read-only="true"/>
-            <tx:method name="*NT" read-only="true"/>
-            <tx:method name="get*" read-only="true"/>
-            <tx:method name="load*" read-only="true"/>
-            <tx:method name="find*" read-only="true"/>
-            <tx:method name="query*" read-only="true"/>
-            <tx:method name="is*" read-only="true"/>
-            <tx:method name="read*" read-only="true"/>
-            <tx:method name="check*" read-only="true"/>
-            <tx:method name="gen*" read-only="true"/>
-            <tx:method name="list*" read-only="true"/>
-            <tx:method name="sync*" read-only="true"/>
-            <tx:method name="*" propagation="REQUIRED" rollback-for="Exception"/>
-        </tx:attributes>
-    </tx:advice>
-
-    <!-- 对子类业务逻辑层实施事务 -->
-    <aop:config>
-        <aop:pointcut id="executeService" expression="execution(* ${basePackage}.*.service.*SVImpl.*(..))"/>
-        <aop:advisor pointcut-ref="executeService" advice-ref="txAdvice"/>
-    </aop:config>
-
-    <!-- 注解方式的事务拦截器 开启 -->
-    <tx:annotation-driven transaction-manager="transactionManager" proxy-target-class="true"/>
+        <!-- 注解方式配置事务 -->
+    <tx:annotation-driven transaction-manager="transactionManager"/>
 </beans>

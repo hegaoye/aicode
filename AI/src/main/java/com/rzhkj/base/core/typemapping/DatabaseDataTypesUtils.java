@@ -138,6 +138,7 @@ public class DatabaseDataTypesUtils {
         _preferredJavaTypeForSqlType.put("bit", "java.lang.Boolean");
         _preferredJavaTypeForSqlType.put("boolean", "java.lang.Boolean");
         _preferredJavaTypeForSqlType.put("char", "java.lang.String");
+        _preferredJavaTypeForSqlType.put("text", "java.lang.String");
         _preferredJavaTypeForSqlType.put("varchar", "java.lang.String");
         // according to resultset.gif, we should use java.io.Reader, but String is more convenient for EJB
 

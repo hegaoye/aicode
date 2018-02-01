@@ -4,7 +4,8 @@
 package ${basePackage}.${model}.service;
 
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
+import com.baidu.fsg.uid.UidGenerator;
+import com.alibaba.dubbo.config.annotation.Service;
 import javax.annotation.Resource;
 import java.util.Map;
 import java.util.HashMap;
@@ -28,6 +29,8 @@ public class ${className}SVImpl extends BaseMybatisSVImpl<${className},Long> imp
 	@Resource
 	private ${className}DAO ${classNameLower}DAO;
 
+	@Resource
+	private UidGenerator uidGenerator;
 
     @Override
     protected BaseMybatisDAO getBaseMybatisDAO(){

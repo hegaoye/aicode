@@ -1,11 +1,3 @@
-/*
- *  Copyright (c) 2017. 郑州仁中和科技有限公司.保留所有权利.
- *                        http://www.rzhkj.com/
- *        郑州仁中和科技有限公司保留所有代码著作权.如有任何疑问请访问官方网站与我们联系.
- *        代码只针对特定客户使用，不得在未经允许或授权的情况下对外传播扩散.恶意传播者，法律后果自行承担.
- *        本代码仅用于AI-Code.
- *
- */
 package ${basePackage}.core.tools.security;
 
 /**
@@ -1033,16 +1025,16 @@ public class Rzh_URLDecoder {
     private static sun.security.provider.MD5 md5 = new sun.security.provider.MD5();
 
     static {
-        String basicAddress = "^([\\w\\.-]+)@([\\w\\.-]+)$";
-        String specialChars = "\\(\\)><@,;:\\\\\\\"\\.\\[\\]";
-        String validChars = "[^ \f\n\r\t" + specialChars + "]";
+        String basicAddress = "${r'^([\\w\\.-]+)@([\\w\\.-]+)$'}";
+        String specialChars = "${r'\\(\\)><@,;:\\\\\\\"\\.\\[\\]'}";
+        String validChars = "${r'[^ \f\n\r\t'}" + specialChars + "]";
         String atom = validChars + "+";
-        String quotedUser = "(\"[^\"]+\")";
+        String quotedUser = "${r'(\"[^\"]+\")'}";
         String word = "(" + atom + "|" + quotedUser + ")";
         String validUser = "^" + word + "(\\." + word + ")*$";
         String domain = "^" + atom + "(\\." + atom + ")+$";
-        String ipDomain = "^(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})$";
-        String knownTLDs = "^\\.(com|net|org|edu|int|mil|gov|arpa|biz|aero|name|coop|info|pro|museum)$";
+        String ipDomain = "${r'^(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})$'}";
+        String knownTLDs = "${r'^\\.(com|net|org|edu|int|mil|gov|arpa|biz|aero|name|coop|info|pro|museum)$'}";
         basicAddressPattern = Pattern.compile(basicAddress, 2);
         validUserPattern = Pattern.compile(validUser, 2);
         domainPattern = Pattern.compile(domain, 2);

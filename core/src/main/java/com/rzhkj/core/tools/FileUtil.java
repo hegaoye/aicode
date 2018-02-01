@@ -373,7 +373,7 @@ public class FileUtil {
         List<File> list = getDirFiles("C:\\workspaces\\AI-Code\\AI\\src\\main\\webapp\\templates\\ssm-dubbo-redis-swagger-lombok-disconf-sentry");
         for (int i = 0; i < list.size(); i++) {
             String path = list.get(i).getAbsoluteFile().toString().replace("C:\\workspaces\\AI-Code\\AI\\src\\main\\webapp\\templates", "").replace("\\", "/");
-            String sql = "INSERT into frameworks_template(code,frameworkCode,path) values('" + (13579 + i) + "','123456','" + path + "');";
+            String sql = "INSERT into frameworks_template(code,frameworkCode,path) values('" + (456789 + i) + "','456789','" + path + "');";
             System.out.println(sql);
         }
     }

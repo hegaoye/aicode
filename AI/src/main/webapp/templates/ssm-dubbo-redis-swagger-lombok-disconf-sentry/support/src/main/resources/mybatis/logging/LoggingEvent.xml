@@ -51,21 +51,21 @@
         caller_line ,
         event_id
         ) VALUES (
-        ${'#{timestmp}'} ,
-        ${'#{formattedMessage}'} ,
-        ${'#{loggerName}'} ,
-        ${'#{levelString}'} ,
-        ${'#{threadName}'} ,
-        ${'#{referenceFlag}'} ,
-        ${'#{arg0}'} ,
-        ${'#{arg1}'} ,
-        ${'#{arg2}'} ,
-        ${'#{arg3}'} ,
-        ${'#{callerFilename}'} ,
-        ${'#{callerClass}'} ,
-        ${'#{callerMethod}'} ,
-        ${'#{callerLine}'} ,
-        ${'#{eventId}'}
+        ${r'#{timestmp}'} ,
+        ${r'#{formattedMessage}'} ,
+        ${r'#{loggerName}'} ,
+        ${r'#{levelString}'} ,
+        ${r'#{threadName}'} ,
+        ${r'#{referenceFlag}'} ,
+        ${r'#{arg0}'} ,
+        ${r'#{arg1}'} ,
+        ${r'#{arg2}'} ,
+        ${r'#{arg3}'} ,
+        ${r'#{callerFilename}'} ,
+        ${r'#{callerClass}'} ,
+        ${r'#{callerMethod}'} ,
+        ${r'#{callerLine}'} ,
+        ${r'#{eventId}'}
         )
         <selectKey keyProperty="id" resultType="long">
             select LAST_INSERT_ID()
@@ -74,23 +74,23 @@
 
     <update id="LoggingEvent.update" parameterType="LoggingEvent">
         UPDATE logging_event SET
-        timestmp = ${'#{timestmp}'} ,
-        formatted_message = ${'#{formattedMessage}'} ,
-        logger_name = ${'#{loggerName}'} ,
-        level_string = ${'#{levelString}'} ,
-        thread_name = ${'#{threadName}'} ,
-        reference_flag = ${'#{referenceFlag}'} ,
-        arg0 = ${'#{arg0}'} ,
-        arg1 = ${'#{arg1}'} ,
-        arg2 = ${'#{arg2}'} ,
-        arg3 = ${'#{arg3}'} ,
-        caller_filename = ${'#{callerFilename}'} ,
-        caller_class = ${'#{callerClass}'} ,
-        caller_method = ${'#{callerMethod}'} ,
-        caller_line = ${'#{callerLine}'}
+        timestmp = ${r'#{timestmp}'} ,
+        formatted_message = ${r'#{formattedMessage}'} ,
+        logger_name = ${r'#{loggerName}'} ,
+        level_string = ${r'#{levelString}'} ,
+        thread_name = ${r'#{threadName}'} ,
+        reference_flag = ${r'#{referenceFlag}'} ,
+        arg0 = ${r'#{arg0}'} ,
+        arg1 = ${r'#{arg1}'} ,
+        arg2 = ${r'#{arg2}'} ,
+        arg3 = ${r'#{arg3}'} ,
+        caller_filename = ${r'#{callerFilename}'} ,
+        caller_class = ${r'#{callerClass}'} ,
+        caller_method = ${r'#{callerMethod}'} ,
+        caller_line = ${r'#{callerLine}'}
         where
         <if test="eventId!=null and eventId!=''">
-            event_id = ${'#{eventId}'}
+            event_id = ${r'#{eventId}'}
         </if>
     </update>
 
@@ -98,60 +98,60 @@
         DELETE FROM logging_event
         where
         <if test="eventId!=null and eventId!=''">
-            event_id = ${'#{eventId}'}
+            event_id = ${r'#{eventId}'}
         </if>
     </delete>
 
     <select id="LoggingEvent.load" resultMap="rs_base">
-        SELECT * FROM logging_event where event_id = ${'#{eventId}'}
+        SELECT * FROM logging_event where event_id = ${r'#{eventId}'}
     </select>
 
     <sql id="LoggingEvent.where">
         <where>
             <if test="timestmp!=null">
-                AND timestmp = ${'#{timestmp}'}
+                AND timestmp = ${r'#{timestmp}'}
             </if>
             <if test="formattedMessage!=null and formattedMessage!=''">
-                AND formatted_message = ${'#{formattedMessage}'}
+                AND formatted_message = ${r'#{formattedMessage}'}
             </if>
             <if test="loggerName!=null and loggerName!=''">
-                AND logger_name = ${'#{loggerName}'}
+                AND logger_name = ${r'#{loggerName}'}
             </if>
             <if test="levelString!=null and levelString!=''">
-                AND level_string = ${'#{levelString}'}
+                AND level_string = ${r'#{levelString}'}
             </if>
             <if test="threadName!=null and threadName!=''">
-                AND thread_name = ${'#{threadName}'}
+                AND thread_name = ${r'#{threadName}'}
             </if>
             <if test="referenceFlag!=null and referenceFlag!=''">
-                AND reference_flag = ${'#{referenceFlag}'}
+                AND reference_flag = ${r'#{referenceFlag}'}
             </if>
             <if test="arg0!=null and arg0!=''">
-                AND arg0 = ${'#{arg0}'}
+                AND arg0 = ${r'#{arg0}'}
             </if>
             <if test="arg1!=null and arg1!=''">
-                AND arg1 = ${'#{arg1}'}
+                AND arg1 = ${r'#{arg1}'}
             </if>
             <if test="arg2!=null and arg2!=''">
-                AND arg2 = ${'#{arg2}'}
+                AND arg2 = ${r'#{arg2}'}
             </if>
             <if test="arg3!=null and arg3!=''">
-                AND arg3 = ${'#{arg3}'}
+                AND arg3 = ${r'#{arg3}'}
             </if>
             <if test="callerFilename!=null and callerFilename!=''">
-                AND caller_filename = ${'#{callerFilename}'}
+                AND caller_filename = ${r'#{callerFilename}'}
             </if>
             <if test="callerClass!=null and callerClass!=''">
-                AND caller_class = ${'#{callerClass}'}
+                AND caller_class = ${r'#{callerClass}'}
             </if>
             <if test="callerMethod!=null and callerMethod!=''">
-                AND caller_method = ${'#{callerMethod}'}
+                AND caller_method = ${r'#{callerMethod}'}
             </if>
             <if test="callerLine!=null and callerLine!=''">
-                AND caller_line = ${'#{callerLine}'}
+                AND caller_line = ${r'#{callerLine}'}
             </if>
             <if test="eventId!=null">
-                AND event_id = ${'#{eventId}'}
+                AND event_id = ${r'#{eventId}'}
             </if>
         </where>
     </sql>
@@ -204,11 +204,11 @@
         FROM logging_event
         <where>
             <if test="createtimeBegin!=null">
-                AND timestmp >= ${'#{createtimeBegin}'}
+                AND timestmp >= ${r'#{createtimeBegin}'}
             </if>
 
             <if test="createtimeEnd!=null">
-                <![CDATA[ AND timestmp <= ${'#{createtimeEnd}'}]]>
+                <![CDATA[ AND timestmp <= ${r'#{createtimeEnd}'}]]>
             </if>
 
             <if test="keyword!=null and keyword!=''">
@@ -222,11 +222,11 @@
         FROM logging_event
         <where>
             <if test="createtimeBegin!=null">
-                AND timestmp >= ${'#{createtimeBegin}'}
+                AND timestmp >= ${r'#{createtimeBegin}'}
             </if>
 
             <if test="createtimeEnd!=null">
-                <![CDATA[ AND timestmp <= ${'#{createtimeEnd}'}]]>
+                <![CDATA[ AND timestmp <= ${r'#{createtimeEnd}'}]]>
             </if>
 
             <if test="keyword!=null and keyword!=''">

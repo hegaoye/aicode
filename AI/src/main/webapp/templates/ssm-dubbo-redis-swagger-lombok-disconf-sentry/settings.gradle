@@ -13,5 +13,5 @@ include 'support-api'//基础支撑项目（support） 对日志，上传，枚�
 include 'support'//为support-api系统提供接口支持
 
 //Web管理项目
-include '${module}-api'
-include '${module}'
+include '${projectName}-api'
+include '${projectName}'

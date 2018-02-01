@@ -4,6 +4,7 @@
 package ${basePackage}.${model}.service;
 
 import org.springframework.stereotype.Component;
+import com.baidu.fsg.uid.UidGenerator;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.Map;
@@ -24,10 +25,11 @@ import ${basePackage}.${model}.entity.${className};
 @Component
 @Service
 public class ${className}SVImpl extends BaseMybatisSVImpl<${className},Long> implements ${className}SV{
+	@Resource
+	private UidGenerator uidGenerator;
 
 	@Resource
 	private ${className}DAO ${classNameLower}DAO;
-
 
     @Override
     protected BaseMybatisDAO getBaseMybatisDAO(){

@@ -184,13 +184,35 @@ ext {
             "swagger-annotations"            : 'io.swagger:swagger-annotations:1.5.10',
             //-----------swagger end--------------
 
+            //-----------dangdang分布式作业框架 begin-----------
+            /**
+             *  目前Elastic job的最新版本已经由原来的elastic-job-core分离除了两个项目，
+             *  分别为Elastic-Job-Lite和Elastic-Job-Cloud。Elastic-Job是一个分布式调度解决方案，
+             *  由两个相互独立的子项目Elastic-Job-Lite和Elastic-Job-Cloud组成，
+             *  Elastic-Job-Lite定位为轻量级无中心化解决方案，使用jar包的形式提供分布式任务的协调服务。
+             *  Elastic-Job-Cloud使用Mesos + Docker(TBD)的解决方案，额外提供资源治理、应用分发以及进程隔离等服务，
+             *  Elastic-Job-Lite和Elastic-Job-Cloud提供同一套API开发作业，开发者仅需一次开发，即可根据需要以Lite或Cloud的方式部署
+             */
+            "elastic-job-lite-spring"        : 'com.dangdang:elastic-job-lite-spring:2.1.4',
+            "elastic-job-common-core"        : 'com.dangdang:elastic-job-common-core:2.1.4',
+            "elastic-job-lite-core"          : 'com.dangdang:elastic-job-lite-core:2.1.4',
+            //-----------dangdang分布式作业框架 end-----------
+
+            //-----------Quartz begin-----------
+            "quartz"                         : 'org.quartz-scheduler:quartz:2.3.0',
+            "quartz-jobs"                    : 'org.quartz-scheduler:quartz-jobs:2.3.0',
+            //-----------Quartz end-----------
+
             //-----------Sentry begin-----------
             "sentry-log4j"                  : 'io.sentry:sentry-log4j:1.5.4',
+            "sentry-log4j2"                  : 'io.sentry:sentry-log4j2:1.5.4',
+            "sentry-logback"                 : 'io.sentry:sentry-logback:1.5.4',
             //-----------Sentry end-----------
 
-            //-----------disconf begin-----------
+
+            //-----------Paypal begin-----------
             "disconf-client"                 : 'com.baidu.disconf:disconf-client:2.6.31'
-            //-----------disconf end-----------
+            //-----------Paypal end-----------
 
 
     ]

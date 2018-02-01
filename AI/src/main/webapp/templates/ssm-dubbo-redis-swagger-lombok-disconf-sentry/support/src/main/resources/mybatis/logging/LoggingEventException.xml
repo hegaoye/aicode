@@ -25,9 +25,9 @@
         	i ,
         	trace_line 
         ) VALUES (
-        	${'#{eventId}'} ,
-        	${'#{i}'} ,
-        	${'#{traceLine}'} 
+        	${r'#{eventId}'} ,
+        	${r'#{i}'} ,
+        	${r'#{traceLine}'}
         )
 		<selectKey keyProperty="id" resultType="long">
 			select LAST_INSERT_ID()
@@ -36,13 +36,13 @@
 
 	<update id="LoggingEventException.update" parameterType="LoggingEventException">
         UPDATE logging_event_exception SET
-	        trace_line = ${'#{traceLine}'} 
+	        trace_line = ${r'#{traceLine}'}
 			where
 				<if test="eventId!=null and eventId!=''">
-				event_id = ${'#{eventId}'} AND 
+				event_id = ${r'#{eventId}'} AND
 				</if>
 				<if test="i!=null and i!=''">
-				i = ${'#{i}'}
+				i = ${r'#{i}'}
 				</if>
 	</update>
 
@@ -50,10 +50,10 @@
         DELETE FROM logging_event_exception
 		where
        		<if test="eventId!=null and eventId!=''">
-				event_id = ${'#{eventId}'} AND 
+				event_id = ${r'#{eventId}'} AND
 			</if>
        		<if test="i!=null and i!=''">
-				i = ${'#{i}'}
+				i = ${r'#{i}'}
 			</if>
     </delete>
 
@@ -62,10 +62,10 @@
 		    FROM logging_event_exception
 				where
 						<if test="eventId!=null and eventId!=''">
-						event_id = ${'#{eventId}'}
+						event_id = ${r'#{eventId}'}
 						</if>
 						<if test="i!=null and i!=''">
-							AND i = ${'#{i}'}
+							AND i = ${r'#{i}'}
 						</if>
 
 	</select>
@@ -73,13 +73,13 @@
 	<sql id="LoggingEventException.where">
 		<where>
 			<if test="eventId!=null and eventId!=''">
-				AND event_id = ${'#{eventId}'}
+				AND event_id = ${r'#{eventId}'}
 			</if>
 			<if test="i!=null and i!=''">
-				AND i = ${'#{i}'}
+				AND i = ${r'#{i}'}
 			</if>
 			<if test="traceLine!=null and traceLine!=''">
-				AND trace_line = ${'#{traceLine}'}
+				AND trace_line = ${r'#{traceLine}'}
 			</if>
 		</where>
 	</sql>

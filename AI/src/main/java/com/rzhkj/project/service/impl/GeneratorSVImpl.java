@@ -197,7 +197,7 @@ public class GeneratorSVImpl implements GenerateSV {
 
         //生成路径处理
         String frameworksTemplatePath = frameworksTemplate.getPath();
-        if (frameworksTemplatePath.contains("/$")) {
+        if (frameworksTemplatePath.contains("/${module}")) {
             frameworksTemplatePath = frameworksTemplatePath.substring(frameworksTemplatePath.indexOf("/$"));
         } else {
             frameworksTemplatePath = frameworksTemplatePath.replaceFirst("/", "");

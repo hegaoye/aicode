@@ -15,19 +15,19 @@
 
     <!-- jedis pool配置 -->
     <bean id="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig">
-        <property name="maxTotal" value="${'${redis.maxTotal}'}" />
-        <property name="maxIdle" value="${'${redis.maxIdle}'}" />
-        <property name="maxWaitMillis" value="${'${redis.maxWaitMillis}'}" />
-        <property name="testOnBorrow" value="${'${redis.testOnBorrow}'}" />
+        <property name="maxTotal" value="${r'${redis.maxTotal}'}" />
+        <property name="maxIdle" value="${r'${redis.maxIdle}'}" />
+        <property name="maxWaitMillis" value="${r'${redis.maxWaitMillis}'}" />
+        <property name="testOnBorrow" value="${r'${redis.testOnBorrow}'}" />
     </bean>
 
     <!-- spring data redis -->
     <bean id="jedisConnectionFactory" class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory">
         <property name="usePool" value="true"/>
-        <property name="hostName" value="${'${redis.host}'}" />
-        <property name="port" value="${'${redis.port}'}" />
-        <property name="password" value="${'${redis.pass}'}" />
-        <property name="timeout" value="${'${redis.timeout}'}" />
+        <property name="hostName" value="${r'${redis.host}'}" />
+        <property name="port" value="${r'${redis.port}'}" />
+        <property name="password" value="${r'${redis.pass}'}" />
+        <property name="timeout" value="${r'${redis.timeout}'}" />
         <!--<property name="database" value="0" />-->
         <constructor-arg index="0" ref="jedisPoolConfig" />
     </bean>

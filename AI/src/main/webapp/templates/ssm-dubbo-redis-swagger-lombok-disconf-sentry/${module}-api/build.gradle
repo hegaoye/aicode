@@ -108,6 +108,7 @@ dependencies {
     compile rootProject.ext.dependencies["sentry-log4j"]
     //------------Sentry end-------------------
 
+
     compile fileTree(dir: '../libs', include: ['*.jar'])
     compile project(":facade")
     compile project(":core")

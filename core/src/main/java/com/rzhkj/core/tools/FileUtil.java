@@ -347,6 +347,7 @@ public class FileUtil {
 
     /**
      * 获取指定目录下所有文件路径
+     *
      * @param dirPath
      */
     public static List<File> getDirFiles(String dirPath) {
@@ -366,6 +367,15 @@ public class FileUtil {
             }
         }
         return ret;
+    }
+
+    public static void main(String[] args) {
+        List<File> list = getDirFiles("C:\\workspaces\\AI-Code\\AI\\src\\main\\webapp\\templates\\ssm-dubbo-redis-swagger-lombok-disconf-sentry");
+        for (int i = 0; i < list.size(); i++) {
+            String path = list.get(i).getAbsoluteFile().toString().replace("C:\\workspaces\\AI-Code\\AI\\src\\main\\webapp\\templates", "").replace("\\", "/");
+            String sql = "INSERT into frameworks_template(code,frameworkCode,path) values('" + (13579 + i) + "','123456','" + path + "');";
+            System.out.println(sql);
+        }
     }
 
 }

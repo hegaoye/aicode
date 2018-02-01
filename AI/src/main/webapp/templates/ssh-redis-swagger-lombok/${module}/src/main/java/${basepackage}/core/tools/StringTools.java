@@ -15,6 +15,23 @@ public class StringTools {
      * @param obj
      * @return boolean
      */
+    public static boolean isEmpty(Object obj){
+        boolean flag=false;
+        if(obj==null){
+            flag=true;
+        }else if(obj.toString().length()<1){
+            flag=true;
+        }
+        return flag;
+    }
+
+
+    /**
+     * 判断对象不为空
+     *
+     * @param obj
+     * @return boolean
+     */
     public static boolean isNotEmpty(Object obj){
         boolean flag=true;
         if(obj==null){

@@ -21,10 +21,10 @@ import ${basePackage}.core.base.BeanRet;
 import ${basePackage}.core.base.Page;
 import ${basePackage}.${model}.facade.${className}SV;
 import ${basePackage}.${model}.entity.${className};
+import ${basePackage}.core.tools.StringTools;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.lang.StringUtils;
-import com.core.tools.StringTools;
 
 /**
  * ${notes}
@@ -52,7 +52,7 @@ public class ${className}Ctrl {
     @ApiOperation(value = "查询${className}详情信息", notes = "查询${className}详情信息")
     @ApiImplicitParams({
             <#list pkFields as pkField>
-            <#if !field.checkDate>
+            <#if !pkField.checkDate>
                 @ApiImplicitParam(name = "${pkField.field}", value = "${pkField.notes}", paramType = "query")<#if pkField_has_next>,</#if>
             </#if>
             </#list>
@@ -120,7 +120,7 @@ public class ${className}Ctrl {
     public BeanRet build(@ApiIgnore ${className} ${classNameLower}) {
         <#list fields as field>
         <#if field.field!='id'  && !field.checkDate>
-        if(StringTools.isNotEmpty(${classNameLower}.get${field.field?cap_first}())){
+        if(StringTools.isEmpty(${classNameLower}.get${field.field?cap_first}())){
           return BeanRet.create();
         }
         </#if>
@@ -149,7 +149,7 @@ public class ${className}Ctrl {
     public BeanRet modify(@ApiIgnore ${className} ${classNameLower}) {
         <#list fields as field>
         <#if !field.checkDate>
-        if(StringTools.isNotEmpty(${classNameLower}.get${field.field?cap_first}())){
+        if(StringTools.isEmpty(${classNameLower}.get${field.field?cap_first}())){
         return BeanRet.create();
         }
         </#if>
@@ -167,7 +167,7 @@ public class ${className}Ctrl {
     @ApiOperation(value = "删除${className}", notes = "删除${className}")
     @ApiImplicitParams({
             <#list pkFields as pkField>
-            <#if !field.checkDate>
+            <#if !pkField.checkDate>
             @ApiImplicitParam(name = "${pkField.field}", value = "${pkField.notes}", paramType = "query")<#if pkField_has_next>,</#if>
             </#if>
             </#list>

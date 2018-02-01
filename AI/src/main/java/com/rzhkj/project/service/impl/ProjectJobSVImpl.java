@@ -7,29 +7,23 @@ package com.rzhkj.project.service.impl;
 
 import com.baidu.fsg.uid.UidGenerator;
 import com.google.common.collect.Maps;
-import com.rzhkj.base.core.FreemarkerHelper;
-import com.rzhkj.base.core.TemplateData;
 import com.rzhkj.core.base.BaseMybatisDAO;
 import com.rzhkj.core.base.BaseMybatisSVImpl;
-import com.rzhkj.core.enums.YNEnum;
 import com.rzhkj.core.exceptions.BaseException;
 import com.rzhkj.core.exceptions.ProjectJobException;
-import com.rzhkj.core.tools.*;
-import com.rzhkj.project.dao.*;
-import com.rzhkj.project.entity.*;
+import com.rzhkj.core.tools.Executors;
+import com.rzhkj.core.tools.StringTools;
+import com.rzhkj.project.dao.ProjectJobDAO;
+import com.rzhkj.project.dao.ProjectJobLogsDAO;
+import com.rzhkj.project.entity.ProjectJob;
+import com.rzhkj.project.entity.ProjectJobStateEnum;
+import com.rzhkj.project.service.GenerateSV;
 import com.rzhkj.project.service.ProjectJobSV;
-import com.rzhkj.setting.dao.SettingDAO;
-import com.rzhkj.setting.entity.Setting;
-import org.apache.commons.io.FileUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 
 
@@ -38,23 +32,13 @@ import java.util.Map;
 public class ProjectJobSVImpl extends BaseMybatisSVImpl<ProjectJob, Long> implements ProjectJobSV {
 
     @Resource
-    private ProjectDAO projectDAO;
-    @Resource
-    private ProjectSqlDAO projectSqlDAO;
-    @Resource
-    private SettingDAO settingDAO;
-    @Resource
-    private ProjectCodeCatalogDAO projectCodeCatalogDAO;
-    @Resource
     private ProjectJobDAO projectJobDAO;
-    @Resource
-    private ProjectRepositoryAccountDAO projectRepositoryAccountDAO;
 
     @Resource
     private ProjectJobLogsDAO projectJobLogsDAO;
 
     @Resource
-    private MapClassTableDAO mapClassTableDAO;
+    private GenerateSV generateSV;
 
     @Resource
     private UidGenerator uidGenerator;
@@ -146,155 +130,11 @@ public class ProjectJobSVImpl extends BaseMybatisSVImpl<ProjectJob, Long> implem
         Executors.singleThreadExecutor(new Runnable() {
             @Override
             public void run() {
-                try {
-                    //1.创建项目
-                    projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "Start By AI-Code"));
-                    Map<String, Object> map = Maps.newHashMap();
-                    map.put("projectCode", projectCode);
-                    Project project = projectDAO.load(map);
-                    String projectPath = buildProject(project);
-                    projectDAO.update(projectCode, project.getBuildNumber() != null ? project.getBuildNumber() + 1 : 1);
-
-                    projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "创建工作空间库完成"));
-                    logger.info("创建工作空间库完成");
-
-                    //2.获取类信息
-                    List<ProjectMap> projectMapList = project.getProjectMapList();
-                    List<MapClassTable> mapClassTableList = new ArrayList<>();
-                    projectMapList.forEach(projectMap -> {
-                        mapClassTableList.add(projectMap.getMapClassTable());
-                    });
-
-                    projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "已经获取类信息"));
-
-                    //3.获取模板信息
-                    List<ProjectFramwork> projectFramworkList = project.getProjectFramworkList();
-
-                    projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "已经获取模板信息"));
-
-                    //4.生成源码
-                    projectFramworkList.forEach(projectFramwork -> {
-                        List<FrameworksTemplate> frameworksTemplateList = projectFramwork.getFrameworks().getFrameworksTemplateList();
-                        frameworksTemplateList.forEach(frameworksTemplate -> {
-                            projectMapList.forEach(projectMap -> {
-                                generator(projectPath, project, projectMap.getMapClassTable(), frameworksTemplate, mapClassTableList);
-                            });
-                            projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "[<span style='color:green;'>✔</span>" + DateTools.yyyyMMddHHmmss(new Date()) + "] [已经生成] 模板 " + frameworksTemplate.getPath() + " 的相关源码"));
-                        });
-                    });
-
-                    //生成sql脚本到项目下
-                    ProjectSql projectSql = projectSqlDAO.load(map);
-                    String tsql = "-- AI-Code 为您构建代码，享受智慧生活!\n" + projectSql.getTsql();
-                    FileUtils.writeByteArrayToFile(new File(projectPath + "/" + project.getEnglishName() + ".sql"), tsql.getBytes());
-
-                    //5.获取模块信息 TODO
-
-                    //6.获取版本控制管理信息
-                    projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "获取代码仓库信息"));
-                    map.clear();
-                    map.put("projectCode", project.getCode());
-                    ProjectRepositoryAccount projectRepositoryAccount = projectRepositoryAccountDAO.load(map);
-                    projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "代码向仓库 ⇛⇛⇛ <a style='text-decoration:underline;' href='" + projectRepositoryAccount.getHome() + "' target='_blank'>" + projectRepositoryAccount.getHome() + " 提交中......"));
-                    GitTools.commitAndPush(new File(projectPath), projectRepositoryAccount.getAccount(), projectRepositoryAccount.getPassword(), "AI-Code 为您构建代码，享受智慧生活");
-                    projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "代码代码提交完成"));
-                    projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "End By <span style='color:green;'>☺</span> AI-Code 为您构建代码，享受智慧生活!"));
-                    projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "End"));
-                    projectJob.setState(ProjectJob.State.Completed.name());
-                    projectJobDAO.update(projectJob);
-                } catch (Exception e) {
-                    logger.error(e.getMessage());
-                    projectJob.setState(ProjectJob.State.Error.name());
-                    projectJobDAO.update(projectJob);
-                }
+                generateSV.aiCode(projectCode, projectJob);
             }
         });
         return projectJob;
     }
 
-    /**
-     * 1.检测项目工作工作空间是否存在
-     * 2.创建项目工作空间
-     * 3.代码仓库检出
-     *
-     * @param project
-     */
-    private String buildProject(Project project) {
-        Setting settingWorkspace = settingDAO.loadByKey(Setting.Key.Workspace.name());
-        String projectPath = new HandleFuncs().getCurrentClassPath() + settingWorkspace.getV() + "/" + project.getEnglishName();
-        projectPath = projectPath.replace("//", "/");
-        //1.检测项目工作工作空间是否存在
-        File file = new File(projectPath);
-        if (file.exists()) {
-            FileUtil.delFolder(projectPath);
-        }
-        file.mkdirs();
 
-        //3.代码仓库检出
-        Map<String, Object> map = Maps.newHashMap();
-        map.put("projectCode", project.getCode());
-        ProjectRepositoryAccount projectRepositoryAccount = projectRepositoryAccountDAO.load(map);
-        GitTools.cloneGit(projectRepositoryAccount.getHome(), projectPath, projectRepositoryAccount.getAccount(), projectRepositoryAccount.getPassword());
-        return projectPath;
-    }
-
-
-    /**
-     * 生成源码文件
-     *
-     * @param projectPath        项目路径
-     * @param project            项目对象
-     * @param mapClassTable      映射对象
-     * @param frameworksTemplate 框架模板对象
-     */
-    private void generator(String projectPath, Project project, MapClassTable mapClassTable, FrameworksTemplate frameworksTemplate, List<MapClassTable> mapClassTableList) {
-        List<MapFieldColumn> mapFieldColumnPks = new ArrayList<>();
-        List<MapFieldColumn> mapFieldColumnNotPks = new ArrayList<>();
-        List<MapFieldColumn> mapFieldColumnList = new ArrayList<>();
-        mapClassTable.getMapFieldColumnList().forEach(mapFieldColumn -> {
-            if (mapFieldColumn.getIsPrimaryKey().equals(YNEnum.Y.name())) {
-                mapFieldColumnPks.add(mapFieldColumn);
-            } else {
-                mapFieldColumnNotPks.add(mapFieldColumn);
-            }
-            mapFieldColumnList.add(mapFieldColumn);
-        });
-
-        TemplateData templateData = new TemplateData(project, mapClassTable, mapClassTableList, mapFieldColumnList, mapFieldColumnPks, mapFieldColumnNotPks);
-        Setting settingTemplatePath = settingDAO.loadByKey(Setting.Key.Template_Path.name());
-
-        //生成路径处理
-        String frameworksTemplatePath = frameworksTemplate.getPath();
-        if (frameworksTemplatePath.contains("/$")) {
-            frameworksTemplatePath = frameworksTemplatePath.substring(frameworksTemplatePath.indexOf("/$"));
-        } else {
-            frameworksTemplatePath = frameworksTemplatePath.replaceFirst("/", "");
-            frameworksTemplatePath = frameworksTemplatePath.substring(frameworksTemplatePath.indexOf("/"));
-        }
-
-        String targetFilePath = projectPath + "/" + frameworksTemplatePath
-                .replace("${basepackage}", project.getBasePackage().replace(".", "/"))
-                .replace("${className}", mapClassTable.getClassName())
-                .replace("${module}", project.getEnglishName())
-                .replace("${model}", templateData.getModel());
-
-        String templatePath = new HandleFuncs().getCurrentClassPath()
-                + "/" + settingTemplatePath.getV()
-                + "/" + frameworksTemplate.getPath();
-
-        if (new File(templatePath).exists()) {
-            if (!templatePath.contains(".jar")) {
-                FreemarkerHelper.generate(templateData, targetFilePath, templatePath);
-            } else {
-                try {
-                    FileUtils.copyFileToDirectory(new File(templatePath), new File(targetFilePath.substring(0, targetFilePath.lastIndexOf("/"))));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        } else {
-            logger.error("文件不存在 ===> " + templatePath);
-        }
-
-    }
 }

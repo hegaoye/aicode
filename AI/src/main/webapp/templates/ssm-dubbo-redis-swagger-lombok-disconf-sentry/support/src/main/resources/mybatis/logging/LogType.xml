@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<mapper namespace="LogType">
+
+	<resultMap id="rs_base" type="LogType">
+        <result property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="code" column="code"/>
+        <result property="detail" column="detail"/>
+        <result property="enable" column="enable"/>
+	</resultMap>
+
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="LogType.columns">
+	    <![CDATA[
+		id,name,code,detail,enable
+	    ]]>
+	</sql>
+
+	<insert id="LogType.insert" useGeneratedKeys="true" keyProperty="id" parameterType="LogType">
+        INSERT INTO log_type (
+        	id ,
+        	name ,
+        	code ,
+        	detail ,
+        	enable 
+        ) VALUES (
+        	${r'#{id}'} ,
+        	${r'#{name}'} ,
+        	${r'#{code}'} ,
+        	${r'#{detail}'} ,
+        	${r'#{enable}'} 
+        )
+		<selectKey keyProperty="id" resultType="long">
+			select LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+
+	<update id="LogType.update" parameterType="LogType">
+        UPDATE log_type SET
+	        name = ${r'#{name}'} ,
+	        code = ${r'#{code}'} ,
+	        detail = ${r'#{detail}'} ,
+	        enable = ${r'#{enable}'} 
+			where
+				<if test="id!=null">
+				id = ${r'#{id}'}
+				</if>
+	</update>
+
+    <delete id="LogType.delete">
+        DELETE FROM log_type
+		where
+       		<if test="id!=null">
+				id = ${r'#{id}'}
+			</if>
+    </delete>
+
+    <select id="LogType.load" resultMap="rs_base">
+		SELECT <include refid="LogType.columns" />
+		    FROM log_type
+				where id = ${r'#{id}'}
+
+	</select>
+
+	<sql id="LogType.where">
+		<where>
+			<if test="id!=null">
+				AND id = ${r'#{id}'}
+			</if>
+			<if test="name!=null and name!=''">
+				AND name = ${r'#{name}'}
+			</if>
+			<if test="code!=null and code!=''">
+				AND code = ${r'#{code}'}
+			</if>
+			<if test="detail!=null and detail!=''">
+				AND detail = ${r'#{detail}'}
+			</if>
+			<if test="enable!=null and enable!=''">
+				AND enable = ${r'#{enable}'}
+			</if>
+		</where>
+	</sql>
+
+
+
+    <select id="LogType.count" resultType="int">
+        SELECT count(1) FROM log_type
+		<include refid="LogType.where"/>
+    </select>
+
+
+    <select id="LogType.query" resultMap="rs_base">
+    	SELECT <include refid="LogType.columns" />
+	    FROM log_type
+		<include refid="LogType.where"/>
+
+		<if test="sortColumns!=null and sortColumns!=''">
+			ORDER BY ${r'${sortColumns}'}
+		</if>
+    </select>
+
+
+</mapper>
+

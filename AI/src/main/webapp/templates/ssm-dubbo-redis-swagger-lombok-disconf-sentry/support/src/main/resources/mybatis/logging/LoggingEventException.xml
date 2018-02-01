@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<mapper namespace="LoggingEventException">
+
+	<resultMap id="rs_base" type="LoggingEventException">
+        <result property="eventId" column="event_id"/>
+        <result property="i" column="i"/>
+        <result property="traceLine" column="trace_line"/>
+	</resultMap>
+
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="LoggingEventException.columns">
+	    <![CDATA[
+		event_id,i,trace_line
+	    ]]>
+	</sql>
+
+	<insert id="LoggingEventException.insert" useGeneratedKeys="true" keyProperty="eventId" parameterType="LoggingEventException">
+        INSERT INTO logging_event_exception (
+        	event_id ,
+        	i ,
+        	trace_line 
+        ) VALUES (
+        	${'#{eventId}'} ,
+        	${'#{i}'} ,
+        	${'#{traceLine}'} 
+        )
+		<selectKey keyProperty="id" resultType="long">
+			select LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+
+	<update id="LoggingEventException.update" parameterType="LoggingEventException">
+        UPDATE logging_event_exception SET
+	        trace_line = ${'#{traceLine}'} 
+			where
+				<if test="eventId!=null and eventId!=''">
+				event_id = ${'#{eventId}'} AND 
+				</if>
+				<if test="i!=null and i!=''">
+				i = ${'#{i}'}
+				</if>
+	</update>
+
+    <delete id="LoggingEventException.delete">
+        DELETE FROM logging_event_exception
+		where
+       		<if test="eventId!=null and eventId!=''">
+				event_id = ${'#{eventId}'} AND 
+			</if>
+       		<if test="i!=null and i!=''">
+				i = ${'#{i}'}
+			</if>
+    </delete>
+
+    <select id="LoggingEventException.load" resultMap="rs_base">
+		SELECT <include refid="LoggingEventException.columns" />
+		    FROM logging_event_exception
+				where
+						<if test="eventId!=null and eventId!=''">
+						event_id = ${'#{eventId}'}
+						</if>
+						<if test="i!=null and i!=''">
+							AND i = ${'#{i}'}
+						</if>
+
+	</select>
+
+	<sql id="LoggingEventException.where">
+		<where>
+			<if test="eventId!=null and eventId!=''">
+				AND event_id = ${'#{eventId}'}
+			</if>
+			<if test="i!=null and i!=''">
+				AND i = ${'#{i}'}
+			</if>
+			<if test="traceLine!=null and traceLine!=''">
+				AND trace_line = ${'#{traceLine}'}
+			</if>
+		</where>
+	</sql>
+
+
+
+    <select id="LoggingEventException.count" resultType="int">
+        SELECT count(1) FROM logging_event_exception
+		<include refid="LoggingEventException.where"/>
+    </select>
+
+
+    <select id="LoggingEventException.query" resultMap="rs_base">
+    	SELECT <include refid="LoggingEventException.columns" />
+	    FROM logging_event_exception
+		<include refid="LoggingEventException.where"/>
+
+		<if test="sortColumns!=null and sortColumns!=''">
+			ORDER BY ${r'${sortColumns}'}
+		</if>
+    </select>
+
+
+</mapper>
+

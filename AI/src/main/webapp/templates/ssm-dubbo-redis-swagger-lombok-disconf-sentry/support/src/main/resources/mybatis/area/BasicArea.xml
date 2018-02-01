@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~  Copyright (c) 2017. 郑州仁中和科技有限公司.保留所有权利.
+  ~                        http://www.rzhkj.com/
+  ~       郑州仁中和科技有限公司保留所有代码著作权.如有任何疑问请访问官方网站与我们联系.
+  ~       代码只针对特定客户使用，不得在未经允许或授权的情况下对外传播扩散.恶意传播者，法律后果自行承担.
+  ~       本代码仅用于龐帝業務系统.目.
+  -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<mapper namespace="BasicArea">
+
+    <resultMap id="rs_base" type="BasicArea">
+        <result property="areaCode" column="area_code"/>
+        <result property="areaName" column="area_name"/>
+        <result property="fullName" column="full_name"/>
+        <result property="province" column="province"/>
+        <result property="city" column="city"/>
+        <result property="level" column="level"/>
+        <result property="isNew" column="is_new"/>
+        <result property="newAreaCode" column="new_area_code"/>
+    </resultMap>
+
+    <!-- 用于select查询公用抽取的列 -->
+    <sql id="BasicArea.columns">
+	    <![CDATA[
+		area_code,area_name,full_name,province,city,level,is_new,new_area_code
+        ]]>
+	</sql>
+
+    <insert id="BasicArea.insert" useGeneratedKeys="true" keyProperty="areaCode" parameterType="BasicArea">
+        INSERT INTO basic_area (
+        area_code ,
+        area_name ,
+        full_name ,
+        province ,
+        city ,
+        level ,
+        is_new ,
+        new_area_code
+        ) VALUES (
+        ${r'#{areaCode}'} ,
+        ${r'#{areaName}'} ,
+        ${r'#{fullName}'} ,
+        ${r'#{province}'} ,
+        ${r'#{city}'} ,
+        ${r'#{level}'} ,
+        ${r'#{isNew}'} ,
+        ${r'#{newAreaCode}'}
+        )
+        <selectKey keyProperty="id" resultType="long">
+            select LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+
+    <update id="BasicArea.update" parameterType="BasicArea">
+        UPDATE basic_area SET
+        area_name = ${r'#{areaName}'} ,
+        full_name = ${r'#{fullName}'} ,
+        province = ${r'#{province}'} ,
+        city = ${r'#{city}'} ,
+        level = ${r'#{level}'} ,
+        is_new = ${r'#{isNew}'} ,
+        new_area_code = ${r'#{newAreaCode}'}
+        where
+        <if test="areaCode!=null and areaCode!=''">
+            area_code = ${r'#{areaCode}'}
+        </if>
+    </update>
+
+    <delete id="BasicArea.delete">
+        DELETE FROM basic_area
+        where
+        <if test="areaCode!=null and areaCode!=''">
+            area_code = ${r'#{areaCode}'}
+        </if>
+    </delete>
+
+    <select id="BasicArea.load" resultMap="rs_base">
+        SELECT
+        <include refid="BasicArea.columns"/>
+        FROM basic_area
+        where area_code = ${r'#{areaCode}'}
+
+    </select>
+
+    <sql id="BasicArea.where">
+        <where>
+            <if test="areaCode!=null and areaCode!=''">
+                AND area_code = ${r'#{areaCode}'}
+            </if>
+            <if test="areaName!=null and areaName!=''">
+                AND area_name = ${r'#{areaName}'}
+            </if>
+            <if test="fullName!=null and fullName!=''">
+                AND full_name = ${r'#{fullName}'}
+            </if>
+            <if test="province!=null and province!=''">
+                AND province = ${r'#{province}'}
+            </if>
+            <if test="city!=null and city!=''">
+                AND city = ${r'#{city}'}
+            </if>
+            <if test="level!=null and level!=''">
+                AND level = ${r'#{level}'}
+            </if>
+            <if test="isNew!=null and isNew!=''">
+                AND is_new = ${r'#{isNew}'}
+            </if>
+            <if test="newAreaCode!=null and newAreaCode!=''">
+                AND new_area_code = ${r'#{newAreaCode}'}
+            </if>
+        </where>
+    </sql>
+
+
+    <select id="BasicArea.count" resultType="int">
+        SELECT count(1) FROM basic_area
+        <include refid="BasicArea.where"/>
+    </select>
+
+
+    <select id="BasicArea.query" resultMap="rs_base">
+        SELECT
+        <include refid="BasicArea.columns"/>
+        FROM basic_area
+        <include refid="BasicArea.where"/>
+
+        <if test="sortColumns!=null and sortColumns!=''">
+            ORDER BY ${r'${sortColumns}'}
+        </if>
+    </select>
+
+    <!--根据areaCode获得区域对象-->
+    <select id="BasicArea.loadAreaCode" resultMap="rs_base">
+        SELECT
+        <include refid="BasicArea.columns"/>
+        FROM basic_area
+        where area_code=${r'#{areaCode}'}
+    </select>
+
+    <!--省 市 区-->
+    <select id="BasicArea.loadAreaCodeByLevel" parameterType="map" resultMap="rs_base">
+        SELECT *
+        FROM basic_area
+        where province=${r'#{province}'} and level=${r'#{level}'}
+    </select>
+
+    <!--所有省-->
+    <select id="BasicArea.listProvoice" resultMap="rs_base">
+        SELECT *
+        FROM basic_area
+        where level=1
+    </select>
+
+
+</mapper>
+

@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<mapper namespace="Setting">
+
+    <resultMap id="rs_base" type="Setting">
+        <result property="id" column="id"/>
+        <result property="k" column="k"/>
+        <result property="v" column="v"/>
+        <result property="summary" column="summary"/>
+    </resultMap>
+
+    <!-- 用于select查询公用抽取的列 -->
+    <sql id="Setting.columns">
+		id,k,v,summary
+	</sql>
+
+    <insert id="Setting.insert" useGeneratedKeys="true" keyProperty="id" parameterType="Setting">
+        INSERT INTO Setting (
+        id ,
+        k ,
+        v,
+        summary,
+        ) VALUES (
+        ${r'#{id}'} ,
+        ${r'#{k}'} ,
+        ${r'#{v}'},
+        ${r'#{summary}'}
+        )
+        <selectKey keyProperty="id" resultType="long">
+            select LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+
+    <update id="Setting.update" parameterType="Setting">
+        UPDATE Setting
+        <trim prefix="set" suffixOverrides=",">
+            <if test="v!=null and v!=''">
+                v = ${r'#{v}'} ,
+            </if>
+            <if test="summary!=null and summary!=''">
+                summary = ${r'#{summary}'} ,
+            </if>
+        </trim>
+        where k=${r'#{k}'}
+    </update>
+
+    <delete id="Setting.delete">
+        DELETE FROM Setting WHERE
+        k = ${r'#{k}'}
+    </delete>
+
+    <select id="Setting.load" resultMap="rs_base">
+        SELECT
+        <include refid="Setting.columns"/>
+        FROM Setting
+        WHERE
+        k = ${r'#{k}'}
+    </select>
+
+    <sql id="Setting.where">
+        <where>
+            <if test="k!=null and k!=''">
+                AND k = ${r'#{k}'}
+            </if>
+            <if test="v!=null and v!=''">
+                AND v = ${r'#{v}'}
+            </if>
+            <if test="summary!=null and summary!=''">
+                AND summary = ${r'#{summary}'}
+            </if>
+        </where>
+    </sql>
+
+
+    <select id="Setting.count" resultType="int">
+        SELECT count(1) FROM Setting
+        <include refid="Setting.where"/>
+    </select>
+
+
+    <select id="Setting.query" resultMap="rs_base">
+        SELECT
+        <include refid="Setting.columns"/>
+        FROM Setting
+        <include refid="Setting.where"/>
+
+        <if test="sortColumns!=null and sortColumns!=''">
+            ORDER BY ${r'${sortColumns}'}
+        </if>
+    </select>
+
+
+    <!--根据key加载一个设置对象-->
+    <select id="Setting.loadByKey" resultMap="rs_base">
+		SELECT * FROM Setting WHERE  k = ${r'#{k}'}
+	</select>
+
+    <!--修改设置值-->
+    <update id="Setting.modifySetting" parameterType="Setting">
+        UPDATE Setting
+        <trim prefix="set" suffixOverrides=",">
+            <if test="v!=null and v!=''">
+                v = ${r'#{v}'} ,
+            </if>
+            <if test="summary!=null and summary!=''">
+                summary = ${r'#{summary}'} ,
+            </if>
+        </trim>
+        WHERE k = ${r'#{k}'}
+    </update>
+
+</mapper>
+

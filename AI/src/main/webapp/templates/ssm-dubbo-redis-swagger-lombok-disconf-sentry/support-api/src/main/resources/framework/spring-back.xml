@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+            http://www.springframework.org/schema/beans/spring-beans.xsd
+             http://www.springframework.org/schema/context
+             http://www.springframework.org/schema/context/spring-context.xsd">
+    <context:component-scan base-package="com"/>
+
+    <!-- 引入属性配置文件 -->
+    <bean class="${basePackage}.core.tools.ConfigUtil">
+        <property name="locations">
+            <list>
+                <value>classpath:config.properties</value>
+                <value>classpath:redis-manager-config.properties</value>
+            </list>
+        </property>
+        <!--<property name="decryptProperties">-->
+        <!--<array>-->
+        <!--&lt;!&ndash; 需要解密的配置 &ndash;&gt;-->
+        <!--<value>db.reader.password</value>-->
+        <!--<value>db.writer.password</value>-->
+        <!--</array>-->
+        <!--</property>-->
+    </bean>
+    <!--redis工具-->
+    <bean id="RedisUtils" class="${basePackage}.core.tools.redis.RedisUtils"/>
+
+    <import resource="classpath:/framework/dubbo-consumer.xml"/>
+    <import resource="classpath:/framework/spring-data-redis.xml"/>
+    <!--异常统一处理-->
+    <bean id="exceptionResolver" class="${basePackage}.core.base.handler.ExceptionHandler"/>
+</beans>

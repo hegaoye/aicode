@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<mapper namespace="LoggingEventProperty">
+
+	<resultMap id="rs_base" type="LoggingEventProperty">
+        <result property="eventId" column="event_id"/>
+        <result property="mappedKey" column="mapped_key"/>
+        <result property="mappedValue" column="mapped_value"/>
+	</resultMap>
+
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="LoggingEventProperty.columns">
+	    <![CDATA[
+		event_id,mapped_key,mapped_value
+	    ]]>
+	</sql>
+
+	<insert id="LoggingEventProperty.insert" useGeneratedKeys="true" keyProperty="eventId" parameterType="LoggingEventProperty">
+        INSERT INTO logging_event_property (
+        	event_id ,
+        	mapped_key ,
+        	mapped_value 
+        ) VALUES (
+        	${r'#{eventId}'} ,
+        	${r'#{mappedKey}'} ,
+        	${r'#{mappedValue}'} 
+        )
+		<selectKey keyProperty="id" resultType="long">
+			select LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+
+	<update id="LoggingEventProperty.update" parameterType="LoggingEventProperty">
+        UPDATE logging_event_property SET
+	        mapped_value = ${r'#{mappedValue}'} 
+			where
+				<if test="eventId!=null and eventId!=''">
+				event_id = ${r'#{eventId}'} AND 
+				</if>
+				<if test="mappedKey!=null and mappedKey!=''">
+				mapped_key = ${r'#{mappedKey}'}
+				</if>
+	</update>
+
+    <delete id="LoggingEventProperty.delete">
+        DELETE FROM logging_event_property
+		where
+       		<if test="eventId!=null and eventId!=''">
+				event_id = ${r'#{eventId}'} AND 
+			</if>
+       		<if test="mappedKey!=null and mappedKey!=''">
+				mapped_key = ${r'#{mappedKey}'}
+			</if>
+    </delete>
+
+    <select id="LoggingEventProperty.load" resultMap="rs_base">
+		SELECT <include refid="LoggingEventProperty.columns" />
+		    FROM logging_event_property
+				where
+						<if test="eventId!=null and eventId!=''">
+						event_id = ${r'#{eventId}'}
+						</if>
+						<if test="mappedKey!=null and mappedKey!=''">
+							AND mapped_key = ${r'#{mappedKey}'}
+						</if>
+
+	</select>
+
+	<sql id="LoggingEventProperty.where">
+		<where>
+			<if test="eventId!=null and eventId!=''">
+				AND event_id = ${r'#{eventId}'}
+			</if>
+			<if test="mappedKey!=null and mappedKey!=''">
+				AND mapped_key = ${r'#{mappedKey}'}
+			</if>
+			<if test="mappedValue!=null and mappedValue!=''">
+				AND mapped_value = ${r'#{mappedValue}'}
+			</if>
+		</where>
+	</sql>
+
+
+
+    <select id="LoggingEventProperty.count" resultType="int">
+        SELECT count(1) FROM logging_event_property
+		<include refid="LoggingEventProperty.where"/>
+    </select>
+
+
+    <select id="LoggingEventProperty.query" resultMap="rs_base">
+    	SELECT <include refid="LoggingEventProperty.columns" />
+	    FROM logging_event_property
+		<include refid="LoggingEventProperty.where"/>
+
+		<if test="sortColumns!=null and sortColumns!=''">
+			ORDER BY ${r'${sortColumns}'}
+		</if>
+    </select>
+
+
+</mapper>
+

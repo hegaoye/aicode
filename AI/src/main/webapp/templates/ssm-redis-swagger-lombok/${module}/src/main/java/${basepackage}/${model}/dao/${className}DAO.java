@@ -54,7 +54,7 @@ public class ${className}DAO extends BaseMybatisDAOImpl<${className},Long>{
      * @return List<${className}>
      */
     public List<${className}> listBy${pkField.field?cap_first}(${pkField.fieldType} ${pkField.field}) {
-            return getSqlSession().selectList(this.sqlmapNamespace + "query", ${pkField.field});
+            return getSqlSession().selectList(this.sqlmapNamespace + ".query", ${pkField.field});
     }
 
     /**
@@ -63,7 +63,7 @@ public class ${className}DAO extends BaseMybatisDAOImpl<${className},Long>{
      * @return List<${className}>
      */
     public List<${className}> listBy${pkField.field?cap_first}(${pkField.fieldType} ${pkField.field},int offset,int limit) {
-         return getSqlSession().selectList(this.sqlmapNamespace + "query", ${pkField.field}, new RowBounds(offset, limit));
+         return getSqlSession().selectList(this.sqlmapNamespace + ".query", ${pkField.field}, new RowBounds(offset, limit));
     }
 
     /**
@@ -108,7 +108,7 @@ public class ${className}DAO extends BaseMybatisDAOImpl<${className},Long>{
     public List<${className}> listBy${field.field?cap_first}Begin(${field.fieldType} ${field.field}) {
                    Map<String,Object> map=new HashMap<>();
                    map.put("${field.field}Begin",${field.field});
-            return getSqlSession().selectList(this.sqlmapNamespace + "query", map);
+            return getSqlSession().selectList(this.sqlmapNamespace + ".query", map);
     }
 
     /**
@@ -119,7 +119,7 @@ public class ${className}DAO extends BaseMybatisDAOImpl<${className},Long>{
     public List<${className}> listBy${field.field?cap_first}Begin(${field.fieldType} ${field.field},int offset,int limit) {
                    Map<String,Object> map=new HashMap<>();
                    map.put("${field.field}Begin",${field.field});
-            return getSqlSession().selectList(this.sqlmapNamespace + "query", ${field.field}, new RowBounds(offset, limit));
+            return getSqlSession().selectList(this.sqlmapNamespace + ".query", ${field.field}, new RowBounds(offset, limit));
     }
 
     /**
@@ -130,7 +130,7 @@ public class ${className}DAO extends BaseMybatisDAOImpl<${className},Long>{
     public List<${className}> listBy${field.field?cap_first}End(${field.fieldType} ${field.field}) {
                    Map<String,Object> map=new HashMap<>();
                    map.put("${field.field}End",${field.field});
-            return getSqlSession().selectList(this.sqlmapNamespace + "query", map);
+            return getSqlSession().selectList(this.sqlmapNamespace + ".query", map);
     }
 
     /**
@@ -141,7 +141,7 @@ public class ${className}DAO extends BaseMybatisDAOImpl<${className},Long>{
     public List<${className}> listBy${field.field?cap_first}End(${field.fieldType} ${field.field},int offset,int limit) {
                    Map<String,Object> map=new HashMap<>();
                    map.put("${field.field}End",${field.field});
-            return getSqlSession().selectList(this.sqlmapNamespace + "query", map, new RowBounds(offset, limit));
+            return getSqlSession().selectList(this.sqlmapNamespace + ".query", map, new RowBounds(offset, limit));
     }
 
     /**
@@ -154,7 +154,7 @@ public class ${className}DAO extends BaseMybatisDAOImpl<${className},Long>{
                    Map<String,Object> map=new HashMap<>();
                    map.put("${field.field}Begin",${field.field}Begin);
                    map.put("${field.field}End",${field.field}End);
-            return getSqlSession().selectList(this.sqlmapNamespace + "query", map);
+            return getSqlSession().selectList(this.sqlmapNamespace + ".query", map);
     }
 
     /**
@@ -167,7 +167,7 @@ public class ${className}DAO extends BaseMybatisDAOImpl<${className},Long>{
                    Map<String,Object> map=new HashMap<>();
                    map.put("${field.field}Begin",${field.field}Begin);
                    map.put("${field.field}End",${field.field}End);
-            return getSqlSession().selectList(this.sqlmapNamespace + "query", map, new RowBounds(offset, limit));
+            return getSqlSession().selectList(this.sqlmapNamespace + ".query", map, new RowBounds(offset, limit));
     }
   </#if>
 </#list>

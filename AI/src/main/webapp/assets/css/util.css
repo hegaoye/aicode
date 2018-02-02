@@ -102,6 +102,9 @@
 /*信息位置*/
 .text-center{text-align: center;}
 
+.color-red{
+  color:red !important;
+}
 /*文字大小*/
 .font12{font-size: 12px}
 .font14{font-size: 14px}
@@ -219,4 +222,8 @@
 /*高度定义*/
 .h100{
   height: 100%;
+}
+
+.inlineBlock{
+  display: inline-block;
 }

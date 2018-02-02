@@ -10,4 +10,3 @@ include 'facade'//接口定义包
 
 //task 作业项目
 include 'AI' //作業調度項目
-include 'task' //作業調度項目

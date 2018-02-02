@@ -369,6 +369,26 @@ public class FileUtil {
         return ret;
     }
 
+    /**
+     * 获取文件路径
+     *
+     * @param dirPath 目录
+     * @return 路径集合
+     */
+    public static List<String> getDirFilesPath(String dirPath) {
+        List<File> list = getDirFiles(dirPath);
+        List<String> pathList = new ArrayList<>();
+        for (int i = 0; i < list.size(); i++) {
+            String path = list.get(i).getAbsoluteFile().toString().replace("\\", "/");
+            if (!path.contains(".git") && !path.contains("git")) {
+                if (new File(path).isFile()) {
+                    pathList.add(path);
+                }
+            }
+        }
+        return pathList;
+    }
+
     public static void main(String[] args) {
         List<File> list = getDirFiles("C:\\workspaces\\AI-Code\\AI\\src\\main\\webapp\\templates\\ssm-dubbo-redis-swagger-lombok-disconf-sentry");
         for (int i = 0; i < list.size(); i++) {

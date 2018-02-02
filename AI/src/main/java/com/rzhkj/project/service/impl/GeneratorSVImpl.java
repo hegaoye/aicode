@@ -4,10 +4,7 @@ import com.google.common.collect.Maps;
 import com.rzhkj.base.core.FreemarkerHelper;
 import com.rzhkj.base.core.TemplateData;
 import com.rzhkj.core.enums.YNEnum;
-import com.rzhkj.core.tools.DateTools;
-import com.rzhkj.core.tools.FileUtil;
-import com.rzhkj.core.tools.GitTools;
-import com.rzhkj.core.tools.HandleFuncs;
+import com.rzhkj.core.tools.*;
 import com.rzhkj.project.dao.*;
 import com.rzhkj.project.entity.*;
 import com.rzhkj.project.service.GenerateSV;
@@ -106,9 +103,14 @@ public class GeneratorSVImpl implements GenerateSV {
             map.clear();
             map.put("projectCode", project.getCode());
             ProjectRepositoryAccount projectRepositoryAccount = projectRepositoryAccountDAO.load(map);
-            projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "代码向仓库 ⇛⇛⇛ <a style='text-decoration:underline;' href='" + projectRepositoryAccount.getHome() + "' target='_blank'>" + projectRepositoryAccount.getHome() + " 提交中......"));
-            GitTools.commitAndPush(new File(projectPath), projectRepositoryAccount.getAccount(), projectRepositoryAccount.getPassword(), "AI-Code 为您构建代码，享受智慧生活");
-            projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "代码代码提交完成"));
+            if (projectRepositoryAccount != null) {
+                projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "代码向仓库 ⇛⇛⇛ <a style='text-decoration:underline;' href='" + projectRepositoryAccount.getHome() + "' target='_blank'>" + projectRepositoryAccount.getHome() + " 提交中......"));
+                GitTools.commitAndPush(new File(projectPath), projectRepositoryAccount.getAccount(), projectRepositoryAccount.getPassword(), "AI-Code 为您构建代码，享受智慧生活");
+                projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "代码代码提交完成"));
+            }
+
+            zipProject(project);
+            projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "代码打包中 ⇛⇛⇛ <a style='text-decoration:underline;' href='#' target='_blank'> 提交中......"));
             projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "End By <span style='color:green;'>☺</span> AI-Code 为您构建代码，享受智慧生活!"));
             projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "End"));
             projectJob.setState(ProjectJob.State.Completed.name());
@@ -166,7 +168,9 @@ public class GeneratorSVImpl implements GenerateSV {
         Map<String, Object> map = Maps.newHashMap();
         map.put("projectCode", project.getCode());
         ProjectRepositoryAccount projectRepositoryAccount = projectRepositoryAccountDAO.load(map);
-        GitTools.cloneGit(projectRepositoryAccount.getHome(), projectPath, projectRepositoryAccount.getAccount(), projectRepositoryAccount.getPassword());
+        if (projectRepositoryAccount != null) {
+            GitTools.cloneGit(projectRepositoryAccount.getHome(), projectPath, projectRepositoryAccount.getAccount(), projectRepositoryAccount.getPassword());
+        }
         return projectPath;
     }
 
@@ -228,5 +232,25 @@ public class GeneratorSVImpl implements GenerateSV {
             logger.error("文件不存在 ===> " + templatePath);
         }
 
+    }
+
+    /**
+     * 压缩文件
+     *
+     * @param project 项目信息
+     */
+    private void zipProject(Project project) {
+        Setting settingWorkspace = settingDAO.loadByKey(Setting.Key.Workspace.name());
+        String projectWorkspacePath = new HandleFuncs().getCurrentClassPath() + settingWorkspace.getV() + "/" + project.getEnglishName();
+        projectWorkspacePath = projectWorkspacePath.replace("//", "/");
+
+        Setting Repository_Path = settingDAO.loadByKey(Setting.Key.Repository_Path.name());
+        String projectPath = new HandleFuncs().getCurrentClassPath() + Repository_Path.getV() + "/" + project.getEnglishName();
+        String destination = projectPath;
+
+        //压缩文件
+        ZipTools.zip(destination, projectWorkspacePath);
+        project.setDownloadUrl((Repository_Path.getV() + "/" + project.getEnglishName() + ".zip").replace("//", "/"));
+        projectDAO.update(project);
     }
 }

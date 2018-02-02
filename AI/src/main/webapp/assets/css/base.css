@@ -120,12 +120,13 @@ html,body{
 /*提示信息标题*/
 .page-msg-red > p.title {
   font-size: 14px;
+  margin-bottom: 5px;
   font-weight: bold;
 }
 
 /*提示信息内容*/
 .page-msg-red > ul {
-  font-size: 12px;
+  font-size: 14px;
 }
 
 .page-msg-red li {

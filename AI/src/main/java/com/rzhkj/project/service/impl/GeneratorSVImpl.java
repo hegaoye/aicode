@@ -4,7 +4,10 @@ import com.google.common.collect.Maps;
 import com.rzhkj.base.core.FreemarkerHelper;
 import com.rzhkj.base.core.TemplateData;
 import com.rzhkj.core.enums.YNEnum;
-import com.rzhkj.core.tools.*;
+import com.rzhkj.core.tools.FileUtil;
+import com.rzhkj.core.tools.GitTools;
+import com.rzhkj.core.tools.HandleFuncs;
+import com.rzhkj.core.tools.ZipTools;
 import com.rzhkj.project.dao.*;
 import com.rzhkj.project.entity.*;
 import com.rzhkj.project.service.GenerateSV;
@@ -20,7 +23,6 @@ import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -58,14 +60,16 @@ public class GeneratorSVImpl implements GenerateSV {
     public void aiCode(String projectCode, ProjectJob projectJob) {
         try {
             //1.创建项目
-            projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "Start By AI-Code"));
+            ProjectJobLogs projectJobLogs = new ProjectJobLogs();
+            projectJobLogs.setCode(projectJob.getCode());
+            projectJobLogs.setLog("Start By AI-Code @Copyright <a href='http://www.rzhkj.com' target='_blank'>仁中和</a>");
+            projectJobLogsDAO.insert(projectJobLogs);
             Map<String, Object> map = Maps.newHashMap();
             map.put("projectCode", projectCode);
             Project project = projectDAO.load(map);
             String projectPath = buildProject(project);
             projectDAO.update(projectCode, project.getBuildNumber() != null ? project.getBuildNumber() + 1 : 1);
-
-            projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "创建工作空间库完成"));
+            projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), " 已初始化项目 【 " + project.getName() + " ( " + project.getEnglishName() + " )】 工作空间"));
             logger.info("创建工作空间库完成");
 
             //2.获取类信息
@@ -75,50 +79,64 @@ public class GeneratorSVImpl implements GenerateSV {
                 mapClassTableList.add(projectMap.getMapClassTable());
             });
 
-            projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "已经获取类信息"));
-
             //3.获取模板信息
             List<ProjectFramwork> projectFramworkList = project.getProjectFramworkList();
 
-            projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "已经获取模板信息"));
-
             //4.生成源码
             projectFramworkList.forEach(projectFramwork -> {
+                projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "已获取项目 【" + projectFramwork.getFrameworks().getName() + "】 的模板"));
                 List<FrameworksTemplate> frameworksTemplateList = projectFramwork.getFrameworks().getFrameworksTemplateList();
                 frameworksTemplateList.forEach(frameworksTemplate -> {
                     projectMapList.forEach(projectMap -> {
                         this.generator(projectPath, project, projectMap.getMapClassTable(), frameworksTemplate, mapClassTableList);
                     });
-                    projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "[<span style='color:green;'>✔</span>" + DateTools.yyyyMMddHHmmss(new Date()) + "] [已经生成] 模板 " + frameworksTemplate.getPath() + " 的相关源码"));
+                    projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), " 【已经生成】 模板 " + frameworksTemplate.getPath() + " 的源码"));
                 });
             });
 
             //生成sql脚本到项目下
             this.generateTsql(projectPath, project.getEnglishName(), projectCode);
+            projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), " 【已经生成】 " + project.getEnglishName() + "Sql 脚本文件并追加系统配置"));
 
             //5.获取模块信息 TODO
 
             //6.获取版本控制管理信息
-            projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "获取代码仓库信息"));
             map.clear();
             map.put("projectCode", project.getCode());
             ProjectRepositoryAccount projectRepositoryAccount = projectRepositoryAccountDAO.load(map);
             if (projectRepositoryAccount != null) {
-                projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "代码向仓库 ⇛⇛⇛ <a style='text-decoration:underline;' href='" + projectRepositoryAccount.getHome() + "' target='_blank'>" + projectRepositoryAccount.getHome() + " 提交中......"));
+                projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "获取代码仓库信息: " + projectRepositoryAccount.getAccount()));
                 GitTools.commitAndPush(new File(projectPath), projectRepositoryAccount.getAccount(), projectRepositoryAccount.getPassword(), "AI-Code 为您构建代码，享受智慧生活");
-                projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "代码代码提交完成"));
+                projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "代码已经提交到 ⇛⇛⇛ <a style='text-decoration:underline;' href='" + projectRepositoryAccount.getHome() + "' target='_blank'>" + projectRepositoryAccount.getHome() + " </a>仓库"));
             }
 
             zipProject(project);
-            projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "代码打包中 ⇛⇛⇛ <a style='text-decoration:underline;' href='#' target='_blank'> 提交中......"));
-            projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "End By <span style='color:green;'>☺</span> AI-Code 为您构建代码，享受智慧生活!"));
-            projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "End"));
+            projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "代码已打包ZIP,您还可以点击下载 ⇛⇛⇛  <a style='text-decoration:underline;' href='" + project.getDownloadUrl() + "' target='_blank'>" + project.getEnglishName() + ".zip</a>"));
             projectJob.setState(ProjectJob.State.Completed.name());
             projectJobDAO.update(projectJob);
         } catch (Exception e) {
             logger.error(e.getMessage());
             projectJob.setState(ProjectJob.State.Error.name());
             projectJobDAO.update(projectJob);
+        } finally {
+            Map<String, Object> map = Maps.newHashMap();
+            map.put("code", projectJob.getCode());
+            ProjectJob projectJobLoad = projectJobDAO.load(map);
+            if (projectJobLoad.getState().equals(ProjectJob.State.Completed.name())) {
+                ProjectJobLogs projectJobLogs = new ProjectJobLogs();
+                projectJobLogs.setCode(projectJob.getCode());
+                projectJobLogs.setLog("Finished: SUCCESS");
+                projectJobLogsDAO.insert(projectJobLogs);
+            } else {
+                ProjectJobLogs projectJobLogs = new ProjectJobLogs();
+                projectJobLogs.setCode(projectJob.getCode());
+                projectJobLogs.setLog("Finished: ERROR");
+                projectJobLogsDAO.insert(projectJobLogs);
+            }
+            ProjectJobLogs projectJobLogs = new ProjectJobLogs();
+            projectJobLogs.setCode(projectJob.getCode());
+            projectJobLogs.setLog("End");
+            projectJobLogsDAO.insert(projectJobLogs);
         }
     }
 
@@ -249,6 +267,15 @@ public class GeneratorSVImpl implements GenerateSV {
         String destination = projectPath;
 
         //压缩文件
+        try {
+            File zipFile = new File(destination);
+            if (zipFile.exists()) {
+                zipFile.delete();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error(e.getMessage());
+        }
         ZipTools.zip(destination, projectWorkspacePath);
         project.setDownloadUrl((Repository_Path.getV() + "/" + project.getEnglishName() + ".zip").replace("//", "/"));
         projectDAO.update(project);

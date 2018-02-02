@@ -6,7 +6,10 @@
 package com.rzhkj.project.entity;
 
 import com.rzhkj.core.base.BaseEntity;
+import com.rzhkj.core.tools.DateTools;
 import lombok.Data;
+
+import java.util.Date;
 
 
 /**
@@ -28,7 +31,7 @@ public class ProjectJobLogs extends BaseEntity implements java.io.Serializable {
 
     public ProjectJobLogs(String code, String log) {
         this.code = code;
-        this.log = log;
+        this.log = "> ✔ " + DateTools.yyyyMMddHHmmssSSS(new Date()) + "&nbsp;&nbsp;" + log;
     }
 }
 

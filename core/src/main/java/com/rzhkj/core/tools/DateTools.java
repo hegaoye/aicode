@@ -140,6 +140,18 @@ public class DateTools {
 
     /**
      * 格式化时间
+     * yyyy-MM-dd HH:mm:ss:SSS
+     *
+     * @param date yyyy-MM-dd HH:mm:ss:SSS
+     * @return
+     */
+    public static String yyyyMMddHHmmssSSS(Date date) {
+        if (date == null) return null;
+        return format(date, "yyyy-MM-dd HH:mm:ss:SSS");
+    }
+
+    /**
+     * 格式化时间
      * yyyy-MM-dd
      *
      * @param date yyyy-MM-dd

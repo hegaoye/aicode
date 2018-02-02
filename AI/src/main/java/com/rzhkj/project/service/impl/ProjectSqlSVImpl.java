@@ -63,7 +63,7 @@ public class ProjectSqlSVImpl extends BaseMybatisSVImpl<ProjectSql, Long> implem
         sqlHeader = "DROP DATABASE if EXISTS " + project.getEnglishName() + ";\n";
         sqlHeader += "CREATE DATABASE " + project.getEnglishName() + ";\n";
         sqlHeader += "USE " + project.getEnglishName() + ";\n";
-        tsql = sqlHeader + " " + tsql;
+        tsql = sqlHeader + tsql;
         entity.setTsql(tsql);
         super.save(entity);
     }

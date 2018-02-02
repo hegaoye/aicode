@@ -57,6 +57,7 @@ public class ProjectJobLogsCtrl extends BaseCtrl {
             Map<String, Object> map = Maps.newHashMap();
             map.put("code", code);
             page.setParams(map);
+//            page.setPageSize(500);
             page = projectJobLogsSV.getList(page);
             int count = projectJobLogsSV.count(map);
             page.setTotalRow(count);

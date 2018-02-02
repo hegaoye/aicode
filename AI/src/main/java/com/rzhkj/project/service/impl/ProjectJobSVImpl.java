@@ -127,7 +127,7 @@ public class ProjectJobSVImpl extends BaseMybatisSVImpl<ProjectJob, Long> implem
         projectJob.setCreateTime(new Date());
         projectJobDAO.insert(projectJob);
 
-        Executors.singleThreadExecutor(new Runnable() {
+        Executors.cacheThreadExecutor(new Runnable() {
             @Override
             public void run() {
                 generateSV.aiCode(projectCode, projectJob);

@@ -24,6 +24,7 @@ import ${basePackage}.${model}.entity.${className};
 import ${basePackage}.core.tools.StringTools;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Date;
 import org.apache.commons.lang.StringUtils;
 
 /**
@@ -124,6 +125,9 @@ public class ${className}Ctrl {
           return BeanRet.create();
         }
         </#if>
+        <#if field.checkDate>
+        ${classNameLower}.set${field.field?cap_first}(new Date());
+        </#if>
         </#list>
 
         ${classNameLower}SV.saveOrUpdate(${classNameLower});
@@ -152,6 +156,9 @@ public class ${className}Ctrl {
         if(StringTools.isEmpty(${classNameLower}.get${field.field?cap_first}())){
         return BeanRet.create();
         }
+        </#if>
+        <#if field.checkDate>
+                ${classNameLower}.set${field.field?cap_first}(new Date());
         </#if>
         </#list>
 

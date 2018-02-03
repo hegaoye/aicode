@@ -6,6 +6,7 @@ import org.apache.commons.lang.StringUtils;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import static java.util.regex.Pattern.*;
 
 public class StringTools {
 
@@ -57,7 +58,7 @@ public class StringTools {
      */ 
 	public static String removeOrdersToPageQuery(String shql) { 
 		//匹配正则表达式必须使用的是'\\'，而不是'//'
-        Pattern p = Pattern.compile("order\\s*by\\s*[\\w|\\W|\\s|\\S]*", Pattern.CASE_INSENSITIVE);
+        Pattern p = compile("order\\s*by\\s*[\\w|\\W|\\s|\\S]*", Pattern.CASE_INSENSITIVE);
         Matcher m = p.matcher(shql); 
         StringBuffer sb = new StringBuffer(); 
         while (m.find()) { 

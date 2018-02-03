@@ -115,14 +115,13 @@ public class BaseDaoImpl<T> extends HibernateDaoSupport implements BaseDao<T> {
      * @param paras 实体类对象
      * @return
      */
+    @Override
     public int count(Class<T> clazz, Map<String, Object> paras) {
         Session session = getHibernateTemplate().getSessionFactory().openSession();
         String queryCountHql = "select count(*) " + this.packHsql(clazz, paras);
-        ;
         Query queryCount = session.createQuery(queryCountHql);
         List<?> countlist = queryCount.list();
         Integer totalCount = Integer.parseInt(countlist.get(0).toString());
-        ;
         session.close();
         return totalCount;
     }
@@ -139,11 +138,11 @@ public class BaseDaoImpl<T> extends HibernateDaoSupport implements BaseDao<T> {
      * @param paras 实体类对象
      * @return
      */
+    @Override
     public Long sum(Class<T> clazz, Map<String, Object> paras, String sumfield) {
         if (StringUtils.isBlank(sumfield)) return 0L;
         Session session = getHibernateTemplate().getSessionFactory().openSession();
         String queryCountHql = "select sum(" + sumfield + ") " + this.packHsql(clazz, paras);
-        ;
         Query queryCount = session.createQuery(queryCountHql);
         List<?> countlist = queryCount.list();
         Long totalCount = 0L;

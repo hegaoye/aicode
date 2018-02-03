@@ -103,11 +103,11 @@ public class ProjectCtrl extends BaseCtrl {
             return BeanRet.create(true, "查询一个详情信息", mapList);
         }
 
-        if (file.isFile()) {
+        if (file.isFile() && !filePath.contains(".jar")) {
             String fileStr = FileUtils.readFileToString(new File(filePath), "UTF-8");
             return BeanRet.create(true, "查询一个详情信息", fileStr);
         }
-        return BeanRet.create();
+        return BeanRet.create(true, "", filePath.replaceAll("/\\w*\\.jar", ""));
     }
 
 

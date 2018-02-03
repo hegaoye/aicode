@@ -6,19 +6,27 @@ import com.rzhkj.core.base.BaseCtrl;
 import com.rzhkj.core.entity.BeanRet;
 import com.rzhkj.core.entity.Page;
 import com.rzhkj.core.exceptions.BaseException;
+import com.rzhkj.core.tools.FileUtil;
+import com.rzhkj.core.tools.HandleFuncs;
 import com.rzhkj.project.entity.Project;
 import com.rzhkj.project.service.ProjectSV;
+import com.rzhkj.setting.entity.Setting;
+import com.rzhkj.setting.service.SettingSV;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.collections.map.HashedMap;
+import org.apache.commons.io.FileUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.annotation.Resource;
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 
@@ -40,6 +48,8 @@ public class ProjectCtrl extends BaseCtrl {
 
     @Resource
     private ProjectSV projectSV;
+    @Resource
+    private SettingSV settingSV;
 
     /**
      * 查询一个详情信息
@@ -60,6 +70,44 @@ public class ProjectCtrl extends BaseCtrl {
         Project project = projectSV.load(map);
         logger.info(JSON.toJSONString(project));
         return BeanRet.create(true, "查询一个详情信息", project);
+    }
+
+
+    /**
+     * 查询文件路径
+     *
+     * @param code     项目编码
+     * @param filePath 文件路径
+     * @return BeanRet
+     */
+    @ApiOperation(value = "查询文件路径", notes = "查询文件路径")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "code", value = "项目编码", paramType = "query")
+    })
+    @GetMapping(value = "/scan/path")
+    @ResponseBody
+    public BeanRet scanPath(String code, String filePath) throws IOException {
+        Assert.hasText(filePath, BaseException.BaseExceptionEnum.Empty_Param.toString());
+        logger.info(filePath);
+
+        Map<String, Object> map = new HashedMap();
+        map.put("code", code);
+        Project project = projectSV.load(map);
+        String workspace = settingSV.load(Setting.Key.Workspace);
+
+        filePath = new HandleFuncs().getCurrentClassPath() + workspace + filePath;
+
+        File file = new File(filePath);
+        if (file.isDirectory()) {
+            List<Map<String, String>> mapList = FileUtil.sanDirFiles(filePath, project.getEnglishName());
+            return BeanRet.create(true, "查询一个详情信息", mapList);
+        }
+
+        if (file.isFile()) {
+            String fileStr = FileUtils.readFileToString(new File(filePath), "UTF-8");
+            return BeanRet.create(true, "查询一个详情信息", fileStr);
+        }
+        return BeanRet.create();
     }
 
 

@@ -7,6 +7,8 @@
  */
 package com.rzhkj.core.tools;
 
+import org.apache.commons.collections.map.HashedMap;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.*;
@@ -14,6 +16,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class FileUtil {
 
@@ -370,6 +373,33 @@ public class FileUtil {
     }
 
     /**
+     * 获取指定目录下所有文件路径
+     *
+     * @param dir
+     */
+    public static List<Map<String, String>> sanDirFiles(String dir, String subStr) {
+        List<Map<String, String>> fileList = new ArrayList<>();
+        File fileDir = new File(dir);
+        //获取目录下的所有文件或文件夹
+        File[] files = fileDir.listFiles();
+        if (files == null) {
+            return null;
+        }
+        for (File file : files) {
+            Map<String, String> map = new HashedMap();
+            if (file.isFile()) {
+                map.put("type", "File");
+                map.put("filePath", file.getPath().substring(file.getPath().indexOf(subStr)).replace("\\", "/").replace("//", "/"));
+            } else if (file.isDirectory()) {
+                map.put("type", "Directory");
+                map.put("filePath", file.getPath().substring(file.getPath().indexOf(subStr)).replace("\\", "/").replace("//", "/"));
+            }
+            fileList.add(map);
+        }
+        return fileList;
+    }
+
+    /**
      * 获取文件路径
      *
      * @param dirPath 目录
@@ -390,11 +420,20 @@ public class FileUtil {
     }
 
     public static void main(String[] args) {
-        List<File> list = getDirFiles("C:\\workspaces\\AI-Code\\AI\\src\\main\\webapp\\templates\\ssm-dubbo-redis-swagger-lombok-disconf-sentry");
-        for (int i = 0; i < list.size(); i++) {
-            String path = list.get(i).getAbsoluteFile().toString().replace("C:\\workspaces\\AI-Code\\AI\\src\\main\\webapp\\templates", "").replace("\\", "/");
-            String sql = "INSERT into frameworks_template(code,frameworkCode,path) values('" + (456789 + i) + "','456789','" + path + "');";
-            System.out.println(sql);
+//        List<File> list = getDirFiles("C:\\workspaces\\AI-Code\\AI\\src\\main\\webapp\\templates\\ssm-dubbo-redis-swagger-lombok-disconf-sentry");
+//        for (int i = 0; i < list.size(); i++) {
+//            String path = list.get(i).getAbsoluteFile().toString().replace("C:\\workspaces\\AI-Code\\AI\\src\\main\\webapp\\templates", "").replace("\\", "/");
+//            String sql = "INSERT into frameworks_template(code,frameworkCode,path) values('" + (456789 + i) + "','456789','" + path + "');";
+//            System.out.println(sql);
+//        }
+
+        List<Map<String, String>> mapList = sanDirFiles("C:\\workspaces\\AI-Code\\AI\\build\\libs\\exploded\\AI.war\\workspace\\announce", "announce");
+        System.out.println(JSON.toJSONString(mapList));
+        try {
+            String fileStr = FileUtils.readFileToString(new File("C:\\workspaces\\AI-Code\\AI\\build\\libs\\exploded\\AI.war\\workspace\\announce\\cycle\\src\\main\\java\\com\\cycle\\admin\\ctrl\\AdminCtrl.java"));
+            System.out.println(fileStr);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

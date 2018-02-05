@@ -61,6 +61,9 @@ dependencies {
 
 
 
+    compile rootProject.ext.dependencies["zip4j"]
+    compile rootProject.ext.dependencies["jgit"]
+
     compile rootProject.ext.dependencies["swagger-annotations"]
 
     compile rootProject.ext.dependencies["lombok"]

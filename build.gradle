@@ -37,7 +37,7 @@ allprojects {
                 from fromFile
                 into intoFile
             }
-            delete "./build/libs/ponddy-pension.jar"
+            delete "./build/libs/AI-Code.jar"
             println("=====================build " + project.name + " success.=========================")
         }
     }

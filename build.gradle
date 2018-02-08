@@ -171,7 +171,7 @@ ext {
             //-----------poi 导入/导出 end--------------
 
             //-----------jwt Nimbus JOSE+JWT  start--------------
-            "java-jwt"                       : 'com.auth0:java-jwt:3.2.0',
+            "java-jwt"                       : 'com.auth0:java-jwt:3.3.0',
             //-----------jwt Nimbus JOSE+JWT  end--------------
 
             //-----------jsch ssh start--------------

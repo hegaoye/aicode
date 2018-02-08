@@ -3,6 +3,7 @@ package com.rzhkj.core.interceptor;
 import com.alibaba.dubbo.common.utils.StringUtils;
 import com.alibaba.fastjson.JSON;
 import com.rzhkj.core.base.JwtToken;
+import com.rzhkj.core.common.Constants;
 import com.rzhkj.core.entity.BeanRet;
 import com.rzhkj.core.tools.CookieTools;
 import org.slf4j.Logger;
@@ -20,12 +21,8 @@ public class LoginInterceptor extends HandlerInterceptorAdapter {
 
 
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        String token = request.getParameter("token");
-        if (StringUtils.isBlank(token)) {
-            return false;
-        }
-
-        boolean flag = JwtToken.verifier(token, "", "");
+        String jwtToken = CookieTools.INSTANCE.getCode((String) Constants.sessionid.val,request);  //获取sessionId
+        boolean flag = JwtToken.verifier(jwtToken, "", "");
         if (flag) {
             return true;
         } else {

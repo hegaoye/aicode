@@ -80,19 +80,7 @@ public class BaseCtrl implements Serializable {
         return null;
     }
 
-    /**
-     * 从session中取值
-     *
-     * @param name 键值
-     * @return String类型的值
-     */
-    public String getAssitantSessionVal(String name) {
-        String sesionKey = CookieTools.INSTANCE.getCode((String) Constants.AssistantSessionId.val, request);    //获取sessionKey
-        if (StringUtils.isNotBlank(sesionKey)) {
-            return (String) hashOperations.get(sesionKey, name);
-        }
-        return null;
-    }
+
 
     /**
      * 从session中取值
@@ -125,9 +113,6 @@ public class BaseCtrl implements Serializable {
         String sesionKey = CookieTools.INSTANCE.getCode((String) Constants.sessionid.val, request);    //获取sessionKey
         if (StringUtils.isNotBlank(sesionKey)) {
             CookieTools.INSTANCE.delCookie((String) Constants.sessionid.val, response);
-            CookieTools.INSTANCE.delCookie(Constants.Student.name(), response);
-            CookieTools.INSTANCE.delCookie(Constants.Tutor.name(), response);
-            CookieTools.INSTANCE.delCookie(Constants.Assitant.name(), response);
             redisTemplate.delete(sesionKey);    //删除session
         }
     }

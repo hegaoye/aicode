@@ -2,6 +2,8 @@ package com.rzhkj.project.ctrl;
 
 import com.alibaba.fastjson.JSON;
 import com.rzhkj.core.base.JwtToken;
+import com.rzhkj.core.common.Constants;
+import com.rzhkj.core.tools.CookieTools;
 import com.rzhkj.core.tools.Md5;
 import com.rzhkj.core.base.BaseCtrl;
 import com.rzhkj.core.entity.BeanRet;
@@ -64,7 +66,7 @@ public class LoginCtrl extends BaseCtrl {
             if (accountObj != null) {
                 token = JwtToken.createToken("account", account);
             }
-            response.setHeader("jwt", token);
+            CookieTools.INSTANCE.addCookie((String) Constants.sessionid.val, token, Constants.Domain, response);    //写入cookie
             logger.info(JSON.toJSONString(accountObj));
             return BeanRet.create(true, "查询一个详情信息", token);
         } catch (Exception e) {

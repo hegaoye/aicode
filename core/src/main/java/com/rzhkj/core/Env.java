@@ -25,7 +25,7 @@ public enum Env {
 
 
     /*开启开发环境配置*/
-//    public static Env env = DEVELOP;//开发
+    public static Env env = DEVELOP;//开发
 
     /*开启测试环境配置*/
 //    public static Env env = SANDBOX;//测试
@@ -36,7 +36,7 @@ public enum Env {
      * 开启  [生产环境]  配置  非上线不得开启,非管理员不可操作
      * ***********************************************
      */
-    public static Env env = PRODUCT;//生产
+//    public static Env env = PRODUCT;//生产
 
 
 }

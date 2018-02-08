@@ -2,7 +2,7 @@ ngx-monaco-editor@2.0.1
 MIT
 MIT
 
-ng-zorro-antd@0.6.12
+ng-zorro-antd@0.6.10
 MIT
 MIT
 

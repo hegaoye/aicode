@@ -3,6 +3,7 @@ package com.rzhkj.project.ctrl;
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Maps;
 import com.rzhkj.core.base.BaseCtrl;
+import com.rzhkj.core.base.JwtToken;
 import com.rzhkj.core.entity.BeanRet;
 import com.rzhkj.core.entity.Page;
 import com.rzhkj.core.exceptions.BaseException;
@@ -123,10 +124,14 @@ public class ProjectCtrl extends BaseCtrl {
     })
     @GetMapping(value = "/list")
     @ResponseBody
-    public BeanRet list(@ApiIgnore Page<Project> page) {
+    public BeanRet list(@ApiIgnore Page<Project> page, String token) {
         Assert.notNull(page, BaseException.BaseExceptionEnum.Empty_Param.toString());
+        String accountCode = JwtToken.getTokenValue(token, "accountCode");
+        Map<String, Object> map = Maps.newHashMap();
+        map.put("accountCode", accountCode);
+        page.setParams(map);
         page = projectSV.getList(page);
-        int count = projectSV.count(new HashedMap());
+        int count = projectSV.count(map);
         page.setTotalRow(count);
         logger.info(JSON.toJSONString(page));
         return BeanRet.create(true, "", page);
@@ -151,7 +156,7 @@ public class ProjectCtrl extends BaseCtrl {
     })
     @PostMapping("/build")
     @ResponseBody
-    public BeanRet build(@ApiIgnore Project project) {
+    public BeanRet build(@ApiIgnore Project project, String token) {
         Assert.hasText(project.getName(), BaseException.BaseExceptionEnum.Empty_Param.toString());
         Assert.hasText(project.getEnglishName(), BaseException.BaseExceptionEnum.Empty_Param.toString());
         Assert.hasText(project.getAuthor(), BaseException.BaseExceptionEnum.Empty_Param.toString());
@@ -160,6 +165,8 @@ public class ProjectCtrl extends BaseCtrl {
         Assert.hasText(project.getDatabaseType(), BaseException.BaseExceptionEnum.Empty_Param.toString());
         Assert.hasText(project.getPhone(), BaseException.BaseExceptionEnum.Empty_Param.toString());
         Assert.hasText(project.getLanguage(), BaseException.BaseExceptionEnum.Empty_Param.toString());
+        String accountCode = JwtToken.getTokenValue(token, "accountCode");
+        project.setAccountCode(accountCode);
         projectSV.build(project);
         return BeanRet.create(true, "创建项目成功", project);
     }

@@ -113,7 +113,10 @@
     <!-- 配置拦截器 -->
     <mvc:interceptors>
         <mvc:interceptor>
-            <mvc:mapping path="/**"/>
+            <mvc:mapping path="/framework/**"/>
+            <mvc:mapping path="/Module/**"/>
+            <mvc:mapping path="/project/**"/>
+            <mvc:exclude-mapping path="/swagger**"/>
             <mvc:exclude-mapping path="/swagger-resources/**"/>
             <mvc:exclude-mapping path="/login/signin**"/>
             <bean id="loginInterceptor" class="com.rzhkj.core.interceptor.LoginInterceptor">

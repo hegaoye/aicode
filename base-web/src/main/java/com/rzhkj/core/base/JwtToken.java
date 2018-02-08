@@ -14,6 +14,7 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.rzhkj.core.tools.DateTools;
 import com.rzhkj.core.tools.Md5;
@@ -35,8 +36,10 @@ public class JwtToken {
 
     public static void main(String[] args) {
         String token = createToken("client_id", "c5f04615-7739-4267-877c-bedd9ab7fed3");
-        boolean flag = verifier("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1MTgwNzY2OTN9.OifFWRj2IgyaBHtcVD-cLPVlcoDkRSm9ocRemmNkpUU", "client_id", "c5f04615-7739-4267-877c-bedd9ab7fed3");
+        boolean flag = verifier(token);
         System.out.println(flag);
+
+
     }
 
 
@@ -44,15 +47,12 @@ public class JwtToken {
      * 验证token
      *
      * @param token
-     * @param key   验证值key
-     * @param value 验证值
      * @return true/false
      */
-    public static boolean verifier(String token, String key, String value) {
+    public static boolean verifier(String token) {
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret);
             JWTVerifier verifier = JWT.require(algorithm)
-//                    .withClaim(key, value)
                     .build();
             DecodedJWT jwt = verifier.verify(token);
             logger.info("verifier token ==============================================");
@@ -73,6 +73,33 @@ public class JwtToken {
         return false;
     }
 
+
+    /**
+     * 获取token 值
+     *
+     * @param token
+     * @param key   验证值key
+     * @return true/false
+     */
+    public static String getTokenValue(String token, String key) {
+        try {
+            Algorithm algorithm = Algorithm.HMAC256(secret);
+            JWTVerifier verifier = JWT.require(algorithm)
+                    .build();
+            DecodedJWT jwt = verifier.verify(token);
+            logger.info("verifier token ==============================================");
+            Claim claim = jwt.getClaim(key);
+            logger.info(claim.asString());
+            String value = claim.asString();
+            return value;
+        } catch (UnsupportedEncodingException exception) {
+            exception.printStackTrace();
+        } catch (JWTVerificationException exception) {
+            exception.printStackTrace();
+        }
+        return null;
+    }
+
     /**
      * 创建token
      *
@@ -88,7 +115,7 @@ public class JwtToken {
             logger.info(DateTools.yyyyMMddHHmmss(expires));
             String token = JWT.create()
                     .withExpiresAt(expires)
-//                    .withClaim(key, value)
+                    .withClaim(key, value)
                     .sign(algorithm);
             logger.info("create token==============================================");
             logger.info(token);

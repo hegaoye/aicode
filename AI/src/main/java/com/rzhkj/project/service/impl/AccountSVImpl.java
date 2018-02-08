@@ -10,6 +10,7 @@ import com.google.common.collect.Maps;
 import com.rzhkj.core.base.BaseMybatisDAO;
 import com.rzhkj.core.base.BaseMybatisSVImpl;
 import com.rzhkj.core.exceptions.BaseException;
+import com.rzhkj.core.tools.Md5;
 import com.rzhkj.project.dao.AccountDAO;
 import com.rzhkj.project.entity.Account;
 import com.rzhkj.project.service.AccountSV;
@@ -44,6 +45,7 @@ public class AccountSVImpl extends BaseMybatisSVImpl<Account, Long> implements A
             throw new BaseException(BaseException.BaseExceptionEnum.Exists);
         }
         entity.setCode(String.valueOf(uidGenerator.getUID()));
+        entity.setPassword(Md5.md5(entity.getPassword()));
         super.save(entity);
     }
 }

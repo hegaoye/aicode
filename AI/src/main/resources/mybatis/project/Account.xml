@@ -38,16 +38,12 @@
 	<update id="Account.update" parameterType="Account">
         UPDATE `account`
 		<trim prefix="set" suffixOverrides=",">
-			<if test="account!=null and account!=''">
-	        account = #{account} ,
-		    </if>
 			<if test="password!=null and password!=''">
-	        password = #{password} 
+	          password = #{password}
 		    </if>
 		</trim>
         WHERE
-	        id = #{id}  AND 
-	        code = #{code} 
+	        code = #{code}
 	</update>
 
     <delete id="Account.delete">

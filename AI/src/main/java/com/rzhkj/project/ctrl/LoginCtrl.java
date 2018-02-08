@@ -3,6 +3,7 @@ package com.rzhkj.project.ctrl;
 import com.alibaba.fastjson.JSON;
 import com.rzhkj.core.base.BaseCtrl;
 import com.rzhkj.core.base.JwtToken;
+import com.rzhkj.core.common.Constants;
 import com.rzhkj.core.entity.BeanRet;
 import com.rzhkj.core.exceptions.BaseException;
 import com.rzhkj.core.tools.Md5;
@@ -64,7 +65,7 @@ public class LoginCtrl extends BaseCtrl {
             Account accountObj = accountSV.load(map);
             String token = null;
             if (accountObj != null) {
-                token = JwtToken.createToken("accountCode", accountObj.getCode());
+                token = JwtToken.createToken(Constants.AccountCode.val.toString(), accountObj.getCode());
             } else {
                 return BeanRet.create();
             }

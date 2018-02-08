@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Maps;
 import com.rzhkj.core.base.BaseCtrl;
 import com.rzhkj.core.base.JwtToken;
+import com.rzhkj.core.common.Constants;
 import com.rzhkj.core.entity.BeanRet;
 import com.rzhkj.core.entity.Page;
 import com.rzhkj.core.exceptions.BaseException;
@@ -126,7 +127,7 @@ public class ProjectCtrl extends BaseCtrl {
     @ResponseBody
     public BeanRet list(@ApiIgnore Page<Project> page, String token) {
         Assert.notNull(page, BaseException.BaseExceptionEnum.Empty_Param.toString());
-        String accountCode = JwtToken.getTokenValue(token, "accountCode");
+        String accountCode = JwtToken.getTokenValue(token, Constants.AccountCode.val.toString());
         Map<String, Object> map = Maps.newHashMap();
         map.put("accountCode", accountCode);
         page.setParams(map);
@@ -165,7 +166,7 @@ public class ProjectCtrl extends BaseCtrl {
         Assert.hasText(project.getDatabaseType(), BaseException.BaseExceptionEnum.Empty_Param.toString());
         Assert.hasText(project.getPhone(), BaseException.BaseExceptionEnum.Empty_Param.toString());
         Assert.hasText(project.getLanguage(), BaseException.BaseExceptionEnum.Empty_Param.toString());
-        String accountCode = JwtToken.getTokenValue(token, "accountCode");
+        String accountCode = JwtToken.getTokenValue(token, Constants.AccountCode.val.toString());
         project.setAccountCode(accountCode);
         projectSV.build(project);
         return BeanRet.create(true, "创建项目成功", project);

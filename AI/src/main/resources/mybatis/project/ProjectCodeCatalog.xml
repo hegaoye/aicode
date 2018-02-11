@@ -83,7 +83,7 @@
         </trim>
         WHERE
         code = #{code} AND
-        projectCode = #{projectCode} AND
+        projectCode = #{projectCode}
     </update>
 
     <delete id="ProjectCodeCatalog.delete">

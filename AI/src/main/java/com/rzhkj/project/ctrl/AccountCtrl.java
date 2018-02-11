@@ -15,7 +15,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.Assert;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -46,7 +46,7 @@ public class AccountCtrl extends BaseCtrl {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "password", value = "密码", required = true, paramType = "query")
     })
-    @PostMapping("/modify/password")
+    @PutMapping("/modify/password")
     @ResponseBody
     public BeanRet modifyPassword(String password, String token) {
         try {

@@ -1,67 +1,62 @@
 package com.rzhkj.project.ctrl;
 
-import com.beust.jcommander.internal.Maps;
 import com.rzhkj.core.base.BaseCtrl;
-import com.rzhkj.core.base.JwtToken;
-import com.rzhkj.core.common.Constants;
 import com.rzhkj.core.entity.BeanRet;
-import com.rzhkj.core.exceptions.BaseException;
-import com.rzhkj.core.tools.Md5;
-import com.rzhkj.project.entity.Account;
-import com.rzhkj.project.service.AccountSV;
+import com.rzhkj.core.tools.DateTools;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.Assert;
-import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.annotation.Resource;
-import java.util.Map;
+import java.util.Date;
 
 
 /**
- * 账户控制器
+ * iot
  *
  * @author lixin
  */
 @Controller
-@RequestMapping("/account")
-@Api(value = "账户控制器", description = "账户控制器")
+@RequestMapping("/iot")
+@Api(value = "iot", description = "iot")
 public class AccountCtrl extends BaseCtrl {
-
-    @Resource
-    private AccountSV accountSV;
 
 
     /**
-     * 修改密码
+     * 开关
      *
-     * @return BeanRet
+     * @param code
+     * @return
      */
-    @ApiOperation(value = "修改密码", notes = "修改密码")
+    @ApiOperation(value = "开", notes = "开")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "password", value = "密码", required = true, paramType = "query")
+            @ApiImplicitParam(name = "code", value = "指令编码", required = true, paramType = "query")
     })
-    @PutMapping("/modify/password")
+    @GetMapping("/on")
     @ResponseBody
-    public BeanRet modifyPassword(String password, String token) {
-        try {
-            Assert.hasText(password, BaseException.BaseExceptionEnum.Empty_Param.toString());
-            String accountCode = JwtToken.getTokenValue(token, Constants.AccountCode.val.toString());
-            Map<String, Object> map = Maps.newHashMap();
-            map.put("code", accountCode);
-            Account accountLoad = accountSV.load(map);
-            accountLoad.setPassword(Md5.md5(password));
-            accountSV.update(accountLoad);
-            return BeanRet.create(true, "注册成功");
-        } catch (Exception e) {
-            e.printStackTrace();
-            logger.error(e.getMessage());
-            return BeanRet.create(false, "注册失败");
-        }
+    public BeanRet on(String code) {
+        logger.info("on::" + code);
+        return BeanRet.create(true, DateTools.yyyyMMddHHmmss(new Date()) + " on::" + code);
+    }
+
+    /**
+     * 关闭
+     *
+     * @param code
+     * @return
+     */
+    @ApiOperation(value = "关", notes = "关")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "code", value = "指令编码", required = true, paramType = "query")
+    })
+    @GetMapping("/off")
+    @ResponseBody
+    public BeanRet off(String code) {
+        logger.info("off::" + code);
+        return BeanRet.create(true, DateTools.yyyyMMddHHmmss(new Date()) + " off::" + code);
     }
 }

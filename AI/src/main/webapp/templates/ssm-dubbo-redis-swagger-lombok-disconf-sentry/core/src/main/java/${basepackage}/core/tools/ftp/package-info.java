@@ -1,1 +1,0 @@
-package ${basePackage}.core.tools.ftp;

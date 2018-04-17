@@ -21,7 +21,7 @@ import java.util.Map;
 @Component
 public class IdCardTools {
     private final static Logger logger = LoggerFactory.getLogger(IdCardTools.class);
-    @Resource
+//    @Resource
     private RedisUtils redisUtils;
     private static Map<String, Object> map = null;
 

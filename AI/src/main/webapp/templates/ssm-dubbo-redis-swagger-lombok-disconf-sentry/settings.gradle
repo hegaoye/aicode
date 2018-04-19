@@ -1,0 +1,17 @@
+//root 项目引入子项目
+//通用模块
+include 'core'//核心jar包
+include 'base-web'//web前端集成的通用jar包
+include 'base-facade'//基础支持接口定义jar包
+
+//接口服务项目
+include 'base-sv'//mybatis基础支撑包，mybatis全项目集成
+include 'facade'//接口定义包
+
+//基础支撑项目（support）
+include 'support-api'//基础支撑项目（support） 对日志，上传，枚举，区域进行支撑查询接口
+include 'support'//为support-api系统提供接口支持
+
+//Web管理项目
+include '${projectName}-api'
+include '${projectName}'

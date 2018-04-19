@@ -1,0 +1,106 @@
+/*
+ *  Copyright (c) 2017. 郑州仁中和科技有限公司.保留所有权利.
+ *                        http://www.rzhkj.com/
+ *        郑州仁中和科技有限公司保留所有代码著作权.如有任何疑问请访问官方网站与我们联系.
+ *        代码只针对特定客户使用，不得在未经允许或授权的情况下对外传播扩散.恶意传播者，法律后果自行承担.
+ *        本代码仅用于龐帝業務系统.
+ *
+ */
+apply plugin: 'org.akhikhl.gretty' // 应用gretty插件
+apply plugin: 'war'
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+    compile rootProject.ext.dependencies["aopalliance"]
+    compile rootProject.ext.dependencies["cglib"]
+    compile rootProject.ext.dependencies["cglib-nodep"]
+
+    //------------通用工具 begin-----------------
+    compile rootProject.ext.dependencies["slf4j-api"]
+    compile rootProject.ext.dependencies["logback-core"]
+    compile rootProject.ext.dependencies["logback-classic"]
+    compile rootProject.ext.dependencies["logback-ext-spring"]
+    compile rootProject.ext.dependencies["commons-lang"]
+    compile rootProject.ext.dependencies["commons-beanutils"]
+    compile rootProject.ext.dependencies["commons-collections"]
+    compile rootProject.ext.dependencies["commons-httpclient"]
+    compile rootProject.ext.dependencies["commons-codec"]
+    compile rootProject.ext.dependencies["commons-discovery"]
+    compile rootProject.ext.dependencies["commons-logging"]
+    compile rootProject.ext.dependencies["commons-logging-api"]
+    compile rootProject.ext.dependencies["commons-fileupload"]
+    compile rootProject.ext.dependencies["commons-dbcp"]
+    compile rootProject.ext.dependencies["commons-pool"]
+    compile rootProject.ext.dependencies["commons-io"]
+    compile rootProject.ext.dependencies["dom4j"]
+    compile rootProject.ext.dependencies["ezmorph"]
+    compile rootProject.ext.dependencies["fastjson"]
+    compile rootProject.ext.dependencies["guava"]
+    compile rootProject.ext.dependencies["jcaptcha"]
+    compile rootProject.ext.dependencies["netty"]
+    compile rootProject.ext.dependencies["okhttp"]
+    compile rootProject.ext.dependencies["logging-interceptor"]
+    //------------通用工具 begin-----------------
+
+    //-----------junit begin------------------
+    compile rootProject.ext.dependencies["hamcrest-core"]
+    compile rootProject.ext.dependencies["junit"]
+    //-----------junit end------------------
+
+    //-----------mybatis begin---------------
+    compile rootProject.ext.dependencies["druid"]
+    compile rootProject.ext.dependencies["mybatis"]
+    compile rootProject.ext.dependencies["mybatis-spring"]
+    compile rootProject.ext.dependencies["mysql-connector"]
+    compile rootProject.ext.dependencies["mybatis-paginator"]
+    //-----------mybatis end---------------
+
+    //------------Memcached begin-------------
+    compile rootProject.ext.dependencies["Memcached-Java-Client"]
+    //------------Memcached begin-------------
+
+    //------------spring begin----------------
+    compile rootProject.ext.dependencies["aspectjweaver"]
+    compile rootProject.ext.dependencies["spring-core"]
+    compile rootProject.ext.dependencies["spring-aop"]
+    compile rootProject.ext.dependencies["spring-aspects"]
+    compile rootProject.ext.dependencies["spring-beans"]
+    compile rootProject.ext.dependencies["spring-context"]
+    compile rootProject.ext.dependencies["spring-expression"]
+    compile rootProject.ext.dependencies["spring-jdbc"]
+    compile rootProject.ext.dependencies["spring-jms"]
+    compile rootProject.ext.dependencies["spring-orm"]
+    compile rootProject.ext.dependencies["spring-oxm"]
+    compile rootProject.ext.dependencies["spring-test"]
+    compile rootProject.ext.dependencies["spring-tx"]
+    compile rootProject.ext.dependencies["spring-web"]
+    compile rootProject.ext.dependencies["spring-webmvc"]
+    compile rootProject.ext.dependencies["spring-webmvc-portlet"]
+    //------------spring end----------------
+
+    //------------dubbo依赖 begin-------------
+    compile rootProject.ext.dependencies["zookeeper"]
+    compile rootProject.ext.dependencies["zkclient"]
+    compile rootProject.ext.dependencies["javassist"]
+    //------------dubbo依赖 end-------------
+
+    //----------reids缓存 begin----------
+    compile rootProject.ext.dependencies["jedis"]
+    compile rootProject.ext.dependencies["spring-data-redis"]
+    //----------reids缓存 end------------
+
+
+    // ----------jwt Nimbus JOSE+JWT begin----------
+    compile rootProject.ext.dependencies["java-jwt"]
+    //----------jwt Nimbus JOSE+JWT end------------
+
+    //------------Sentry start-------------------
+    compile rootProject.ext.dependencies["sentry-logback"]
+    //------------Sentry end-------------------
+
+    compile rootProject.ext.dependencies["disconf-client"]
+
+    compile fileTree(dir: '../libs', include: ['*.jar'])
+    compile project(":core")
+    compile project(":facade")
+    compile project(":base-sv")
+}

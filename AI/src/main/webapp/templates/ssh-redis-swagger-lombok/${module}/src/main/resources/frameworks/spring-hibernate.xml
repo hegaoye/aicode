@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
+        http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx-4.1.xsd
+		http://www.springframework.org/schema/context
+		http://www.springframework.org/schema/context/spring-context-4.1.xsd"
+       default-autowire="byName">
+
+    <context:component-scan base-package="com"/>
+    <!-- 自动扫描所有注解该路径 -->
+    <context:property-placeholder location="classpath:/jdbc.properties"/>
+    <!-- 配置数据源 使用的是Druid数据源 -->
+    <bean name="dataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+        <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+        <property name="url" value="${r'${jdbc.url}'}"/>
+        <property name="username" value="${r'${jdbc.username}'}"/>
+        <property name="password" value="${r'${jdbc.password}'}"/>
+        <property name="validationQuery" value="${r'${jdbc.validationQuery}'}"/>
+        <property name="maxActive" value="${r'${jdbc.maxActive}'}"/>
+        <property name="initialSize" value="${r'${jdbc.initialSize}'}"/>
+        <property name="maxWait" value="${r'${jdbc.maxWait}'}"/>
+        <property name="minIdle" value="${r'${jdbc.minIdle}'}"/>
+        <property name="timeBetweenEvictionRunsMillis" value="${r'${jdbc.timeBetweenEvictionRunsMillis}'}"/>
+        <property name="minEvictableIdleTimeMillis" value="${r'${jdbc.minEvictableIdleTimeMillis}'}"/>
+        <property name="testWhileIdle" value="${r'${jdbc.testWhileIdle}'}"/>
+        <property name="testOnBorrow" value="${r'${jdbc.testOnBorrow}'}"/>
+        <property name="testOnReturn" value="${r'${jdbc.testOnReturn}'}"/>
+        <!-- mysql 不支持 poolPreparedStatements-->
+        <!--<property name="poolPreparedStatements" value="true" />-->
+        <!--<property name="maxPoolPreparedStatementPerConnectionSize" value="20" />-->
+        <!-- 开启Druid的监控统计功能 -->
+        <property name="filters" value="stat"/>
+    </bean>
+
+
+    <bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="hibernateProperties">
+            <props>
+                <!-- 自动验证数据库表结构 -->
+                <!--注意，这句-->
+                <!--一般来讲是先用create，然后再修改为update，这样开发起来会很方便-->
+                <!--如果要自动建表,必须为以下-->
+                <!--<prop key="hibernate.hbm2ddl.auto">create</prop>-->
+                <!--<prop key="hibernate.hbm2ddl.auto">update</prop>-->
+                <!--上面不是自动建表，而是更新表结构-->
+                <!--<prop key="hibernate.dialect">org.hibernate.dialect.MySQLInnoDBDialect</prop>-->
+                <!--<prop key="hibernate.show_sql">true</prop>-->
+                <!--<prop key="hibernate.format_sql">true</prop>-->
+                <!--&lt;!&ndash;一次读的数据库记录数&ndash;&gt;-->
+                <!--<prop key="hibernate.jdbc.fetch_size">50</prop>-->
+                <!--&lt;!&ndash; 设定对数据库进行批量删除 &ndash;&gt;-->
+                <!--<prop key="hibernate.jdbc.batch_size">30</prop>-->
+            </props>
+        </property>
+        <property name="packagesToScan">
+            <list>
+                <!-- 扫描实体类 -->
+                <#list classes as class>
+                <!--${class.notes} 对应数据库表名 ${class.tableName}-->
+                <value>${basePackage}.${class.classModel}.entity</value>
+                </#list>
+            </list>
+        </property>
+    </bean>
+
+        <!-- 配置事务管理器 -->
+    <bean id="transactionManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+        <property name="sessionFactory" ref="sessionFactory"/>
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+        <!-- 注解方式配置事务 -->
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+</beans>

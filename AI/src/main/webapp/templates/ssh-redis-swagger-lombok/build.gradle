@@ -1,0 +1,225 @@
+def intoFile = "../build/libs/"
+
+allprojects {
+    apply plugin: 'idea'
+    apply plugin: 'java'
+    sourceCompatibility = 1.8
+
+    [compileJava, compileTestJava, javadoc]*.options*.encoding = "UTF-8"
+
+    buildscript {
+        repositories {
+            maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
+        }
+        dependencies {
+            classpath 'org.akhikhl.gretty:gretty:+'
+        }
+    }
+
+    repositories {
+        maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
+    }
+
+
+    dependencies {
+        compile "javax.servlet:javax.servlet-api:4.+"
+        compile "javax.servlet.jsp:jsp-api:2.2.1-b03"
+        testCompile group: 'junit', name: 'junit', version: '4.11'
+    }
+
+    task allTask << { task -> println "项目:" + project.name }
+    build {
+        doLast {
+            def fromFile = "./build/libs/" + project.name + ".war"
+            copy {
+                from fromFile
+                into intoFile
+            }
+
+            delete "./build/libs/hawthorn-api.jar"
+            println("=====================build " + project.name + " success.=========================")
+        }
+
+        doFirst{
+            def fromFile = "./buld/libs/"
+        }
+    }
+
+}
+ext {
+    dependencies = [
+            "asm"                            : 'asm:asm:3.3.1',
+            "aopalliance"                    : 'aopalliance:aopalliance:1.0',
+//            "aspectjrt"                      : 'org.aspectj:aspectjrt:1.8.10',
+            "aspectjweaver"                  : 'org.aspectj:aspectjweaver:1.8.10',
+            "cglib"                          : 'cglib:cglib:2.2.2',
+            "cglib-nodep"                    : 'cglib:cglib-nodep:2.2.2',
+            "commons-beanutils"              : 'commons-beanutils:commons-beanutils:1.9.2',
+            "commons-codec"                  : 'commons-codec:commons-codec:1.6',
+            "commons-collections"            : 'commons-collections:commons-collections:3.2.1',
+            "commons-dbcp"                   : 'commons-dbcp:commons-dbcp:1.2.2',
+            "commons-discovery"              : 'commons-discovery:commons-discovery:0.2',
+            "commons-fileupload"             : 'commons-fileupload:commons-fileupload:1.2.1',
+            "commons-httpclient"             : 'commons-httpclient:commons-httpclient:3.0.1',
+            "commons-io"                     : 'commons-io:commons-io:2.4',
+            "commons-lang"                   : 'commons-lang:commons-lang:2.5',
+            "commons-lang3"                  : 'org.apache.commons:commons-lang3:3.4',
+            "commons-logging"                : 'commons-logging:commons-logging:1.2',
+            "commons-logging-api"            : 'commons-logging:commons-logging-api:1.1',
+            "commons-pool"                   : 'commons-pool:commons-pool:1.6',
+            "commons-pool2"                  : 'org.apache.commons:commons-pool2:2.4.2',
+            "commons-net"                    : 'commons-net:commons-net:3.6',
+            "dom4j"                          : 'dom4j:dom4j:1.6.1',
+            "druid"                          : 'com.alibaba:druid:1.0.29',
+            "ezmorph"                        : 'net.sf.ezmorph:ezmorph:1.0.6',
+            "fastjson"                       : 'com.alibaba:fastjson:1.2.32',
+            "guava"                          : 'com.google.guava:guava:21.0',
+
+            "jackson-core"                   : 'com.fasterxml.jackson.core:jackson-core:2.7.4',
+            "jackson-core-asl"               : 'org.codehaus.jackson:jackson-core-asl:1.9.13',
+            "jackson-databind"               : 'com.fasterxml.jackson.core:jackson-databind:2.7.4',
+            "jackson-annotations"            : 'com.fasterxml.jackson.core:jackson-annotations:2.7.4',
+            "jackson-jaxrs-base"             : 'com.fasterxml.jackson.jaxrs:jackson-jaxrs-base:2.7.4',
+            "jackson-jaxrs-json-provider"    : 'com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider:2.7.4',
+            "jackson-module-jaxb-annotations": 'com.fasterxml.jackson.module:jackson-module-jaxb-annotations:2.7.4',
+            "jackson-mapper-asl"             : 'org.codehaus.jackson:jackson-mapper-asl:1.9.12',
+            "javax.persistence"              : 'org.eclipse.persistence:javax.persistence:2.1.0',
+            "javax.transaction"              : 'javax.transaction:javax.transaction-api:1.2',
+            "jcaptcha"                       : 'com.octo.captcha:jcaptcha:1.0', //验证码生成
+            "jdom"                           : 'org.jdom:jdom:1.1.3',
+            "jline"                          : 'jline:jline:0.9.94',
+            "jtds"                           : 'net.sourceforge.jtds:jtds:1.2.4',
+            "junit"                          : 'junit:junit:4.12',
+            "jxl"                            : 'net.sourceforge.jexcelapi:jxl:2.6.12',
+            "log4j"                          : 'log4j:log4j:1.2.16',
+            "logback-core"                   : 'ch.qos.logback:logback-core:1.2.3',
+            "logback-classic"                : 'ch.qos.logback:logback-classic:1.2.3',
+            "logback-access"                 : 'ch.qos.logback:logback-access:1.2.3',
+            "Memcached-Java-Client"          : 'com.whalin:Memcached-Java-Client:3.0.2',
+            "mysql-connector"                : 'mysql:mysql-connector-java:5.1.38',
+            "netty"                          : 'org.jboss.netty:netty:3.2.2.Final',
+            "quartz"                         : 'org.quartz-scheduler:quartz:2.2.1',
+            "slf4j-api"                      : 'org.slf4j:slf4j-api:1.7.5',
+            "slf4j-log4j12"                  : 'org.slf4j:slf4j-log4j12:1.7.5',
+            "testng"                         : 'org.testng:testng:6.9.10',
+            "lombok"                         : 'org.projectlombok:lombok:1.16.4',
+            //----------------spring begin--------------
+            "spring-aop"                     : 'org.springframework:spring-aop:4.3.8.RELEASE',
+            "spring-aspects"                 : 'org.springframework:spring-aspects:4.3.8.RELEASE',
+            "spring-beans"                   : 'org.springframework:spring-beans:4.3.8.RELEASE',
+            "spring-context"                 : 'org.springframework:spring-context:4.3.8.RELEASE',
+            "spring-core"                    : 'org.springframework:spring-core:4.3.8.RELEASE',
+            "spring-expression"              : 'org.springframework:spring-expression:4.3.8.RELEASE',
+            "spring-jdbc"                    : 'org.springframework:spring-jdbc:4.3.8.RELEASE',
+            "spring-jms"                     : 'org.springframework:spring-jms:4.3.8.RELEASE',
+            "spring-orm"                     : 'org.springframework:spring-orm:4.3.8.RELEASE',
+            "spring-oxm"                     : 'org.springframework:spring-oxm:4.3.8.RELEASE',
+            "spring-test"                    : 'org.springframework:spring-test:4.3.8.RELEASE',
+            "spring-tx"                      : 'org.springframework:spring-tx:4.3.8.RELEASE',
+            "spring-web"                     : 'org.springframework:spring-web:4.3.8.RELEASE',
+            "spring-webmvc"                  : 'org.springframework:spring-webmvc:4.3.8.RELEASE',
+            "spring-webmvc-portlet"          : 'org.springframework:spring-webmvc-portlet:4.3.8.RELEASE',
+            //--------------spring end------------------
+
+            //--------------mybatis begin------------------
+            "mybatis"                        : 'org.mybatis:mybatis:3.4.2',
+            "mybatis-spring"                 : 'org.mybatis:mybatis-spring:1.3.0',
+            "mybatis-paginator"              : 'com.github.miemiedev:mybatis-paginator:1.2.17',
+            //--------------mybatis end------------------
+
+            //-----------hibernate begin--------------------------
+            "antlr"                          : 'antlr:antlr:2.7.7',
+            "hamcrest-core"                  : 'org.hamcrest:hamcrest-core:1.3',
+            "hibernate-core"                 : 'org.hibernate:hibernate-core:4.0.1.Final',
+            "hibernate-commons-annotations"  : 'org.hibernate.common:hibernate-commons-annotations:4.0.1.Final',
+            "hibernate-validator"            : 'org.hibernate:hibernate-validator:4.1.0.Final',
+            "hibernate-jpa-2.0-api"          : 'org.hibernate.javax.persistence:hibernate-jpa-2.0-api:1.0.0.Final',
+            "hsqldb"                         : 'hsqldb:hsqldb:1.8.0',
+            "jboss-transaction-api_1.1_spec" : 'org.jboss.spec.javax.transaction:jboss-transaction-api_1.1_spec:1.0.1.Final',
+            "jboss-logging"                  : 'org.jboss.logging:jboss-logging:3.3.1.Final',
+            //-----------hibernate end--------------------------
+
+            //----------jstl begin-------------
+            "jstl"                           : 'javax.servlet.jsp.jstl:jstl:1.2',
+            "standard"                       : 'taglibs:standard:1.1.2',
+            //----------jstl end---------------
+
+            //----------reids缓存 begin----------
+            "jedis"                          : 'redis.clients:jedis:2.9.0',
+            "spring-data-redis"              : 'org.springframework.data:spring-data-redis:1.8.1.RELEASE',
+            //----------reids缓存 end----------
+
+            //-----------poi 导入/导出 start--------------
+            "poi"                            : 'org.apache.poi:poi:3.15',
+            "poi-ooxml"                      : 'org.apache.poi:poi-ooxml:3.15',
+            //-----------poi 导入/导出 end--------------
+
+            //-----------swagger start--------------
+            "swagger2"                       : 'io.springfox:springfox-swagger2:2.6.1',
+            "swagger-ui"                     : 'io.springfox:springfox-swagger-ui:2.6.1',
+            "swagger-annotations"            : 'io.swagger:swagger-annotations:1.5.13',
+            //-----------swagger end--------------
+
+            //-----------dangdang分布式作业框架 begin-----------
+            "elastic-job-lite-spring"        : 'com.dangdang:elastic-job-lite-spring:2.1.4',
+            "elastic-job-common-core"        : 'com.dangdang:elastic-job-common-core:2.1.4',
+            "elastic-job-lite-core"          : 'com.dangdang:elastic-job-lite-core:2.1.4',
+            "lombok"                         : 'org.projectlombok:lombok:1.16.4',
+            //-----------dangdang分布式作业框架 end-----------
+
+            //-----------七牛云上传 start--------------
+            "gson"                           : 'com.google.code.gson:gson:2.8.0',
+            "okhttp"                         : 'com.squareup.okhttp3:okhttp:3.8.0',
+            "logging-interceptor"            : 'com.squareup.okhttp3:logging-interceptor:3.4.0-RC1',
+            "okio"                           : 'com.squareup.okio:okio:1.12.0',
+            "qiniu-java-sdk"                 : 'com.qiniu:qiniu-java-sdk:7.2.6',
+            //-----------七牛云上传 end--------------
+
+            //-----------Sentry begin-----------
+            "sentry-logback"                 : 'io.sentry:sentry-logback:1.2.2',
+            //-----------Sentry end-----------
+
+            //-----------Google生成二维码---start-------------
+            "google.zxing"                   : 'com.google.zxing:core:3.3.0',
+            //-----------Google生成二维码---end-------------
+
+            //------------solr  start------------
+            "solr-solrj"                     :'org.apache.solr:solr-solrj:6.6.1',
+            //------------solr  end------------
+
+            //------------极光推送 start------------
+            "jpush-client"                   :'cn.jpush.api:jpush-client:3.3.1',
+            //------------极光推送  end------------
+
+            //------------aliyun 文本反垃圾 start------------
+            "aliyun-java-sdk-core"           :'com.aliyun:aliyun-java-sdk-core:3.3.1',
+            //------------aliyun 文本反垃圾  end------------
+
+            //------------微信sdk start------------
+            "weixin-java-mp"                 :'com.github.binarywang:weixin-java-mp:2.8.8.BETA',
+            //------------微信sdk start------------
+
+            //------------apache httpclient start------------
+            "httpclient"                     :'org.apache.httpcomponents:httpclient:4.5.2',
+            "httpcore"                       :'org.apache.httpcomponents:httpcore:4.4.5',
+            //------------apache httpclient end------------
+            "dom4j"                      :'org.dom4j:dom4j:2.0.0',
+
+            //-----------jwt Nimbus JOSE+JWT  start--------------
+            "java-jwt"                       : 'com.auth0:java-jwt:3.2.0',
+            //-----------jwt Nimbus JOSE+JWT  end--------------
+
+            //-----------jsch ssh start--------------
+            "jsch"                           : 'com.jcraft:jsch:0.1.54',
+            //-----------jsch ssh  end--------------
+
+            //-----------Sentry begin-----------
+            "sentry-log4j"                  : 'io.sentry:sentry-log4j:1.5.4',
+            //-----------Sentry end-----------
+
+            //-----------Paypal begin-----------
+            "disconf-client"                 : 'com.baidu.disconf:disconf-client:2.6.31'
+            //-----------Paypal end-----------
+    ]
+}
+

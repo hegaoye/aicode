@@ -1,16 +1,16 @@
 /*
-Navicat MariaDB Data Transfer
+Navicat MySQL Data Transfer
 
-Source Server         : 220
-Source Server Version : 100123
-Source Host           : 192.168.10.220:3306
-Source Database       : ai_code_simple
+Source Server         : 127.0.0.1
+Source Server Version : 50553
+Source Host           : 127.0.0.1:3306
+Source Database       : ai_code
 
-Target Server Type    : MariaDB
-Target Server Version : 100123
+Target Server Type    : MYSQL
+Target Server Version : 50553
 File Encoding         : 65001
 
-Date: 2018-04-18 17:21:45
+Date: 2018-04-19 17:39:39
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -66,7 +66,7 @@ CREATE TABLE `frameworks_template` (
   `frameworkCode` varchar(64) DEFAULT '' COMMENT '框架编码',
   `path` varchar(256) DEFAULT NULL COMMENT '模板路径',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=124205 DEFAULT CHARSET=utf8mb4 COMMENT='框架配置文件模板';
+) ENGINE=InnoDB AUTO_INCREMENT=125897 DEFAULT CHARSET=utf8mb4 COMMENT='框架配置文件模板';
 
 -- ----------------------------
 -- Records of frameworks_template
@@ -342,6 +342,7 @@ INSERT INTO `frameworks_template` VALUES ('124201', '456983', '456789', '/ssm-du
 INSERT INTO `frameworks_template` VALUES ('124202', '456984', '456789', '/ssm-dubbo-redis-swagger-lombok-disconf-sentry/support-api/src/main/resources/spring-mvc.xml');
 INSERT INTO `frameworks_template` VALUES ('124203', '456985', '456789', '/ssm-dubbo-redis-swagger-lombok-disconf-sentry/support-api/src/main/resources/upload_config.properties');
 INSERT INTO `frameworks_template` VALUES ('124204', '456986', '456789', '/ssm-dubbo-redis-swagger-lombok-disconf-sentry/support-api/src/main/webapp/WEB-INF/web.xml');
+INSERT INTO `frameworks_template` VALUES ('124205', '456987', '123456', '/ssm-redis-swagger-lombok/${module}/src/main/java/${basepackage}/core/execptions/BaseException.java');
 
 -- ----------------------------
 -- Table structure for map_class_table
@@ -354,7 +355,7 @@ CREATE TABLE `map_class_table` (
   `className` varchar(64) DEFAULT NULL COMMENT '类名',
   `notes` varchar(256) DEFAULT NULL COMMENT '注释',
   PRIMARY KEY (`id`,`code`)
-) ENGINE=InnoDB AUTO_INCREMENT=526 DEFAULT CHARSET=utf8mb4 COMMENT='类表映射信息';
+) ENGINE=InnoDB AUTO_INCREMENT=534 DEFAULT CHARSET=utf8mb4 COMMENT='类表映射信息';
 
 -- ----------------------------
 -- Records of map_class_table
@@ -579,6 +580,14 @@ INSERT INTO `map_class_table` VALUES ('520', '744389352203198464', 'cust', 'Cust
 INSERT INTO `map_class_table` VALUES ('521', '744389352203198502', 'cust_addr', 'CustAddr', '买家收货地址信息表（现自提点即代理商）');
 INSERT INTO `map_class_table` VALUES ('522', '744389352203198518', 'cust_agent', 'CustAgent', '用户选择的服务代理商');
 INSERT INTO `map_class_table` VALUES ('525', '747925759555395585', 'zoom_account', 'ZoomAccount', '课堂老师临时zoom账户');
+INSERT INTO `map_class_table` VALUES ('526', '856047901920583681', 'errortype', 'Errortype', '错误类型');
+INSERT INTO `map_class_table` VALUES ('527', '856047901920583686', 'repair_feedback', 'RepairFeedback', '维修反馈');
+INSERT INTO `map_class_table` VALUES ('528', '856047901920583694', 'staff', 'Staff', '员工信息');
+INSERT INTO `map_class_table` VALUES ('529', '856047901920583707', 'test_flow', 'TestFlow', '测试流程');
+INSERT INTO `map_class_table` VALUES ('530', '856047901920583714', 'test_flow_staff', 'TestFlowStaff', '员工与测试流程关联');
+INSERT INTO `map_class_table` VALUES ('531', '856047901920583718', 'test_option', 'TestOption', '检测项');
+INSERT INTO `map_class_table` VALUES ('532', '856047901920583726', 'test_record', 'TestRecord', '检测记录');
+INSERT INTO `map_class_table` VALUES ('533', '856047901920583740', 'test_unit', 'TestUnit', '测试件，测试硬件单元');
 
 -- ----------------------------
 -- Table structure for map_field_column
@@ -598,7 +607,7 @@ CREATE TABLE `map_field_column` (
   `isDate` varchar(1) DEFAULT 'N' COMMENT '是否是时间类型',
   `isState` varchar(1) DEFAULT 'N' COMMENT '是否是状态',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5326 DEFAULT CHARSET=utf8mb4 COMMENT='字段属性映射信息';
+) ENGINE=InnoDB AUTO_INCREMENT=5384 DEFAULT CHARSET=utf8mb4 COMMENT='字段属性映射信息';
 
 -- ----------------------------
 -- Records of map_field_column
@@ -3581,6 +3590,64 @@ INSERT INTO `map_field_column` VALUES ('5322', '747925759555395585', '7479257595
 INSERT INTO `map_field_column` VALUES ('5323', '747925759555395585', '747925759555395595', 'updateTime', 'updateTime', 'datetime', 'java.util.Date', '更新时间', null, 'N', 'Y', 'N');
 INSERT INTO `map_field_column` VALUES ('5324', '747925759555395585', '747925759555395596', 'apiKey', 'apiKey', 'varchar', 'java.lang.String', 'apiKey', null, 'N', 'N', 'N');
 INSERT INTO `map_field_column` VALUES ('5325', '747925759555395585', '747925759555395597', 'apiSecret', 'apiSecret', 'varchar', 'java.lang.String', 'apiSecret', null, 'N', 'N', 'N');
+INSERT INTO `map_field_column` VALUES ('5326', '856047901920583681', '856047901920583682', 'id', 'id', 'bigint', 'java.lang.Long', 'id', null, 'Y', 'N', 'N');
+INSERT INTO `map_field_column` VALUES ('5327', '856047901920583681', '856047901920583683', 'code', 'code', 'varchar', 'java.lang.String', '类型编码', null, 'Y', 'N', 'N');
+INSERT INTO `map_field_column` VALUES ('5328', '856047901920583681', '856047901920583684', 'name', 'name', 'varchar', 'java.lang.String', '错误类型', null, 'N', 'N', 'N');
+INSERT INTO `map_field_column` VALUES ('5329', '856047901920583681', '856047901920583685', 'state', 'state', 'varchar', 'java.lang.String', '状态 启用 enable,禁用 disable', null, 'N', 'N', 'N');
+INSERT INTO `map_field_column` VALUES ('5330', '856047901920583686', '856047901920583687', 'id', 'id', 'bigint', 'java.lang.Long', 'id', null, 'Y', 'N', 'N');
+INSERT INTO `map_field_column` VALUES ('5331', '856047901920583686', '856047901920583688', 'testRecordCode', 'testRecordCode', 'varchar', 'java.lang.String', '检测记录编码', null, 'N', 'N', 'N');
+INSERT INTO `map_field_column` VALUES ('5332', '856047901920583686', '856047901920583689', 'staffCode', 'staffCode', 'varchar', 'java.lang.String', '员工编码', null, 'N', 'N', 'N');
+INSERT INTO `map_field_column` VALUES ('5333', '856047901920583686', '856047901920583690', 'testFlowCode', 'testFlowCode', 'varchar', 'java.lang.String', '流程编码', null, 'N', 'N', 'N');
+INSERT INTO `map_field_column` VALUES ('5334', '856047901920583686', '856047901920583691', 'errorCode', 'errorCode', 'varchar', 'java.lang.String', '错误类型编码', null, 'N', 'N', 'N');
+INSERT INTO `map_field_column` VALUES ('5335', '856047901920583686', '856047901920583692', 'feedback', 'feedback', 'varchar', 'java.lang.String', '反馈信息', null, 'N', 'N', 'N');
+INSERT INTO `map_field_column` VALUES ('5336', '856047901920583686', '856047901920583693', 'createTime', 'createTime', 'datetime', 'java.util.Date', '创建时间', null, 'N', 'Y', 'N');
+INSERT INTO `map_field_column` VALUES ('5337', '856047901920583694', '856047901920583695', 'id', 'id', 'bigint', 'java.lang.Long', '', null, 'Y', 'N', 'N');
+INSERT INTO `map_field_column` VALUES ('5338', '856047901920583694', '856047901920583696', 'code', 'code', 'varchar', 'java.lang.String', '唯一编码', null, 'Y', 'N', 'N');
+INSERT INTO `map_field_column` VALUES ('5339', '856047901920583694', '856047901920583697', 'name', 'name', 'varchar', 'java.lang.String', '姓名', null, 'N', 'N', 'N');
+INSERT INTO `map_field_column` VALUES ('5340', '856047901920583694', '856047901920583698', 'jobnumber', 'jobnumber', 'varchar', 'java.lang.String', '工号', null, 'N', 'N', 'N');
+INSERT INTO `map_field_column` VALUES ('5341', '856047901920583694', '856047901920583699', 'phone', 'phone', 'varchar', 'java.lang.String', '电话', null, 'N', 'N', 'N');
+INSERT INTO `map_field_column` VALUES ('5342', '856047901920583694', '856047901920583700', 'gender', 'gender', 'varchar', 'java.lang.String', '性别', null, 'N', 'N', 'N');
+INSERT INTO `map_field_column` VALUES ('5343', '856047901920583694', '856047901920583701', 'age', 'age', 'varchar', 'java.lang.String', '年龄', null, 'N', 'N', 'N');
+INSERT INTO `map_field_column` VALUES ('5344', '856047901920583694', '856047901920583702', 'address', 'address', 'varchar', 'java.lang.String', '地址', null, 'N', 'N', 'N');
+INSERT INTO `map_field_column` VALUES ('5345', '856047901920583694', '856047901920583703', 'state', 'state', 'varchar', 'java.lang.String', '状态 入职 hire，离职 leave', null, 'N', 'N', 'N');
+INSERT INTO `map_field_column` VALUES ('5346', '856047901920583694', '856047901920583704', 'hiredate', 'hiredate', 'datetime', 'java.util.Date', '入职时间', null, 'N', 'Y', 'N');
+INSERT INTO `map_field_column` VALUES ('5347', '856047901920583694', '856047901920583705', 'createTime', 'createTime', 'datetime', 'java.util.Date', '创建时间', null, 'N', 'Y', 'N');
+INSERT INTO `map_field_column` VALUES ('5348', '856047901920583694', '856047901920583706', 'updateTime', 'updateTime', 'datetime', 'java.util.Date', '更新时间', null, 'N', 'Y', 'N');
+INSERT INTO `map_field_column` VALUES ('5349', '856047901920583707', '856047901920583708', 'id', 'id', 'bigint', 'java.lang.Long', 'id', null, 'Y', 'N', 'N');
+INSERT INTO `map_field_column` VALUES ('5350', '856047901920583707', '856047901920583709', 'code', 'code', 'varchar', 'java.lang.String', 'code', null, 'Y', 'N', 'N');
+INSERT INTO `map_field_column` VALUES ('5351', '856047901920583707', '856047901920583710', 'name', 'name', 'varchar', 'java.lang.String', '流程名称', null, 'N', 'N', 'N');
+INSERT INTO `map_field_column` VALUES ('5352', '856047901920583707', '856047901920583711', 'state', 'state', 'varchar', 'java.lang.String', '状态 \r\n            启用 enable,禁用 disable', null, 'N', 'N', 'N');
+INSERT INTO `map_field_column` VALUES ('5353', '856047901920583707', '856047901920583712', 'createTime', 'createTime', 'datetime', 'java.util.Date', '创建时间', null, 'N', 'Y', 'N');
+INSERT INTO `map_field_column` VALUES ('5354', '856047901920583707', '856047901920583713', 'updateTime', 'updateTime', 'datetime', 'java.util.Date', '更新时间', null, 'N', 'Y', 'N');
+INSERT INTO `map_field_column` VALUES ('5355', '856047901920583714', '856047901920583715', 'id', 'id', 'bigint', 'java.lang.Long', 'id', null, 'Y', 'N', 'N');
+INSERT INTO `map_field_column` VALUES ('5356', '856047901920583714', '856047901920583716', 'staffCode', 'staffCode', 'varchar', 'java.lang.String', '员工编码', null, 'Y', 'N', 'N');
+INSERT INTO `map_field_column` VALUES ('5357', '856047901920583714', '856047901920583717', 'testFlowCode', 'testFlowCode', 'varchar', 'java.lang.String', '流程编码', null, 'Y', 'N', 'N');
+INSERT INTO `map_field_column` VALUES ('5358', '856047901920583718', '856047901920583719', 'id', 'id', 'bigint', 'java.lang.Long', 'id', null, 'Y', 'N', 'N');
+INSERT INTO `map_field_column` VALUES ('5359', '856047901920583718', '856047901920583720', 'testUnitCode', 'testUnitCode', 'varchar', 'java.lang.String', '测试件编码', null, 'Y', 'N', 'N');
+INSERT INTO `map_field_column` VALUES ('5360', '856047901920583718', '856047901920583721', 'code', 'code', 'varchar', 'java.lang.String', '测试项编码', null, 'Y', 'N', 'N');
+INSERT INTO `map_field_column` VALUES ('5361', '856047901920583718', '856047901920583722', 'option', 'option', 'varchar', 'java.lang.String', '测试项', null, 'N', 'N', 'N');
+INSERT INTO `map_field_column` VALUES ('5362', '856047901920583718', '856047901920583723', 'state', 'state', 'char', 'java.lang.String', '状态 启用 enable,禁用 disable', null, 'N', 'N', 'N');
+INSERT INTO `map_field_column` VALUES ('5363', '856047901920583718', '856047901920583724', 'createTime', 'createTime', 'datetime', 'java.util.Date', '创建时间', null, 'N', 'Y', 'N');
+INSERT INTO `map_field_column` VALUES ('5364', '856047901920583718', '856047901920583725', 'updateTime', 'updateTime', 'datetime', 'java.util.Date', '更新时间', null, 'N', 'Y', 'N');
+INSERT INTO `map_field_column` VALUES ('5365', '856047901920583726', '856047901920583727', 'id', 'id', 'bigint', 'java.lang.Long', 'id', null, 'Y', 'N', 'N');
+INSERT INTO `map_field_column` VALUES ('5366', '856047901920583726', '856047901920583728', 'code', 'code', 'varchar', 'java.lang.String', '记录编码', null, 'Y', 'N', 'N');
+INSERT INTO `map_field_column` VALUES ('5367', '856047901920583726', '856047901920583729', 'staffCode', 'staffCode', 'varchar', 'java.lang.String', '员工编码', null, 'N', 'N', 'N');
+INSERT INTO `map_field_column` VALUES ('5368', '856047901920583726', '856047901920583730', 'jobNumber', 'jobNumber', 'varchar', 'java.lang.String', '工号', null, 'N', 'N', 'N');
+INSERT INTO `map_field_column` VALUES ('5369', '856047901920583726', '856047901920583731', 'testUnitCode', 'testUnitCode', 'varchar', 'java.lang.String', '测试件编码', null, 'N', 'N', 'N');
+INSERT INTO `map_field_column` VALUES ('5370', '856047901920583726', '856047901920583732', 'testOptionCode', 'testOptionCode', 'varchar', 'java.lang.String', '测试项编码', null, 'N', 'N', 'N');
+INSERT INTO `map_field_column` VALUES ('5371', '856047901920583726', '856047901920583733', 'testFlowCode', 'testFlowCode', 'varchar', 'java.lang.String', '测试流程编码', null, 'N', 'N', 'N');
+INSERT INTO `map_field_column` VALUES ('5372', '856047901920583726', '856047901920583734', 'staffName', 'staffName', 'varchar', 'java.lang.String', '员工姓名', null, 'N', 'N', 'N');
+INSERT INTO `map_field_column` VALUES ('5373', '856047901920583726', '856047901920583735', 'sn', 'sn', 'varchar', 'java.lang.String', '测试sn码', null, 'N', 'N', 'N');
+INSERT INTO `map_field_column` VALUES ('5374', '856047901920583726', '856047901920583736', 'testFlowName', 'testFlowName', 'varchar', 'java.lang.String', '流程名', null, 'N', 'N', 'N');
+INSERT INTO `map_field_column` VALUES ('5375', '856047901920583726', '856047901920583737', 'testOption', 'testOption', 'varchar', 'java.lang.String', '测试项', null, 'N', 'N', 'N');
+INSERT INTO `map_field_column` VALUES ('5376', '856047901920583726', '856047901920583738', 'state', 'state', 'varchar', 'java.lang.String', '状态 成功 TestSuccess，失败 TestFailed', null, 'N', 'N', 'N');
+INSERT INTO `map_field_column` VALUES ('5377', '856047901920583726', '856047901920583739', 'testTIme', 'testTime', 'datetime', 'java.util.Date', '测试时间', null, 'N', 'Y', 'N');
+INSERT INTO `map_field_column` VALUES ('5378', '856047901920583740', '856047901920583741', 'id', 'id', 'bigint', 'java.lang.Long', 'id', null, 'Y', 'N', 'N');
+INSERT INTO `map_field_column` VALUES ('5379', '856047901920583740', '856047901920583742', 'sn', 'sn', 'varchar', 'java.lang.String', 'sn 编码', null, 'Y', 'N', 'N');
+INSERT INTO `map_field_column` VALUES ('5380', '856047901920583740', '856047901920583743', 'code', 'code', 'varchar', 'java.lang.String', '编码', null, 'Y', 'N', 'N');
+INSERT INTO `map_field_column` VALUES ('5381', '856047901920583740', '856047901920583744', 'state', 'state', 'varchar', 'java.lang.String', '状态 创建 Create，测试通过TestSuccess，测试失败TestFailed，检修 Repair', null, 'N', 'N', 'N');
+INSERT INTO `map_field_column` VALUES ('5382', '856047901920583740', '856047901920583745', 'createTime', 'createTime', 'datetime', 'java.util.Date', '创建日期', null, 'N', 'Y', 'N');
+INSERT INTO `map_field_column` VALUES ('5383', '856047901920583740', '856047901920583746', 'updateTime', 'updateTime', 'datetime', 'java.util.Date', '更新时间', null, 'N', 'Y', 'N');
 
 -- ----------------------------
 -- Table structure for map_relationship
@@ -3658,7 +3725,7 @@ CREATE TABLE `project` (
   `updateTime` datetime DEFAULT NULL COMMENT '更新时间',
   `accountCode` varchar(64) DEFAULT NULL COMMENT '账户编码',
   PRIMARY KEY (`id`,`code`)
-) ENGINE=InnoDB AUTO_INCREMENT=131 DEFAULT CHARSET=utf8mb4 COMMENT='项目信息';
+) ENGINE=InnoDB AUTO_INCREMENT=132 DEFAULT CHARSET=utf8mb4 COMMENT='项目信息';
 
 -- ----------------------------
 -- Records of project
@@ -3670,6 +3737,7 @@ INSERT INTO `project` VALUES ('126', '741610147585064960', 'dubbo', 'dubbo', 'du
 INSERT INTO `project` VALUES ('128', '741715889679974400', 'dubbo2', 'dubbo2', 'dubbo2', 'Mysql', 'java', 'Enable', 'dubbo2', 'dubbo2', 'dubbo2', 'com.dubbo2', null, '/repository/dubbo2.zip', '1', 'N', 'Y', 'Y', '2018-02-01 16:39:07', '2018-02-01 16:39:21', '21218cca77804d2ba1');
 INSERT INTO `project` VALUES ('129', '747543009249812480', '庞帝zoom临时账户业务', '龐帝業務系统,临时增加zoom的临时账户业务解决zoom资源问题', 'zoom_account', 'Mysql', 'java', 'Enable', 'Copyright (c) 2017. 郑州仁中和科技有限公司.保留所有权利.\n                      http://www.rzhkj.com/\n      郑州仁中和科技有限公司保留所有代码著作权.如有任何疑问请访问官方网站与我们联系.\n      代码只针对特定客户使用，不得在未经允许或授权的情况下对外传播扩散.恶意传播者，法律后果自行承担.\n      本代码仅用于龐帝業務系统.', 'lixin', 'hegaoye@qq.com', 'com.ponddy', null, '/repository/zoom_account.zip', '1', 'N', 'Y', 'Y', '2018-02-05 14:52:10', '2018-02-05 21:03:29', '21218cca77804d2ba1');
 INSERT INTO `project` VALUES ('130', '752172640397746176', '测试', '测试', 'demo', 'Mysql', 'js', 'Enable', '测试', '测试', '15824826097', '测试', null, 'DownloadUrl', null, 'N', 'N', 'N', '2018-02-08 17:43:30', '2018-02-08 17:43:30', '21218cca77804d2ba1922c33e0151105');
+INSERT INTO `project` VALUES ('131', '856024537298477056', 'pps', 'pps是玺得科技公司针对pi-top产品生产质量检测而研发的系统，仅限于本公司使用与研究.', 'pps', 'Mysql', 'java', 'Enable', 'pps是玺得科技公司针对pi-top产品生产质量检测而研发的系统，仅限于本公司使用与研究.', 'leo', 'leo@pi-top.com', 'com.pitop', null, '/repository/pps.zip', '1', 'N', 'Y', 'Y', '2018-04-19 16:53:06', '2018-04-19 17:15:46', '21218cca77804d2ba1');
 
 -- ----------------------------
 -- Table structure for project_code_catalog
@@ -3700,7 +3768,7 @@ CREATE TABLE `project_framwork` (
   `frameworkCode` varchar(64) DEFAULT NULL COMMENT '技术编码',
   `projectCode` varchar(64) DEFAULT NULL COMMENT '项目编码',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=73 DEFAULT CHARSET=utf8mb4 COMMENT='项目应用技术';
+) ENGINE=InnoDB AUTO_INCREMENT=74 DEFAULT CHARSET=utf8mb4 COMMENT='项目应用技术';
 
 -- ----------------------------
 -- Records of project_framwork
@@ -3713,6 +3781,7 @@ INSERT INTO `project_framwork` VALUES ('66', '456789', '741610147585064960');
 INSERT INTO `project_framwork` VALUES ('68', '456789', '741715889679974400');
 INSERT INTO `project_framwork` VALUES ('71', '123456', '742797551423709184');
 INSERT INTO `project_framwork` VALUES ('72', '456789', '747543009249812480');
+INSERT INTO `project_framwork` VALUES ('73', '123456', '856024537298477056');
 
 -- ----------------------------
 -- Table structure for project_job
@@ -3726,7 +3795,7 @@ CREATE TABLE `project_job` (
   `state` varchar(16) DEFAULT NULL COMMENT '任务状态: 创建[Create] , 执行中[Executing], 完成[C ompleted] ,失败[Error] 警告 [Waring]',
   `createTime` datetime DEFAULT NULL COMMENT '执行任务时间',
   PRIMARY KEY (`id`,`code`)
-) ENGINE=InnoDB AUTO_INCREMENT=314 DEFAULT CHARSET=utf8mb4 COMMENT='任务';
+) ENGINE=InnoDB AUTO_INCREMENT=315 DEFAULT CHARSET=utf8mb4 COMMENT='任务';
 
 -- ----------------------------
 -- Records of project_job
@@ -3801,6 +3870,7 @@ INSERT INTO `project_job` VALUES ('310', '741715889679974400', '7457894600021688
 INSERT INTO `project_job` VALUES ('311', '747543009249812480', '747544332099739648', '1', 'Completed', '2018-02-05 14:53:27');
 INSERT INTO `project_job` VALUES ('312', '747543009249812480', '747596850959835136', '1', 'Completed', '2018-02-05 15:44:24');
 INSERT INTO `project_job` VALUES ('313', '747543009249812480', '747711062730203136', '1', 'Completed', '2018-02-05 17:35:12');
+INSERT INTO `project_job` VALUES ('314', '856024537298477056', '856055684401324032', '1', 'Completed', '2018-04-19 17:23:19');
 
 -- ----------------------------
 -- Table structure for project_job_logs
@@ -3811,7 +3881,7 @@ CREATE TABLE `project_job_logs` (
   `code` varchar(64) DEFAULT NULL COMMENT '任务编码',
   `log` varchar(1024) DEFAULT '' COMMENT '日志',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=16891 DEFAULT CHARSET=utf8mb4 COMMENT='任务日志';
+) ENGINE=InnoDB AUTO_INCREMENT=16939 DEFAULT CHARSET=utf8mb4 COMMENT='任务日志';
 
 -- ----------------------------
 -- Records of project_job_logs
@@ -10274,6 +10344,54 @@ INSERT INTO `project_job_logs` VALUES ('16887', '747711062730203136', '> ✔ 201
 INSERT INTO `project_job_logs` VALUES ('16888', '747711062730203136', '> ✔ 2018-02-05 17:35:23:172&nbsp;&nbsp;代码已打包ZIP,您还可以点击下载 ⇛⇛⇛  <a style=\'text-decoration:underline;\' href=\'/repository/zoom_account.zip\' target=\'_blank\'>zoom_account.zip</a>');
 INSERT INTO `project_job_logs` VALUES ('16889', '747711062730203136', 'Finished: SUCCESS');
 INSERT INTO `project_job_logs` VALUES ('16890', '747711062730203136', 'End');
+INSERT INTO `project_job_logs` VALUES ('16891', '856055684401324032', 'Start By AI-Code @Copyright <a href=\'http://www.rzhkj.com\' target=\'_blank\'>仁中和</a>');
+INSERT INTO `project_job_logs` VALUES ('16892', '856055684401324032', '> ✔ 2018-04-19 17:23:24:111&nbsp;&nbsp; 已初始化项目 【 pps ( pps )】 工作空间');
+INSERT INTO `project_job_logs` VALUES ('16893', '856055684401324032', '> ✔ 2018-04-19 17:23:24:114&nbsp;&nbsp;已获取项目 【ssm+redis+swagger+lombok】 的模板');
+INSERT INTO `project_job_logs` VALUES ('16894', '856055684401324032', '> ✔ 2018-04-19 17:23:24:449&nbsp;&nbsp; 【已经生成】 模板 /ssm-redis-swagger-lombok/${module}/src/main/java/${basepackage}/${model}/dao/${className}DAO.java 的源码');
+INSERT INTO `project_job_logs` VALUES ('16895', '856055684401324032', '> ✔ 2018-04-19 17:23:24:573&nbsp;&nbsp; 【已经生成】 模板 /ssm-redis-swagger-lombok/${module}/src/main/resources/mybatis/${model}/${className}.xml 的源码');
+INSERT INTO `project_job_logs` VALUES ('16896', '856055684401324032', '> ✔ 2018-04-19 17:23:24:679&nbsp;&nbsp; 【已经生成】 模板 /ssm-redis-swagger-lombok/${module}/src/main/java/${basepackage}/${model}/ctrl/${className}Ctrl.java 的源码');
+INSERT INTO `project_job_logs` VALUES ('16897', '856055684401324032', '> ✔ 2018-04-19 17:23:24:755&nbsp;&nbsp; 【已经生成】 模板 /ssm-redis-swagger-lombok/${module}/src/main/java/${basepackage}/${model}/entity/${className}.java 的源码');
+INSERT INTO `project_job_logs` VALUES ('16898', '856055684401324032', '> ✔ 2018-04-19 17:23:24:843&nbsp;&nbsp; 【已经生成】 模板 /ssm-redis-swagger-lombok/${module}/src/main/java/${basepackage}/${model}/facade/${className}SV.java 的源码');
+INSERT INTO `project_job_logs` VALUES ('16899', '856055684401324032', '> ✔ 2018-04-19 17:23:24:969&nbsp;&nbsp; 【已经生成】 模板 /ssm-redis-swagger-lombok/${module}/src/main/java/${basepackage}/${model}/service/${className}SVImpl.java 的源码');
+INSERT INTO `project_job_logs` VALUES ('16900', '856055684401324032', '> ✔ 2018-04-19 17:23:25:023&nbsp;&nbsp; 【已经生成】 模板 /ssm-redis-swagger-lombok/${module}/src/main/resources/frameworks/spring-cache-uid.xml 的源码');
+INSERT INTO `project_job_logs` VALUES ('16901', '856055684401324032', '> ✔ 2018-04-19 17:23:25:067&nbsp;&nbsp; 【已经生成】 模板 /ssm-redis-swagger-lombok/${module}/src/main/resources/frameworks/spring-data-redis.xml 的源码');
+INSERT INTO `project_job_logs` VALUES ('16902', '856055684401324032', '> ✔ 2018-04-19 17:23:25:115&nbsp;&nbsp; 【已经生成】 模板 /ssm-redis-swagger-lombok/${module}/src/main/resources/frameworks/spring-datasource.xml 的源码');
+INSERT INTO `project_job_logs` VALUES ('16903', '856055684401324032', '> ✔ 2018-04-19 17:23:25:169&nbsp;&nbsp; 【已经生成】 模板 /ssm-redis-swagger-lombok/${module}/src/main/resources/frameworks/spring-import.xml 的源码');
+INSERT INTO `project_job_logs` VALUES ('16904', '856055684401324032', '> ✔ 2018-04-19 17:23:25:240&nbsp;&nbsp; 【已经生成】 模板 /ssm-redis-swagger-lombok/${module}/src/main/resources/frameworks/spring-mybatis.xml 的源码');
+INSERT INTO `project_job_logs` VALUES ('16905', '856055684401324032', '> ✔ 2018-04-19 17:23:25:283&nbsp;&nbsp; 【已经生成】 模板 /ssm-redis-swagger-lombok/${module}/src/main/resources/frameworks/spring-uid.xml 的源码');
+INSERT INTO `project_job_logs` VALUES ('16906', '856055684401324032', '> ✔ 2018-04-19 17:23:25:316&nbsp;&nbsp; 【已经生成】 模板 /ssm-redis-swagger-lombok/${module}/src/main/resources/disconf.properties 的源码');
+INSERT INTO `project_job_logs` VALUES ('16907', '856055684401324032', '> ✔ 2018-04-19 17:23:25:350&nbsp;&nbsp; 【已经生成】 模板 /ssm-redis-swagger-lombok/${module}/src/main/resources/jdbc.properties 的源码');
+INSERT INTO `project_job_logs` VALUES ('16908', '856055684401324032', '> ✔ 2018-04-19 17:23:25:381&nbsp;&nbsp; 【已经生成】 模板 /ssm-redis-swagger-lombok/${module}/src/main/resources/log4j.properties 的源码');
+INSERT INTO `project_job_logs` VALUES ('16909', '856055684401324032', '> ✔ 2018-04-19 17:23:25:412&nbsp;&nbsp; 【已经生成】 模板 /ssm-redis-swagger-lombok/${module}/src/main/resources/redis-manager-config.properties 的源码');
+INSERT INTO `project_job_logs` VALUES ('16910', '856055684401324032', '> ✔ 2018-04-19 17:23:25:439&nbsp;&nbsp; 【已经生成】 模板 /ssm-redis-swagger-lombok/${module}/src/main/resources/sentry.properties 的源码');
+INSERT INTO `project_job_logs` VALUES ('16911', '856055684401324032', '> ✔ 2018-04-19 17:23:25:474&nbsp;&nbsp; 【已经生成】 模板 /ssm-redis-swagger-lombok/${module}/src/main/resources/spring-servlet.xml 的源码');
+INSERT INTO `project_job_logs` VALUES ('16912', '856055684401324032', '> ✔ 2018-04-19 17:23:25:502&nbsp;&nbsp; 【已经生成】 模板 /ssm-redis-swagger-lombok/${module}/src/main/resources/upload_config.properties 的源码');
+INSERT INTO `project_job_logs` VALUES ('16913', '856055684401324032', '> ✔ 2018-04-19 17:23:25:543&nbsp;&nbsp; 【已经生成】 模板 /ssm-redis-swagger-lombok/${module}/src/main/webapp/WEB-INF/web.xml 的源码');
+INSERT INTO `project_job_logs` VALUES ('16914', '856055684401324032', '> ✔ 2018-04-19 17:23:25:572&nbsp;&nbsp; 【已经生成】 模板 /ssm-redis-swagger-lombok/settings.gradle 的源码');
+INSERT INTO `project_job_logs` VALUES ('16915', '856055684401324032', '> ✔ 2018-04-19 17:23:25:648&nbsp;&nbsp; 【已经生成】 模板 /ssm-redis-swagger-lombok/build.gradle 的源码');
+INSERT INTO `project_job_logs` VALUES ('16916', '856055684401324032', '> ✔ 2018-04-19 17:23:25:686&nbsp;&nbsp; 【已经生成】 模板 /ssm-redis-swagger-lombok/${module}/build.gradle 的源码');
+INSERT INTO `project_job_logs` VALUES ('16917', '856055684401324032', '> ✔ 2018-04-19 17:23:25:735&nbsp;&nbsp; 【已经生成】 模板 /ssm-redis-swagger-lombok/${module}/src/main/resources/mybatis/mybatis-config.xml 的源码');
+INSERT INTO `project_job_logs` VALUES ('16918', '856055684401324032', '> ✔ 2018-04-19 17:23:25:789&nbsp;&nbsp; 【已经生成】 模板 /ssm-redis-swagger-lombok/${module}/src/main/java/${basepackage}/core/base/BaseMybatisDAO.java 的源码');
+INSERT INTO `project_job_logs` VALUES ('16919', '856055684401324032', '> ✔ 2018-04-19 17:23:25:875&nbsp;&nbsp; 【已经生成】 模板 /ssm-redis-swagger-lombok/${module}/src/main/java/${basepackage}/core/base/BaseMybatisDAOImpl.java 的源码');
+INSERT INTO `project_job_logs` VALUES ('16920', '856055684401324032', '> ✔ 2018-04-19 17:23:25:912&nbsp;&nbsp; 【已经生成】 模板 /ssm-redis-swagger-lombok/${module}/src/main/java/${basepackage}/core/base/BaseMybatisSV.java 的源码');
+INSERT INTO `project_job_logs` VALUES ('16921', '856055684401324032', '> ✔ 2018-04-19 17:23:25:949&nbsp;&nbsp; 【已经生成】 模板 /ssm-redis-swagger-lombok/${module}/src/main/java/${basepackage}/core/base/BaseMybatisSVImpl.java 的源码');
+INSERT INTO `project_job_logs` VALUES ('16922', '856055684401324032', '> ✔ 2018-04-19 17:23:25:985&nbsp;&nbsp; 【已经生成】 模板 /ssm-redis-swagger-lombok/${module}/src/main/java/${basepackage}/core/base/BeanRet.java 的源码');
+INSERT INTO `project_job_logs` VALUES ('16923', '856055684401324032', '> ✔ 2018-04-19 17:23:26:027&nbsp;&nbsp; 【已经生成】 模板 /ssm-redis-swagger-lombok/${module}/src/main/java/${basepackage}/core/base/Page.java 的源码');
+INSERT INTO `project_job_logs` VALUES ('16924', '856055684401324032', '> ✔ 2018-04-19 17:23:26:057&nbsp;&nbsp; 【已经生成】 模板 /ssm-redis-swagger-lombok/${module}/src/main/java/${basepackage}/core/base/BaseEntity.java 的源码');
+INSERT INTO `project_job_logs` VALUES ('16925', '856055684401324032', '> ✔ 2018-04-19 17:23:26:098&nbsp;&nbsp; 【已经生成】 模板 /ssm-redis-swagger-lombok/${module}/src/main/java/${basepackage}/core/tools/redis/MybatisRedisCache.java 的源码');
+INSERT INTO `project_job_logs` VALUES ('16926', '856055684401324032', '> ✔ 2018-04-19 17:23:26:137&nbsp;&nbsp; 【已经生成】 模板 /ssm-redis-swagger-lombok/${module}/src/main/java/${basepackage}/core/tools/redis/RedisCacheTransfer.java 的源码');
+INSERT INTO `project_job_logs` VALUES ('16927', '856055684401324032', '> ✔ 2018-04-19 17:23:26:178&nbsp;&nbsp; 【已经生成】 模板 /ssm-redis-swagger-lombok/${module}/src/main/java/${basepackage}/core/tools/redis/RedisUtils.java 的源码');
+INSERT INTO `project_job_logs` VALUES ('16928', '856055684401324032', '> ✔ 2018-04-19 17:23:26:235&nbsp;&nbsp; 【已经生成】 模板 /ssm-redis-swagger-lombok/${module}/src/main/java/${basepackage}/core/interceptor/ContextInterceptor.java 的源码');
+INSERT INTO `project_job_logs` VALUES ('16929', '856055684401324032', '> ✔ 2018-04-19 17:23:26:317&nbsp;&nbsp; 【已经生成】 模板 /ssm-redis-swagger-lombok/${module}/src/main/java/${basepackage}/core/tools/SwaggerConfig.java 的源码');
+INSERT INTO `project_job_logs` VALUES ('16930', '856055684401324032', '> ✔ 2018-04-19 17:23:26:390&nbsp;&nbsp; 【已经生成】 模板 /ssm-redis-swagger-lombok/${module}/src/main/java/${basepackage}/core/base/ExceptionHandler.java 的源码');
+INSERT INTO `project_job_logs` VALUES ('16931', '856055684401324032', '> ✔ 2018-04-19 17:23:26:974&nbsp;&nbsp; 【已经生成】 模板 /ssm-redis-swagger-lombok/libs/uid-generator-1.0.0-SNAPSHOT.jar 的源码');
+INSERT INTO `project_job_logs` VALUES ('16932', '856055684401324032', '> ✔ 2018-04-19 17:23:27:006&nbsp;&nbsp; 【已经生成】 模板 /ssm-redis-swagger-lombok/libs/worker_node.sql 的源码');
+INSERT INTO `project_job_logs` VALUES ('16933', '856055684401324032', '> ✔ 2018-04-19 17:23:27:013&nbsp;&nbsp; 【已经生成】 ppsSql 脚本文件并追加系统配置');
+INSERT INTO `project_job_logs` VALUES ('16934', '856055684401324032', '> ✔ 2018-04-19 17:23:27:018&nbsp;&nbsp;获取代码仓库信息: hegaoye@qq.com');
+INSERT INTO `project_job_logs` VALUES ('16935', '856055684401324032', '> ✔ 2018-04-19 17:23:27:023&nbsp;&nbsp;代码已经提交到 ⇛⇛⇛ <a style=\'text-decoration:underline;\' href=\'https://github.com/pi-top/pps.git\' target=\'_blank\'>https://github.com/pi-top/pps.git </a>仓库');
+INSERT INTO `project_job_logs` VALUES ('16936', '856055684401324032', '> ✔ 2018-04-19 17:23:27:114&nbsp;&nbsp;代码已打包ZIP,您还可以点击下载 ⇛⇛⇛  <a style=\'text-decoration:underline;\' href=\'/repository/pps.zip\' target=\'_blank\'>pps.zip</a>');
+INSERT INTO `project_job_logs` VALUES ('16937', '856055684401324032', 'Finished: SUCCESS');
+INSERT INTO `project_job_logs` VALUES ('16938', '856055684401324032', 'End');
 
 -- ----------------------------
 -- Table structure for project_map
@@ -10284,7 +10402,7 @@ CREATE TABLE `project_map` (
   `projectCode` varchar(64) DEFAULT NULL COMMENT '项目编码',
   `mapClassTableCode` varchar(64) DEFAULT NULL COMMENT '字段属性映射编码',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=527 DEFAULT CHARSET=utf8mb4 COMMENT='项目数据表';
+) ENGINE=InnoDB AUTO_INCREMENT=535 DEFAULT CHARSET=utf8mb4 COMMENT='项目数据表';
 
 -- ----------------------------
 -- Records of project_map
@@ -10466,6 +10584,14 @@ INSERT INTO `project_map` VALUES ('521', '744388819627253760', '7443893522031984
 INSERT INTO `project_map` VALUES ('522', '744388819627253760', '744389352203198502');
 INSERT INTO `project_map` VALUES ('523', '744388819627253760', '744389352203198518');
 INSERT INTO `project_map` VALUES ('526', '747543009249812480', '747925759555395585');
+INSERT INTO `project_map` VALUES ('527', '856024537298477056', '856047901920583681');
+INSERT INTO `project_map` VALUES ('528', '856024537298477056', '856047901920583686');
+INSERT INTO `project_map` VALUES ('529', '856024537298477056', '856047901920583694');
+INSERT INTO `project_map` VALUES ('530', '856024537298477056', '856047901920583707');
+INSERT INTO `project_map` VALUES ('531', '856024537298477056', '856047901920583714');
+INSERT INTO `project_map` VALUES ('532', '856024537298477056', '856047901920583718');
+INSERT INTO `project_map` VALUES ('533', '856024537298477056', '856047901920583726');
+INSERT INTO `project_map` VALUES ('534', '856024537298477056', '856047901920583740');
 
 -- ----------------------------
 -- Table structure for project_module
@@ -10497,7 +10623,7 @@ CREATE TABLE `project_repository_account` (
   `state` varchar(16) DEFAULT NULL COMMENT '状态：停用[Disenable]，启用[Enable]',
   `type` varchar(16) DEFAULT NULL COMMENT '仓库类型:Git, Svn',
   PRIMARY KEY (`id`,`code`)
-) ENGINE=InnoDB AUTO_INCREMENT=58 DEFAULT CHARSET=utf8mb4 COMMENT='版本控制管理';
+) ENGINE=InnoDB AUTO_INCREMENT=59 DEFAULT CHARSET=utf8mb4 COMMENT='版本控制管理';
 
 -- ----------------------------
 -- Records of project_repository_account
@@ -10509,6 +10635,7 @@ INSERT INTO `project_repository_account` VALUES ('51', '741612088910282752', '74
 INSERT INTO `project_repository_account` VALUES ('53', '741716422255919104', '741715889679974400', 'hegaoye@qq.com', 'h@gaoy@6258371', 'https://gitee.com/helixin/AiCodeTest.git', 'https://gitee.com/helixin/AiCodeTest.git', 'Enable', 'Git');
 INSERT INTO `project_repository_account` VALUES ('56', '742801485613760512', '742797551423709184', 'zdfsir@163.com', 'Zdf205@#!', 'https://gitee.com/zdfsir/cycle-demo.git', '公告', 'Enable', 'Git');
 INSERT INTO `project_repository_account` VALUES ('57', '747544263380262912', '747543009249812480', 'hegaoye@qq.com', 'h@gaoy@6258371', 'https://gitee.com/helixin/AiCodeTest.git', 'https://gitee.com/helixin/AiCodeTest.git', 'Enable', 'Git');
+INSERT INTO `project_repository_account` VALUES ('58', '856055495422763008', '856024537298477056', 'hegaoye@qq.com', 'h@gaoy@6258371', 'https://github.com/pi-top/pps.git', 'pps 的综合仓库，存储接口代码，如果有前端应该前后端分离，再建一个仓库可以起名为pps-ui\nhttps://github.com/pi-top/pps.git', 'Enable', 'Git');
 
 -- ----------------------------
 -- Table structure for project_sql
@@ -10521,7 +10648,7 @@ CREATE TABLE `project_sql` (
   `tsql` text COMMENT 'sql脚本',
   `state` varchar(16) DEFAULT NULL COMMENT '状态：停用[Disenable]，启用[Enable]',
   PRIMARY KEY (`id`,`projectCode`)
-) ENGINE=InnoDB AUTO_INCREMENT=77 DEFAULT CHARSET=utf8mb4 COMMENT='项目sql脚本';
+) ENGINE=InnoDB AUTO_INCREMENT=78 DEFAULT CHARSET=utf8mb4 COMMENT='项目sql脚本';
 
 -- ----------------------------
 -- Records of project_sql
@@ -10537,6 +10664,7 @@ INSERT INTO `project_sql` VALUES ('73', '742797551423709184', '74336488224400179
 INSERT INTO `project_sql` VALUES ('74', '744353205758427136', '744353772694110208', 'DROP DATABASE if EXISTS asdf;\nCREATE DATABASE asdf;\nUSE asdf;\nCREATE TABLE `build_tools` (\r\n  `id` bigint(20) NOT NULL AUTO_INCREMENT,\r\n  `code` varchar(64) NOT NULL COMMENT \'构建工具编码\',\r\n  `buildType` varchar(16) DEFAULT NULL COMMENT \'管理类型:Gradle,Maven\',\r\n  PRIMARY KEY (`id`,`code`)\r\n) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COMMENT=\'项目构建工具\';\r\n', 'Enable');
 INSERT INTO `project_sql` VALUES ('75', '744388819627253760', '744389335023329280', 'DROP DATABASE if EXISTS bobaissh;\nCREATE DATABASE bobaissh;\nUSE bobaissh;\n\r\nDROP TABLE IF EXISTS `cust`;\r\nCREATE TABLE `cust` (\r\n  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT \'id\',\r\n  `cust_code` varchar(32) DEFAULT NULL COMMENT \'会员编码\',\r\n  `cust_name` varchar(50) NOT NULL COMMENT \'会员名称\',\r\n  `cust_truename` varchar(20) DEFAULT NULL COMMENT \'真实姓名\',\r\n  `cust_phone` varchar(11) DEFAULT NULL COMMENT \'手机号\',\r\n  `cust_avatar` varchar(128) DEFAULT NULL COMMENT \'会员头像\',\r\n  `cust_sex` varchar(6) DEFAULT \'UNKNOW\' COMMENT \'会员性别 MALE男 FAEMALE女 UNKNOW未知\',\r\n  `area_code` char(12) DEFAULT NULL COMMENT \'区域编码\',\r\n  `area_name` varchar(32) DEFAULT NULL COMMENT \'区域名称\',\r\n  `area_full_name` varchar(128) DEFAULT NULL COMMENT \'区域全称\',\r\n  `cust_birthday` date DEFAULT NULL COMMENT \'生日\',\r\n  `cust_passwd` varchar(32) NOT NULL COMMENT \'会员密码\',\r\n  `cust_paypwd` char(32) DEFAULT NULL COMMENT \'支付密码\',\r\n  `cust_email` varchar(100) DEFAULT NULL COMMENT \'会员邮箱\',\r\n  `cust_email_bind` char(1) NOT NULL DEFAULT \'N\' COMMENT \'邮箱绑定Y是 N否\',\r\n  `cust_phone_bind` char(1) NOT NULL DEFAULT \'N\' COMMENT \'手机号绑定 Y是 N否\',\r\n  `is_member` varchar(3) NOT NULL DEFAULT \'N\' COMMENT \'是否是会员 N否 NEW新会员 OLD老会员（平台消费普通用户即可成为新会员，可享受会员价；老会员指三楂红已有积分会员，可使用积分抵扣，也可享受会员价）\',\r\n  `cust_login_num` int(11) unsigned NOT NULL DEFAULT 1 COMMENT \'登录次数\',\r\n  `cust_openid` varchar(32) DEFAULT NULL COMMENT \'微信用户的标识，对当前公众号唯一\',\r\n  `cust_unionid` varchar(32) DEFAULT NULL COMMENT \'微信unionId\',\r\n  `cust_nickname` varchar(128) DEFAULT NULL COMMENT \'微信用户昵称\',\r\n  `alipay_login_code` varchar(100) DEFAULT NULL COMMENT \'支付宝登录号\',\r\n  `cust_qq` varchar(100) DEFAULT NULL COMMENT \'qq\',\r\n  `cust_qqopenid` varchar(100) DEFAULT NULL COMMENT \'qq互联id\',\r\n  `cust_qqinfo` text DEFAULT NULL COMMENT \'qq账号相关信息\',\r\n  `cust_sinaopenid` varchar(100) DEFAULT NULL COMMENT \'新浪微博登录id\',\r\n  `cust_sinainfo` text DEFAULT NULL COMMENT \'新浪账号相关信息序列化值\',\r\n  `cust_points` int(11) NOT NULL DEFAULT 0 COMMENT \'会员积分\',\r\n  `cust_login_time` datetime DEFAULT NULL COMMENT \'当前登录时间\',\r\n  `cust_old_login_time` datetime DEFAULT NULL COMMENT \'上次登录时间\',\r\n  `cust_login_ip` varchar(20) DEFAULT NULL COMMENT \'当前登录ip\',\r\n  `cust_old_login_ip` varchar(20) DEFAULT NULL COMMENT \'上次登录ip\',\r\n  `inviter_code` varchar(32) DEFAULT NULL COMMENT \'邀请人编码\',\r\n  `auth_state` varchar(8) NOT NULL DEFAULT \'UNAUTH\' COMMENT \'认证状态(AUDIT 待审核，UNPASS 未通过,AUTH 认证通过，UNAUTH 未认证，EXPIRED 认证过期)\',\r\n  `state` varchar(8) NOT NULL DEFAULT \'NORMAL\' COMMENT \'状态（NORMAL 已正常；FREEZE 已冻结；DEL 删除）\',\r\n  `create_time` datetime NOT NULL COMMENT \'创建时间\',\r\n  `update_time` datetime DEFAULT NULL COMMENT \'修改时间\',\r\n  PRIMARY KEY (`id`),\r\n  UNIQUE KEY `cust_phone` (`cust_phone`) USING BTREE,\r\n  KEY `member_name` (`cust_name`)\r\n) ENGINE=InnoDB AUTO_INCREMENT=55 DEFAULT CHARSET=utf8mb4 COMMENT=\'用户\';\r\n\r\n-- ----------------------------\r\n-- Table structure for cust_addr\r\n-- ----------------------------\r\nDROP TABLE IF EXISTS `cust_addr`;\r\nCREATE TABLE `cust_addr` (\r\n  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT \'id\',\r\n  `cust_code` varchar(32) NOT NULL COMMENT \'会员编码\',\r\n  `receiver_name` varchar(50) NOT NULL COMMENT \'收货人名称\',\r\n  `area_code` char(12) NOT NULL COMMENT \'区域编码\',\r\n  `area_name` varchar(32) NOT NULL COMMENT \'区域名称\',\r\n  `area_full_name` varchar(128) NOT NULL COMMENT \'区域全称\',\r\n  `address` varchar(255) NOT NULL COMMENT \'地址\',\r\n  `tel_phone` varchar(20) DEFAULT NULL COMMENT \'座机电话\',\r\n  `mob_phone` varchar(15) DEFAULT NULL COMMENT \'手机电话\',\r\n  `is_default` char(1) NOT NULL DEFAULT \'N\' COMMENT \'默认收货地址 Y是 N否\',\r\n  `take_site_code` varchar(32) DEFAULT NULL COMMENT \'自提点编码\',\r\n  `take_site_name` varchar(64) DEFAULT NULL COMMENT \'自提点名字\',\r\n  `take_site_addr` varchar(128) DEFAULT NULL COMMENT \'自提点地址\',\r\n  `create_time` datetime NOT NULL COMMENT \'创建时间\',\r\n  `update_time` datetime DEFAULT NULL COMMENT \'修改时间\',\r\n  PRIMARY KEY (`id`)\r\n) ENGINE=InnoDB AUTO_INCREMENT=41 DEFAULT CHARSET=utf8mb4 COMMENT=\'买家收货地址信息表（现自提点即代理商）\';\r\n\r\n-- ----------------------------\r\n-- Table structure for cust_agent\r\n-- ----------------------------\r\nDROP TABLE IF EXISTS `cust_agent`;\r\nCREATE TABLE `cust_agent` (\r\n  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT \'id\',\r\n  `cust_code` varchar(32) NOT NULL COMMENT \'用户编码\',\r\n  `agent_code` varchar(32) NOT NULL COMMENT \'代理商编码\',\r\n  `agent_name` varchar(64) NOT NULL COMMENT \'代理商名称\',\r\n  `is_default` char(1) NOT NULL COMMENT \'是否是默认服务代理商\',\r\n  `create_time` datetime NOT NULL COMMENT \'创建时间\',\r\n  `update_time` datetime NOT NULL COMMENT \'修改时间\',\r\n  PRIMARY KEY (`id`)\r\n) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COMMENT=\'用户选择的服务代理商\';\r\n', 'Enable');
 INSERT INTO `project_sql` VALUES ('76', '747543009249812480', '747925759555395584', 'DROP DATABASE if EXISTS zoom_account;\nCREATE DATABASE zoom_account;\nUSE zoom_account;\n\r\ndrop table if exists zoom_account;\r\n\r\n/*==============================================================*/\r\n/* Table: zoom_account                                          */\r\n/*==============================================================*/\r\ncreate table zoom_account\r\n(\r\n   id                   bigint not null auto_increment,\r\n   classroomCode        varchar(64) not null comment \'课堂编码\',\r\n   tutorCode            varchar(64) not null comment \'老师编码\',\r\n   zoomCode             varchar(64) comment \'zoom编码\',\r\n   state                varchar(16) comment \'状态：Enable,Disable\',\r\n   unique_id            varchar(64) not null comment \'账户编码\',\r\n   password             varchar(64) comment \'密码\',\r\n   email                varchar(64) comment \'email\',\r\n   createTime           datetime comment \'创建时间\',\r\n   updateTime           datetime comment \'更新时间\',\r\n   apiKey               varchar(64) comment \'apiKey\',\r\n   apiSecret            varchar(64) comment \'apiSecret\',\r\n   primary key (id, classroomCode, tutorCode, unique_id)\r\n);\r\n\r\nalter table zoom_account comment \'课堂老师临时zoom账户\';\r\n', 'Enable');
+INSERT INTO `project_sql` VALUES ('77', '856024537298477056', '856047901920583680', 'DROP DATABASE if EXISTS pps;\nCREATE DATABASE pps;\nUSE pps;\n/*==============================================================*/\r\n/* DBMS name:      MySQL 5.0                                    */\r\n/* Created on:     2018/4/18 17:34:13                           */\r\n/*==============================================================*/\r\n\r\n\r\ndrop table if exists errorType;\r\n\r\ndrop table if exists repair_feedback;\r\n\r\ndrop table if exists staff;\r\n\r\ndrop table if exists test_flow;\r\n\r\ndrop table if exists test_flow_staff;\r\n\r\ndrop table if exists test_option;\r\n\r\ndrop table if exists test_record;\r\n\r\ndrop table if exists test_unit;\r\n\r\n/*==============================================================*/\r\n/* Table: errorType                                             */\r\n/*==============================================================*/\r\ncreate table errorType\r\n(\r\n   id                   bigint not null comment \'id\',\r\n   code                 varchar(64) not null comment \'类型编码\',\r\n   name                 varchar(32) comment \'错误类型\',\r\n   state                varchar(16) comment \'状态 启用 enable,禁用 disable\',\r\n   primary key (id, code)\r\n);\r\n\r\nalter table errorType comment \'错误类型\';\r\n\r\n/*==============================================================*/\r\n/* Table: repair_feedback                                       */\r\n/*==============================================================*/\r\ncreate table repair_feedback\r\n(\r\n   id                   bigint not null comment \'id\',\r\n   testRecordCode       varchar(64) not null comment \'检测记录编码\',\r\n   staffCode            varchar(64) comment \'员工编码\',\r\n   testFlowCode         varchar(64) comment \'流程编码\',\r\n   errorCode            varchar(64) comment \'错误类型编码\',\r\n   feedback             varchar(256) comment \'反馈信息\',\r\n   createTime           datetime comment \'创建时间\',\r\n   primary key (id)\r\n);\r\n\r\nalter table repair_feedback comment \'维修反馈\';\r\n\r\n/*==============================================================*/\r\n/* Table: staff                                                 */\r\n/*==============================================================*/\r\ncreate table staff\r\n(\r\n   id                   bigint not null,\r\n   code                 varchar(64) not null comment \'唯一编码\',\r\n   name                 varchar(16) comment \'姓名\',\r\n   jobnumber            varchar(32) comment \'工号\',\r\n   phone                varchar(16) comment \'电话\',\r\n   gender               varchar(16) comment \'性别\',\r\n   age                  varchar(16) comment \'年龄\',\r\n   address              varchar(128) comment \'地址\',\r\n   state                varchar(16) comment \'状态 入职 hire，离职 leave\',\r\n   hiredate             datetime comment \'入职时间\',\r\n   createTime           datetime comment \'创建时间\',\r\n   updateTime           datetime comment \'更新时间\',\r\n   primary key (id, code)\r\n);\r\n\r\nalter table staff comment \'员工信息\';\r\n\r\n/*==============================================================*/\r\n/* Table: test_flow                                             */\r\n/*==============================================================*/\r\ncreate table test_flow\r\n(\r\n   id                   bigint not null comment \'id\',\r\n   code                 varchar(64) not null comment \'code\',\r\n   name                 varchar(32) comment \'流程名称\',\r\n   state                varchar(16) comment \'状态 \r\n            启用 enable,禁用 disable\',\r\n   createTime           datetime comment \'创建时间\',\r\n   updateTime           datetime comment \'更新时间\',\r\n   primary key (id, code)\r\n);\r\n\r\nalter table test_flow comment \'测试流程\';\r\n\r\n/*==============================================================*/\r\n/* Table: test_flow_staff                                       */\r\n/*==============================================================*/\r\ncreate table test_flow_staff\r\n(\r\n   id                   bigint not null comment \'id\',\r\n   staffCode            varchar(64) not null comment \'员工编码\',\r\n   testFlowCode         varchar(64) not null comment \'流程编码\',\r\n   primary key (id, staffCode, testFlowCode)\r\n);\r\n\r\nalter table test_flow_staff comment \'员工与测试流程关联\';\r\n\r\n/*==============================================================*/\r\n/* Table: test_option                                           */\r\n/*==============================================================*/\r\ncreate table test_option\r\n(\r\n   id                   bigint not null comment \'id\',\r\n   testUnitCode         varchar(64) not null comment \'测试件编码\',\r\n   code                 varchar(64) not null comment \'测试项编码\',\r\n   `option`             varchar(32) comment \'测试项\',\r\n   state                char(10) comment \'状态 启用 enable,禁用 disable\',\r\n   createTime           datetime comment \'创建时间\',\r\n   updateTime           datetime comment \'更新时间\',\r\n   primary key (id, testUnitCode, code)\r\n);\r\n\r\nalter table test_option comment \'检测项\';\r\n\r\n/*==============================================================*/\r\n/* Table: test_record                                           */\r\n/*==============================================================*/\r\ncreate table test_record\r\n(\r\n   id                   bigint not null comment \'id\',\r\n   code                 varchar(64) not null comment \'记录编码\',\r\n   staffCode            varchar(64) not null comment \'员工编码\',\r\n   jobNumber            varchar(32) comment \'工号\',\r\n   testUnitCode         varchar(64) comment \'测试件编码\',\r\n   testOptionCode       varchar(64) comment \'测试项编码\',\r\n   testFlowCode         varchar(64) comment \'测试流程编码\',\r\n   staffName            varchar(64) comment \'员工姓名\',\r\n   sn                   varchar(64) comment \'测试sn码\',\r\n   testFlowName         varchar(32) comment \'流程名\',\r\n   testOption           varchar(64) comment \'测试项\',\r\n   state                varchar(64) comment \'状态 成功 TestSuccess，失败 TestFailed\',\r\n   testTIme             datetime comment \'测试时间\',\r\n   primary key (id, code)\r\n);\r\n\r\nalter table test_record comment \'检测记录\';\r\n\r\n/*==============================================================*/\r\n/* Table: test_unit                                             */\r\n/*==============================================================*/\r\ncreate table test_unit\r\n(\r\n   id                   bigint not null comment \'id\',\r\n   sn                   varchar(64) not null comment \'sn 编码\',\r\n   code                 varchar(64) not null comment \'编码\',\r\n   state                varchar(16) comment \'状态 创建 Create，测试通过TestSuccess，测试失败TestFailed，检修 Repair\',\r\n   createTime           datetime comment \'创建日期\',\r\n   updateTime           datetime comment \'更新时间\',\r\n   primary key (id, sn, code)\r\n);\r\n\r\nalter table test_unit comment \'测试件，测试硬件单元\';\r\n\r\n', 'Enable');
 
 -- ----------------------------
 -- Table structure for setting
@@ -10553,7 +10681,7 @@ CREATE TABLE `setting` (
 -- ----------------------------
 -- Records of setting
 -- ----------------------------
-INSERT INTO `setting` VALUES ('1', 'DefaultDatabase', 'ai_code_simple', '默认链接数据库');
+INSERT INTO `setting` VALUES ('1', 'DefaultDatabase', 'ai_code', '默认链接数据库');
 INSERT INTO `setting` VALUES ('2', 'Gradle_Directory_Structure', '[\"src/main/java\",\"src/main/resources/framework\"]', 'gradle目录结构');
 INSERT INTO `setting` VALUES ('3', 'Workspace', '/workspace/', '工作目录');
 INSERT INTO `setting` VALUES ('4', 'Package_entity', 'po', '实体目录命名');
@@ -10573,7 +10701,7 @@ CREATE TABLE `worker_node` (
   `MODIFIED` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'modified time',
   `CREATED` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT 'created time',
   PRIMARY KEY (`ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=1421 DEFAULT CHARSET=utf8 COMMENT='DB WorkerID Assigner for UID Generator';
+) ENGINE=InnoDB AUTO_INCREMENT=1424 DEFAULT CHARSET=utf8 COMMENT='DB WorkerID Assigner for UID Generator';
 
 -- ----------------------------
 -- Records of worker_node
@@ -10754,3 +10882,6 @@ INSERT INTO `worker_node` VALUES ('1417', '172.17.0.10', '1523844465972-63676', 
 INSERT INTO `worker_node` VALUES ('1418', '172.17.0.11', '1523844467191-21720', '2', '2018-04-16', '2018-04-16 10:07:47', '2018-04-16 10:07:47');
 INSERT INTO `worker_node` VALUES ('1419', '172.17.0.10', '1524010827051-89480', '2', '2018-04-18', '2018-04-18 08:20:27', '2018-04-18 08:20:27');
 INSERT INTO `worker_node` VALUES ('1420', '172.17.0.7', '1524010830766-72521', '2', '2018-04-18', '2018-04-18 08:20:31', '2018-04-18 08:20:31');
+INSERT INTO `worker_node` VALUES ('1421', '2001:0:9d38:90d7:3496:305e:3f57:fe72', '1524127769916-41743', '2', '2018-04-19', '2018-04-19 16:49:29', '2018-04-19 16:49:29');
+INSERT INTO `worker_node` VALUES ('1422', '2001:0:9d38:90d7:3496:305e:3f57:fe72', '1524128256131-27280', '2', '2018-04-19', '2018-04-19 16:57:36', '2018-04-19 16:57:36');
+INSERT INTO `worker_node` VALUES ('1423', '2001:0:9d38:90d7:3496:305e:3f57:fe72', '1524129308783-89523', '2', '2018-04-19', '2018-04-19 17:15:08', '2018-04-19 17:15:08');

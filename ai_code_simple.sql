@@ -143,7 +143,7 @@ INSERT INTO `frameworks_template` VALUES ('123525', '336363636', '74108520', '/s
 INSERT INTO `frameworks_template` VALUES ('123526', '337373737', '74108520', '/ssh-redis-swagger-lombok/${module}/src/main/java/${basepackage}/core/base/ExceptionHandler.java');
 INSERT INTO `frameworks_template` VALUES ('123527', '338383838', '74108520', '/ssh-redis-swagger-lombok/libs/uid-generator-1.0.0-SNAPSHOT.jar');
 INSERT INTO `frameworks_template` VALUES ('123528', '339393939', '74108520', '/ssh-redis-swagger-lombok/libs/worker_node.sql');
-INSERT INTO `frameworks_template` VALUES ('123529', '4404040404', '74108520', '/ssh-redis-swagger-lombok/${module}/src/main/java/${basepackage}/core/execptions/BaseException.java');
+INSERT INTO `frameworks_template` VALUES ('123529', '4404040404', '74108520', '/ssh-redis-swagger-lombok/${module}/src/main/java/${basepackage}/core/exceptions/BaseException.java');
 INSERT INTO `frameworks_template` VALUES ('124007', '456789', '456789', '/ssm-dubbo-redis-swagger-lombok-disconf-sentry/${module}/build.gradle');
 INSERT INTO `frameworks_template` VALUES ('124008', '456790', '456789', '/ssm-dubbo-redis-swagger-lombok-disconf-sentry/${module}/src/main/java/${basepackage}/${model}/dao/${className}DAO.java');
 INSERT INTO `frameworks_template` VALUES ('124009', '456791', '456789', '/ssm-dubbo-redis-swagger-lombok-disconf-sentry/${module}/src/main/java/${basepackage}/${model}/service/${className}SVImpl.java');

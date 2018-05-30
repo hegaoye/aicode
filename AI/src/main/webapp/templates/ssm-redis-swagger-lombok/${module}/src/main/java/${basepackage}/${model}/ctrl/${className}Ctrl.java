@@ -17,8 +17,10 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Resource;
 import java.util.List;
 import ${basePackage}.core.tools.redis.RedisUtils;
+import ${basePackage}.core.tools.StringTools;
 import ${basePackage}.core.base.BeanRet;
 import ${basePackage}.core.base.Page;
+import ${basePackage}.core.base.BaseCtrl;
 import ${basePackage}.${model}.facade.${className}SV;
 import ${basePackage}.${model}.entity.${className};
 
@@ -32,7 +34,7 @@ import ${basePackage}.${model}.entity.${className};
 @Controller
 @RequestMapping("/${classNameLower}")
 @Api(value = "${notes}控制器", description = "${notes}控制器")
-public class ${className}Ctrl {
+public class ${className}Ctrl extends BaseCtrl {
  private final static Logger logger = LoggerFactory.getLogger(${className}Ctrl.class);
 
     @Resource
@@ -43,52 +45,36 @@ public class ${className}Ctrl {
     @Resource
     private ${className}SV ${classNameLower}SV;
 <#if (pkFields?size>0)>
-    /**
-     * 查询${className}一个详情信息
-     * <#list pkFields as pkField>@param ${pkField.field} ${pkField.notes}</#list>
-     * @return BeanRet
-     */
-    @ApiOperation(value = "查询${className}一个详情信息", notes = "查询${className}一个详情信息")
-    @ApiImplicitParams({
-            <#list pkFields as pkField>
-            @ApiImplicitParam(name = "${pkField.field}", value = "${pkField.notes}", paramType = "query")<#if pkField_has_next>,</#if>
-            </#list>
-    })
-    @GetMapping(value = "/load")
-    @ResponseBody
-    public BeanRet load(<#list pkFields as pkField>${pkField.fieldType} ${pkField.field}<#if pkField_has_next>,</#if></#list>) {
-        <#list pkFields as pkField>
-        if(${pkField.field}==null){
-          return BeanRet.create();
-        }
-        </#list>
-        ${className} ${classNameLower} = ${classNameLower}SV.load(<#list pkFields as pkField>${pkField.field}<#if pkField_has_next>,</#if></#list>);
-        logger.info(JSON.toJSONString(${classNameLower}));
-        return BeanRet.create(true, "查询详情信息", ${classNameLower});
-    }
 
 
 <#list pkFields as pkField>
+
     /**
-     * 查询${className}一个详情信息
+     * 查询${className}详情信息
      *
      * @param ${pkField.field} ${pkField.notes}
      * @return BeanRet
      */
-    @ApiOperation(value = "查询${className}一个详情信息", notes = "查询${className}一个详情信息")
+    @ApiOperation(value = "查询${className}详情信息", notes = "查询${className}详情信息")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "${pkField.field}", value = "${pkField.notes}", paramType = "query")
     })
-    @GetMapping(value = "/load/{${pkField.field}}")
+    @GetMapping(value = "/loadBy${pkField.field?cap_first}")
     @ResponseBody
     public BeanRet loadBy${pkField.field?cap_first}(@PathVariable ${pkField.fieldType} ${pkField.field}) {
-        if(${pkField.field}==null){
+        if(StringTools.isEmpty(${pkField.field})){
           return BeanRet.create();
         }
+<#if pkField.field!='id'>
         ${className} ${classNameLower} = ${classNameLower}SV.loadBy${pkField.field?cap_first}(${pkField.field});
+</#if>
+<#if pkField.field =='id'>
+        ${className} ${classNameLower} = ${classNameLower}SV.load(${pkField.field});
+</#if>
         logger.info(JSON.toJSONString(${classNameLower}));
         return BeanRet.create(true, "查询详情信息", ${classNameLower});
     }
+
 </#list>
 </#if>
 
@@ -110,41 +96,10 @@ public class ${className}Ctrl {
     @ResponseBody
     public BeanRet list(@ApiIgnore ${className} ${classNameLower},@ApiIgnore Page<${className}> page) {
         if(page==null){
-          return BeanRet.create();
+          return BeanRet.create(false,"分页对象不能为空");
         }
-        List<${className}> ${classNameLower}s = ${classNameLower}SV.list(${classNameLower},page.genRowStart(),page.getPageSize());
-        int total = ${classNameLower}SV.count(${classNameLower});
-        page.setTotalRow(total);
-        page.setVoList(${classNameLower}s);
-        logger.info(JSON.toJSONString(page));
-        return BeanRet.create(true, "", page);
-    }
-
-
-    /**
-     * 查询${className}信息集合
-     *
-     * @return 分页对象
-     */
-    @ApiOperation(value = "查询${className}信息集合", notes = "查询${className}信息集合")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "curPage", value = "当前页", required = true, paramType = "query"),
-            @ApiImplicitParam(name = "pageSize", value = "分页大小", required = true, paramType = "query"),
-            <#list pkFields as pkField>
-            @ApiImplicitParam(name = "${pkField.field}", value = "${pkField.notes}", paramType = "query")<#if pkField_has_next>,</#if>
-            </#list>
-
-    })
-    @GetMapping(value = "/listby")
-    @ResponseBody
-    public BeanRet listByPk(<#list pkFields as pkField>${pkField.fieldType} ${pkField.field},</#list>@ApiIgnore Page<${className}> page) {
-        if(page==null){
-          return BeanRet.create();
-        }
-        List<${className}> ${classNameLower}s = ${classNameLower}SV.list(<#list pkFields as pkField>${pkField.field},</#list> page.genRowStart(),page.getPageSize());
-        int total = ${classNameLower}SV.count(<#list pkFields as pkField>${pkField.field}<#if pkField_has_next>,</#if></#list>);
-        page.setTotalRow(total);
-        page.setVoList(${classNameLower}s);
+        page.setParams(JSON.parseObject(JSON.toJSONString(${classNameLower})));
+        page = ${classNameLower}SV.getList(page);
         logger.info(JSON.toJSONString(page));
         return BeanRet.create(true, "", page);
     }
@@ -157,20 +112,13 @@ public class ${className}Ctrl {
     @ApiOperation(value = "创建${className}", notes = "创建${className}")
     @ApiImplicitParams({
             <#list fields as field>
-            @ApiImplicitParam(name = "${field.field}", value = "${field.notes}", paramType = "query")<#if field_has_next>,</#if>
+            @ApiImplicitParam(name = "${field.field}", value = "${field.notes}", paramType = "query", required = true)<#if field_has_next>,</#if>
             </#list>
     })
     @PostMapping("/build")
     @ResponseBody
     public BeanRet build(@ApiIgnore ${className} ${classNameLower}) {
-        <#list fields as field>
-        if(${classNameLower}.get${field.field?cap_first}()==null){
-          return BeanRet.create();
-        }
-        </#list>
-
-        ${classNameLower}SV.saveOrUpdate(${classNameLower});
-        return BeanRet.create(true, "创建${className}成功", ${classNameLower});
+        return ${classNameLower}SV.insert(${classNameLower});
     }
 
 
@@ -188,14 +136,7 @@ public class ${className}Ctrl {
     @PutMapping("/modify")
     @ResponseBody
     public BeanRet modify(@ApiIgnore ${className} ${classNameLower}) {
-        <#list fields as field>
-        if(${classNameLower}.get${field.field?cap_first}()==null){
-        return BeanRet.create();
-        }
-        </#list>
-
-        ${classNameLower}SV.saveOrUpdate(${classNameLower});
-        return BeanRet.create(true, "修改${className}成功", ${classNameLower});
+        return ${classNameLower}SV.modify(${classNameLower});
     }
 
     /**
@@ -206,12 +147,17 @@ public class ${className}Ctrl {
     @ApiOperation(value = "删除${className}", notes = "删除${className}")
     @ApiImplicitParams({
             <#list pkFields as pkField>
-            @ApiImplicitParam(name = "${pkField.field}", value = "${pkField.notes}", paramType = "query")<#if pkField_has_next>,</#if>
+            @ApiImplicitParam(name = "${pkField.field}", value = "${pkField.notes}", paramType = "query", required = true)<#if pkField_has_next>,</#if>
             </#list>
     })
     @DeleteMapping("/delete")
     @ResponseBody
     public BeanRet delete(<#list pkFields as pkField>${pkField.fieldType} ${pkField.field}<#if pkField_has_next>,</#if></#list>) {
+        <#list pkFields as field>
+                if(StringTools.isEmpty(${classNameLower}.get${field.field?cap_first}())){
+                return BeanRet.create(false,"${field.notes}不能为空");
+                }
+        </#list>
         ${classNameLower}SV.delete(<#list pkFields as pkField>${pkField.field}<#if pkField_has_next>,</#if></#list>);
         return BeanRet.create(true, "删除${className}成功");
     }

@@ -18,8 +18,8 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Resource;
 import java.util.List;
 import ${basePackage}.core.tools.redis.RedisUtils;
-import ${basePackage}.core.base.entity.BeanRet;
-import ${basePackage}.core.base.entity.Page;
+import ${basePackage}.core.base.BeanRet;
+import ${basePackage}.core.base.Page;
 import ${basePackage}.${model}.service.${className}SV;
 import ${basePackage}.${model}.entity.${className};
 
@@ -33,7 +33,7 @@ import ${basePackage}.${model}.entity.${className};
 @Controller
 @RequestMapping("/${classNameLower}")
 @Api(value = "${notes}控制器", description = "${notes}控制器")
-public class ${className}Ctrl {
+public class ${className}Ctrl  {
  private final static Logger logger = LoggerFactory.getLogger(${className}Ctrl.class);
 
     @Resource

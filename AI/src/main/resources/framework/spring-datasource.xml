@@ -17,7 +17,7 @@
             http://www.springframework.org/schema/context/spring-context.xsd"
        default-autowire="byName">
 
-    <context:property-placeholder location="classpath:jdbc.properties"/>
+    <context:property-placeholder location="classpath:ai_jdbc.properties"/>
 
     <!-- 配置系统的数据源 -->
     <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">

@@ -185,4 +185,51 @@ public abstract class BaseMybatisSVImpl<E, PK extends Serializable> implements B
         return getBaseMybatisDAO().isUnique(entity, uniquePropertyNames);
     }
 
+
+
+
+    /**
+     * 检查字段是否存在
+     *
+     * @param property    例如 phone 这项要和实体类对应，否则不起效
+     * @param propertyVal 例如 13174108520
+     * @return 存在返回true ;不存在返回false
+     */
+    @Override
+    public boolean isExist(String property, String propertyVal) throws BaseException {
+        if (StringUtils.isBlank(property)) {
+            throw new BaseException("字段" + property + BaseException.ExceptionMessage.ParamIsEmpty);
+        }
+        if (StringUtils.isBlank(propertyVal)) {
+            throw new BaseException("字段值" + BaseException.ExceptionMessage.ParamIsEmpty);
+        }
+        Map<String, Object> param = new HashedMap();
+        param.put(property, propertyVal);
+        int result = getBaseMybatisDAO().count(param);
+        return result > 0;
+    }
+
+    /**
+     * 根据条件集合 检查字段是否存在
+     *
+     * @param property      例如 phone 这项要和实体类对应，否则不起效
+     * @param propertyVal   例如 13174108520
+     * @param conditionsMap 条件集合
+     * @return 存在返回true ;不存在返回false
+     */
+    @Override
+    public boolean isExistByConditions(String property, String propertyVal, Map conditionsMap) throws BaseException {
+        if (StringUtils.isBlank(property)) {
+            throw new BaseException("字段" + property + BaseException.ExceptionMessage.ParamIsEmpty);
+        }
+        if (StringUtils.isBlank(propertyVal)) {
+            throw new BaseException("字段值" + BaseException.ExceptionMessage.ParamIsEmpty);
+        }
+        Map<String, Object> param = new HashedMap();
+        param.putAll(conditionsMap);
+        param.put(property, propertyVal);
+        int result = getBaseMybatisDAO().count(param);
+        return result > 0;
+    }
+
 }

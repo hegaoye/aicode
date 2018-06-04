@@ -54,7 +54,11 @@ public class MapFieldColumn extends BaseEntity implements java.io.Serializable {
 
     public void toJava() {
         this.field = StringHelper.toJavaVariableName(this.column);
-        this.fieldType = DatabaseDataTypesUtils.getPreferredJavaType(this.sqlType);
+        if(this.field.equals("id")){
+            this.fieldType = "java.lang.Long";
+        }else {
+            this.fieldType = DatabaseDataTypesUtils.getPreferredJavaType(this.sqlType);
+        }
     }
 
 

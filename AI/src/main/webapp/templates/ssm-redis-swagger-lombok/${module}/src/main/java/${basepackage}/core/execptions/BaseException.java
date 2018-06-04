@@ -10,6 +10,7 @@ import java.io.Serializable;
 /**
  * 基本异常类
  *
+ *
  * @author lixin 2017-08-03 17:46
  */
 public class BaseException extends RuntimeException implements Serializable {

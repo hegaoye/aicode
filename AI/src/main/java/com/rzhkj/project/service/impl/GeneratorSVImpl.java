@@ -228,6 +228,7 @@ public class GeneratorSVImpl implements GenerateSV {
 
         String targetFilePath = projectPath + "/" + frameworksTemplatePath
                 .replace("${basepackage}", project.getBasePackage().replace(".", "/"))
+                .replace("${basePackage}", project.getBasePackage().replace(".", "/"))
                 .replace("${className}", mapClassTable.getClassName())
                 .replace("${module}", project.getEnglishName())
                 .replace("${model}", templateData.getModel());

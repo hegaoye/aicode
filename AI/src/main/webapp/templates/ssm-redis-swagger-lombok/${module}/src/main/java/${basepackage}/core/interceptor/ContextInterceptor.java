@@ -45,6 +45,8 @@ public class ContextInterceptor extends HandlerInterceptorAdapter {
         } catch (Exception e) {
             e.printStackTrace();
         }
+         /*进入action设置*/
+        initBaseAction(request, response, handler);
         return true;
     }
 
@@ -89,6 +91,18 @@ public class ContextInterceptor extends HandlerInterceptorAdapter {
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
     }
+
+    /*初始化BaseActon*/
+    private void initBaseAction(HttpServletRequest request, HttpServletResponse response, Object handler) {
+        if (handler instanceof HandlerMethod) {
+            HandlerMethod handlerMethod = (HandlerMethod) handler;
+            //取得action对象
+            if (handlerMethod.getBean() instanceof BaseCtrl) {
+                BaseCtrl action = (BaseCtrl) handlerMethod.getBean();
+                //调用初始化函数
+                action.init(request, response);
+            }
+        }
 
 
 }

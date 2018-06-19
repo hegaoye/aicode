@@ -108,16 +108,16 @@ public class ProjectFramworkCtrl extends BaseCtrl {
      *
      * @return BeanRet
      */
-    @ApiOperation(value = "添加项目技术", notes = "请求方式请用POST，Ajax的[Content-Type: application/json;charset=utf-8]模式，并对以下属性进行设置，最后以JSON格式提交如：[{\"frameworkCode\":\"123\"....},{\"projectCode\":\"456\"....}]")
+    @ApiOperation(value = "添加项目技术", notes = "用JSON格式提交如：{projectStr:[{\"frameworkCode\":\"123\",\"projectCode\":\"456\"},{....}]}")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "projectCode", value = "项目编码", required = true, paramType = "query"),
-            @ApiImplicitParam(name = "frameworkCode", value = "技术编码", required = true, paramType = "query")
+            @ApiImplicitParam(name = "projectStr", value = "项目技术json", required = true, paramType = "query")
     })
     @PostMapping("/add")
     @ResponseBody
-    public BeanRet add(@ApiIgnore @RequestBody List<ProjectFramwork> projectFramwors) {
+    public BeanRet add(@ApiIgnore String projectStr) {
         try {
-            Assert.notNull(projectFramwors, BaseException.BaseExceptionEnum.Empty_Param.toString());
+            Assert.notNull(projectStr, BaseException.BaseExceptionEnum.Empty_Param.toString());
+            List<ProjectFramwork> projectFramwors = JSON.parseArray(projectStr, ProjectFramwork.class);
             projectFramworkSV.save(projectFramwors);
             return BeanRet.create(true, "添加项目技术成功", projectFramwors);
         } catch (Exception e) {

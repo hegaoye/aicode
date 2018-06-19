@@ -14,7 +14,7 @@ import com.alibaba.fastjson.JSON;
 import ${basePackage}.core.base.BaseMybatisDAO;
 import ${basePackage}.core.base.BaseMybatisSVImpl;
 import ${basePackage}.core.entity.Page;
-import ${basePackage}.${model}.facade.${className}SV;
+import ${basePackage}.${model}.service.${className}SV;
 import ${basePackage}.${model}.dao.${className}DAO;
 import ${basePackage}.${model}.entity.${className};
 

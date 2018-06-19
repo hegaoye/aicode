@@ -168,10 +168,10 @@ public class DataSourceProvider {
 
     public static void main(String[] args) {
         try {
-            String driver = ConfigUtil.getValue("jdbc.driver", "jdbc.properties");
-            String url = ConfigUtil.getValue("jdbc.url", "jdbc.properties");
-            String username = ConfigUtil.getValue("jdbc.username", "jdbc.properties");
-            String password = ConfigUtil.getValue("jdbc.password", "jdbc.properties");
+            String driver = ConfigUtil.getValue("jdbc.driver", "ai_jdbc.properties");
+            String url = ConfigUtil.getValue("jdbc.url", "ai_jdbc.properties");
+            String username = ConfigUtil.getValue("jdbc.username", "ai_jdbc.properties");
+            String password = ConfigUtil.getValue("jdbc.password", "ai_jdbc.properties");
             logger.info(url);
             logger.info(username);
             logger.info(password);

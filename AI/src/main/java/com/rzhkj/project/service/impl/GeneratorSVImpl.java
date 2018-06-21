@@ -65,7 +65,7 @@ public class GeneratorSVImpl implements GenerateSV {
             projectJobLogs.setLog("Start By AI-Code @Copyright <a href='http://www.rzhkj.com' target='_blank'>仁中和</a>");
             projectJobLogsDAO.insert(projectJobLogs);
             Map<String, Object> map = Maps.newHashMap();
-            map.put("projectCode", projectCode);
+            map.put("code", projectCode);
             Project project = projectDAO.load(map);
             String projectPath = buildProject(project);
             projectDAO.update(projectCode, project.getBuildNumber() != null ? project.getBuildNumber() + 1 : 1);

@@ -2,7 +2,7 @@ apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
 
 jar {
-    manifest { attributes 'Main-Class': '${basePackage}.PpsCloudEurekaApplication' }
+    manifest { attributes 'Main-Class': '${basePackage}.EurekaApplication' }
 }
 
 dependencies {

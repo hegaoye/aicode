@@ -5,7 +5,7 @@ package ${basePackage}.${model}.service;
 
 import ${basePackage}.core.entity.Page;
 import ${basePackage}.core.exceptions.BaseException;
-import ${basePackage}.core.exceptions.UserInfoException;
+import ${basePackage}.core.exceptions.${className}Exception;
 import ${basePackage}.${model}.dao.${className}DAO;
 import ${basePackage}.${model}.entity.${className};
 import lombok.extern.slf4j.Slf4j;

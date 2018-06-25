@@ -4,6 +4,7 @@
 package ${basePackage}.${model}.ctrl;
 
 import com.alibaba.fastjson.JSON;
+import springfox.documentation.annotations.ApiIgnore;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -111,13 +112,12 @@ public class ${className}Ctrl {
     @ResponseBody
     public List<${className}> list(@ApiIgnore ${className} ${classNameLower},@ApiIgnore Page<${className}> page) {
         if(page==null){
-            return BeanRet.create();
+            return null;
         }
         List<${className}> ${classNameLower}s = ${classNameLower}SV.list(${classNameLower},page.genRowStart(),page.getPageSize());
         int total = ${classNameLower}SV.count(${classNameLower});
         page.setTotalRow(total);
-        page.setVoList();
-        logger.info(JSON.toJSONString(page));
+        log.info(JSON.toJSONString(page));
         return ${classNameLower}s;
     }
 
@@ -139,12 +139,12 @@ public class ${className}Ctrl {
     @ResponseBody
     public List<${className}> listByPk(<#list pkFields as pkField>${pkField.fieldType} ${pkField.field},</#list>@ApiIgnore Page<${className}> page) {
         if(page==null){
-            return BeanRet.create();
+            return null;
         }
         List<${className}> ${classNameLower}s = ${classNameLower}SV.list(<#list pkFields as pkField>${pkField.field},</#list> page.genRowStart(),page.getPageSize());
         int total = ${classNameLower}SV.count(<#list pkFields as pkField>${pkField.field}<#if pkField_has_next>,</#if></#list>);
         page.setTotalRow(total);
-        logger.info(JSON.toJSONString(page));
+        log.info(JSON.toJSONString(page));
         return ${classNameLower}s;
     }
 

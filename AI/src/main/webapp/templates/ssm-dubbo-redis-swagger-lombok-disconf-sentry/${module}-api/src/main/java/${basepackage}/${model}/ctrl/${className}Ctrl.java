@@ -78,7 +78,7 @@ public class ${className}Ctrl  {
      */
     @ApiOperation(value = "查询${className}一个详情信息", notes = "查询${className}一个详情信息")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "${pkField.field}", value = "${pkField.notes}", paramType = "query")
+            @ApiImplicitParam(name = "${pkField.field}", value = "${pkField.notes}", paramType = "path")
     })
     @GetMapping(value = "/load/{${pkField.field}}")
     @ResponseBody

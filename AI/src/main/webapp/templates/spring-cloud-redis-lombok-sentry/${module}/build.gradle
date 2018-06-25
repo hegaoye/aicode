@@ -1,0 +1,22 @@
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+
+dependencies {
+    compile('org.springframework.boot:spring-boot-starter-web')
+    compile('org.springframework.cloud:spring-cloud-starter-eureka-server')
+    compile('org.springframework.cloud:spring-cloud-starter-hystrix')
+    compile('org.springframework.cloud:spring-cloud-starter-hystrix-dashboard')
+    compile fileTree(dir: '../libs', include: ['*.jar'])
+    compile project(':core')
+    compile project(':base-facade')
+    compile project(':facade')
+    compile project(':base-sv')
+    testCompile('org.springframework.boot:spring-boot-starter-test')
+
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${r'${springCloudVersion}'}"
+    }
+}

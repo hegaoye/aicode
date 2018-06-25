@@ -1,0 +1,124 @@
+apply plugin: 'java'
+
+subprojects {
+    sourceCompatibility = 1.8
+
+    [compileJava, compileTestJava, javadoc]*.options*.encoding = "UTF-8"
+
+    buildscript {
+        ext {
+            springBootVersion = '1.5.13.RELEASE'
+        }
+        repositories {
+            mavenCentral()
+        }
+        dependencies {
+            classpath("org.akhikhl.gretty:gretty:+")
+            classpath("org.springframework.boot:spring-boot-gradle-plugin:${r'${springBootVersion}'}")
+        }
+    }
+
+    apply plugin: 'java'
+    apply plugin: 'idea'
+
+    sourceCompatibility = 1.8
+    repositories {
+        maven { url 'http://maven.jahia.org/maven2' }
+        mavenCentral()
+    }
+
+    ext {
+        springCloudVersion = 'Dalston.SR5'
+    }
+
+    dependencies {
+        compile "javax.servlet:javax.servlet-api:4.+"
+        compile "javax.servlet.jsp:jsp-api:2.2.1-b03"
+
+
+
+        compile('org.springframework.boot:spring-boot-starter-logging')
+
+        //----------- commons  start--------------
+        compile('commons-beanutils:commons-beanutils:1.9.2')
+        compile('commons-codec:commons-codec:1.6')
+        compile('commons-collections:commons-collections:3.2.1')
+        compile('commons-dbcp:commons-dbcp:1.2.2')
+        compile('commons-discovery:commons-discovery:0.2')
+        compile('commons-fileupload:commons-fileupload:1.2.1')
+        compile('commons-httpclient:commons-httpclient:3.0.1')
+        compile('commons-io:commons-io:2.4')
+        compile('commons-lang:commons-lang:2.5')
+        compile('org.apache.commons:commons-lang3:3.4')
+        compile('commons-logging:commons-logging:1.2')
+        compile('commons-logging:commons-logging-api:1.1')
+        compile('commons-pool:commons-pool:1.6')
+        compile('org.apache.commons:commons-pool2:2.4.2')
+        compile('commons-net:commons-net:3.6')
+        //-----------commons   end--------------
+
+        //----------- mybatis mysql druid start--------------
+        compile('org.mybatis.spring.boot:mybatis-spring-boot-starter:1.3.2')
+        compile('com.github.miemiedev:mybatis-paginator:1.2.17')
+        compile('mysql:mysql-connector-java:8.0.11')
+        compile('com.alibaba:druid:1.1.9')
+        //-----------mybatis mysql druid end--------------
+
+        //-----------redis start--------------
+        compile "org.springframework.boot:spring-boot-starter-redis:1.0.1.RELEASE"
+        compile "redis.clients:jedis:2.9.0"
+        //-----------redis end--------------
+
+        // -----------Memcached start--------------
+        compile "com.whalin:Memcached-Java-Client:3.0.2"
+        //-----------Memcached end--------------
+
+        // -----------lombok start--------------
+        compile "org.projectlombok:lombok:1.16.18"
+        //-----------lombok end--------------
+
+        // -----------okhttp start--------------
+        compile "com.squareup.okhttp3:okhttp:3.4.0-RC1"
+        compile "com.squareup.okhttp3:logging-interceptor:3.4.0-RC1"
+        //-----------okhttp end--------------
+
+        // -----------kaptcha 图形验证码 start--------------
+        compile "com.github.penggle:kaptcha:2.3.2"
+        //-----------kaptcha 图形验证码 end--------------
+
+        // -----------testng start--------------
+        compile "org.testng:testng:6.9.10"
+        //-----------testng end--------------
+
+        //-----------swagger2 start--------------
+        compile "io.springfox:springfox-swagger2:2.7.0"
+        compile "io.springfox:springfox-swagger-ui:2.7.0"
+        //-----------swagger2 end--------------
+
+        //-----------poi 导入/导出 start--------------
+        compile "org.apache.poi:poi:3.15"
+        compile "org.apache.poi:poi-ooxml:3.15"
+        //-----------poi 导入/导出 end--------------
+
+        //-----------工具包依赖 begin-----------
+        compile "com.alibaba:fastjson:1.2.32"
+        compile "com.google.guava:guava:21.0"
+        compile "log4j:log4j:1.2.16"
+        //-----------工具包依赖 end-----------
+
+        // -----------Sentry begin-----------
+        compile "io.sentry:sentry-log4j:1.5.4"
+        //-----------Sentry end-----------
+
+        //-----------jsch ssh start--------------
+        compile "com.jcraft:jsch:0.1.54"
+        //-----------jsch ssh  end--------------
+
+        // -----------jsch ssh start--------------
+        compile "net.lingala.zip4j:zip4j:1.3.2"
+        //-----------jsch ssh  end--------------
+
+
+        testCompile group: 'junit', name: 'junit', version: '4.12'
+    }
+}

@@ -69,7 +69,7 @@ public   interface ${className}DAO {
     *
     * @param ${classNameLower} 对象
     */
-    void updateStateBy${field.field?cap_first}(@Param("${pkField.field}") ${pkField.fieldType} ${pkField.field},@Param("newState") ${className}State newState,@Param("oldState") ${className}State... oldStates);
+    void updateStateBy${pkField.field?cap_first}(@Param("${pkField.field}") ${pkField.fieldType} ${pkField.field},@Param("newState") ${className}State newState,@Param("oldState") ${className}State... oldStates);
 
     /**
     * 根据主键${pkField.field} 更新 ${className} 的状态到另一个状态

@@ -122,7 +122,7 @@
 <#if (pkFields?size>0)>
     <#list pkFields as pkField>
         <!--根据主键更新 ${tableName} 的数据-->
-        <update id="updateStateBy${field.field?cap_first}" parameterType="map">
+        <update id="updateStateBy${pkField.field?cap_first}" parameterType="map">
             UPDATE `${tableName}`
             set state = ${r'#{newState}'}
             <where>

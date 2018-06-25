@@ -164,7 +164,7 @@ public abstract class BaseMybatisDAOImpl<E, PK extends Serializable> extends Sql
      * INSERT INTO STUDENT (id,name,sex,tel,address)
      * VALUES
      * <foreach collection="entitys" item="entity" index="index" separator="," >
-     * (#{entity.id},#{entity.name},#{entity.sex},#{entity.tel},#{entity.address})
+     * ({entity.id},{entity.name},{entity.sex},{entity.tel},{entity.address})
      * </foreach>
      * </insert>
      *
@@ -192,9 +192,9 @@ public abstract class BaseMybatisDAOImpl<E, PK extends Serializable> extends Sql
      * <p>
      * 例如：
      * <update id="batchUpdate" parameterType="Student" >
-     * UPDATE STUDENT SET name = #{name}
+     * UPDATE STUDENT SET name = {name}
      * <foreach collection="entitys" index="index" item="entity" open=" " separator="," close=" ">
-     * #{obj}
+     * {obj}
      * </foreach>
      * </update>
      *
@@ -218,9 +218,9 @@ public abstract class BaseMybatisDAOImpl<E, PK extends Serializable> extends Sql
      * <p>
      * 例如：
      * <update id="batchUpdateStudentWithMap" parameterType="java.util.Map" >
-     * UPDATE STUDENT SET name = #{name} WHERE id IN
+     * UPDATE STUDENT SET name = {name} WHERE id IN
      * <foreach collection="idList" index="index" item="item" open="(" separator="," close=")">
-     * #{item}
+     * {item}
      * </foreach>
      * </update>
      *
@@ -247,7 +247,7 @@ public abstract class BaseMybatisDAOImpl<E, PK extends Serializable> extends Sql
      * <delete id="batchDelete" parameterType="java.util.List">
      * DELETE FROM STUDENT WHERE id IN
      * <foreach collection="keys" index="index" item="key" open="(" separator="," close=")">
-     * #{key}
+     * {key}
      * </foreach>
      * </delete>
      *

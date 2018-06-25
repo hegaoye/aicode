@@ -1,6 +1,6 @@
 include 'core', 'base-facade', 'base-sv','base-web'
 
 include 'eureka',
-        '${module}',
-        '${module}-api',
+        '${projectName}',
+        '${projectName}-api',
         'facade'

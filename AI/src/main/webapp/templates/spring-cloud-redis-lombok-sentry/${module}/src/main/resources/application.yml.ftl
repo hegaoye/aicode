@@ -60,7 +60,7 @@ eureka:
 
 #指定mybatis映射文件的地址
 mybatis:
-  mapper-locations: classpath:mapper/*/*.xml
+  mapper-locations: classpath:mapper/*/*.xml,classpath:/META-INF/mybatis/mapper/WORKER*.xml
   configLocation: classpath:mapper/mybatis-config.xml
 
 logging:

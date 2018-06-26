@@ -58,18 +58,18 @@
     <logger name="org.springframework" level="TRACE"/>
 
     <!--日志异步到数据库 -->
-    <appender name="MSYQL-POOL" class="ch.qos.logback.classic.db.DBAppender">
-        <!--日志异步到数据库 -->
-        <connectionSource class="ch.qos.logback.core.db.DriverManagerConnectionSource">
-            <!--连接池 -->
-            <dataSource class="org.apache.commons.dbcp.BasicDataSource">
-                <driverClass>com.mysql.jdbc.Driver</driverClass>
-                <url>jdbc:mysql://192.168.10.250:3306/ai_code_simple</url>
-                <user>root</user>
-                <password>mysqladmin</password>
-            </dataSource>
-        </connectionSource>
-    </appender>
+    <!--<appender name="MSYQL-POOL" class="ch.qos.logback.classic.db.DBAppender">-->
+        <!--&lt;!&ndash;日志异步到数据库 &ndash;&gt;-->
+        <!--<connectionSource class="ch.qos.logback.core.db.DriverManagerConnectionSource">-->
+            <!--&lt;!&ndash;连接池 &ndash;&gt;-->
+            <!--<dataSource class="org.apache.commons.dbcp.BasicDataSource">-->
+                <!--<driverClass>com.mysql.jdbc.Driver</driverClass>-->
+                <!--<url>jdbc:mysql://192.168.10.250:3306/ai_code_simple</url>-->
+                <!--<user>root</user>-->
+                <!--<password>mysqladmin</password>-->
+            <!--</dataSource>-->
+        <!--</connectionSource>-->
+    <!--</appender>-->
 
     <!-- 日志输出级别 -->
     <root level="DEBUG">

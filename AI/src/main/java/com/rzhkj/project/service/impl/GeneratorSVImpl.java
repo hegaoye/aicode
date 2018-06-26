@@ -67,7 +67,7 @@ public class GeneratorSVImpl implements GenerateSV {
             Map<String, Object> map = Maps.newHashMap();
             map.put("code", projectCode);
             Project project = projectDAO.load(map);
-            String projectPath = buildProject(project);
+            String projectPath = this.buildProject(project);
             projectDAO.update(projectCode, project.getBuildNumber() != null ? project.getBuildNumber() + 1 : 1);
             projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), " 已初始化项目 【 " + project.getName() + " ( " + project.getEnglishName() + " )】 工作空间"));
             logger.info("创建工作空间库完成");
@@ -177,10 +177,10 @@ public class GeneratorSVImpl implements GenerateSV {
         projectPath = projectPath.replace("//", "/");
         //1.检测项目工作工作空间是否存在
         File file = new File(projectPath);
-        if (file.exists()) {
-            FileUtil.delFolder(projectPath);
+        if (!file.exists()) {
+            file.mkdirs();
+//            FileUtil.delFolder(projectPath);
         }
-        file.mkdirs();
 
         //3.代码仓库检出
         Map<String, Object> map = Maps.newHashMap();
@@ -239,7 +239,10 @@ public class GeneratorSVImpl implements GenerateSV {
 
         if (new File(templatePath).exists()) {
             if (!templatePath.contains(".jar")) {
-                FreemarkerHelper.generate(templateData, targetFilePath, templatePath);
+                //增量判断，默认是增量只创建不存在的文件
+                if (!new File(targetFilePath.replace("//", "/")).exists()) {
+                    FreemarkerHelper.generate(templateData, targetFilePath, templatePath);
+                }
             } else {
                 try {
                     FileUtils.copyFileToDirectory(new File(templatePath), new File(targetFilePath.substring(0, targetFilePath.lastIndexOf("/"))));

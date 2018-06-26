@@ -53,6 +53,7 @@ public interface ${className}SV {
      */
      List<${className}> list(${className} ${classNameLower}, int offset, int limit);
      int count(${className} ${classNameLower});
+     int count();
 
      /**
      * 查询${className}分页

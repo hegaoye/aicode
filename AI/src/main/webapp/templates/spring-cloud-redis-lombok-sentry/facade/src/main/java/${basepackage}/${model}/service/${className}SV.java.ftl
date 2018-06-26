@@ -4,7 +4,6 @@
 package ${basePackage}.${model}.service;
 
 import java.util.List;
-import java.util.Date;
 
 import ${basePackage}.${model}.entity.${className};
 

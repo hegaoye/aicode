@@ -4,21 +4,16 @@
 package ${basePackage}.${model}.ctrl;
 
 import com.alibaba.fastjson.JSON;
-import springfox.documentation.annotations.ApiIgnore;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 import javax.annotation.Resource;
 import java.util.List;
+
 import ${basePackage}.core.entity.BeanRet;
 import ${basePackage}.core.entity.Page;
 import ${basePackage}.core.tools.redis.RedisUtils;
@@ -181,7 +176,7 @@ public class ${className}Ctrl {
     @PutMapping("/modify")
     @ResponseBody
     public ${className} modify(@ApiIgnore ${className} ${classNameLower}) {
-        ${classNameLower}SV.update(${classNameLower});
+        ${classNameLower}SV.modify(${classNameLower});
         return ${classNameLower};
     }
 

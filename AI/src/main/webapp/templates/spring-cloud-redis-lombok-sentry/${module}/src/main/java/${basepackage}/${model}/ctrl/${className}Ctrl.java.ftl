@@ -105,10 +105,8 @@ public class ${className}Ctrl {
     })
     @GetMapping(value = "/list")
     @ResponseBody
-    public List<${className}> list(@ApiIgnore ${className} ${classNameLower},@ApiIgnore Page<${className}> page) {
-        if(page==null){
-            return null;
-        }
+    public List<${className}> list(@ApiIgnore ${className} ${classNameLower},Integer curPage,Integer pageSize) {
+        Page<${className}> page=new Page<${className}>(pageSize,curPage);
         List<${className}> ${classNameLower}s = ${classNameLower}SV.list(${classNameLower},page.genRowStart(),page.getPageSize());
         int total = ${classNameLower}SV.count(${classNameLower});
         page.setTotalRow(total);
@@ -132,10 +130,8 @@ public class ${className}Ctrl {
     })
     @GetMapping(value = "/list/by")
     @ResponseBody
-    public List<${className}> listByPk(<#list pkFields as pkField>${pkField.fieldType} ${pkField.field},</#list>@ApiIgnore Page<${className}> page) {
-        if(page==null){
-            return null;
-        }
+    public List<${className}> listByPk(<#list pkFields as pkField>${pkField.fieldType} ${pkField.field},</#list>Integer curPage,Integer pageSize) {
+        Page<${className}> page=new Page<${className}>(pageSize,curPage);
         List<${className}> ${classNameLower}s = ${classNameLower}SV.list(<#list pkFields as pkField>${pkField.field},</#list> page.genRowStart(),page.getPageSize());
         int total = ${classNameLower}SV.count(<#list pkFields as pkField>${pkField.field}<#if pkField_has_next>,</#if></#list>);
         page.setTotalRow(total);

@@ -9,7 +9,6 @@ import ${basePackage}.core.exceptions.${className}Exception;
 import ${basePackage}.${model}.dao.${className}DAO;
 import ${basePackage}.${model}.entity.${className};
 import lombok.extern.slf4j.Slf4j;
-import ${basePackage}.core.exceptions.BaseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;

@@ -25,7 +25,7 @@ import ${basePackage}.core.entity.BeanRet;
 import ${basePackage}.core.entity.Page;
 import ${basePackage}.core.tools.redis.RedisUtils;
 import ${basePackage}.${model}.entity.${className};
-import ${basePackage}.${model}.service.${className}FeignSV;
+import ${basePackage}.${model}.service.${className}FeignSVImpl;
 /**
  * ${notes} 控制器
  *
@@ -40,7 +40,7 @@ public class ${className}Ctrl {
     @Resource
     protected RedisUtils redisUtils;
     @Autowired
-    private ${className}FeignSV ${classNameLower}FeignSV;
+    private ${className}FeignSVImpl ${classNameLower}FeignSVImpl;
 
 
     <#if (pkFields?size>0)>

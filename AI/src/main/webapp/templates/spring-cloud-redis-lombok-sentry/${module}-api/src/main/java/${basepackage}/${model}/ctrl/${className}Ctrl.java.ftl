@@ -10,22 +10,21 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.*;
-import javax.annotation.Resource;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
+
+import javax.annotation.Resource;
 import java.util.List;
+
 import ${basePackage}.core.exceptions.BaseException;
 import ${basePackage}.core.entity.BeanRet;
 import ${basePackage}.core.entity.Page;
 import ${basePackage}.core.tools.redis.RedisUtils;
 import ${basePackage}.${model}.entity.${className};
 import ${basePackage}.${model}.service.${className}FeignSVImpl;
+
 /**
  * ${notes} 控制器
  *
@@ -85,9 +84,15 @@ public class ${className}Ctrl {
     @GetMapping(value = "/load/{${pkField.field}}")
     @ResponseBody
     public BeanRet loadBy${pkField.field?cap_first}(@PathVariable ${pkField.fieldType} ${pkField.field}) {
+        <#if field.field!='id'>
         if(StringUtils.isEmpty(${pkField.field})){
             return BeanRet.create(BaseException.BaseExceptionEnum.Empty_Param);
         }
+        <#else>
+        if(${pkField.field}==null||${pkField.field}==0){
+            return BeanRet.create(BaseException.BaseExceptionEnum.Empty_Param);
+        }
+        </#if>
         ${className} ${classNameLower} = ${classNameLower}FeignSV.loadBy${pkField.field?cap_first}(${pkField.field});
         log.info(JSON.toJSONString(${classNameLower}));
         return BeanRet.create(true, BaseException.BaseExceptionEnum.Success, ${classNameLower});
@@ -111,7 +116,7 @@ public class ${className}Ctrl {
     })
     @GetMapping(value = "/list")
     @ResponseBody
-    public List<${className}> list(@ApiIgnore ${className} ${classNameLower},@ApiIgnore Page<${className}> page) {
+    public BeanRet list(@ApiIgnore ${className} ${classNameLower},@ApiIgnore Page<${className}> page) {
         if(page==null){
             return BeanRet.create(BaseException.BaseExceptionEnum.Empty_Param);
         }
@@ -139,7 +144,7 @@ public class ${className}Ctrl {
     })
     @GetMapping(value = "/list/by")
     @ResponseBody
-    public List<${className}> listByPk(<#list pkFields as pkField>${pkField.fieldType} ${pkField.field},</#list>@ApiIgnore Page<${className}> page) {
+    public BeanRet listByPk(<#list pkFields as pkField>${pkField.fieldType} ${pkField.field},</#list>@ApiIgnore Page<${className}> page) {
         if(page==null){
            return BeanRet.create(BaseException.BaseExceptionEnum.Empty_Param);
         }
@@ -166,9 +171,11 @@ public class ${className}Ctrl {
     @ResponseBody
     public BeanRet build(@ApiIgnore ${className} ${classNameLower}) {
         <#list fields as field>
+            <#if field.field!='id'  && !field.checkDate>
         if (StringUtils.isEmpty(${classNameLower}.get${field.field?cap_first}())) {
            return BeanRet.create(BaseException.BaseExceptionEnum.Empty_Param);
         }
+          </#if>
         </#list>
         ${classNameLower}FeignSV.save(${classNameLower});
         return BeanRet.create(true, BaseException.BaseExceptionEnum.Success,${classNameLower});
@@ -212,7 +219,7 @@ public class ${className}Ctrl {
     @DeleteMapping("/delete")
     @ResponseBody
     public BeanRet delete(<#list pkFields as pkField>${pkField.fieldType} ${pkField.field}<#if pkField_has_next>,</#if></#list>) {
-        if (<#list pkFields as pkField>StringUtils.isEmpty(${pkField.field})<#if pkField_has_next>&&</#if></#list>) {
+        if (<#list pkFields as pkField><#if field.field=='id'>${pkField.field}!=null<#else>StringUtils.isEmpty(${pkField.field})</#if><#if pkField_has_next>&&</#if></#list>) {
            return BeanRet.create(BaseException.BaseExceptionEnum.Empty_Param);
         }
 

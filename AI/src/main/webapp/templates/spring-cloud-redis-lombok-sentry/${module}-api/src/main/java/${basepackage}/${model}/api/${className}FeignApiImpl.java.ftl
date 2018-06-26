@@ -5,8 +5,10 @@ package ${basePackage}.${model}.api;
 
 import ${basePackage}.${model}.entity.${className};
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -50,7 +52,7 @@ public class ${className}FeignApiImpl implements ${className}FeignApi {
      * @return 分页对象
      */
     @Override
-    public    List<${className}> list(@RequestBody ${className} ${classNameLower},Integer curPage,Integer pageSize){
+    public    List<${className}> list(@RequestBody ${className} ${classNameLower},int curPage,int pageSize){
         return new ArrayList();
     }
 
@@ -61,7 +63,7 @@ public class ${className}FeignApiImpl implements ${className}FeignApi {
      * @return 分页对象
      */
     @Override
-    public   List<${className}> listByPk(<#list pkFields as pkField>${pkField.fieldType} ${pkField.field},</#list>Integer curPage,Integer pageSize){
+    public   List<${className}> listByPk(<#list pkFields as pkField>${pkField.fieldType} ${pkField.field},</#list>int curPage,int pageSize){
         return new ArrayList();
     }
 

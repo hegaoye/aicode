@@ -4,11 +4,7 @@
 package ${basePackage}.${model}.api;
 
 import org.springframework.cloud.netflix.feign.FeignClient;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 import ${basePackage}.${model}.entity.${className};
@@ -58,7 +54,7 @@ public interface ${className}FeignApi {
      * @return 分页对象
      */
     @PostMapping(value = "/list")
-    List<${className}> list(@RequestBody ${className} ${classNameLower},int curPage,int pageSize);
+    List<${className}> list(@RequestBody ${className} ${classNameLower},@RequestParam("curPage") int curPage,@RequestParam("pageSize") int pageSize);
 
 
     /**
@@ -67,7 +63,28 @@ public interface ${className}FeignApi {
      * @return 分页对象
      */
     @GetMapping(value = "/list/by")
-    List<${className}> listByPk(<#list pkFields as pkField>${pkField.fieldType} ${pkField.field},</#list>int curPage,int pageSize);
+    List<${className}> listByPk(<#list pkFields as pkField>@RequestParam("${pkField.field}") ${pkField.fieldType} ${pkField.field},</#list>@RequestParam("curPage") int curPage,@RequestParam("pageSize") int pageSize);
+
+
+
+
+    /**
+    * 统计${className}信息数量根据主键
+    *
+    * @return 总条数
+    */
+    @GetMapping(value = "/count/by")
+    public Integer count(<#list pkFields as pkField>@RequestParam("${pkField.field}") ${pkField.fieldType} ${pkField.field}<#if pkField_has_next>,</#if></#list>);
+
+    /**
+    * 统计${className}信息数量
+    *
+    * @return 总条数
+    */
+    @PostMapping(value = "/count")
+    public Integer count(@RequestBody Account account);
+
+
 
     /**
      * 创建${className}

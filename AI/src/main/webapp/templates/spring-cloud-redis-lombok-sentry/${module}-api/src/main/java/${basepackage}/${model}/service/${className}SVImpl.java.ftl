@@ -3,16 +3,17 @@
 */
 package ${basePackage}.${model}.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import lombok.extern.slf4j.Slf4j;
 import java.util.List;
 
-import ${basePackage}.${model}.api.${className}FeignAPI;
-import ${basePackage}.${model}.entity.${className};
-import ${basePackage}.core.exceptions.BaseException;
+import ${basePackage}.${model}.api.${className}FeignApi;
 import ${basePackage}.core.exceptions.${className}Exception;
+import ${basePackage}.core.exceptions.BaseException;
+import ${basePackage}.core.entity.Page;
 import ${basePackage}.${model}.entity.${className};
+
 
 /**
  * ${notes}
@@ -23,7 +24,7 @@ import ${basePackage}.${model}.entity.${className};
 public class ${className}SVImpl {
 
     @Autowired
-    private ${className}FeignAPI ${classNameLower}FeignAPI;
+    private ${className}FeignApi ${classNameLower}FeignApi;
 
 <#if (pkFields?size>0)>
     /**
@@ -35,7 +36,7 @@ public class ${className}SVImpl {
         if(<#list pkFields as field>${field.field}==null<#if field_has_next>&&</#if></#list>){
             throw new ${className}Exception(BaseException.BaseExceptionEnum.Ilegal_Param);
         }
-        return ${classNameLower}FeignAPI.load(<#list pkFields as field>${field.field}<#if field_has_next>,</#if></#list>);
+        return ${classNameLower}FeignApi.load(<#list pkFields as field>${field.field}<#if field_has_next>,</#if></#list>);
     }
     <#list pkFields as pkField>
     /**
@@ -47,7 +48,7 @@ public class ${className}SVImpl {
         if(${pkField.field}==null){
             throw new ${className}Exception(BaseException.BaseExceptionEnum.Ilegal_Param);
         }
-        return ${classNameLower}FeignAPI.loadBy${pkField.field?cap_first}(${pkField.field});
+        return ${classNameLower}FeignApi.loadBy${pkField.field?cap_first}(${pkField.field});
     }
 
     </#list>
@@ -62,7 +63,7 @@ public class ${className}SVImpl {
         if(<#list pkFields as field>${field.field}==null<#if field_has_next>&&</#if></#list>){
             throw new ${className}Exception(BaseException.BaseExceptionEnum.Ilegal_Param);
         }
-        ${classNameLower}FeignAPI.delete(<#list pkFields as pkField>${pkField.field}<#if pkField_has_next>,</#if></#list>);
+        ${classNameLower}FeignApi.delete(<#list pkFields as pkField>${pkField.field}<#if pkField_has_next>,</#if></#list>);
     }
 
 </#if>
@@ -77,7 +78,7 @@ public class ${className}SVImpl {
      * @return List<${className}>
      */
     public List<${className}> list(${className} ${classNameLower}, int curPage,int pageSize) {
-        return ${classNameLower}FeignAPI.list(${classNameLower}, curPage,pageSize);
+        return ${classNameLower}FeignApi.list(${classNameLower}, curPage,pageSize);
     }
 
     /**
@@ -88,7 +89,7 @@ public class ${className}SVImpl {
      * @param pageSize 分页条数
      * @return List<${className}>
      */
-    public List<${className}> list(<#list pkFields as pkField>${pkField.fieldType} ${pkField.field},</#list>int offset, int limit) {
+    public List<${className}> list(<#list pkFields as pkField>${pkField.fieldType} ${pkField.field},</#list>int curPage, int pageSize) {
         if (curPage < 0) {
            curPage = 1;
         }
@@ -97,9 +98,27 @@ public class ${className}SVImpl {
             pageSize = Page.limit;
         }
 
-        return ${classNameLower}FeignAPI.list(<#list pkFields as pkField>${pkField.field},</#list>curPage,pageSize);
+        ${className} ${classNameLower}=new ${className}();
+        <#list pkFields as pkField>
+        ${classNameLower}.set${pkField.field?cap_first}(${pkField.field});
+        </#list>
+
+        return ${classNameLower}FeignApi.list(${classNameLower},curPage,pageSize);
     }
 
+
+    public int count(<#list pkFields as pkField>${pkField.fieldType} ${pkField.field}<#if pkField_has_next>,</#if></#list>) {
+        return ${classNameLower}FeignApi.count(<#list pkFields as pkField>${pkField.field}<#if pkField_has_next>,</#if></#list>);
+    }
+
+
+    public int count(Account account) {
+        return ${classNameLower}FeignApi.count(account);
+    }
+
+    public int count() {
+        return ${classNameLower}FeignApi.count();
+    }
 
     /**
      * 保存
@@ -109,7 +128,7 @@ public class ${className}SVImpl {
      */
     public void save(${className} ${classNameLower}) {
         if(${classNameLower}==null){ throw new ${className}Exception(BaseException.BaseExceptionEnum.Ilegal_Param);}
-        ${classNameLower}FeignAPI.build(${classNameLower});
+        ${classNameLower}FeignApi.build(${classNameLower});
     }
 
     /**
@@ -120,7 +139,7 @@ public class ${className}SVImpl {
      */
     public void modify(${className} ${classNameLower}) {
         if(${classNameLower}==null){ throw new ${className}Exception(BaseException.BaseExceptionEnum.Ilegal_Param);}
-        ${classNameLower}FeignAPI.modify(${classNameLower});
+        ${classNameLower}FeignApi.modify(${classNameLower});
     }
 
 }

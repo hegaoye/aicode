@@ -140,6 +140,46 @@ public class ${className}Ctrl {
     }
 
     /**
+    * 统计${className}信息数量根据主键
+    *
+    * @return 总条数
+    */
+    @ApiOperation(value = " 统计${className}信息数量根据主键", notes = " 统计${className}信息数量根据主键")
+    @ApiImplicitParams({
+    <#list pkFields as pkField>
+    @ApiImplicitParam(name = "${pkField.field}", value = "${pkField.notes}", paramType = "query")<#if pkField_has_next>,</#if>
+    </#list>
+    })
+    @GetMapping(value = "/count/by")
+    @ResponseBody
+    public Integer count(<#list pkFields as pkField>${pkField.fieldType} ${pkField.field}<#if pkField_has_next>,</#if></#list>) {
+        return ${classNameLower}SV.count(<#list pkFields as pkField>${pkField.field}<#if pkField_has_next>,</#if></#list>);
+    }
+
+    /**
+    * 统计${className}信息数量
+    *
+    * @return 总条数
+    */
+    @ApiOperation(value = "统计${className}信息数量", notes = "统计${className}信息数量")
+    @ApiImplicitParams({
+    <#list fields as field>
+    @ApiImplicitParam(name = "${field.field}", value = "${field.notes}", paramType = "query")<#if field_has_next>,</#if>
+    </#list>
+    })
+    @PostMapping(value = "/count")
+    @ResponseBody
+    public Integer count(Account account) {
+        if(account==null){
+            return ${classNameLower}SV.count();
+        }else{
+            return ${classNameLower}SV.count(account);
+        }
+    }
+
+
+
+    /**
     * 创建${className}
     *
     * @return BeanRet

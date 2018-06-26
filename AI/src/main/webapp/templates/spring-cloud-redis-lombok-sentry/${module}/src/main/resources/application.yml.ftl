@@ -1,6 +1,6 @@
 spring:
   application:
-     name: pps-cloud-provider
+     name: ${projectName}-provider
   output:
        ansi:
          enabled: always #控制台的输出颜色控制

@@ -6,7 +6,6 @@ package ${basePackage}.${model}.service;
 import java.util.List;
 import java.util.Date;
 
-import ${basePackage}.core.base.BaseMybatisSV;
 import ${basePackage}.${model}.entity.${className};
 
 /**

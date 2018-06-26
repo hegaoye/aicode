@@ -7,7 +7,7 @@ import org.apache.ibatis.session.RowBounds;
 import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Repository;
 import java.util.List;
-
+import ${basePackage}.${model}.entity.${className}State;
 import ${basePackage}.${model}.entity.${className};
 
 /**
@@ -61,7 +61,7 @@ public   interface ${className}DAO {
      * @param ${pkField.field} ${pkField.notes}
      * @return ${className}
      */
-     ${className} load(@Param("${pkField.field}") ${pkField.fieldType} ${pkField.field});
+     ${className} loadBy${pkField.field?cap_first}(@Param("${pkField.field}") ${pkField.fieldType} ${pkField.field});
     </#if>
 
     /**
@@ -76,16 +76,17 @@ public   interface ${className}DAO {
     *
     * @param ${classNameLower} 对象
     */
-    void update(${className} ${classNameLower},@Param("states") ${className}State... states);
-
-    /**
-    * 根据主键${pkField.field} 更新 ${className} 的状态到另一个状态
-    *
-    * @param ${classNameLower} 对象
-    */
-    void update(@Param("${pkField.field}") ${pkField.fieldType} ${pkField.field},@Param("state") ${className}State state);
+    void updateBy${pkField.field?cap_first}(@Param("${pkField.field}") ${pkField.fieldType} ${pkField.field},@Param("state") ${className}State state);
 
     </#list>
+
+    /**
+    * 根据状态 更新对象${className}
+    *
+    * @param ${classNameLower} 对象
+    * @param states 状态数组（可以不传）
+    */
+    void update(${className} ${classNameLower},@Param("states") ${className}State... states);
 
     /**
      * 删除对象${className}
@@ -129,7 +130,7 @@ public   interface ${className}DAO {
     List<${className}> list();
 
     int count();
-    int count(@Param(${className} ${classNameLower});
+    int count(${className} ${classNameLower});
 
 
     /**
@@ -152,5 +153,5 @@ public   interface ${className}DAO {
     * @return List<${className}>
     */
     List<${className}> list(<#list pkFields as pkField>${pkField.fieldType} ${pkField.field},</#list>${className}State state,RowBounds rowBounds);
-    int count(<#list pkFields as pkField>${pkField.fieldType} ${pkField.field}</#list>${className}State state);
+    int count(<#list pkFields as pkField>${pkField.fieldType} ${pkField.field},</#list>${className}State state);
 }

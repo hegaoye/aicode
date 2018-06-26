@@ -35,6 +35,9 @@ public class ${className}SVImpl implements ${className}SV {
      */
     @Override
     public ${className} load(<#list pkFields as field>${field.fieldType} ${field.field}<#if field_has_next>,</#if></#list>) {
+           if(<#list pkFields as field>${field.field}==null<#if field_has_next>&&</#if></#list>){
+                 throw new ${className}Exception(BaseException.BaseExceptionEnum.Ilegal_Param);
+            }
             return ${classNameLower}DAO.load(<#list pkFields as field>${field.field}<#if field_has_next>,</#if></#list>);
     }
     <#list pkFields as pkField>
@@ -45,6 +48,9 @@ public class ${className}SVImpl implements ${className}SV {
      */
     @Override
     public ${className} loadBy${pkField.field?cap_first}(${pkField.fieldType} ${pkField.field}) {
+            if(${pkField.field}==null){
+                 throw new ${className}Exception(BaseException.BaseExceptionEnum.Ilegal_Param);
+            }
             return ${classNameLower}DAO.loadBy${pkField.field?cap_first}(${pkField.field});
     }
 
@@ -57,6 +63,9 @@ public class ${className}SVImpl implements ${className}SV {
      */
     @Override
     public void delete(<#list pkFields as pkField>${pkField.fieldType} ${pkField.field}<#if pkField_has_next>,</#if></#list>) {
+            if(<#list pkFields as field>${field.field}==null<#if field_has_next>&&</#if></#list>){
+                throw new ${className}Exception(BaseException.BaseExceptionEnum.Ilegal_Param);
+            }
             ${classNameLower}DAO.delete(<#list pkFields as pkField>${pkField.field}<#if pkField_has_next>,</#if></#list>);
     }
 
@@ -90,6 +99,16 @@ public class ${className}SVImpl implements ${className}SV {
     }
 
 
+    @Override
+    public int count(Account account) {
+        return ${classNameLower}DAO.count(account);
+    }
+
+    @Override
+    public int count() {
+        return ${classNameLower}DAO.count();
+    }
+
     /**
     * 保存
     *
@@ -99,7 +118,7 @@ public class ${className}SVImpl implements ${className}SV {
     @Override
     public void save(${className} ${classNameLower}) {
         if(${classNameLower}==null){ throw new ${className}Exception(BaseException.BaseExceptionEnum.Ilegal_Param);}
-        ${classNameLower}DAO().insert(${classNameLower});
+        ${classNameLower}DAO.insert(${classNameLower});
     }
 
     /**
@@ -109,9 +128,9 @@ public class ${className}SVImpl implements ${className}SV {
     * @throws BaseException
     */
     @Override
-    public void update(${className} ${classNameLower}) {
+    public void modify(${className} ${classNameLower}) {
         if(${classNameLower}==null){ throw new ${className}Exception(BaseException.BaseExceptionEnum.Ilegal_Param);}
-        ${classNameLower}DAO().update(${classNameLower});
+        ${classNameLower}DAO.update(${classNameLower});
     }
 
 }

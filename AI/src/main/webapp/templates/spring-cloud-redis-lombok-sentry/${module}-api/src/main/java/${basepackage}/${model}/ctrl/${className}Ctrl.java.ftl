@@ -84,7 +84,7 @@ public class ${className}Ctrl {
     @GetMapping(value = "/load/{${pkField.field}}")
     @ResponseBody
     public BeanRet loadBy${pkField.field?cap_first}(@PathVariable ${pkField.fieldType} ${pkField.field}) {
-        <#if field.field!='id'>
+        <#if pkField.field!='id'>
         if(StringUtils.isEmpty(${pkField.field})){
             return BeanRet.create(BaseException.BaseExceptionEnum.Empty_Param);
         }
@@ -197,9 +197,11 @@ public class ${className}Ctrl {
     @ResponseBody
     public BeanRet modify(@ApiIgnore ${className} ${classNameLower}) {
     <#list fields as field>
+        <#if field.field!='id'  && !field.checkDate>
         if (StringUtils.isEmpty(${classNameLower}.get${field.field?cap_first}())) {
-            return BeanRet.create(BaseException.BaseExceptionEnum.Empty_Param);
+         return BeanRet.create(BaseException.BaseExceptionEnum.Empty_Param);
         }
+        </#if>
     </#list>
         ${classNameLower}SVImpl.modify(${classNameLower});
         return BeanRet.create(true, BaseException.BaseExceptionEnum.Success,${classNameLower});
@@ -219,7 +221,7 @@ public class ${className}Ctrl {
     @DeleteMapping("/delete")
     @ResponseBody
     public BeanRet delete(<#list pkFields as pkField>${pkField.fieldType} ${pkField.field}<#if pkField_has_next>,</#if></#list>) {
-        if (<#list pkFields as pkField><#if field.field=='id'>${pkField.field}!=null<#else>StringUtils.isEmpty(${pkField.field})</#if><#if pkField_has_next>&&</#if></#list>) {
+        if (<#list pkFields as pkField><#if pkField.field=='id'>${pkField.field}!=null<#else>StringUtils.isEmpty(${pkField.field})</#if><#if pkField_has_next>&&</#if></#list>) {
            return BeanRet.create(BaseException.BaseExceptionEnum.Empty_Param);
         }
 

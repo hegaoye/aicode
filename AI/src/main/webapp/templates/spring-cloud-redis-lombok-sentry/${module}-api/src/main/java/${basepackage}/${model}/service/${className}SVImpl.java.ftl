@@ -116,9 +116,6 @@ public class ${className}SVImpl {
         return ${classNameLower}FeignApi.count(account);
     }
 
-    public int count() {
-        return ${classNameLower}FeignApi.count();
-    }
 
     /**
      * 保存

@@ -67,6 +67,16 @@ public class ${className}FeignApiImpl implements ${className}FeignApi {
         return new ArrayList();
     }
 
+
+    @Override
+    public Integer count(@RequestParam("id") Long id, @RequestParam("code") String code, @RequestParam("account") String account) {
+         return 0;
+    }
+
+    @Override
+    public Integer count(@RequestBody Account account) {
+        return 0;
+    }
     /**
      * 创建${className}
      *

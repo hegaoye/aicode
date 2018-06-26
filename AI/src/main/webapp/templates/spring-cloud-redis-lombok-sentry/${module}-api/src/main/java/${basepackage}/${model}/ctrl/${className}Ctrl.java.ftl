@@ -23,7 +23,7 @@ import ${basePackage}.core.entity.BeanRet;
 import ${basePackage}.core.entity.Page;
 import ${basePackage}.core.tools.redis.RedisUtils;
 import ${basePackage}.${model}.entity.${className};
-import ${basePackage}.${model}.service.${className}FeignSVImpl;
+import ${basePackage}.${model}.service.${className}SVImpl;
 
 /**
  * ${notes} 控制器
@@ -39,7 +39,7 @@ public class ${className}Ctrl {
     @Resource
     protected RedisUtils redisUtils;
     @Autowired
-    private ${className}FeignSVImpl ${classNameLower}FeignSVImpl;
+    private ${className}SVImpl ${classNameLower}SVImpl;
 
 
     <#if (pkFields?size>0)>
@@ -64,7 +64,7 @@ public class ${className}Ctrl {
           return null;
         }
     </#list>
-        ${className} ${classNameLower} = ${classNameLower}FeignSV.load(<#list pkFields as pkField>${pkField.field}<#if pkField_has_next>,</#if></#list>);
+        ${className} ${classNameLower} = ${classNameLower}SVImpl.load(<#list pkFields as pkField>${pkField.field}<#if pkField_has_next>,</#if></#list>);
         log.info(JSON.toJSONString(${classNameLower}));
         return BeanRet.create(true, BaseException.BaseExceptionEnum.Success, ${classNameLower});
     }
@@ -93,7 +93,7 @@ public class ${className}Ctrl {
             return BeanRet.create(BaseException.BaseExceptionEnum.Empty_Param);
         }
         </#if>
-        ${className} ${classNameLower} = ${classNameLower}FeignSV.loadBy${pkField.field?cap_first}(${pkField.field});
+        ${className} ${classNameLower} = ${classNameLower}SVImpl.loadBy${pkField.field?cap_first}(${pkField.field});
         log.info(JSON.toJSONString(${classNameLower}));
         return BeanRet.create(true, BaseException.BaseExceptionEnum.Success, ${classNameLower});
     }
@@ -120,8 +120,8 @@ public class ${className}Ctrl {
         if(page==null){
             return BeanRet.create(BaseException.BaseExceptionEnum.Empty_Param);
         }
-        List<${className}> ${classNameLower}s = ${classNameLower}FeignSV.list(${classNameLower},page.genRowStart(),page.getPageSize());
-        int total = ${classNameLower}FeignSV.count(${classNameLower});
+        List<${className}> ${classNameLower}s = ${classNameLower}SVImpl.list(${classNameLower},page.genRowStart(),page.getPageSize());
+        int total = ${classNameLower}SVImpl.count(${classNameLower});
         page.setTotalRow(total);
         page.setVoList(${classNameLower}s);
         log.info(JSON.toJSONString(page));
@@ -148,8 +148,8 @@ public class ${className}Ctrl {
         if(page==null){
            return BeanRet.create(BaseException.BaseExceptionEnum.Empty_Param);
         }
-        List<${className}> ${classNameLower}s = ${classNameLower}FeignSV.list(<#list pkFields as pkField>${pkField.field},</#list> page.genRowStart(),page.getPageSize());
-        int total = ${classNameLower}FeignSV.count(<#list pkFields as pkField>${pkField.field}<#if pkField_has_next>,</#if></#list>);
+        List<${className}> ${classNameLower}s = ${classNameLower}SVImpl.list(<#list pkFields as pkField>${pkField.field},</#list> page.genRowStart(),page.getPageSize());
+        int total = ${classNameLower}SVImpl.count(<#list pkFields as pkField>${pkField.field}<#if pkField_has_next>,</#if></#list>);
         page.setTotalRow(total);
         page.setVoList(${classNameLower}s);
         log.info(JSON.toJSONString(page));
@@ -177,7 +177,7 @@ public class ${className}Ctrl {
         }
           </#if>
         </#list>
-        ${classNameLower}FeignSV.save(${classNameLower});
+        ${classNameLower}SVImpl.save(${classNameLower});
         return BeanRet.create(true, BaseException.BaseExceptionEnum.Success,${classNameLower});
     }
 
@@ -201,7 +201,7 @@ public class ${className}Ctrl {
             return BeanRet.create(BaseException.BaseExceptionEnum.Empty_Param);
         }
     </#list>
-        ${classNameLower}FeignSV.modify(${classNameLower});
+        ${classNameLower}SVImpl.modify(${classNameLower});
         return BeanRet.create(true, BaseException.BaseExceptionEnum.Success,${classNameLower});
     }
 
@@ -223,7 +223,7 @@ public class ${className}Ctrl {
            return BeanRet.create(BaseException.BaseExceptionEnum.Empty_Param);
         }
 
-        ${classNameLower}FeignSV.delete(<#list pkFields as pkField>${pkField.field}<#if pkField_has_next>,</#if></#list>);
+        ${classNameLower}SVImpl.delete(<#list pkFields as pkField>${pkField.field}<#if pkField_has_next>,</#if></#list>);
         return BeanRet.create(true, "删除${className}成功");
     }
 

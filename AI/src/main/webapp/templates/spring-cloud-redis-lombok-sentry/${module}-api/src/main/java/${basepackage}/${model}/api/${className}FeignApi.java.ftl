@@ -74,7 +74,7 @@ public interface ${className}FeignApi {
     * @return 总条数
     */
     @GetMapping(value = "/count/by")
-    public Integer count(<#list pkFields as pkField>@RequestParam("${pkField.field}") ${pkField.fieldType} ${pkField.field}<#if pkField_has_next>,</#if></#list>);
+    Integer count(<#list pkFields as pkField>@RequestParam("${pkField.field}") ${pkField.fieldType} ${pkField.field}<#if pkField_has_next>,</#if></#list>);
 
     /**
     * 统计${className}信息数量
@@ -82,7 +82,7 @@ public interface ${className}FeignApi {
     * @return 总条数
     */
     @PostMapping(value = "/count")
-    public Integer count(@RequestBody Account account);
+    Integer count(@RequestBody Account account);
 
 
 

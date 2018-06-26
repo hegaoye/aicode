@@ -73,6 +73,19 @@ public class ${className}SVImpl implements ${className}SV {
 
 
     /**
+    * 查询${className}分页
+    *
+    * @param ${classNameLower}  对象
+    * @param offset 查询开始行
+    * @param limit  查询行数
+    * @return List<${className}>
+    */
+    @Override
+    public List<${className}> list(${className} ${classNameLower}, int offset, int limit) {
+        return ${classNameLower}DAO.list(${classNameLower}, new RowBounds(offset, limit));
+    }
+
+    /**
      * 查询${className}分页
      *
      <#list pkFields as pkField>* @param ${pkField.field}  ${pkField.notes}</#list>

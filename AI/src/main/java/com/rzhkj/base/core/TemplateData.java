@@ -38,6 +38,7 @@ public class TemplateData implements Serializable {
     public TemplateData() {
     }
 
+    //定义模板变量
     public TemplateData(Project project, MapClassTable classTable, List<MapClassTable> classes, List<MapFieldColumn> columns, List<MapFieldColumn> pkColumns, List<MapFieldColumn> notPkColumns) {
         this.projectName = project.getEnglishName();
         this.basePackage = project.getBasePackage();
@@ -48,7 +49,19 @@ public class TemplateData implements Serializable {
         this.clazz = classTable;
         this.tableName = classTable.getTableName();
         this.className = classTable.getClassName();
-        this.classNameLower = StringHelper.toJavaVariableName(classTable.getClassName());
+        for (MapFieldColumn mapFieldColumn : pkColumns) {
+            if (mapFieldColumn.getField().equalsIgnoreCase(classTable.getClassName())) {
+                this.classNameLower = StringHelper.toJavaVariableName(classTable.getClassName()) + "Obj";
+                break;
+            }
+        }
+        for (MapFieldColumn mapFieldColumn : notPkColumns) {
+            if (mapFieldColumn.getField().equalsIgnoreCase(classTable.getClassName())) {
+                this.classNameLower = StringHelper.toJavaVariableName(classTable.getClassName()) + "Obj";
+                break;
+            }
+        }
+//        this.classNameLower = StringHelper.toJavaVariableName(classTable.getClassName());
         this.notes = classTable.getNotes();
         this.classes = classes;
 

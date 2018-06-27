@@ -74,7 +74,7 @@ public class ${className}FeignApiImpl implements ${className}FeignApi {
     }
 
     @Override
-    public Integer count(@RequestBody Account account) {
+    public Integer count(@RequestBody ${className} ${classNameLower}) {
         return 0;
     }
     /**

@@ -169,7 +169,7 @@ public class ${className}Ctrl {
     })
     @PostMapping(value = "/count")
     @ResponseBody
-    public Integer count(Account account) {
+    public Integer count(${className} ${classNameLower}) {
         if(account==null){
             return ${classNameLower}SV.count();
         }else{

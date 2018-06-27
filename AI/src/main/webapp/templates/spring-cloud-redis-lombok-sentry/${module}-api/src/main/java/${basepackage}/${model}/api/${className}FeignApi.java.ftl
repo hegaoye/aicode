@@ -82,7 +82,7 @@ public interface ${className}FeignApi {
     * @return 总条数
     */
     @PostMapping(value = "/count")
-    Integer count(@RequestBody Account account);
+    Integer count(@RequestBody ${className} ${classNameLower});
 
 
 

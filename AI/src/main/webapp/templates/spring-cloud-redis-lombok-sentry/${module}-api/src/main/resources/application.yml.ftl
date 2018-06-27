@@ -1,6 +1,6 @@
 spring:
   application:
-    name: pps-cloud-consumer
+    name: ${projectName}-consumer
   output:
     ansi:
       enabled: always

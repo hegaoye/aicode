@@ -38,7 +38,7 @@ public class TemplateData implements Serializable {
     public TemplateData() {
     }
 
-    //定义模板变量
+    //TODO {定义模板变量}
     public TemplateData(Project project, MapClassTable classTable, List<MapClassTable> classes, List<MapFieldColumn> columns, List<MapFieldColumn> pkColumns, List<MapFieldColumn> notPkColumns) {
         this.projectName = project.getEnglishName();
         this.basePackage = project.getBasePackage();

@@ -134,16 +134,18 @@
                 </if>
             </where>
         </update>
+    </#list>
 
+    <#list pkFields as pkField>
         <!--根据主键更新 ${tableName} 的状态数据-->
         <update id="updateBy${pkField.field?cap_first}" parameterType="map">
             UPDATE `${tableName}`
             set state = ${r'#{state}'}
             where ${pkField.column}=<@mapperEl pkField.field/>
         </update>
-
-
     </#list>
+
+
 </#if>
 
     <!--根据任意条件删除${tableName}信息-->

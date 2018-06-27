@@ -55,6 +55,42 @@ public class ${className}SVImpl implements ${className}SV {
 
     </#list>
 
+    <#list pkFields as pkField>
+    /**
+    * 根据主键${pkField.field},oldStates 共同更新 ${className} 的状态到newState状态
+    *
+    * @param ${classNameLower} 对象
+    */
+    public void updateStateBy${pkField.field?cap_first}(${pkField.fieldType} ${pkField.field},${className}State newState,${className}State... oldStates){
+        if(${pkField.field}==null){
+            throw new ${className}Exception(BaseException.BaseExceptionEnum.Ilegal_Param);
+        }
+        if(newState==null){
+            throw new ${className}Exception(BaseException.BaseExceptionEnum.Ilegal_Param);
+        }
+        if(oldStates==null){
+            throw new ${className}Exception(BaseException.BaseExceptionEnum.Ilegal_Param);
+        }
+        ${classNameLower}DAO.updateStateBy${pkField.field?cap_first}(${pkField.field},newState,oldStates);
+    }
+    </#list>
+
+    <#list pkFields as pkField>
+    /**
+    * 根据主键${pkField.field} 更新 ${className} 的状态到另一个状态
+    *
+    * @param ${pkField.field} ${pkField.notes}
+    * @param state 状态
+    */
+    public void updateBy${pkField.field?cap_first}(${pkField.fieldType} ${pkField.field},${className}State state){
+            if(${pkField.field}==null){
+               throw new ${className}Exception(BaseException.BaseExceptionEnum.Ilegal_Param);
+            }
+          ${classNameLower}DAO.updateBy${pkField.field?cap_first}(${pkField.field},state);
+    }
+    </#list>
+
+
     /**
      * 删除对象${className}
      <#list pkFields as pkField>* @param ${pkField.field} ${pkField.notes}</#list>

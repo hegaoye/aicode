@@ -46,12 +46,11 @@ public   interface ${className}DAO {
 <#if (pkFields?size>0)>
     /**
      * 加载一个对象${className}
-     <#list pkFields as pkField>
-     *@param ${pkField.field} ${pkField.notes}
-     </#list>
+     * map参数为主键参数
+     * @param map <#list pkFields as pkField>${pkField.field} ${pkField.notes}<#if pkField_has_next>,</#if></#list>
      * @return ${className}
      */
-    ${className} load(<#list pkFields as pkField>@Param("${pkField.field}")${pkField.fieldType} ${pkField.field}<#if pkField_has_next>,</#if></#list>);
+    ${className} load(Map<String,Object> map);
 
 
     <#list pkFields as pkField>
@@ -63,14 +62,18 @@ public   interface ${className}DAO {
      */
      ${className} loadBy${pkField.field?cap_first}(@Param("${pkField.field}") ${pkField.fieldType} ${pkField.field});
     </#if>
+    </#list>
 
+    <#list pkFields as pkField>
     /**
     * 根据主键${pkField.field},oldStates 共同更新 ${className} 的状态到newState状态
     *
     * @param ${classNameLower} 对象
     */
     void updateStateBy${pkField.field?cap_first}(@Param("${pkField.field}") ${pkField.fieldType} ${pkField.field},@Param("newState") ${className}State newState,@Param("oldState") ${className}State... oldStates);
+    </#list>
 
+    <#list pkFields as pkField>
     /**
     * 根据主键${pkField.field} 更新 ${className} 的状态到另一个状态
     *
@@ -78,16 +81,7 @@ public   interface ${className}DAO {
     * @param state 状态
     */
     void updateBy${pkField.field?cap_first}(@Param("${pkField.field}") ${pkField.fieldType} ${pkField.field},@Param("state") ${className}State state);
-
     </#list>
-
-    /**
-    * 根据状态 更新对象${className}
-    *
-    * @param ${classNameLower} 对象
-    * @param states 状态数组（可以不传）
-    */
-    void update(${className} ${classNameLower},@Param("states") ${className}State... states);
 
     /**
      * 删除对象${className}

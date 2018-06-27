@@ -67,7 +67,9 @@ public class ${className}SVImpl implements ${className}SV {
     /**
     * 根据主键${pkField.field},oldStates 共同更新 ${className} 的状态到newState状态
     *
-    * @param ${classNameLower} 对象
+    * @param ${pkField.field} ${pkField.notes}
+    * @param newState 新状态
+    * @param oldStates 旧状态集合
     */
     public void updateStateBy${pkField.field?cap_first}(${pkField.fieldType} ${pkField.field},${className}State newState,${className}State... oldStates){
         if(${pkField.field}==null){

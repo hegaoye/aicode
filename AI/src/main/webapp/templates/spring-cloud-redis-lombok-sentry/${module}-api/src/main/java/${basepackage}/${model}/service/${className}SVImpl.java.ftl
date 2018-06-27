@@ -113,7 +113,7 @@ public class ${className}SVImpl {
 
 
     public int count(${className} ${classNameLower}) {
-        return ${classNameLower}FeignApi.count(account);
+        return ${classNameLower}FeignApi.count(${classNameLower});
     }
 
 

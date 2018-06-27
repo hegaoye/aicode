@@ -159,7 +159,7 @@ public class ${className}SVImpl implements ${className}SV {
 
     @Override
     public int count(${className} ${classNameLower}) {
-        return ${classNameLower}DAO.count(account);
+        return ${classNameLower}DAO.count(${classNameLower});
     }
 
     @Override

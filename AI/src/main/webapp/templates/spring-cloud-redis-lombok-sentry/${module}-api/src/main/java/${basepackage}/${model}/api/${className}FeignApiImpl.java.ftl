@@ -69,7 +69,7 @@ public class ${className}FeignApiImpl implements ${className}FeignApi {
 
 
     @Override
-    public Integer count(@RequestParam("id") Long id, @RequestParam("code") String code, @RequestParam("account") String account) {
+    public Integer count(<#list pkFields as pkField>@RequestParam("${pkField.field}") ${pkField.fieldType} ${pkField.field}<#if pkField_has_next>,</#if></#list>){
          return 0;
     }
 

@@ -7,12 +7,15 @@ import ${basePackage}.core.entity.Page;
 import ${basePackage}.core.exceptions.BaseException;
 import ${basePackage}.core.exceptions.${className}Exception;
 import ${basePackage}.${model}.dao.${className}DAO;
+import ${basePackage}.${model}.entity.${className}State;
 import ${basePackage}.${model}.entity.${className};
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import org.apache.ibatis.session.RowBounds;
 import com.baidu.fsg.uid.UidGenerator;
 
@@ -36,8 +39,13 @@ public class ${className}SVImpl implements ${className}SV {
     public ${className} load(<#list pkFields as field>${field.fieldType} ${field.field}<#if field_has_next>,</#if></#list>) {
            if(<#list pkFields as field>${field.field}==null<#if field_has_next>&&</#if></#list>){
                  throw new ${className}Exception(BaseException.BaseExceptionEnum.Ilegal_Param);
-            }
-            return ${classNameLower}DAO.load(<#list pkFields as field>${field.field}<#if field_has_next>,</#if></#list>);
+           }
+
+            Map<String,Object> param=new HashMap<>();
+            <#list pkFields as field>
+            param.put("${field.field}",${field.field});
+            </#list>
+            return ${classNameLower}DAO.load(param);
     }
     <#list pkFields as pkField>
     /**

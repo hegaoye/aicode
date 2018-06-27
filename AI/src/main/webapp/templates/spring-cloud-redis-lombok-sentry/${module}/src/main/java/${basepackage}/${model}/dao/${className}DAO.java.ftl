@@ -7,6 +7,9 @@ import org.apache.ibatis.session.RowBounds;
 import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Repository;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+
 import ${basePackage}.${model}.entity.${className}State;
 import ${basePackage}.${model}.entity.${className};
 

@@ -4,7 +4,8 @@
 package ${basePackage}.${model}.service;
 
 import java.util.List;
-
+import java.util.Map;
+import ${basePackage}.${model}.entity.${className}State;
 import ${basePackage}.${model}.entity.${className};
 
 /**

@@ -59,10 +59,6 @@ public class MapFieldColumn extends BaseEntity implements java.io.Serializable {
             this.fieldType = "java.lang.Long";
         } else {
             this.fieldType = DatabaseDataTypesUtils.getPreferredJavaType(this.sqlType);
-            this.checkDigit = DatabaseDataTypesUtils.isIntegerNumber(this.fieldType);
-            if (!this.checkDigit) {
-                this.checkDigit = DatabaseDataTypesUtils.isFloatNumber(this.fieldType);
-            }
         }
     }
 
@@ -77,6 +73,14 @@ public class MapFieldColumn extends BaseEntity implements java.io.Serializable {
 
     public boolean getCheckPk() {
         return isPrimaryKey.equals(YNEnum.Y.name()) ? true : false;
+    }
+
+    public boolean getCheckDigit() {
+        this.checkDigit = DatabaseDataTypesUtils.isIntegerNumber(this.fieldType);
+        if (!this.checkDigit) {
+            this.checkDigit = DatabaseDataTypesUtils.isFloatNumber(this.fieldType);
+        }
+        return checkDigit;
     }
 
 }

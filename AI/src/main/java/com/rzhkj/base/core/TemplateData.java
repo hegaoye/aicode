@@ -49,6 +49,7 @@ public class TemplateData implements Serializable {
         this.clazz = classTable;
         this.tableName = classTable.getTableName();
         this.className = classTable.getClassName();
+        this.classNameLower = StringHelper.toJavaVariableName(classTable.getClassName());
         for (MapFieldColumn mapFieldColumn : pkColumns) {
             if (mapFieldColumn.getField().equalsIgnoreCase(classTable.getClassName())) {
                 this.classNameLower = StringHelper.toJavaVariableName(classTable.getClassName()) + "Obj";
@@ -61,7 +62,6 @@ public class TemplateData implements Serializable {
                 break;
             }
         }
-//        this.classNameLower = StringHelper.toJavaVariableName(classTable.getClassName());
         this.notes = classTable.getNotes();
         this.classes = classes;
 

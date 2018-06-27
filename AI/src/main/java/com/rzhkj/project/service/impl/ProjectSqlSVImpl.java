@@ -53,7 +53,7 @@ public class ProjectSqlSVImpl extends BaseMybatisSVImpl<ProjectSql, Long> implem
         entity.setState(ProjectSqlStateEnum.Enable.name());
         String tsql = entity.getTsql();
         Map<String, Object> map = Maps.newHashMap();
-        map.put("projectCode", entity.getProjectCode());
+        map.put("code", entity.getProjectCode());
         Project project = projectDAO.load(map);
         String sqlHeader = "";
         //是否存在 drop  database  if  exists

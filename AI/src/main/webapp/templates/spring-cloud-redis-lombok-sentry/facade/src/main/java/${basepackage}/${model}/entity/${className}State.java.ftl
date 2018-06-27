@@ -23,9 +23,9 @@ public enum ${className}State implements java.io.Serializable {
     * @return
     */
     public static ${className}State getEnum(String stateName) {
-        for (${className}State ${classNameLower} : ${className}State.values()) {
-            if (${classNameLower}.name().equalsIgnoreCase(stateName)) {
-                return ${classNameLower};
+        for (${className}State ${classNameLower}State : ${className}State.values()) {
+            if (${classNameLower}State.name().equalsIgnoreCase(stateName)) {
+                return ${classNameLower}State;
             }
         }
         return null;

@@ -38,6 +38,7 @@ public class MapFieldColumn extends BaseEntity implements java.io.Serializable {
     private boolean checkDate;
     private boolean checkState;
     private boolean checkPk;
+    private boolean checkDigit = false;
 
     public MapFieldColumn() {
     }
@@ -54,10 +55,14 @@ public class MapFieldColumn extends BaseEntity implements java.io.Serializable {
 
     public void toJava() {
         this.field = StringHelper.toJavaVariableName(this.column);
-        if(this.field.equals("id")){
+        if (this.field.equals("id")) {
             this.fieldType = "java.lang.Long";
-        }else {
+        } else {
             this.fieldType = DatabaseDataTypesUtils.getPreferredJavaType(this.sqlType);
+            this.checkDigit = DatabaseDataTypesUtils.isIntegerNumber(this.fieldType);
+            if (!this.checkDigit) {
+                this.checkDigit = DatabaseDataTypesUtils.isFloatNumber(this.fieldType);
+            }
         }
     }
 

@@ -84,7 +84,7 @@ public class ${className}Ctrl {
     @GetMapping(value = "/load/{${pkField.field}}")
     @ResponseBody
     public BeanRet loadBy${pkField.field?cap_first}(@PathVariable ${pkField.fieldType} ${pkField.field}) {
-        <#if pkField.field!='id'>
+        <#if pkField.field!='id' && !pkField.checkDigit>
         if(StringUtils.isEmpty(${pkField.field})){
             return BeanRet.create(BaseException.BaseExceptionEnum.Empty_Param);
         }
@@ -171,7 +171,7 @@ public class ${className}Ctrl {
     @ResponseBody
     public BeanRet build(@ApiIgnore ${className} ${classNameLower}) {
         <#list fields as field>
-            <#if field.field!='id'  && !field.checkDate>
+            <#if field.field!='id'  && !field.checkDate && !field.checkDigit>
         if (StringUtils.isEmpty(${classNameLower}.get${field.field?cap_first}())) {
            return BeanRet.create(BaseException.BaseExceptionEnum.Empty_Param);
         }
@@ -197,7 +197,7 @@ public class ${className}Ctrl {
     @ResponseBody
     public BeanRet modify(@ApiIgnore ${className} ${classNameLower}) {
     <#list fields as field>
-        <#if field.field!='id'  && !field.checkDate>
+        <#if field.field!='id'  && !field.checkDate && !field.checkDigit>
         if (StringUtils.isEmpty(${classNameLower}.get${field.field?cap_first}())) {
          return BeanRet.create(BaseException.BaseExceptionEnum.Empty_Param);
         }

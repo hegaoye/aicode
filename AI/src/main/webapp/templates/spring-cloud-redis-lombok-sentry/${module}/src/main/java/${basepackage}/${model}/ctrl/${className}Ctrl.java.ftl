@@ -193,7 +193,7 @@ public class ${className}Ctrl {
     })
     @PostMapping("/build")
     @ResponseBody
-    public ${className} build(@ApiIgnore ${className} ${classNameLower}) {
+    public ${className} build(@RequestBody @ApiIgnore ${className} ${classNameLower}) {
         ${classNameLower}SV.save(${classNameLower});
         return ${classNameLower};
     }

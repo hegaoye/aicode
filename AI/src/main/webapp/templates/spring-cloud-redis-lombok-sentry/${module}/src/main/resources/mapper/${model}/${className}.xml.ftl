@@ -186,7 +186,7 @@
             </if>
             </#list>
             <if test="state!=null">
-                AND state =#{state}
+                AND state =${r'#{state}'}
             </if>
         </select>
 
@@ -201,7 +201,7 @@
             </if>
             </#list>
             <if test="state!=null">
-                AND state =#{state}
+                AND state =${r'#{state}'}
             </if>
         </select>
 </#if>

@@ -34,7 +34,7 @@ public interface ${className}FeignApi {
      * @param ${pkField.field} ${pkField.notes}
      * @return BeanRet
      */
-    @GetMapping(value = "/${className?uncap_first}/load/${pkField.field}")
+    @GetMapping(value = "/${className?uncap_first}/load/${pkField.field}/{${pkField.field}}")
     ${className} loadBy${pkField.field?cap_first}(@RequestParam("${pkField.field}") ${pkField.fieldType} ${pkField.field});
 
     </#list>

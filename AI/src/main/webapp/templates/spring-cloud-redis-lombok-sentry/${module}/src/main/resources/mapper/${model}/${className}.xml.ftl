@@ -62,11 +62,11 @@
     <#list columns as column>
     ${column.column} <#if column_has_next>,</#if>
     </#list>
-        ) VALUES (
+        ) VALUES
         <foreach item='item' index='index' collection='list' separator=','>
             (
         <#list fields as field>
-            <@mapperEl field.field/> <#if field_has_next>,</#if>
+        ${r'#{item.'}${field.field}${r'}'}<#if field_has_next>,</#if>
         </#list>
             )
         </foreach>

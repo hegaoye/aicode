@@ -81,7 +81,7 @@ public class ${className}Ctrl {
     @ApiImplicitParams({
         @ApiImplicitParam(name = "${pkField.field}", value = "${pkField.notes}",dataType = "${pkField.fieldType}", paramType = "path")
     })
-    @GetMapping(value = "/load/{${pkField.field}}")
+    @GetMapping(value = "/load/${pkField.field}/{${pkField.field}}")
     @ResponseBody
     public BeanRet loadBy${pkField.field?cap_first}(@PathVariable ${pkField.fieldType} ${pkField.field}) {
         <#if pkField.field!='id' && !pkField.checkDigit>

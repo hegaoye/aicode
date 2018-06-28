@@ -6,6 +6,7 @@ dependencies {
     compile('org.springframework.cloud:spring-cloud-starter-eureka-server')
     compile('org.springframework.cloud:spring-cloud-starter-hystrix')
     compile('org.springframework.cloud:spring-cloud-starter-hystrix-dashboard')
+    compile('com.alibaba:druid-spring-boot-starter:1.1.10')
     compile fileTree(dir: '../libs', include: ['*.jar'])
     compile project(':core')
     compile project(':base-facade')

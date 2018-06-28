@@ -1,124 +1,95 @@
 package ${basePackage}.core.base;
 
-import ${basePackage}.core.entity.Page;
 import ${basePackage}.core.exceptions.BaseException;
-import ${basePackage}.core.tools.redis.RedisUtils;
-import org.apache.commons.collections.map.HashedMap;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.data.redis.core.RedisTemplate;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.session.RowBounds;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
 
-import javax.annotation.Resource;
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
 /**
+ * 基础接口实现
+ *
  * @author lixin hegaoye@qq.com
- *         基础接口实现
  */
 @Transactional
+@Slf4j
 public abstract class BaseSVImpl<E, PK extends Serializable> implements BaseSV<E, PK> {
-    protected final static Logger logger = LoggerFactory.getLogger(BaseSVImpl.class);
-
-    @Resource
-    protected RedisTemplate<String, Object> redisTemplate;
-    @Resource
-    protected RedisUtils redisUtils;
 
     /**
      * 获得dao对象
      *
      * @return BaseDAO
      */
-    protected abstract BaseDAO getBaseMybatisDAO();//获得当前dao对象
+    protected abstract BaseDAO getBaseDAO();//获得当前dao对象
+
 
     /**
      * 根据id查询实体
      *
-     * @param id
-     * @return
-     * @throws BaseException
-     */
-    @Transactional(readOnly = true)
-    @Override
-    public E load(PK id) throws BaseException {
-        if (id == null) {
-            throw new BaseException("PK 为0 或着为null异常！");
-        }
-        E e = (E) getBaseMybatisDAO().load(id);
-        return e;
-    }
-
-
-    /**
-     * 条件查询实体
-     *
-     * @param param
-     * @return
+     * @param param 实体的属性
+     * @return E 实体
      * @throws BaseException
      */
     @Transactional(readOnly = true)
     @Override
     public E load(Map<String, Object> param) throws BaseException {
-        Assert.notEmpty(param, "查询参数为空！");
-        E e = (E) getBaseMybatisDAO().load(param);
+        E e = (E) getBaseDAO().load(param);
         return e;
     }
 
     /**
      * 查询所有数据
      *
-     * @return
-     * @throws BaseException
-     */
-    @Transactional(readOnly = true)
-    @Override
-    public List<E> getAll() throws BaseException {
-        return getBaseMybatisDAO().query(new HashedMap());
-    }
-
-    /**
-     * 分页查询
-     *
-     * @param page 分页对象
      * @return List<E>
      * @throws BaseException
      */
-
     @Transactional(readOnly = true)
-    public Page<E> getList(Page<E> page) throws BaseException {
-        if (page == null) {
-            throw new BaseException("page 为空对象！查询失败！");
-        }
-        int i = getBaseMybatisDAO().count(page.getParams());
-        page.setTotalRow(i);
-        List<E> list = getBaseMybatisDAO().query(page.getParams(), page.genRowStart(), page.getPageSize());
-        page.setVoList(list);
-        return page;
+    @Override
+    public List<E> listAll() throws BaseException {
+        return getBaseDAO().list(new HashMap());
     }
 
 
     /**
-     * 根据条件查询
+     * 根据条件查询 集合
      *
-     * @param map
-     * @return
+     * @param map 对象类型的参数
+     * @return List<E>
      * @throws BaseException
-     * @remark 根据条件查询
      */
     @Transactional(readOnly = true)
     @Override
-    public List<E> queryList(Map<String, Object> map) throws BaseException {
-        List<E> list = getBaseMybatisDAO().query(map);
+    public List<E> list(Map<String, Object> map) throws BaseException {
+        List<E> list = getBaseDAO().list(map);
         return list;
     }
 
     /**
-     * 根据id判断是插入还是更新
-     * 更新或保存
+     * 根据条件查询进行分页
+     *
+     * @param map    对象类型的参数
+     * @param offset 开始行
+     * @param limit  步长
+     * @return List<E>
+     * @throws BaseException
+     */
+    @Override
+    public List<E> list(Map<String, Object> map, int offset, int limit) throws BaseException {
+        return getBaseDAO().list(map, new RowBounds(offset, limit));
+    }
+
+    @Override
+    public int count(Map<String, Object> map) {
+        return getBaseDAO().count(map);
+    }
+
+    /**
+     * 保存或者更新实体
      *
      * @param entity 实体
      * @throws BaseException
@@ -128,68 +99,37 @@ public abstract class BaseSVImpl<E, PK extends Serializable> implements BaseSV<E
         if (entity == null) {
             throw new BaseException("对象为空异常！");
         }
-        getBaseMybatisDAO().insertOrUpdate(entity);
+
+        if (((BaseEntity) entity).getId() == null) {
+            getBaseDAO().insert(entity);
+        } else {
+            getBaseDAO().update(entity);
+        }
     }
 
 
     /**
-     * 保存
+     * 数据保存
      *
      * @param entity 实体
      * @throws BaseException
      */
     @Override
     public void save(E entity) throws BaseException {
-        getBaseMybatisDAO().insert(entity);
+        getBaseDAO().insert(entity);
     }
 
 
     /**
-     * 更新
+     * 数据更新
      *
      * @param entity 实体
      * @throws BaseException
      */
     @Override
-    public void update(E entity) throws BaseException {
-        getBaseMybatisDAO().update(entity);
+    public void modify(E entity) throws BaseException {
+        getBaseDAO().update(entity);
     }
 
-    /**
-     * 根据id进行删除数据
-     *
-     * @param id 对象id
-     * @throws BaseException
-     */
-    @Override
-    public void deleteById(PK id) throws BaseException {
-        getBaseMybatisDAO().delete(id);
-    }
-
-    /**
-     * 批量删除信息
-     *
-     * @param ids ids 集合
-     * @throws BaseException
-     * @remark 批量删除信息
-     */
-    @Override
-    public void deleteByIds(List<Long> ids) throws BaseException {
-        getBaseMybatisDAO().batchDelete(ids);
-    }
-
-    /**
-     * 判断是否唯一
-     *
-     * @param entity              实体
-     * @param uniquePropertyNames 判断属性名称
-     * @return boolean
-     * @throws BaseException
-     */
-    @Transactional(readOnly = true)
-    @Override
-    public boolean isUnique(E entity, String uniquePropertyNames) throws BaseException {
-        return getBaseMybatisDAO().isUnique(entity, uniquePropertyNames);
-    }
 
 }

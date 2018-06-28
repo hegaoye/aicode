@@ -172,6 +172,38 @@
             where ${pkfield.column} = <@mapperEl pkfield.field/>
         </select>
     </#list>
+
+
+        <!--查询一条${tableName} countByPk  通过${pkfield.field} -->
+        <select id="listByPk" resultMap="rs_base">
+            SELECT
+            <include refid="columns"/>
+            FROM `${tableName}`
+            where
+            <#list pkFields as pkfield>
+            <if test="${pkfield.field}!=null">
+            And ${pkfield.column} = <@mapperEl pkfield.field/>
+            </if>
+            </#list>
+            <if test="state!=null">
+                AND state =#{state}
+            </if>
+        </select>
+
+        <!--查询一条${tableName} countByPk  通过${pkfield.field} -->
+        <select id="countByPk" resultType="long">
+            SELECT count(1)
+            FROM `${tableName}`
+            where
+            <#list pkFields as pkfield>
+            <if test="${pkfield.field}!=null">
+            And ${pkfield.column} = <@mapperEl pkfield.field/>
+            </if>
+            </#list>
+            <if test="state!=null">
+                AND state =#{state}
+            </if>
+        </select>
 </#if>
 
 
@@ -189,7 +221,7 @@
         <include refid="where"/>
 
         <if test="sortColumns!=null and sortColumns!=''">
-            ORDER BY ${r'#{sortColumns}'}
+            ORDER BY ${r'${sortColumns}'}
         </if>
     </select>
 

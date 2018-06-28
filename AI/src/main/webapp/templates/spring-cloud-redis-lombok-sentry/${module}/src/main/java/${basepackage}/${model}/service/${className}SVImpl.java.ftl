@@ -9,6 +9,8 @@ import ${basePackage}.core.exceptions.${className}Exception;
 import ${basePackage}.${model}.dao.${className}DAO;
 import ${basePackage}.${model}.entity.${className}State;
 import ${basePackage}.${model}.entity.${className};
+import ${basePackage}.core.base.BaseDAO;
+import ${basePackage}.core.base.BaseSVImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,7 +23,7 @@ import com.baidu.fsg.uid.UidGenerator;
 
 @Service("${classNameLower}SV")
 @Slf4j
-public class ${className}SVImpl implements ${className}SV {
+public class ${className}SVImpl extends BaseSVImpl implements ${className}SV {
 
     @Autowired
     private ${className}DAO ${classNameLower}DAO;
@@ -29,6 +31,10 @@ public class ${className}SVImpl implements ${className}SV {
     @Resource
     private UidGenerator uidGenerator;
 
+    @Override
+    protected BaseDAO getBaseDAO() {
+        return ${classNameLower}DAO;
+    }
 <#if (pkFields?size>0)>
     /**
      * 加载一个对象${className}
@@ -111,24 +117,16 @@ public class ${className}SVImpl implements ${className}SV {
             if(<#list pkFields as field>${field.field}==null<#if field_has_next>&&</#if></#list>){
                 throw new ${className}Exception(BaseException.BaseExceptionEnum.Ilegal_Param);
             }
-            ${classNameLower}DAO.delete(<#list pkFields as pkField>${pkField.field}<#if pkField_has_next>,</#if></#list>);
+            Map<String,Object> param=new HashMap<>();
+            <#list pkFields as pkField>
+            param.put("${pkField.field}",${pkField.field});
+            </#list>
+            ${classNameLower}DAO.delete(param);
     }
 
 </#if>
 
 
-    /**
-    * 查询${className}分页
-    *
-    * @param ${classNameLower}  对象
-    * @param offset 查询开始行
-    * @param limit  查询行数
-    * @return List<${className}>
-    */
-    @Override
-    public List<${className}> list(${className} ${classNameLower}, int offset, int limit) {
-        return ${classNameLower}DAO.list(${classNameLower}, new RowBounds(offset, limit));
-    }
 
     /**
      * 查询${className}分页
@@ -147,48 +145,20 @@ public class ${className}SVImpl implements ${className}SV {
             if (limit < 0) {
               limit = Page.limit;
             }
-
-            return ${classNameLower}DAO.list(<#list pkFields as pkField>${pkField.field}<#if pkField_has_next>,</#if></#list>,new RowBounds(offset, limit));
+            Map<String,Object> param=new HashMap<>();
+            <#list pkFields as pkField>
+            param.put("${pkField.field}",${pkField.field});
+            </#list>
+            return ${classNameLower}DAO.list(param,new RowBounds(offset, limit));
     }
 
     @Override
     public int count(<#list pkFields as pkField>${pkField.fieldType} ${pkField.field}<#if pkField_has_next>,</#if></#list>) {
-            return ${classNameLower}DAO.count(<#list pkFields as pkField>${pkField.field}<#if pkField_has_next>,</#if></#list>);
-    }
-
-
-    @Override
-    public int count(${className} ${classNameLower}) {
-        return ${classNameLower}DAO.count(${classNameLower});
-    }
-
-    @Override
-    public int count() {
-        return ${classNameLower}DAO.count();
-    }
-
-    /**
-    * 保存
-    *
-    * @param ${classNameLower} 实体
-    * @throws BaseException
-    */
-    @Override
-    public void save(${className} ${classNameLower}) {
-        if(${classNameLower}==null){ throw new ${className}Exception(BaseException.BaseExceptionEnum.Ilegal_Param);}
-        ${classNameLower}DAO.insert(${classNameLower});
-    }
-
-    /**
-    * 更新
-    *
-    * @param ${classNameLower} 实体
-    * @throws BaseException
-    */
-    @Override
-    public void modify(${className} ${classNameLower}) {
-        if(${classNameLower}==null){ throw new ${className}Exception(BaseException.BaseExceptionEnum.Ilegal_Param);}
-        ${classNameLower}DAO.update(${classNameLower});
+            Map<String,Object> param=new HashMap<>();
+            <#list pkFields as pkField>
+            param.put("${pkField.field}",${pkField.field});
+            </#list>
+            return ${classNameLower}DAO.count(param);
     }
 
 }

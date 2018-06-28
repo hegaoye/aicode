@@ -1,6 +1,5 @@
 package ${basePackage}.core.base;
 
-import ${basePackage}.core.entity.Page;
 import ${basePackage}.core.exceptions.BaseException;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,25 +30,14 @@ public interface BaseSV<E, PK extends Serializable> {
      * @throws BaseException
      */
     @Transactional(readOnly = true)
-    void update(E entity) throws BaseException;
+    void modify(E entity) throws BaseException;
 
 
     /**
      * 根据id查询实体
      *
-     * @param id
-     * @return
-     * @throws BaseException
-     */
-    @Transactional(readOnly = true)
-    E load(PK id) throws BaseException;
-
-
-    /**
-     * 根据id查询实体
-     *
-     * @param param
-     * @return
+     * @param param 实体的属性
+     * @return E 实体
      * @throws BaseException
      */
     @Transactional(readOnly = true)
@@ -58,36 +46,40 @@ public interface BaseSV<E, PK extends Serializable> {
     /**
      * 查询所有数据
      *
-     * @return
+     * @return List<E>
      * @throws BaseException
      */
-    List<E> getAll() throws BaseException;
+    List<E> listAll() throws BaseException;
+
 
     /**
-     * 分页查询
+     * 根据条件查询 集合
      *
-     * @param page 分页对象
+     * @param map 对象类型的参数
      * @return List<E>
      * @throws BaseException
      */
     @Transactional(readOnly = true)
-    Page<E> getList(Page<E> page) throws BaseException;
+    List<E> list(Map<String, Object> map) throws BaseException;
 
 
     /**
-     * @author 立坤 更新于2017.07.21
-     * @remark 根据条件查询
+     * 根据条件查询进行分页
      *
-     * @param map
-     * @return
+     * @param map    对象类型的参数
+     * @param offset 开始行
+     * @param limit  步长
+     * @return List<E>
      * @throws BaseException
      */
     @Transactional(readOnly = true)
-    List<E> queryList(Map<String, Object> map) throws BaseException;
+    List<E> list(Map<String, Object> map, int offset, int limit) throws BaseException;
+
+    int count(Map<String, Object> map);
 
 
     /**
-     * 根据id判断是插入还是更新
+     * 保存或者更新实体
      *
      * @param entity 实体
      * @throws BaseException
@@ -96,35 +88,4 @@ public interface BaseSV<E, PK extends Serializable> {
     void saveOrUpdate(E entity) throws BaseException;
 
 
-
-    /**
-     * 根据id进行删除数据
-     *
-     * @param id 对象id
-     * @throws BaseException
-     */
-    @Transactional(readOnly = true)
-    void deleteById(PK id) throws BaseException;
-
-    /**
-     * @author 立坤 更新于2017.07.21
-     * @remark 批量删除信息
-     *
-     * @param ids
-     * @throws BaseException
-     */
-    @Transactional(readOnly = true)
-    void deleteByIds(List<Long> ids) throws BaseException;
-
-    /**
-     * 判断是否唯一
-     *
-     * @param entity              实体
-     * @param uniquePropertyNames 判断属性名称
-     * @return boolean
-     * @throws BaseException
-     */
-
-    @Transactional(readOnly = true)
-    boolean isUnique(E entity, String uniquePropertyNames) throws BaseException;
 }

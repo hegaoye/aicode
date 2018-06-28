@@ -174,7 +174,7 @@
     </#list>
 
 
-        <!--查询一条${tableName} countByPk  通过${pkfield.field} -->
+        <!--查询一条${tableName} countByPk -->
         <select id="listByPk" resultMap="rs_base">
             SELECT
             <include refid="columns"/>
@@ -190,7 +190,7 @@
             </if>
         </select>
 
-        <!--查询一条${tableName} countByPk  通过${pkfield.field} -->
+        <!--查询一条${tableName} countByPk-->
         <select id="countByPk" resultType="long">
             SELECT count(1)
             FROM `${tableName}`

@@ -31,7 +31,7 @@ import ${basePackage}.${model}.service.${className}SVImpl;
  * @author ${author}
  */
 @RestController
-@RequestMapping("/${classNameLower}")
+@RequestMapping("/${className?uncap_first}")
 @Slf4j
 @Api(value = "${notes}控制器", description = "${notes}控制器")
 public class ${className}Ctrl {

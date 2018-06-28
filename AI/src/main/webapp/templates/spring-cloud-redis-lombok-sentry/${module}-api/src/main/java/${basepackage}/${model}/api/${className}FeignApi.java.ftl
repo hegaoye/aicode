@@ -23,7 +23,7 @@ public interface ${className}FeignApi {
     </#list>
      * @return BeanRet
      */
-    @GetMapping(value = "/${classNameLower}/load")
+    @GetMapping(value = "/${className?uncap_first}/load")
     ${className} load(<#list pkFields as pkField>@RequestParam("${pkField.field}") ${pkField.fieldType} ${pkField.field}<#if pkField_has_next>,</#if></#list>);
 
     <#list pkFields as pkField>
@@ -34,7 +34,7 @@ public interface ${className}FeignApi {
      * @param ${pkField.field} ${pkField.notes}
      * @return BeanRet
      */
-    @GetMapping(value = "/${classNameLower}/load/${pkField.field}")
+    @GetMapping(value = "/${className?uncap_first}/load/${pkField.field}")
     ${className} loadBy${pkField.field?cap_first}(@RequestParam("${pkField.field}") ${pkField.fieldType} ${pkField.field});
 
     </#list>
@@ -43,7 +43,7 @@ public interface ${className}FeignApi {
      *
      * @return BeanRet
      */
-    @DeleteMapping("/${classNameLower}/delete")
+    @DeleteMapping("/${className?uncap_first}/delete")
     void delete(<#list pkFields as pkField>@RequestParam("${pkField.field}") ${pkField.fieldType} ${pkField.field}<#if pkField_has_next>,</#if></#list>);
 </#if>
 
@@ -53,8 +53,8 @@ public interface ${className}FeignApi {
      *
      * @return 分页对象
      */
-    @PostMapping(value = "/${classNameLower}/list")
-    List<${className}> list(@RequestBody ${className} ${classNameLower},@RequestParam("curPage") int curPage,@RequestParam("pageSize") int pageSize);
+    @PostMapping(value = "/${className?uncap_first}/list")
+    List<${className}> list(@RequestBody ${className} ${className?uncap_first},@RequestParam("curPage") int curPage,@RequestParam("pageSize") int pageSize);
 
 
     /**
@@ -62,7 +62,7 @@ public interface ${className}FeignApi {
      *
      * @return 分页对象
      */
-    @GetMapping(value = "/${classNameLower}/list/by")
+    @GetMapping(value = "/${className?uncap_first}/list/by")
     List<${className}> listByPk(<#list pkFields as pkField>@RequestParam("${pkField.field}") ${pkField.fieldType} ${pkField.field},</#list>@RequestParam("curPage") int curPage,@RequestParam("pageSize") int pageSize);
 
 
@@ -73,7 +73,7 @@ public interface ${className}FeignApi {
     *
     * @return 总条数
     */
-    @GetMapping(value = "/${classNameLower}/count/by")
+    @GetMapping(value = "/${className?uncap_first}/count/by")
     Integer count(<#list pkFields as pkField>@RequestParam("${pkField.field}") ${pkField.fieldType} ${pkField.field}<#if pkField_has_next>,</#if></#list>);
 
     /**
@@ -81,8 +81,8 @@ public interface ${className}FeignApi {
     *
     * @return 总条数
     */
-    @PostMapping(value = "/${classNameLower}/count")
-    Integer count(@RequestBody ${className} ${classNameLower});
+    @PostMapping(value = "/${className?uncap_first}/count")
+    Integer count(@RequestBody ${className} ${className?uncap_first});
 
 
 
@@ -91,8 +91,8 @@ public interface ${className}FeignApi {
      *
      * @return BeanRet
      */
-    @PostMapping("/${classNameLower}/build")
-    ${className} build(@RequestBody ${className} ${classNameLower});
+    @PostMapping("/${className?uncap_first}/build")
+    ${className} build(@RequestBody ${className} ${className?uncap_first});
 
 
     /**
@@ -100,8 +100,8 @@ public interface ${className}FeignApi {
      *
      * @return BeanRet
      */
-    @PutMapping("/${classNameLower}/modify")
-    ${className} modify(@RequestBody ${className} ${classNameLower});
+    @PutMapping("/${className?uncap_first}/modify")
+    ${className} modify(@RequestBody ${className} ${className?uncap_first});
 
 
 

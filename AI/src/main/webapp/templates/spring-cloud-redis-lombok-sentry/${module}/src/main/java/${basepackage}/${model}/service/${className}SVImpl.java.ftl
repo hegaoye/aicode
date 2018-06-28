@@ -127,6 +127,50 @@ public class ${className}SVImpl extends BaseSVImpl implements ${className}SV {
 </#if>
 
 
+    /**
+    * 查询${className}分页
+    *
+    * @param ${classNameLower}  对象
+    * @param offset 查询开始行
+    * @param limit  查询行数
+    * @return List<${className}>
+    */
+    @Override
+    public List<${className}> list(${className} ${classNameLower}, int offset, int limit) {
+            if (offset < 0) {
+               offset = 0;
+            }
+
+            if (limit < 0) {
+               limit = Page.limit;
+            }
+
+            Map<String, Object> map = null;
+            if (${classNameLower} != null) {
+               map = JSON.parseObject(JSON.toJSONString(${classNameLower}));
+            } else {
+               map = new HashMap<>();
+            }
+        return ${classNameLower}DAO.list(map, new RowBounds(offset, limit));
+    }
+
+     int count(${className} ${classNameLower}){
+        if (offset < 0) {
+           offset = 0;
+        }
+
+        if (limit < 0) {
+           limit = Page.limit;
+        }
+
+        Map<String, Object> map = null;
+        if (${classNameLower} != null) {
+           map = JSON.parseObject(JSON.toJSONString(${classNameLower}));
+        } else {
+           map = new HashMap<>();
+        }
+       return ${classNameLower}DAO.count(map);
+     }
 
     /**
      * 查询${className}分页

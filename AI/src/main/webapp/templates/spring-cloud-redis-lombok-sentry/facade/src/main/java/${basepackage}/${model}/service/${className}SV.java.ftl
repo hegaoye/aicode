@@ -66,6 +66,18 @@ public interface ${className}SV extends BaseSV {
 </#if>
 
 
+
+    /**
+     * 查询${className}分页
+     *
+     * @param ${classNameLower}  ${notes}
+     * @param offset 查询开始行
+     * @param limit  查询行数
+     * @return List<${className}>
+     */
+     List<${className}> list(${className} ${classNameLower}, int offset, int limit);
+     int count(${className} ${classNameLower});
+
      /**
      * 查询${className}分页
      *
@@ -76,6 +88,7 @@ public interface ${className}SV extends BaseSV {
      */
      List<${className}> list(<#list pkFields as pkField>${pkField.fieldType} ${pkField.field},</#list>int offset, int limit);
      int count(<#list pkFields as pkField>${pkField.fieldType} ${pkField.field}<#if pkField_has_next>,</#if></#list>);
+
 
 
 }

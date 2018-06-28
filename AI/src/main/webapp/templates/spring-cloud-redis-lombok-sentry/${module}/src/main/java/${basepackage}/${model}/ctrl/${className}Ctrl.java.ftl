@@ -104,9 +104,9 @@ public class ${className}Ctrl {
     @ApiImplicitParam(name = "${field.field}", value = "${field.notes}", paramType = "query")<#if field_has_next>,</#if>
     </#list>
     })
-    @GetMapping(value = "/list")
+    @PostMapping(value = "/list")
     @ResponseBody
-    public List<${className}> list(@ApiIgnore ${className} ${classNameLower},Integer curPage,Integer pageSize) {
+    public List<${className}> list(@RequestBody @ApiIgnore ${className} ${classNameLower},Integer curPage,Integer pageSize) {
         Page<${className}> page=new Page<${className}>(pageSize,curPage);
         List<${className}> ${classNameLower}s = ${classNameLower}SV.list(${classNameLower},page.genRowStart(),page.getPageSize());
         int total = ${classNameLower}SV.count(${classNameLower});
@@ -170,7 +170,7 @@ public class ${className}Ctrl {
     })
     @PostMapping(value = "/count")
     @ResponseBody
-    public Integer count(${className} ${classNameLower}) {
+    public Integer count(@RequestBody ${className} ${classNameLower}) {
         if(${classNameLower}==null){
             return ${classNameLower}SV.count(new HashMap());
         }else{

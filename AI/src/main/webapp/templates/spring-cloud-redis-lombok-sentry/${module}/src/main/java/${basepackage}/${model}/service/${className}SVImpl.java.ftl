@@ -12,6 +12,7 @@ import ${basePackage}.${model}.entity.${className};
 import ${basePackage}.core.base.BaseDAO;
 import ${basePackage}.core.base.BaseSVImpl;
 import lombok.extern.slf4j.Slf4j;
+import com.alibaba.fastjson.JSON;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
@@ -154,15 +155,7 @@ public class ${className}SVImpl extends BaseSVImpl implements ${className}SV {
         return ${classNameLower}DAO.list(map, new RowBounds(offset, limit));
     }
 
-     int count(${className} ${classNameLower}){
-        if (offset < 0) {
-           offset = 0;
-        }
-
-        if (limit < 0) {
-           limit = Page.limit;
-        }
-
+    public  int count(${className} ${classNameLower}){
         Map<String, Object> map = null;
         if (${classNameLower} != null) {
            map = JSON.parseObject(JSON.toJSONString(${classNameLower}));

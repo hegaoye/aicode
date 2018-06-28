@@ -1,2 +1,8 @@
 apply plugin: 'java'
 apply plugin: 'idea'
+dependencies {
+    compile project(':core')
+    compile project(':base-facade')
+    compile project(':base-sv')
+    testCompile('org.springframework.boot:spring-boot-starter-test')
+}

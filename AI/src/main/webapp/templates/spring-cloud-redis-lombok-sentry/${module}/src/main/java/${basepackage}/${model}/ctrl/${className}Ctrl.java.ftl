@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.HashMap;
 
 import ${basePackage}.core.entity.BeanRet;
 import ${basePackage}.core.entity.Page;
@@ -171,7 +172,7 @@ public class ${className}Ctrl {
     @ResponseBody
     public Integer count(${className} ${classNameLower}) {
         if(${classNameLower}==null){
-            return ${classNameLower}SV.count();
+            return ${classNameLower}SV.count(new HashMap());
         }else{
             return ${classNameLower}SV.count(${classNameLower});
         }

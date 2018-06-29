@@ -1,0 +1,27 @@
+server:
+  port: 8765
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${spring.cloud.client.ipAddress}:${spring.application.instance_id:${server.port}}
+    ip-address: localhost
+
+spring:
+  application:
+    name: pps-cloud-config
+  cloud:
+    config:
+      server:
+        git:
+          uri: https://gitee.com/helixin/spring-cloud-config.git
+          searchPaths: "local"
+      label: "master"
+#security:
+#  basic:
+#    enabled: false
+#  user:
+#    name: root
+#    password: booszy

@@ -1,0 +1,23 @@
+#需要时更改文件名，将application.yml 中留下简单配置接口，剩余内容可以放在服务器上或者git仓库中
+spring:
+  application:
+    name: pps-cloud-provider
+  cloud:
+    config:
+      discovery:
+        enabled: true
+        service-id: pps-cloud-config
+      fail-fast: true
+#      username: root
+#      password: booszy
+      profile: test
+
+#访问注册中心配置
+eureka:
+   instance:
+      status-page-url: http://localhost:${server.port}/swagger-ui.html
+      lease-expiration-duration-in-seconds: 5 #心跳更新时间5s
+      lease-renewal-interval-in-seconds: 5 #心跳过期时间5s
+   client:
+     serviceUrl:
+       defaultZone: http://localhost:8761/eureka/

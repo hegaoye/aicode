@@ -15,7 +15,7 @@ spring:
 #访问注册中心配置
 eureka:
    instance:
-      status-page-url: http://localhost:${server.port}/swagger-ui.html
+      status-page-url: http://localhost:${r"${"}server.port}/swagger-ui.html
       lease-expiration-duration-in-seconds: 5 #心跳更新时间5s
       lease-renewal-interval-in-seconds: 5 #心跳过期时间5s
    client:

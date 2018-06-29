@@ -23,6 +23,7 @@ import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
  * http://localhost:8765/consumer-dev.properties
  * http://localhost:8765/consumer/dev
  *
+ *
  * @author eacdy
  */
 @SpringBootApplication(exclude = DataSourceAutoConfiguration.class)

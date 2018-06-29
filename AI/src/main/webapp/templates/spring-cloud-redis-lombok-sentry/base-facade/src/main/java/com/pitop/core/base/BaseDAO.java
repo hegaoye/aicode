@@ -44,7 +44,7 @@ public interface BaseDAO<E, PK extends Serializable> {
      * @param entity 实体
      * @return 返回更细的实体
      */
-    E update(E entity);
+    void update(E entity);
 
     /**
      * 更新操作

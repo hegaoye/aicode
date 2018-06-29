@@ -111,7 +111,7 @@
                     </foreach>
                 </if>
             <#elseif field.checkPk>
-                <if test="${field.field}!=null and ${field.field}!=''">
+                <if test="${field.field}!=null">
                     AND ${field.column} = <@mapperEl field.field/>
                 </if>
             </#if>

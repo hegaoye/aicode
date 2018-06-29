@@ -11,6 +11,7 @@ import ${basePackage}.${model}.entity.${className}State;
 import ${basePackage}.${model}.entity.${className};
 import ${basePackage}.core.base.BaseDAO;
 import ${basePackage}.core.base.BaseSVImpl;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import lombok.extern.slf4j.Slf4j;
 import com.alibaba.fastjson.JSON;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -148,7 +149,7 @@ public class ${className}SVImpl extends BaseSVImpl implements ${className}SV {
 
             Map<String, Object> map = null;
             if (${classNameLower} != null) {
-               map = JSON.parseObject(JSON.toJSONString(${classNameLower}));
+               map = JSON.parseObject(JSON.toJSONString(${classNameLower}, SerializerFeature.WriteDateUseDateFormat));
             } else {
                map = new HashMap<>();
             }
@@ -158,7 +159,7 @@ public class ${className}SVImpl extends BaseSVImpl implements ${className}SV {
     public  int count(${className} ${classNameLower}){
         Map<String, Object> map = null;
         if (${classNameLower} != null) {
-           map = JSON.parseObject(JSON.toJSONString(${classNameLower}));
+           map = JSON.parseObject(JSON.toJSONString(${classNameLower}, SerializerFeature.WriteDateUseDateFormat));
         } else {
            map = new HashMap<>();
         }

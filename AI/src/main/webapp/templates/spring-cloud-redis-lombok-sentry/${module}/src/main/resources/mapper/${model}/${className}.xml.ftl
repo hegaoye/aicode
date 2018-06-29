@@ -191,7 +191,7 @@
         </select>
 
         <!--查询一条${tableName} countByPk-->
-        <select id="countByPk" resultType="long">
+        <select id="countByPk" resultType="integer">
             SELECT count(1)
             FROM `${tableName}`
             where
@@ -208,7 +208,7 @@
 
 
     <!--根据任何条件统计${tableName}数据条数-->
-    <select id="count" resultType="long">
+    <select id="count" resultType="integer">
         SELECT count(1) FROM `${tableName}`
         <include refid="where"/>
     </select>

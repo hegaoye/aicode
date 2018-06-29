@@ -26,9 +26,8 @@ public interface BaseDAO<E, PK extends Serializable> {
      * 反之，只保存实体，并返回该实体。
      *
      * @param entity 实体
-     * @return 返回保存后的实体，此返回的实体通常带有ID。
      */
-    E insert(E entity);
+    void insert(E entity);
 
 
     /**

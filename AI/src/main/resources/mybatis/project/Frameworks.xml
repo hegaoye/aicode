@@ -10,6 +10,10 @@
         <result property="id" column="id"/>
         <result property="code" column="code"/>
         <result property="name" column="name"/>
+        <result property="gitHome" column="gitHome"/>
+        <result property="account" column="account"/>
+        <result property="password" column="password"/>
+        <result property="isPublic" column="isPublic"/>
         <result property="description" column="description"/>
     </resultMap>
 
@@ -21,7 +25,7 @@
 
     <!-- 用于select查询公用抽取的列 -->
     <sql id="Frameworks.columns">
-		id,name,code,description
+		id,name,gitHome,account,password,isPublic,code,description
 	</sql>
 
     <insert id="Frameworks.insert" useGeneratedKeys="true" keyProperty="id" parameterType="Frameworks">
@@ -29,11 +33,19 @@
         id ,
         code ,
         name ,
+        gitHome ,
+        account ,
+        password ,
+        isPublic,
         description
         ) VALUES (
         #{id} ,
         #{code} ,
         #{name} ,
+        #{gitHome} ,
+        #{account} ,
+        #{password} ,
+        #{isPublic} ,
         #{description}
         )
         <selectKey keyProperty="id" resultType="long">
@@ -74,6 +86,18 @@
             </if>
             <if test="name!=null and name!=''">
                 AND name = #{name}
+            </if>
+            <if test="account!=null and account!=''">
+                AND account = #{account}
+            </if>
+            <if test="password!=null and password!=''">
+                AND password = #{password}
+            </if>
+            <if test="gitHome!=null and gitHome!=''">
+                AND gitHome = #{gitHome}
+            </if>
+            <if test="isPublic!=null and isPublic!=''">
+                AND isPublic = #{isPublic}
             </if>
             <if test="description!=null and description!=''">
                 AND description = #{description}

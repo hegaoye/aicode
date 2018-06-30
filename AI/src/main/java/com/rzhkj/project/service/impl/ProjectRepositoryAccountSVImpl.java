@@ -15,6 +15,7 @@ import com.rzhkj.core.tools.StringTools;
 import com.rzhkj.project.dao.ProjectRepositoryAccountDAO;
 import com.rzhkj.project.entity.ProjectRepositoryAccount;
 import com.rzhkj.project.entity.ProjectRepositoryAccountStateEnum;
+import com.rzhkj.project.entity.ProjectRepositoryTypeEnum;
 import com.rzhkj.project.service.ProjectRepositoryAccountSV;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
@@ -59,6 +60,7 @@ public class ProjectRepositoryAccountSVImpl extends BaseMybatisSVImpl<ProjectRep
 
         projectRepositoryAccount.setCode(String.valueOf(uidGenerator.getUID()));
         projectRepositoryAccount.setState(ProjectRepositoryAccountStateEnum.Enable.name());
+        projectRepositoryAccount.setType(projectRepositoryAccount.getType().equalsIgnoreCase(ProjectRepositoryTypeEnum.GIT.name()) ? ProjectRepositoryTypeEnum.GIT.name() : ProjectRepositoryTypeEnum.SVN.name());
 
         super.save(projectRepositoryAccount);
     }

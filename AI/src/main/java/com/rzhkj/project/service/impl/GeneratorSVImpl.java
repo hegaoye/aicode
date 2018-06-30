@@ -1,5 +1,6 @@
 package com.rzhkj.project.service.impl;
 
+import com.baidu.fsg.uid.UidGenerator;
 import com.google.common.collect.Maps;
 import com.rzhkj.base.core.FreemarkerHelper;
 import com.rzhkj.base.core.TemplateData;
@@ -23,6 +24,7 @@ import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -47,8 +49,16 @@ public class GeneratorSVImpl implements GenerateSV {
 
     @Resource
     private ProjectJobLogsDAO projectJobLogsDAO;
+
+    @Resource
+    private FrameworksTemplateDAO frameworksTemplateDAO;
+
     @Resource
     private SettingDAO settingDAO;
+
+    @Resource
+    private UidGenerator uidGenerator;
+
 
     /**
      * 根据项目码创建项目代码
@@ -81,11 +91,16 @@ public class GeneratorSVImpl implements GenerateSV {
 
             //3.获取模板信息
             List<ProjectFramwork> projectFramworkList = project.getProjectFramworkList();
+            //从git中检出技术模板库
+            this.readyframeworksTemplateList(projectFramworkList);
 
             //4.生成源码
             projectFramworkList.forEach(projectFramwork -> {
                 projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "已获取项目 【" + projectFramwork.getFrameworks().getName() + "】 的模板"));
-                List<FrameworksTemplate> frameworksTemplateList = projectFramwork.getFrameworks().getFrameworksTemplateList();
+                Map<String, Object> param = new HashMap<>();
+                param.put("frameworkCode", projectFramwork.getFrameworks().getCode());
+                List<FrameworksTemplate> frameworksTemplateList = frameworksTemplateDAO.query(param);
+//                List<FrameworksTemplate> frameworksTemplateList = projectFramwork.getFrameworks().getFrameworksTemplateList();
                 frameworksTemplateList.forEach(frameworksTemplate -> {
                     projectMapList.forEach(projectMap -> {
                         this.generator(projectPath, project, projectMap.getMapClassTable(), frameworksTemplate, mapClassTableList);
@@ -140,6 +155,37 @@ public class GeneratorSVImpl implements GenerateSV {
         }
     }
 
+    //准备框架模板
+    private void readyframeworksTemplateList(List<ProjectFramwork> projectFramworkList) {
+        Setting setting = settingDAO.loadByKey(Setting.Key.Template_Path.name());
+        String template_Path = new HandleFuncs().getCurrentClassPath() + setting.getV();//获得默认仓库地址
+        for (ProjectFramwork projectFramwork : projectFramworkList) {
+            Frameworks frameworks = projectFramwork.getFrameworks();
+            if (frameworks.getGitHome() != null) {
+                String project_template_Path = template_Path + frameworks.getGitHome().substring(frameworks.getGitHome().lastIndexOf("/") + 1).replace(".git", "");
+                if (YNEnum.Y == YNEnum.getYN(frameworks.getIsPublic())) {
+                    GitTools.cloneGit(frameworks.getGitHome(), project_template_Path);
+                } else {
+                    GitTools.cloneGit(frameworks.getGitHome(), project_template_Path, frameworks.getAccount(), frameworks.getPassword());
+                }
+                List<File> Files = FileUtil.getDirFiles(template_Path);
+                for (File file : Files) {
+                    if (file.getAbsoluteFile().toString().contains("\\.git\\")) {
+                        continue;
+                    }
+                    String path = ("/" + file.getAbsoluteFile().toString()).replace("\\", "/").replace(template_Path, "");
+                    path = "/" + path;
+                    path = path.replace("//", "/");
+                    FrameworksTemplate frameworksTemplate = new FrameworksTemplate();
+                    frameworksTemplate.setCode(String.valueOf(uidGenerator.getUID()));
+                    frameworksTemplate.setPath(path);
+                    frameworksTemplate.setFrameworkCode(frameworks.getCode());
+                    frameworksTemplateDAO.insert(frameworksTemplate);
+                }
+            }
+        }
+    }
+
 
     private void generateTsql(String projectPath, String projectEnglishName, String projectCode) {
         String tsql = "-- AI-Code 为您构建代码，享受智慧生活!\n";
@@ -187,7 +233,11 @@ public class GeneratorSVImpl implements GenerateSV {
         map.put("projectCode", project.getCode());
         ProjectRepositoryAccount projectRepositoryAccount = projectRepositoryAccountDAO.load(map);
         if (projectRepositoryAccount != null) {
-            GitTools.cloneGit(projectRepositoryAccount.getHome(), projectPath, projectRepositoryAccount.getAccount(), projectRepositoryAccount.getPassword());
+            if (ProjectRepositoryTypeEnum.GIT == ProjectRepositoryTypeEnum.getEnum(projectRepositoryAccount.getType())) {
+                GitTools.cloneGit(projectRepositoryAccount.getHome(), projectPath, projectRepositoryAccount.getAccount(), projectRepositoryAccount.getPassword());
+            } else if (ProjectRepositoryTypeEnum.SVN == ProjectRepositoryTypeEnum.getEnum(projectRepositoryAccount.getType())) {
+                //TODO SVN 仓库工具类
+            }
         }
         return projectPath;
     }

@@ -1,14 +1,13 @@
 package com.rzhkj.core.tools;
 
 import com.alibaba.dubbo.common.utils.StringUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.jgit.api.*;
 import org.eclipse.jgit.internal.storage.file.FileRepository;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,8 +17,8 @@ import java.util.Set;
 /**
  * Created by liuyang on 2017/12/27.
  */
+@Slf4j
 public class GitTools {
-    protected final static Logger logger = LoggerFactory.getLogger(GitTools.class);
 
     /**
      * 创建仓库
@@ -90,11 +89,14 @@ public class GitTools {
      */
     public static Repository openGitRepository(File repoDir) {
         try {
-            return new FileRepository(getGitAbsolutePath(repoDir).getAbsoluteFile());
+            File file = getGitAbsolutePath(repoDir);
+            if (file.exists()) {
+                return new FileRepository(file);
+            }
         } catch (IOException e) {
-            e.printStackTrace();
-            return null;
+            log.error(e.getMessage());
         }
+        return null;
     }
 
     /**
@@ -172,7 +174,7 @@ public class GitTools {
         boolean ret = false;
         File repoGitDir = getGitAbsolutePath(repoDir);
         if (!repoGitDir.exists()) {
-            System.out.println("仓库不存在");
+            log.error("仓库不存在");
             return false;
         } else {
             Repository repository = null;
@@ -219,7 +221,7 @@ public class GitTools {
         Status ret = null;
         File repoGitDir = getGitAbsolutePath(repoDir);
         if (!repoGitDir.exists()) {
-            System.out.println("仓库不存在");
+            log.error("仓库不存在");
             return null;
         } else {
             Repository repository = null;
@@ -253,7 +255,7 @@ public class GitTools {
         boolean ret = false;
         File repoGitDir = getGitAbsolutePath(repoDir);
         if (!repoGitDir.exists()) {
-            System.out.println("仓库不存在");
+            log.error("仓库不存在");
             return false;
         } else {
             Repository repository = null;
@@ -288,7 +290,7 @@ public class GitTools {
         String gitPathURI = "";
         File repoGitDir = getGitAbsolutePath(repoDir);
         if (!repoGitDir.exists()) {
-            System.out.println("仓库不存在");
+            log.error("仓库不存在");
             return false;
         } else {
             Repository repository = null;
@@ -309,7 +311,7 @@ public class GitTools {
                 git.push().add(ref).call();
                 ret = true;
             } catch (Exception e) {
-                e.printStackTrace();
+                log.error(e.getMessage());
                 return false;
             } finally {
                 if (repository != null) {
@@ -337,7 +339,7 @@ public class GitTools {
         boolean ret = false;
         File repoGitDir = getGitAbsolutePath(repoDir);
         if (!repoGitDir.exists()) {
-            logger.info("仓库不存在");
+            log.info("仓库不存在");
             return false;
         } else {
             Repository repository = null;
@@ -409,45 +411,48 @@ public class GitTools {
         String sshUrl = "git@github.com:vevoly/allinpayView.git";
         //新建仓库
         /*Repository newRepo = createGitRepository(dirPath);
-        System.out.println("新建或打开已有的仓库，分支名为：" + newRepo.getBranch());*/
+        log.error("新建或打开已有的仓库，分支名为：" + newRepo.getBranch());*/
         //删除仓库
         /*deleteGitRepository(dirPath);*/
         //仓库状态
         /*Status repoStatus = getGitStatus(dirPath);
-        System.out.println("添加的文件：" + repoStatus.getAdded());
-        System.out.println("修改的文件：" + repoStatus.getModified());
-        System.out.println("改变的文件：" + repoStatus.getChanged());
-        System.out.println("忽略的文件：" + repoStatus.getIgnoredNotInIndex());
-        System.out.println("删除的文件：" + repoStatus.getRemoved());
-        System.out.println("未提交文件：" + repoStatus.getUncommittedChanges());*/
+        log.error("添加的文件：" + repoStatus.getAdded());
+        log.error("修改的文件：" + repoStatus.getModified());
+        log.error("改变的文件：" + repoStatus.getChanged());
+        log.error("忽略的文件：" + repoStatus.getIgnoredNotInIndex());
+        log.error("删除的文件：" + repoStatus.getRemoved());
+        log.error("未提交文件：" + repoStatus.getUncommittedChanges());*/
         //克隆
         /*if (cloneGit(httpsUrl, clonePath, username, password)) {
-            System.out.println("clone完成\n目录：" + clonePath);
+            log.error("clone完成\n目录：" + clonePath);
         } else {
-            System.out.println("clone失败");
+            log.error("clone失败");
         }*/
         //检出
         /*if (checkoutGit(clonePath)) {
-            System.out.println("检出成功\n目录：" + clonePath);
+            log.error("检出成功\n目录：" + clonePath);
         } else {
-            System.out.println("检出失败");
+            log.error("检出失败");
         }*/
         //创建分支
         if (createBranch("dev", clonePath)) {
-            System.out.println("创建新分支成功\n分支名：dev");
+            log.error("创建新分支成功\n分支名：dev");
         } else {
-            System.out.println("创建新分支失败");
+            log.error("创建新分支失败");
         }
         //打开仓库
         Repository repo = openGitRepository(dirPath);
-        System.out.println("新打开仓库分支：" + repo.getBranch());
+        log.error("新打开仓库分支：" + repo.getBranch());
 
         //提交
         /*if (commitAndPush(new File(clonePath), username, password, "jgit提交测试")) {
-            System.out.println("提交成功");
+            log.error("提交成功");
         } else {
-            System.out.println("提交失败");
+            log.error("提交失败");
         }*/
+
+        String gitPath = "https://gitee.com/helixin/aicode_template.git";
+        System.out.println(gitPath.substring(gitPath.lastIndexOf("/")+1).replace(".git", ""));
     }
 
 

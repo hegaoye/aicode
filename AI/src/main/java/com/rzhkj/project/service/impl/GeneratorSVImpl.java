@@ -109,6 +109,10 @@ public class GeneratorSVImpl implements GenerateSV {
                 });
             });
 
+            //清理临时模板数据
+            this.cleanTemplates(projectFramworkList);
+
+
             //生成sql脚本到项目下
             this.generateTsql(projectPath, project.getEnglishName(), projectCode);
             projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), " 【已经生成】 " + project.getEnglishName() + "Sql 脚本文件并追加系统配置"));
@@ -130,6 +134,7 @@ public class GeneratorSVImpl implements GenerateSV {
             projectJob.setState(ProjectJob.State.Completed.name());
             projectJobDAO.update(projectJob);
         } catch (Exception e) {
+            e.printStackTrace();
             logger.error(e.getMessage());
             projectJob.setState(ProjectJob.State.Error.name());
             projectJobDAO.update(projectJob);
@@ -152,6 +157,21 @@ public class GeneratorSVImpl implements GenerateSV {
             projectJobLogs.setCode(projectJob.getCode());
             projectJobLogs.setLog("End");
             projectJobLogsDAO.insert(projectJobLogs);
+        }
+    }
+
+    //清理临时模板数据
+    private void cleanTemplates(List<ProjectFramwork> projectFramworkList) {
+        frameworksTemplateDAO.deleteAll();
+        Setting setting = settingDAO.loadByKey(Setting.Key.Template_Path.name());
+        String template_Path = new HandleFuncs().getCurrentClassPath() + setting.getV();//获得默认仓库地址
+
+        for (ProjectFramwork projectFramwork : projectFramworkList) {
+            Frameworks frameworks = projectFramwork.getFrameworks();
+            if (frameworks.getGitHome() != null) {
+                String project_template_Path = template_Path + frameworks.getGitHome().substring(frameworks.getGitHome().lastIndexOf("/") + 1).replace(".git", "");
+                FileUtil.delFolder(project_template_Path);
+            }
         }
     }
 
@@ -273,7 +293,9 @@ public class GeneratorSVImpl implements GenerateSV {
             frameworksTemplatePath = frameworksTemplatePath.substring(frameworksTemplatePath.indexOf("/$"));
         } else {
             frameworksTemplatePath = frameworksTemplatePath.replaceFirst("/", "");
-            frameworksTemplatePath = frameworksTemplatePath.substring(frameworksTemplatePath.indexOf("/"));
+            if (frameworksTemplatePath.indexOf("/") > 0) {
+                frameworksTemplatePath = frameworksTemplatePath.substring(frameworksTemplatePath.indexOf("/"));
+            }
         }
 
         String targetFilePath = projectPath + "/" + frameworksTemplatePath.replace(".ftl", "")

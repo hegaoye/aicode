@@ -420,8 +420,11 @@ public class FileUtil {
     }
 
     public static void main(String[] args) {
+        GitTools.cloneGit("https://gitee.com/helixin/aicode_template.git", "C:\\workspaces\\AI-Code\\AI\\build\\libs\\exploded\\AI.war\\templates\\aicode_template");
+        GitTools.deleteGitRepository("C:\\workspaces\\AI-Code\\AI\\build\\libs\\exploded\\AI.war\\templates\\aicode_template\\.git");
+
+
         List<File> list = getDirFiles("C:\\workspaces\\AI-Code\\AI\\src\\main\\webapp\\templates\\spring-cloud-redis-lombok-sentry");
-        System.out.println(JSON.toJSONString(list));
         for (int i = 0; i < list.size(); i++) {
             String path = list.get(i).getAbsoluteFile().toString().replace("C:\\workspaces\\AI-Code\\AI\\src\\main\\webapp\\templates", "").replace("\\", "/");
             String sql = "INSERT into frameworks_template(code,frameworkCode,path) values('" + (888888 + i) + "','888888','" + path + "');";

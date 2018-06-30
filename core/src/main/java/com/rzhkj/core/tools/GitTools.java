@@ -1,8 +1,10 @@
 package com.rzhkj.core.tools;
 
-import com.alibaba.dubbo.common.utils.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.jgit.api.*;
+import org.eclipse.jgit.api.errors.CannotDeleteCurrentBranchException;
+import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.api.errors.NotMergedException;
 import org.eclipse.jgit.internal.storage.file.FileRepository;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
@@ -74,11 +76,27 @@ public class GitTools {
     /**
      * 删除仓库
      *
-     * @param dirPath
+     * @param repoDir
      * @return
      */
-    public static boolean deleteGitRepository(String dirPath) {
-        return deleteGitRepository(new File(dirPath));
+    public static boolean deleteGitRepository(String repoDir) {
+        File repoGitDir = getGitAbsolutePath(new File(repoDir));
+        Repository repository = null;
+        try {
+            repository = new FileRepository(repoGitDir.getAbsoluteFile());
+            Git git = new Git(repository);
+            git.branchDelete().setBranchNames("master").setForce(true).call();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (CannotDeleteCurrentBranchException e) {
+            e.printStackTrace();
+        } catch (NotMergedException e) {
+            e.printStackTrace();
+        } catch (GitAPIException e) {
+            e.printStackTrace();
+        }
+        return false;
+//        return deleteGitRepository(new File(dirPath));
     }
 
     /**
@@ -123,7 +141,7 @@ public class GitTools {
         boolean ret = false;
         try {
             CloneCommand cloneCommand = Git.cloneRepository().setURI(httpsUrl);
-            if (!StringUtils.isBlank(username)) {
+            if (username != null && password != null) {
                 cloneCommand.setCredentialsProvider(new UsernamePasswordCredentialsProvider(username, password));
             }
             if (repoDir != null) {
@@ -452,7 +470,7 @@ public class GitTools {
         }*/
 
         String gitPath = "https://gitee.com/helixin/aicode_template.git";
-        System.out.println(gitPath.substring(gitPath.lastIndexOf("/")+1).replace(".git", ""));
+        System.out.println(gitPath.substring(gitPath.lastIndexOf("/") + 1).replace(".git", ""));
     }
 
 

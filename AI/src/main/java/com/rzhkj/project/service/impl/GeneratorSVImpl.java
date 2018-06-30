@@ -188,7 +188,14 @@ public class GeneratorSVImpl implements GenerateSV {
                 } else {
                     GitTools.cloneGit(frameworks.getGitHome(), project_template_Path, frameworks.getAccount(), frameworks.getPassword());
                 }
+
                 List<File> Files = FileUtil.getDirFiles(template_Path);
+                for (File file : Files) {
+                    if (!file.getAbsoluteFile().toString().contains(frameworks.getName())) {
+                        file.delete();
+                    }
+                }
+                Files = FileUtil.getDirFiles(template_Path);
                 for (File file : Files) {
                     if (file.getAbsoluteFile().toString().contains("\\.git\\")) {
                         continue;

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans default-autowire="byName"
+       xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+            http://www.springframework.org/schema/beans/spring-beans.xsd
+            http://www.springframework.org/schema/context
+            http://www.springframework.org/schema/context/spring-context.xsd">
+    <!-- 启用自动代理功能 -->
+    <context:component-scan base-package="com"/>
+    <import resource="classpath:/framework/disconf.xml"/>
+
+    <!-- 引入属性配置文件 -->
+    <bean class="${basePackage}.core.tools.ConfigUtil">
+        <property name="locations">
+            <list>
+                <value>classpath:jdbc.properties</value>
+                <value>classpath:config.properties</value>
+                <value>classpath:redis-manager-config.properties</value>
+            </list>
+        </property>
+        <!--<property name="decryptProperties">-->
+        <!--<array>-->
+        <!--&lt;!&ndash; 需要解密的配置 &ndash;&gt;-->
+        <!--<value>db.reader.password</value>-->
+        <!--<value>db.writer.password</value>-->
+        <!--</array>-->
+        <!--</property>-->
+    </bean>
+    <!--redis工具-->
+    <bean class="${basePackage}.core.tools.redis.RedisUtils"/>
+    <!--springBean获取工具-->
+    <bean class="${basePackage}.core.tools.SpringContextUtils"/>
+    <!-- 使用中间类解决RedisCache.jedisConnectionFactory的静态注入，从而使MyBatis实现第三方缓存 -->
+    <bean id="redisCacheTransfer" class="${basePackage}.core.cache.RedisCacheTransfer">
+        <property name="jedisConnectionFactory" ref="jedisConnectionFactory"/>
+    </bean>
+
+    <import resource="classpath:framework/spring-uid.xml"/>
+    <import resource="classpath:framework/spring-data-redis.xml"/>
+    <import resource="classpath:framework/spring-core.xml"/>
+    <import resource="classpath:framework/dubbo-provider-registry.xml"/>
+</beans>

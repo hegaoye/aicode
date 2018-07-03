@@ -1,6 +1,0 @@
-include 'core', 'base-facade', 'base-sv','base-web'
-
-include 'eureka',
-        '${projectName}',
-        '${projectName}-api',
-        'facade'

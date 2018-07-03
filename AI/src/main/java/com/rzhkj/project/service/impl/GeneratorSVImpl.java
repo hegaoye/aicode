@@ -92,7 +92,7 @@ public class GeneratorSVImpl implements GenerateSV {
             //3.获取模板信息
             List<ProjectFramwork> projectFramworkList = project.getProjectFramworkList();
             //从git中检出技术模板库
-//            this.readyframeworksTemplateList(projectFramworkList);
+            this.readyframeworksTemplateList(projectFramworkList);
 
             //4.生成源码
             projectFramworkList.forEach(projectFramwork -> {
@@ -110,7 +110,7 @@ public class GeneratorSVImpl implements GenerateSV {
             });
 
             //清理临时模板数据
-//            this.cleanTemplates(projectFramworkList);
+            this.cleanTemplates(projectFramworkList);
 
 
             //生成sql脚本到项目下
@@ -251,8 +251,8 @@ public class GeneratorSVImpl implements GenerateSV {
         //1.检测项目工作工作空间是否存在
         File file = new File(projectPath);
         if (!file.exists()) {
-            file.mkdirs();
-//            FileUtil.delFolder(projectPath);
+//            file.mkdirs();
+            FileUtil.delFolder(projectPath);
         }
 
         //3.代码仓库检出

@@ -1,0 +1,13 @@
+apply plugin: 'java'
+
+dependencies {
+    //-----------mybatis begin---------------
+    compile rootProject.ext.dependencies["mybatis"]
+    compile rootProject.ext.dependencies["mybatis-spring"]
+    compile rootProject.ext.dependencies["mysql-connector"]
+    //-----------mybatis end---------------
+
+    compile project(":core")
+    compile project(":base-facade")
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+}

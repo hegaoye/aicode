@@ -1,0 +1,11 @@
+apply plugin: 'java'
+
+
+dependencies {
+
+    compile project(":base-facade")
+    compile rootProject.ext.dependencies["lombok"]
+    compile rootProject.ext.dependencies["okhttp"]
+    compile rootProject.ext.dependencies["logging-interceptor"]
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+}

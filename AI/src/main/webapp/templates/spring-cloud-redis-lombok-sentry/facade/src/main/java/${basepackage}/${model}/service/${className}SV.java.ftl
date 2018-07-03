@@ -14,7 +14,7 @@ import ${basePackage}.${model}.entity.${className};
  *
  * @author ${author}
  */
-public interface ${className}SV extends BaseSV {
+public interface ${className}SV extends BaseSV<${className},Long> {
 
 <#if (pkFields?size>0)>
 

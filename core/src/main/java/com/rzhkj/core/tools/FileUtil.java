@@ -420,6 +420,13 @@ public class FileUtil {
     }
 
     public static void main(String[] args) {
+
+        File file = new File("C:\\workspaces\\AI-Code\\AI\\src\\main\\webapp\\templates");
+        File[] list1 = file.listFiles();
+        for (File file1 : list1) {
+            System.out.println(file1.getName());
+        }
+
         GitTools.cloneGit("https://gitee.com/helixin/aicode_template.git", "C:\\workspaces\\AI-Code\\AI\\build\\libs\\exploded\\AI.war\\templates\\aicode_template");
         GitTools.deleteGitRepository("C:\\workspaces\\AI-Code\\AI\\build\\libs\\exploded\\AI.war\\templates\\aicode_template\\.git");
 

@@ -1,6 +1,6 @@
 spring:
   application:
-    name: ${projectName}-consumer
+    name: ${projectName?replace("_","-")}-consumer
   output:
     ansi:
       enabled: always

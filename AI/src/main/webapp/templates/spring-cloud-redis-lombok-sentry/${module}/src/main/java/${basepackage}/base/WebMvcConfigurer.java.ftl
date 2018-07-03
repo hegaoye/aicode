@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * Created by lixin on 2018/6/29.
  */
-@Configuration
+//@Configuration
 public class WebMvcConfigurer extends WebMvcConfigurerAdapter {
     @Override
     public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {

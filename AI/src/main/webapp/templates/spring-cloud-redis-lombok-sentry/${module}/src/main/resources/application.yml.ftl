@@ -1,6 +1,6 @@
 spring:
   application:
-     name: ${projectName}-provider
+     name: ${projectName?replace("_","-")}-provider
   output:
        ansi:
          enabled: always #控制台的输出颜色控制

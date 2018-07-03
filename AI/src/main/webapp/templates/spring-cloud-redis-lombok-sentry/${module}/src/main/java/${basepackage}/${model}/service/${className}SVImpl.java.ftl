@@ -19,13 +19,15 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.List;
 import java.util.HashMap;
+import java.util.Date;
 import java.util.Map;
 import org.apache.ibatis.session.RowBounds;
 import com.baidu.fsg.uid.UidGenerator;
 
-@Service("${classNameLower}SV")
+@Service("${className?uncap_first}SV")
 @Slf4j
-public class ${className}SVImpl extends BaseSVImpl implements ${className}SV {
+
+public class ${className}2222222SVImpl extends BaseSVImpl<${className}, Long> implements ${className}SV {
 
     @Autowired
     private ${className}DAO ${classNameLower}DAO;
@@ -37,6 +39,27 @@ public class ${className}SVImpl extends BaseSVImpl implements ${className}SV {
     protected BaseDAO getBaseDAO() {
         return ${classNameLower}DAO;
     }
+
+    /**
+    * 保存account对象
+    *
+    * @param entity 实体
+    * @throws BaseException
+    */
+    @Override
+    public void save(${className} entity) throws BaseException {
+        entity.setCode(String.valueOf(uidGenerator.getUID()));
+        <#list fields as field>
+        <#if field.checkPk && field.field?contains("code")>
+        entity.set${field.field?cap_first}(String.valueOf(uidGenerator.getUID()));
+        </#if>
+        <#if field.checkDate>
+        entity.set${field.field?cap_first}(new Date());
+        </#if>
+        </#list>
+        super.save(entity);
+    }
+
 <#if (pkFields?size>0)>
     /**
      * 加载一个对象${className}

@@ -13,7 +13,7 @@ import ${basePackage}.${model}.entity.${className};
  * ${notes} api请求熔断器
  * @author ${author}
  */
-@FeignClient(value = "${projectName}-provider", fallback = ${className}FeignApiImpl.class)
+@FeignClient(value = "${projectName?replace("_","-")}-provider", fallback = ${className}FeignApiImpl.class)
 public interface ${className}FeignApi {
 <#if (pkFields?size>0)>
     /**

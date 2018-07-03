@@ -36,7 +36,7 @@ public class ${className}Ctrl {
     protected RedisUtils redisUtils;
 
     @Resource
-    private ${className}SV ${classNameLower}SV;
+    private ${className}SV ${className?uncap_first}SV;
 
 <#if (pkFields?size>0)>
     /**
@@ -60,7 +60,7 @@ public class ${className}Ctrl {
         return null;
         }
         </#list>
-        ${className} ${classNameLower} = ${classNameLower}SV.load(<#list pkFields as pkField>${pkField.field}<#if pkField_has_next>,</#if></#list>);
+        ${className} ${classNameLower} = ${className?uncap_first}SV.load(<#list pkFields as pkField>${pkField.field}<#if pkField_has_next>,</#if></#list>);
         log.info(JSON.toJSONString(${classNameLower}));
         return ${classNameLower};
     }
@@ -83,7 +83,7 @@ public class ${className}Ctrl {
         if(${pkField.field}==null){
            return null;
         }
-        ${className} ${classNameLower} = ${classNameLower}SV.loadBy${pkField.field?cap_first}(${pkField.field});
+        ${className} ${classNameLower} = ${className?uncap_first}SV.loadBy${pkField.field?cap_first}(${pkField.field});
         log.info(JSON.toJSONString(${classNameLower}));
         return ${classNameLower};
     }
@@ -108,8 +108,8 @@ public class ${className}Ctrl {
     @ResponseBody
     public List<${className}> list(@RequestBody @ApiIgnore ${className} ${classNameLower},Integer curPage,Integer pageSize) {
         Page<${className}> page=new Page<${className}>(pageSize,curPage);
-        List<${className}> ${classNameLower}s = ${classNameLower}SV.list(${classNameLower},page.genRowStart(),page.getPageSize());
-        int total = ${classNameLower}SV.count(${classNameLower});
+        List<${className}> ${classNameLower}s = ${className?uncap_first}SV.list(${classNameLower},page.genRowStart(),page.getPageSize());
+        int total = ${className?uncap_first}SV.count(${classNameLower});
         page.setTotalRow(total);
         log.info(JSON.toJSONString(page));
         return ${classNameLower}s;
@@ -133,8 +133,8 @@ public class ${className}Ctrl {
     @ResponseBody
     public List<${className}> listByPk(<#list pkFields as pkField>${pkField.fieldType} ${pkField.field},</#list>Integer curPage,Integer pageSize) {
         Page<${className}> page=new Page<${className}>(pageSize,curPage);
-        List<${className}> ${classNameLower}s = ${classNameLower}SV.list(<#list pkFields as pkField>${pkField.field},</#list> page.genRowStart(),page.getPageSize());
-        int total = ${classNameLower}SV.count(<#list pkFields as pkField>${pkField.field}<#if pkField_has_next>,</#if></#list>);
+        List<${className}> ${classNameLower}s = ${className?uncap_first}SV.list(<#list pkFields as pkField>${pkField.field},</#list> page.genRowStart(),page.getPageSize());
+        int total = ${className?uncap_first}SV.count(<#list pkFields as pkField>${pkField.field}<#if pkField_has_next>,</#if></#list>);
         page.setTotalRow(total);
         log.info(JSON.toJSONString(page));
         return ${classNameLower}s;
@@ -154,7 +154,7 @@ public class ${className}Ctrl {
     @GetMapping(value = "/count/by")
     @ResponseBody
     public Integer count(<#list pkFields as pkField>${pkField.fieldType} ${pkField.field}<#if pkField_has_next>,</#if></#list>) {
-        return ${classNameLower}SV.count(<#list pkFields as pkField>${pkField.field}<#if pkField_has_next>,</#if></#list>);
+        return ${className?uncap_first}SV.count(<#list pkFields as pkField>${pkField.field}<#if pkField_has_next>,</#if></#list>);
     }
 
     /**
@@ -172,9 +172,9 @@ public class ${className}Ctrl {
     @ResponseBody
     public Integer count(@RequestBody ${className} ${classNameLower}) {
         if(${classNameLower}==null){
-            return ${classNameLower}SV.count(new HashMap());
+            return ${className?uncap_first}SV.count(new HashMap());
         }else{
-            return ${classNameLower}SV.count(${classNameLower});
+            return ${className?uncap_first}SV.count(${classNameLower});
         }
     }
 
@@ -187,14 +187,16 @@ public class ${className}Ctrl {
     */
     @ApiOperation(value = "创建${className}", notes = "创建${className}")
     @ApiImplicitParams({
-    <#list fields as field>
+    <#list notPkFields as field>
+        <#if !field.checkDate>
         @ApiImplicitParam(name = "${field.field}", value = "${field.notes}", paramType = "query")<#if field_has_next>,</#if>
+        </#if>
     </#list>
     })
     @PostMapping("/build")
     @ResponseBody
     public ${className} build(@RequestBody @ApiIgnore ${className} ${classNameLower}) {
-        ${classNameLower}SV.save(${classNameLower});
+        ${className?uncap_first}SV.save(${classNameLower});
         return ${classNameLower};
     }
 
@@ -213,7 +215,7 @@ public class ${className}Ctrl {
     @PutMapping("/modify")
     @ResponseBody
     public ${className} modify(@ApiIgnore ${className} ${classNameLower}) {
-        ${classNameLower}SV.modify(${classNameLower});
+        ${className?uncap_first}SV.modify(${classNameLower});
         return ${classNameLower};
     }
 
@@ -231,7 +233,7 @@ public class ${className}Ctrl {
     @DeleteMapping("/delete")
     @ResponseBody
     public BeanRet delete(<#list pkFields as pkField>${pkField.fieldType} ${pkField.field}<#if pkField_has_next>,</#if></#list>) {
-        ${classNameLower}SV.delete(<#list pkFields as pkField>${pkField.field}<#if pkField_has_next>,</#if></#list>);
+        ${className?uncap_first}SV.delete(<#list pkFields as pkField>${pkField.field}<#if pkField_has_next>,</#if></#list>);
         return BeanRet.create(true, "删除${className}成功");
     }
 

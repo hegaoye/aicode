@@ -92,15 +92,15 @@ public class GeneratorSVImpl implements GenerateSV {
             //3.获取模板信息
             List<ProjectFramwork> projectFramworkList = project.getProjectFramworkList();
             //从git中检出技术模板库
-            this.readyframeworksTemplateList(projectFramworkList);
+//            this.readyframeworksTemplateList(projectFramworkList);
 
             //4.生成源码
             projectFramworkList.forEach(projectFramwork -> {
                 projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "已获取项目 【" + projectFramwork.getFrameworks().getName() + "】 的模板"));
                 Map<String, Object> param = new HashMap<>();
                 param.put("frameworkCode", projectFramwork.getFrameworks().getCode());
-                List<FrameworksTemplate> frameworksTemplateList = frameworksTemplateDAO.query(param);
-//                List<FrameworksTemplate> frameworksTemplateList = projectFramwork.getFrameworks().getFrameworksTemplateList();
+//                List<FrameworksTemplate> frameworksTemplateList = frameworksTemplateDAO.query(param);
+                List<FrameworksTemplate> frameworksTemplateList = projectFramwork.getFrameworks().getFrameworksTemplateList();
                 frameworksTemplateList.forEach(frameworksTemplate -> {
                     projectMapList.forEach(projectMap -> {
                         this.generator(projectPath, project, projectMap.getMapClassTable(), frameworksTemplate, mapClassTableList);
@@ -110,7 +110,7 @@ public class GeneratorSVImpl implements GenerateSV {
             });
 
             //清理临时模板数据
-            this.cleanTemplates(projectFramworkList);
+//            this.cleanTemplates(projectFramworkList);
 
 
             //生成sql脚本到项目下
@@ -190,11 +190,11 @@ public class GeneratorSVImpl implements GenerateSV {
                 }
 
                 List<File> Files = FileUtil.getDirFiles(template_Path);
-                for (File file : Files) {
-                    if (!file.getAbsoluteFile().toString().contains(frameworks.getName())) {
-                        file.delete();
-                    }
-                }
+//                for (File file : Files) {
+//                    if (!file.getAbsoluteFile().toString().contains(frameworks.getName())) {
+//                        file.delete();
+//                    }
+//                }
                 Files = FileUtil.getDirFiles(template_Path);
                 for (File file : Files) {
                     if (file.getAbsoluteFile().toString().contains("\\.git\\")) {

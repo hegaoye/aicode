@@ -25,11 +25,11 @@ CREATE TABLE `frameworks` (
   PRIMARY KEY (`id`,`code`)
 ) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COMMENT='框架技术池';
 
-INSERT INTO `frameworks` VALUES ('5', '123456', 'ssm+redis+swagger+lombok', 'ssm+redis+swagger+lombok', null, null, null, null);
+INSERT INTO `frameworks` VALUES ('5', '123456', 'ssm-redis-swagger-lombok', 'ssm+redis+swagger+lombok', 'https://gitee.com/helixin/aicode_template.git', '', '', 'Y');
 INSERT INTO `frameworks` VALUES ('6', '456789', 'ssm-dubbo-redis-swagger-lombok-disconf-sentry', '此项目整合了ssm+dubbo+redis+swagger+lombok几大框架便于实现分布式，采用gradle管理构建项目，lombok使用请安装ide的插件并进行设置即可完成javabean的简化', null, null, null, null);
 INSERT INTO `frameworks` VALUES ('7', '74108520', 'ssh+redis+swagger+lombok', 'ssh+redis+swagger+lombok', null, null, null, null);
 INSERT INTO `frameworks` VALUES ('8', '888888', 'spring-cloud-redis-lombok-sentry', '此框架整合了spring-cloud、redis、lombok，swagger等最新版本，可以方便的实现单项目开发，分布式开发的需求；需要注意的是需要对spring boot有所了解将有助于使用此套框架，框架自己包含了工具包，配置好了分层，需要修改数据库连接地址以及一些自己内网的信息接口生成后直接运行使用，免测试。', 'https://gitee.com/helixin/aicode_template.git', null, null, 'Y');
-INSERT INTO `frameworks` VALUES ('9', '9999', 'git-spring-cloud-redis-lombok-sentry', '此框架整合了spring-cloud、redis、lombok，swagger等最新版本，可以方便的实现单项目开发，分布式开发的需求；需要注意的是需要对spring boot有所了解将有助于使用此套框架，框架自己包含了工具包，配置好了分层，需要修改数据库连接地址以及一些自己内网的信息接口生成后直接运行使用，免测试。', 'https://gitee.com/helixin/aicode_template.git', null, null, 'Y');
+INSERT INTO `frameworks` VALUES ('9', '999999', 'ssm-redis-swagger-lombok-pitop', 'ssm+redis+swagger+lombok', 'https://gitee.com/helixin/aicode_template.git', '', '', 'Y');
 
 DROP TABLE IF EXISTS `frameworks_template`;
 CREATE TABLE `frameworks_template` (

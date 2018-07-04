@@ -5,10 +5,7 @@ import com.google.common.collect.Maps;
 import com.rzhkj.base.core.FreemarkerHelper;
 import com.rzhkj.base.core.TemplateData;
 import com.rzhkj.core.enums.YNEnum;
-import com.rzhkj.core.tools.FileUtil;
-import com.rzhkj.core.tools.GitTools;
-import com.rzhkj.core.tools.HandleFuncs;
-import com.rzhkj.core.tools.ZipTools;
+import com.rzhkj.core.tools.*;
 import com.rzhkj.project.dao.*;
 import com.rzhkj.project.entity.*;
 import com.rzhkj.project.service.GenerateSV;
@@ -99,11 +96,12 @@ public class GeneratorSVImpl implements GenerateSV {
                 projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "已获取项目 【" + projectFramwork.getFrameworks().getName() + "】 的模板"));
                 Map<String, Object> param = new HashMap<>();
                 param.put("frameworkCode", projectFramwork.getFrameworks().getCode());
-//                List<FrameworksTemplate> frameworksTemplateList = frameworksTemplateDAO.query(param);
-                List<FrameworksTemplate> frameworksTemplateList = projectFramwork.getFrameworks().getFrameworksTemplateList();
+                Frameworks frameworks = projectFramwork.getFrameworks();
+                List<FrameworksTemplate> frameworksTemplateList = frameworksTemplateDAO.query(param);
+//                List<FrameworksTemplate> frameworksTemplateList = projectFramwork.getFrameworks().getFrameworksTemplateList();
                 frameworksTemplateList.forEach(frameworksTemplate -> {
                     projectMapList.forEach(projectMap -> {
-                        this.generator(projectPath, project, projectMap.getMapClassTable(), frameworksTemplate, mapClassTableList);
+                        this.generator(projectPath, project, frameworks, projectMap.getMapClassTable(), frameworksTemplate, mapClassTableList);
                     });
                     projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), " 【已经生成】 模板 " + frameworksTemplate.getPath() + " 的源码"));
                 });
@@ -129,7 +127,7 @@ public class GeneratorSVImpl implements GenerateSV {
                 projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "代码已经提交到 ⇛⇛⇛ <a style='text-decoration:underline;' href='" + projectRepositoryAccount.getHome() + "' target='_blank'>" + projectRepositoryAccount.getHome() + " </a>仓库"));
             }
 
-            zipProject(project);
+            this.zipProject(project);
             projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "代码已打包ZIP,您还可以点击下载 ⇛⇛⇛  <a style='text-decoration:underline;' href='" + project.getDownloadUrl() + "' target='_blank'>" + project.getEnglishName() + ".zip</a>"));
             projectJob.setState(ProjectJob.State.Completed.name());
             projectJobDAO.update(projectJob);
@@ -181,6 +179,7 @@ public class GeneratorSVImpl implements GenerateSV {
         String template_Path = new HandleFuncs().getCurrentClassPath() + setting.getV();//获得默认仓库地址
         for (ProjectFramwork projectFramwork : projectFramworkList) {
             Frameworks frameworks = projectFramwork.getFrameworks();
+            logger.debug(JSON.toJSONString(frameworks));
             if (frameworks.getGitHome() != null) {
                 String project_template_Path = template_Path + frameworks.getGitHome().substring(frameworks.getGitHome().lastIndexOf("/") + 1).replace(".git", "");
                 if (YNEnum.Y == YNEnum.getYN(frameworks.getIsPublic())) {
@@ -189,6 +188,22 @@ public class GeneratorSVImpl implements GenerateSV {
                     GitTools.cloneGit(frameworks.getGitHome(), project_template_Path, frameworks.getAccount(), frameworks.getPassword());
                 }
 
+                File templateFile = new File(template_Path);
+                File[] files = templateFile.listFiles();
+                for (File file : files) {
+                    if (file.isDirectory()) {
+                        for (File file2 : file.listFiles()) {
+                            if (!file2.getName().contains(frameworks.getName()) && !frameworks.getName().equalsIgnoreCase(file2.getName())) {
+                                if (file2.isDirectory()) {
+                                    logger.debug("del:" + file2.getAbsolutePath());
+                                    FileUtil.delFolder(file2.getAbsolutePath());
+                                } else {
+                                    file2.delete();
+                                }
+                            }
+                        }
+                    }
+                }
                 List<File> Files = FileUtil.getDirFiles(template_Path);
 //                for (File file : Files) {
 //                    if (!file.getAbsoluteFile().toString().contains(frameworks.getName())) {
@@ -197,7 +212,7 @@ public class GeneratorSVImpl implements GenerateSV {
 //                }
                 Files = FileUtil.getDirFiles(template_Path);
                 for (File file : Files) {
-                    if (file.getAbsoluteFile().toString().contains("\\.git\\")) {
+                    if (file.getAbsoluteFile().toString().contains("\\.git\\") || file.getAbsoluteFile().toString().contains("README.md")) {
                         continue;
                     }
                     String path = ("/" + file.getAbsoluteFile().toString()).replace("\\", "/").replace(template_Path, "");
@@ -278,7 +293,7 @@ public class GeneratorSVImpl implements GenerateSV {
      * @param mapClassTable      映射对象
      * @param frameworksTemplate 框架模板对象
      */
-    private void generator(String projectPath, Project project, MapClassTable mapClassTable, FrameworksTemplate frameworksTemplate, List<MapClassTable> mapClassTableList) {
+    private void generator(String projectPath, Project project, Frameworks frameworks, MapClassTable mapClassTable, FrameworksTemplate frameworksTemplate, List<MapClassTable> mapClassTableList) {
         List<MapFieldColumn> mapFieldColumnPks = new ArrayList<>();
         List<MapFieldColumn> mapFieldColumnNotPks = new ArrayList<>();
         List<MapFieldColumn> mapFieldColumnList = new ArrayList<>();
@@ -298,6 +313,8 @@ public class GeneratorSVImpl implements GenerateSV {
         String frameworksTemplatePath = frameworksTemplate.getPath();
         if (frameworksTemplatePath.contains("/${module}")) {
             frameworksTemplatePath = frameworksTemplatePath.substring(frameworksTemplatePath.indexOf("/$"));
+        } else if (frameworksTemplatePath.contains(frameworks.getName())) {
+            frameworksTemplatePath = frameworksTemplatePath.substring(frameworksTemplatePath.indexOf(frameworks.getName())+frameworks.getName().length());
         } else {
             frameworksTemplatePath = frameworksTemplatePath.replaceFirst("/", "");
             if (frameworksTemplatePath.indexOf("/") > 0) {
@@ -315,6 +332,8 @@ public class GeneratorSVImpl implements GenerateSV {
         String templatePath = new HandleFuncs().getCurrentClassPath()
                 + "/" + settingTemplatePath.getV()
                 + "/" + frameworksTemplate.getPath();
+        logger.debug("模板路径：" + templatePath);
+        logger.debug("目标文件路径" + targetFilePath);
 
         if (new File(templatePath).exists()) {
             if (!templatePath.contains(".jar")) {

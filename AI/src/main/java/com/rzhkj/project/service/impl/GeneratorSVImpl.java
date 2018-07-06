@@ -188,6 +188,7 @@ public class GeneratorSVImpl implements GenerateSV {
                     GitTools.cloneGit(frameworks.getGitHome(), project_template_Path, frameworks.getAccount(), frameworks.getPassword());
                 }
 
+                //删除不相干的模板及目录文件
                 File templateFile = new File(template_Path);
                 File[] files = templateFile.listFiles();
                 for (File file : files) {
@@ -204,13 +205,8 @@ public class GeneratorSVImpl implements GenerateSV {
                         }
                     }
                 }
+
                 List<File> Files = FileUtil.getDirFiles(template_Path);
-//                for (File file : Files) {
-//                    if (!file.getAbsoluteFile().toString().contains(frameworks.getName())) {
-//                        file.delete();
-//                    }
-//                }
-                Files = FileUtil.getDirFiles(template_Path);
                 for (File file : Files) {
                     if (file.getAbsoluteFile().toString().contains("\\.git\\") || file.getAbsoluteFile().toString().contains("README.md")) {
                         continue;
@@ -314,7 +310,7 @@ public class GeneratorSVImpl implements GenerateSV {
         if (frameworksTemplatePath.contains("/${module}")) {
             frameworksTemplatePath = frameworksTemplatePath.substring(frameworksTemplatePath.indexOf("/$"));
         } else if (frameworksTemplatePath.contains(frameworks.getName())) {
-            frameworksTemplatePath = frameworksTemplatePath.substring(frameworksTemplatePath.indexOf(frameworks.getName())+frameworks.getName().length());
+            frameworksTemplatePath = frameworksTemplatePath.substring(frameworksTemplatePath.indexOf(frameworks.getName()) + frameworks.getName().length());
         } else {
             frameworksTemplatePath = frameworksTemplatePath.replaceFirst("/", "");
             if (frameworksTemplatePath.indexOf("/") > 0) {

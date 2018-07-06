@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 用于代码生成业务  TODO 暂未优化
+ * 用于代码生成业务
  * Created by lixin on 2018/2/1.
  */
 @Component
@@ -127,7 +127,10 @@ public class GeneratorSVImpl implements GenerateSV {
                 projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "代码已经提交到 ⇛⇛⇛ <a style='text-decoration:underline;' href='" + projectRepositoryAccount.getHome() + "' target='_blank'>" + projectRepositoryAccount.getHome() + " </a>仓库"));
             }
 
+            //7.创建压缩文件
             this.zipProject(project);
+
+            //记录日志
             projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "代码已打包ZIP,您还可以点击下载 ⇛⇛⇛  <a style='text-decoration:underline;' href='" + project.getDownloadUrl() + "' target='_blank'>" + project.getEnglishName() + ".zip</a>"));
             projectJob.setState(ProjectJob.State.Completed.name());
             projectJobDAO.update(projectJob);

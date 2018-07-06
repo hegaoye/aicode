@@ -84,8 +84,9 @@ public class GitTools {
         Repository repository = null;
         try {
             repository = new FileRepository(repoGitDir.getAbsoluteFile());
-            Git git = new Git(repository);
-            git.branchDelete().setBranchNames("master").setForce(true).call();
+            try (Git git = new Git(repository)) {
+                git.branchDelete().setBranchNames("master").setForce(true).call();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         } catch (CannotDeleteCurrentBranchException e) {
@@ -139,6 +140,7 @@ public class GitTools {
      */
     public static boolean cloneGit(String httpsUrl, File repoDir, String username, String password) {
         boolean ret = false;
+        Git git = null;
         try {
             CloneCommand cloneCommand = Git.cloneRepository().setURI(httpsUrl);
             if (username != null && password != null) {
@@ -148,11 +150,16 @@ public class GitTools {
                 //目录为null则克隆到当前项目下的目录，不建议这样做
                 cloneCommand.setDirectory(repoDir);
             }
-            cloneCommand.call();
+            git = cloneCommand.call();
+
             ret = true;
         } catch (Exception e) {
             e.printStackTrace();
             return false;
+        } finally {
+            if (git != null) {
+                git.close();
+            }
         }
         return ret;
     }
@@ -198,10 +205,12 @@ public class GitTools {
             Repository repository = null;
             try {
                 repository = openGitRepository(repoDir);
-                Git git = new Git(repository);
-                CheckoutCommand checkoutCommand = git.checkout();
-                checkoutCommand.setName(branchName).call();
-                PullCommand pullCommand = git.pull();
+                PullCommand pullCommand;
+                try (Git git = new Git(repository)) {
+                    CheckoutCommand checkoutCommand = git.checkout();
+                    checkoutCommand.setName(branchName).call();
+                    pullCommand = git.pull();
+                }
                 pullCommand.call();
                 ret = true;
             } catch (Exception e) {
@@ -245,8 +254,9 @@ public class GitTools {
             Repository repository = null;
             try {
                 repository = new FileRepository(repoGitDir.getAbsoluteFile());
-                Git git = new Git(repository);
-                ret = git.status().call();
+                try (Git git = new Git(repository)) {
+                    ret = git.status().call();
+                }
             } catch (Exception e) {
                 e.printStackTrace();
                 return null;
@@ -279,8 +289,10 @@ public class GitTools {
             Repository repository = null;
             try {
                 repository = openGitRepository(repoDir);
-                Git git = new Git(repository);
-                PullCommand pullCommand = git.pull();
+                PullCommand pullCommand;
+                try (Git git = new Git(repository)) {
+                    pullCommand = git.pull();
+                }
                 pullCommand.call();
                 ret = true;
             } catch (Exception e) {
@@ -312,9 +324,10 @@ public class GitTools {
             return false;
         } else {
             Repository repository = null;
+            Git git = null;
             try {
                 repository = new FileRepository(repoGitDir.getAbsoluteFile());
-                Git git = new Git(repository);
+                git = new Git(repository);
                 //检查分支是否存在
                 List<Ref> refList = git.branchList().call();
                 for (Ref ref : refList) {
@@ -334,6 +347,9 @@ public class GitTools {
             } finally {
                 if (repository != null) {
                     repository.close();
+                }
+                if (git != null) {
+                    git.close();
                 }
             }
         }
@@ -361,9 +377,10 @@ public class GitTools {
             return false;
         } else {
             Repository repository = null;
+            Git git = null;
             try {
                 repository = new FileRepository(repoGitDir.getAbsoluteFile());
-                Git git = new Git(repository);
+                git = new Git(repository);
                 Status repoStatus = getGitStatus(repoDir);
                 Set<String> untractedFiles = repoStatus.getUntracked();
                 for (String fileName : untractedFiles) {
@@ -380,6 +397,9 @@ public class GitTools {
             } finally {
                 if (repository != null) {
                     repository.close();
+                }
+                if (git != null) {
+                    git.close();
                 }
             }
         }

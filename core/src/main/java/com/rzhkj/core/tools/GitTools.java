@@ -24,26 +24,26 @@ public class GitTools {
 
     /**
      * 创建仓库
+     * <p>
+     * 如果仓库不存在就创建仓库
+     * 仓库存在，返回存在的仓库
      *
      * @param repoDir 仓库文件夹
      * @return 仓库实例
-     * 如果仓库不存在就创建仓库
-     * 仓库存在，返回存在的仓库
      */
     public static Repository createGitRepository(File repoDir) {
         Repository ret = null;
         File repoGitDir = getGitAbsolutePath(repoDir);
-        if (repoGitDir.exists()) {
-            ret = openGitRepository(repoDir);
-        } else {
-            try {
+        try {
+            if (!repoGitDir.exists()) {
                 //创建本地仓的库
                 ret = FileRepositoryBuilder.create(repoGitDir);
                 ret.create();
-            } catch (IOException e) {
-                e.printStackTrace();
-                return null;
+            } else {
+                ret = openGitRepository(repoDir);
             }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
         return ret;
     }
@@ -97,7 +97,6 @@ public class GitTools {
             e.printStackTrace();
         }
         return false;
-//        return deleteGitRepository(new File(dirPath));
     }
 
     /**
@@ -151,7 +150,6 @@ public class GitTools {
                 cloneCommand.setDirectory(repoDir);
             }
             git = cloneCommand.call();
-
             ret = true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -193,17 +191,16 @@ public class GitTools {
      * @return
      */
     public static boolean checkoutGit(File repoDir, String branchName) {
-        if (branchName == null) {
-            branchName = "master";
-        }
-        boolean ret = false;
-        File repoGitDir = getGitAbsolutePath(repoDir);
-        if (!repoGitDir.exists()) {
-            log.error("仓库不存在");
-            return false;
-        } else {
-            Repository repository = null;
-            try {
+        Repository repository = null;
+        try {
+            if (branchName == null) {
+                branchName = "master";
+            }
+            File repoGitDir = getGitAbsolutePath(repoDir);
+            if (!repoGitDir.exists()) {
+                log.error("仓库不存在");
+                return false;
+            } else {
                 repository = openGitRepository(repoDir);
                 PullCommand pullCommand;
                 try (Git git = new Git(repository)) {
@@ -212,17 +209,16 @@ public class GitTools {
                     pullCommand = git.pull();
                 }
                 pullCommand.call();
-                ret = true;
-            } catch (Exception e) {
-                e.printStackTrace();
-                return false;
-            } finally {
-                if (repository != null) {
-                    repository.close();
-                }
+                return true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            if (repository != null) {
+                repository.close();
             }
         }
-        return ret;
     }
 
     public static boolean checkoutGit(String repoDir, String branchName) {
@@ -246,24 +242,23 @@ public class GitTools {
      */
     public static Status getGitStatus(File repoDir) {
         Status ret = null;
-        File repoGitDir = getGitAbsolutePath(repoDir);
-        if (!repoGitDir.exists()) {
-            log.error("仓库不存在");
-            return null;
-        } else {
-            Repository repository = null;
-            try {
+        Repository repository = null;
+        try {
+            File repoGitDir = getGitAbsolutePath(repoDir);
+            if (!repoGitDir.exists()) {
+                log.error("仓库不存在");
+                return null;
+            } else {
                 repository = new FileRepository(repoGitDir.getAbsoluteFile());
                 try (Git git = new Git(repository)) {
                     ret = git.status().call();
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
-                return null;
-            } finally {
-                if (repository != null) {
-                    repository.close();
-                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (repository != null) {
+                repository.close();
             }
         }
         return ret;

@@ -7,7 +7,6 @@ package com.rzhkj.project.entity;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import com.rzhkj.core.base.BaseEntity;
-import com.rzhkj.core.tools.JSON;
 import lombok.Data;
 
 import java.util.List;

@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.rzhkj.core.base.BaseCtrl;
 import com.rzhkj.core.entity.BeanRet;
 import com.rzhkj.core.entity.Page;
+import com.rzhkj.core.enums.YNEnum;
 import com.rzhkj.core.exceptions.BaseException;
 import com.rzhkj.project.entity.Frameworks;
 import com.rzhkj.project.service.FrameworksSV;
@@ -106,15 +107,24 @@ public class FrameworksCtrl extends BaseCtrl {
     @ApiOperation(value = "添加", notes = "添加")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "name", value = "技术名称", required = true, paramType = "query"),
+            @ApiImplicitParam(name = "account", value = "模板仓库账户", required = true, paramType = "query"),
+            @ApiImplicitParam(name = "password", value = "模板仓库密码", required = true, paramType = "query"),
+            @ApiImplicitParam(name = "gitHome", value = "模板仓库地址", required = true, paramType = "query"),
+            @ApiImplicitParam(name = "isPublic", value = "是否是公开库 Y N", required = true, paramType = "query"),
+            @ApiImplicitParam(name = "isDefault", value = "默认仓库", required = true, paramType = "query"),
             @ApiImplicitParam(name = "description", value = "技术描述", required = true, paramType = "query")
     })
     @PostMapping("/build")
     @ResponseBody
-    public BeanRet build(@ApiIgnore Frameworks frameworks) {
+    public BeanRet build(@ApiIgnore Frameworks frameworks, String isDefault) {
         try {
             Assert.hasText(frameworks.getName(), BaseException.BaseExceptionEnum.Empty_Param.toString());
             Assert.hasText(frameworks.getDescription(), BaseException.BaseExceptionEnum.Empty_Param.toString());
-
+            if (YNEnum.getYN(isDefault) == YNEnum.Y) {
+                frameworks.setGitHome(null);
+                frameworks.setAccount(null);
+                frameworks.setPassword(null);
+            }
             frameworksSV.save(frameworks);
             return BeanRet.create(true, "添加成功", frameworks);
         } catch (Exception e) {

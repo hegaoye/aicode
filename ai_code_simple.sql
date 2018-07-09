@@ -250,6 +250,7 @@ INSERT INTO `setting` VALUES ('3', 'Workspace', '/workspace/', '工作目录');
 INSERT INTO `setting` VALUES ('4', 'Package_entity', 'po', '实体目录命名');
 INSERT INTO `setting` VALUES ('5', 'Template_Path', '/templates/', '模板默认路径');
 INSERT INTO `setting` VALUES ('6', 'Repository_Path', '/repository/', 'zip仓库');
+INSERT INTO `setting` VALUES ('7', 'GitHome_Default', 'https://gitee.com/helixin/aicode_template.git', '默认系统模板仓库路径');
 
 -- ----------------------------
 -- Table structure for worker_node

@@ -23,10 +23,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 @Component
@@ -57,6 +54,17 @@ public class ProjectSVImpl extends BaseMybatisSVImpl<Project, Long> implements P
     private MapRelationshipDAO mapRelationshipDAO;
     @Resource
     private ProjectMapDAO projectMapDAO;
+    @Resource
+    private ProjectRepositoryAccountDAO projectRepositoryAccountDAO;
+
+    @Resource
+    private ProjectFramworkDAO projectFramworkDAO;
+    @Resource
+    private ProjectJobDAO projectJobDAO;
+    @Resource
+    private ProjectSqlDAO projectSqlDAO;
+
+
     @Resource
     private UidGenerator uidGenerator;
 
@@ -119,7 +127,7 @@ public class ProjectSVImpl extends BaseMybatisSVImpl<Project, Long> implements P
     /**
      * 删除项目
      * 1.判断项目是否存在
-     * 2.更新状态为删除状态
+     * 2.删除数据
      * 3.删除项目
      *
      * @param code 项目编码
@@ -136,9 +144,44 @@ public class ProjectSVImpl extends BaseMybatisSVImpl<Project, Long> implements P
         map.put("code", code);
         Project project = projectDAO.load(map);
 
-        //2.更新状态为删除状态
+        //2.删除数据
         project.setState(ProjectStateEnum.Delete.name());
-        projectDAO.update(project);
+        projectDAO.delete(project.getId());
+
+        //删除项目技术框架数据
+        ProjectFramwork projectFramwork = new ProjectFramwork(project.getCode());
+        projectFramworkDAO.delete(projectFramwork);
+
+        //删除项目的sql脚本
+        ProjectSql projectSql = new ProjectSql(project.getCode());
+        projectSqlDAO.delete(projectSql);
+
+        //删除项目的仓库账户
+        ProjectRepositoryAccount projectRepositoryAccount = new ProjectRepositoryAccount(project.getCode());
+        projectRepositoryAccountDAO.delete(projectRepositoryAccount);
+
+        //删除项目模块
+        ProjectModule projectModule = new ProjectModule(project.getCode());
+        projectModuleDAO.delete(projectModule);
+
+        //删除job
+        ProjectJob projectJob = new ProjectJob(project.getCode());
+        projectJobDAO.delete(projectJob);
+
+        //删除构建日志
+        ProjectJobLogs projectJobLogs = new ProjectJobLogs(project.getCode());
+        projectJobLogsDAO.delete(projectJobLogs);
+        Map<String, Object> param = new HashMap<>();
+        param.put("projectCode", project.getCode());
+        List<ProjectMap> projectMaps = projectMapDAO.query(param);
+        for (ProjectMap projectMap : projectMaps) {
+            mapFieldColumnDAO.delete(projectMap.getMapClassTableCode());
+            mapRelationshipDAO.delete(projectMap.getMapClassTableCode());
+            Map<String, Object> param2 = new HashMap<>();
+            param2.put("mapClassTableCode", projectMap.getMapClassTableCode());
+            projectMapDAO.delete(param2);
+        }
+
 
         //3.删除项目
         //项目源码删除

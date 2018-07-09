@@ -28,5 +28,11 @@ public class ProjectRepositoryAccount extends BaseEntity implements java.io.Seri
     private String state;//数据库字段:state  属性显示:状态：停用[Disenable]，启用[Enable]
     private String type;//数据库字段:type  属性显示:仓库类型:Git, Svn
 
+    public ProjectRepositoryAccount() {
+    }
+
+    public ProjectRepositoryAccount(String projectCode) {
+        this.projectCode = projectCode;
+    }
 }
 

@@ -23,5 +23,12 @@ public class ProjectSql extends BaseEntity implements java.io.Serializable {
     private String code;//数据库字段:code  属性显示:tsql编码
     private String tsql;//数据库字段:tsql  属性显示:sql脚本
     private String state;//数据库字段:state  属性显示:状态：停用[Disenable]，启用[Enable]
+
+    public ProjectSql() {
+    }
+
+    public ProjectSql(String projectCode) {
+        this.projectCode = projectCode;
+    }
 }
 

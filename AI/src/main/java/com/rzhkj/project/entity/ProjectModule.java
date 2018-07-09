@@ -24,5 +24,12 @@ public class ProjectModule extends BaseEntity implements java.io.Serializable {
     private String moduleCode;//数据库字段:moudleCode  属性显示:模块编码
 
     private Module module;
+
+    public ProjectModule() {
+    }
+
+    public ProjectModule(String projectCode) {
+        this.projectCode = projectCode;
+    }
 }
 

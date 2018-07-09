@@ -34,11 +34,16 @@ public class ProjectJob extends BaseEntity implements java.io.Serializable {
     public ProjectJob() {
     }
 
+    public ProjectJob(String projectCode) {
+        this.projectCode = projectCode;
+    }
+
     public ProjectJob(String code, Integer number, String state) {
         this.code = code;
         this.number = number;
         this.state = state;
     }
+
 
     // 创建[Create] , 执行中[Executing], 完成[Completed] ,失败[Error] 警告 [Waring]
     public enum State {

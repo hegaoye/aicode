@@ -22,4 +22,12 @@ public class ProjectRepositoryAccountDAO extends BaseMybatisDAOImpl<ProjectRepos
     public void delete(String code) {
         getSqlSession().delete(sqlmapNamespace + ".delete", code);
     }
+
+    /**
+     * 删除
+     *
+     */
+    public void delete(ProjectRepositoryAccount projectRepositoryAccount) {
+        getSqlSession().delete(sqlmapNamespace + ".delete", projectRepositoryAccount);
+    }
 }

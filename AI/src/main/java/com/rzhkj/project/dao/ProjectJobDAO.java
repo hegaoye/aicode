@@ -22,4 +22,13 @@ public class ProjectJobDAO extends BaseMybatisDAOImpl<ProjectJob, Long> {
     public void delete(String code) {
         getSqlSession().delete(sqlmapNamespace + ".delete", code);
     }
+
+    /**
+     * 删除任务
+     *
+     * @param projectJob
+     */
+    public void delete(ProjectJob projectJob) {
+        getSqlSession().delete(sqlmapNamespace + ".delete", projectJob);
+    }
 }

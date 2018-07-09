@@ -23,4 +23,13 @@ public class ProjectJobLogsDAO extends BaseMybatisDAOImpl<ProjectJobLogs, Long> 
     public void delete(String code) {
         getSqlSession().delete(sqlmapNamespace + ".delete", code);
     }
+
+    /**
+     * 删除任务执行日志
+     *
+     * @param projectJobLogs
+     */
+    public void delete(ProjectJobLogs projectJobLogs) {
+        getSqlSession().delete(sqlmapNamespace + ".delete", projectJobLogs);
+    }
 }

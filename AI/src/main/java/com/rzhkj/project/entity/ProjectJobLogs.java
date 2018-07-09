@@ -33,5 +33,9 @@ public class ProjectJobLogs extends BaseEntity implements java.io.Serializable {
         this.code = code;
         this.log = "> ✔ " + DateTools.yyyyMMddHHmmssSSS(new Date()) + "&nbsp;&nbsp;" + log;
     }
+
+    public ProjectJobLogs(String projectCode) {
+        this.code = projectCode;
+    }
 }
 

@@ -111,7 +111,6 @@ public class FrameworksCtrl extends BaseCtrl {
             @ApiImplicitParam(name = "password", value = "模板仓库密码", required = true, paramType = "query"),
             @ApiImplicitParam(name = "gitHome", value = "模板仓库地址", required = true, paramType = "query"),
             @ApiImplicitParam(name = "isPublic", value = "是否是公开库 Y N", required = true, paramType = "query"),
-            @ApiImplicitParam(name = "isDefault", value = "默认仓库", required = true, paramType = "query"),
             @ApiImplicitParam(name = "description", value = "技术描述", required = true, paramType = "query")
     })
     @PostMapping("/build")
@@ -120,11 +119,6 @@ public class FrameworksCtrl extends BaseCtrl {
         try {
             Assert.hasText(frameworks.getName(), BaseException.BaseExceptionEnum.Empty_Param.toString());
             Assert.hasText(frameworks.getDescription(), BaseException.BaseExceptionEnum.Empty_Param.toString());
-            if (YNEnum.getYN(isDefault) == YNEnum.Y) {
-                frameworks.setGitHome(null);
-                frameworks.setAccount(null);
-                frameworks.setPassword(null);
-            }
             frameworksSV.save(frameworks);
             return BeanRet.create(true, "添加成功", frameworks);
         } catch (Exception e) {

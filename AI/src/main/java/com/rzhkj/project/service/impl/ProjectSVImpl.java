@@ -9,6 +9,8 @@ import com.rzhkj.core.base.BaseMybatisSVImpl;
 import com.rzhkj.core.enums.YNEnum;
 import com.rzhkj.core.exceptions.BaseException;
 import com.rzhkj.core.exceptions.ProjectException;
+import com.rzhkj.core.tools.FileUtil;
+import com.rzhkj.core.tools.HandleFuncs;
 import com.rzhkj.core.tools.JSON;
 import com.rzhkj.core.tools.StringTools;
 import com.rzhkj.project.dao.*;
@@ -20,6 +22,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -116,7 +119,8 @@ public class ProjectSVImpl extends BaseMybatisSVImpl<Project, Long> implements P
     /**
      * 删除项目
      * 1.判断项目是否存在
-     * 2.删除项目
+     * 2.更新状态为删除状态
+     * 3.删除项目
      *
      * @param code 项目编码
      */
@@ -132,9 +136,29 @@ public class ProjectSVImpl extends BaseMybatisSVImpl<Project, Long> implements P
         map.put("code", code);
         Project project = projectDAO.load(map);
 
-        //2.删除项目
+        //2.更新状态为删除状态
         project.setState(ProjectStateEnum.Delete.name());
         projectDAO.update(project);
+
+        //3.删除项目
+        //项目源码删除
+        Setting settingWorkspace = settingDAO.loadByKey(Setting.Key.Workspace.name());
+        String projectPath = new HandleFuncs().getCurrentClassPath() + settingWorkspace.getV() + "/" + project.getEnglishName();
+        projectPath = projectPath.replace("//", "/");
+        File file = new File(projectPath);
+        if (file.exists()) {
+            FileUtil.delFolder(projectPath);
+        }
+        //项目zip删除
+        Setting settingRepositoryPath = settingDAO.loadByKey(Setting.Key.Repository_Path.name());
+        String repositoryPath = new HandleFuncs().getCurrentClassPath() + settingWorkspace.getV() + "/" + project.getEnglishName() + ".zip";
+        repositoryPath = repositoryPath.replace("//", "/");
+        File repositoryFile = new File(repositoryPath);
+        if (repositoryFile.exists()) {
+            repositoryFile.delete();
+        }
+
+
     }
 
     /**

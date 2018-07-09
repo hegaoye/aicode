@@ -115,7 +115,7 @@ public class FrameworksCtrl extends BaseCtrl {
     })
     @PostMapping("/build")
     @ResponseBody
-    public BeanRet build(@ApiIgnore Frameworks frameworks, String isDefault) {
+    public BeanRet build(@ApiIgnore Frameworks frameworks) {
         try {
             Assert.hasText(frameworks.getName(), BaseException.BaseExceptionEnum.Empty_Param.toString());
             Assert.hasText(frameworks.getDescription(), BaseException.BaseExceptionEnum.Empty_Param.toString());

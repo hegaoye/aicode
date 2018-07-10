@@ -2,12 +2,14 @@ package com.rzhkj.core.base;
 
 
 import com.alibaba.fastjson.annotation.JSONField;
+import lombok.Data;
 
 import java.util.Date;
 
 /**
  * @author shangze
  */
+@Data
 public class BaseEntity implements java.io.Serializable {
 
     private static final long serialVersionUID = -7200095849148417467L;

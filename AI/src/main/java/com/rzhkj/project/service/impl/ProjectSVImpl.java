@@ -146,7 +146,7 @@ public class ProjectSVImpl extends BaseMybatisSVImpl<Project, Long> implements P
 
         //2.删除数据
         project.setState(ProjectStateEnum.Delete.name());
-        projectDAO.delete(project.getId());
+        projectDAO.delete(project);
 
         //删除项目技术框架数据
         ProjectFramwork projectFramwork = new ProjectFramwork(project.getCode());
@@ -194,7 +194,7 @@ public class ProjectSVImpl extends BaseMybatisSVImpl<Project, Long> implements P
         }
         //项目zip删除
         Setting settingRepositoryPath = settingDAO.loadByKey(Setting.Key.Repository_Path.name());
-        String repositoryPath = new HandleFuncs().getCurrentClassPath() + settingWorkspace.getV() + "/" + project.getEnglishName() + ".zip";
+        String repositoryPath = new HandleFuncs().getCurrentClassPath() + settingRepositoryPath.getV() + "/" + project.getEnglishName() + ".zip";
         repositoryPath = repositoryPath.replace("//", "/");
         File repositoryFile = new File(repositoryPath);
         if (repositoryFile.exists()) {

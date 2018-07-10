@@ -23,4 +23,14 @@ public class ProjectDAO extends BaseMybatisDAOImpl<Project, Long> {
         map.put("buildNumber", i);
         getSqlSession().update(sqlmapNamespace + ".update", map);
     }
+
+
+    /**
+     * 删除
+     *
+     * @param project
+     */
+    public void delete(Project project) {
+        getSqlSession().delete(sqlmapNamespace + ".delete", project);
+    }
 }

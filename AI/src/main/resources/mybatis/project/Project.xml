@@ -36,7 +36,8 @@
         <collection property="projectMapList" column="{projectCode=code}" select="ProjectMap.query"/>
         <collection property="projectJobList" column="{projectCode=code}" select="ProjectJob.query"/>
         <collection property="projectModuleList" column="{projectCode=code}" select="ProjectModule.query"/>
-        <collection property="projectRepositoryAccountList" column="{projectCode=code}" select="ProjectRepositoryAccount.query"/>
+        <collection property="projectRepositoryAccountList" column="{projectCode=code}"
+                    select="ProjectRepositoryAccount.query"/>
         <collection property="projectSqlList" column="{projectCode=code}" select="ProjectSql.query"/>
     </resultMap>
 
@@ -153,7 +154,7 @@
 
     <delete id="Project.delete">
         DELETE FROM `project`
-        <include refid="Project.where"/>
+        WHERE code=#{code}
     </delete>
 
     <select id="Project.load" resultMap="rs_base_all">

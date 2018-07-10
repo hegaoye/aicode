@@ -137,6 +137,7 @@ public class GeneratorSVImpl implements GenerateSV {
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e.getMessage());
+            projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "ERROR : " + e.getMessage()));
             projectJob.setState(ProjectJob.State.Error.name());
             projectJobDAO.update(projectJob);
         } finally {

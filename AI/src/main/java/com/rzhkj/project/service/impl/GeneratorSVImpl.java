@@ -198,7 +198,7 @@ public class GeneratorSVImpl implements GenerateSV {
                 for (File file : files) {
                     if (file.isDirectory()) {
                         for (File file2 : file.listFiles()) {
-                            if (!file2.getName().contains(frameworks.getName()) && !frameworks.getName().equalsIgnoreCase(file2.getName())) {
+                            if (!frameworks.getName().equalsIgnoreCase(file2.getName())) {
                                 if (file2.isDirectory()) {
                                     logger.debug("del:" + file2.getAbsolutePath());
                                     FileUtil.delFolder(file2.getAbsolutePath());

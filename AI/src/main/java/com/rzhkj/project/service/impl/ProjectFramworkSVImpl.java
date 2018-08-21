@@ -43,7 +43,7 @@ public class ProjectFramworkSVImpl extends BaseMybatisSVImpl<ProjectFramwork, Lo
     /**
      * 批量存储 项目框架选择
      * 1.判断集合
-     * 2.判断是否已经选择
+     * 2.清空项目关联框架
      * 3.保存
      *
      * @param projectFramwors 项目选择的框架集合
@@ -55,18 +55,10 @@ public class ProjectFramworkSVImpl extends BaseMybatisSVImpl<ProjectFramwork, Lo
             logger.warn(BaseException.BaseExceptionEnum.Empty_Param.toString());
             throw new ProjectException(BaseException.BaseExceptionEnum.Empty_Param);
         }
-        projectFramwors.forEach(projectFramwork -> {
-            //2.判断是否已经选择
-            Map<String, Object> map = Maps.newHashMap();
-            map.put("frameworkCode", projectFramwork.getFrameworkCode());
-            map.put("projectCode", projectFramwork.getProjectCode());
-            ProjectFramwork projectFramworkLoad = projectFramworkDAO.load(map);
-            if (projectFramworkLoad == null) {
-                //3.保存
-                projectFramworkDAO.insert(projectFramwork);
-            }
-        });
-
+        //2.清空项目关联框架
+        projectFramworkDAO.deleteAll(projectFramwors.get(0).getProjectCode());
+        //3.保存
+        projectFramworkDAO.batchInsert(projectFramwors);
     }
 
     /**

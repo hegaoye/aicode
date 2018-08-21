@@ -22,4 +22,13 @@ public class ProjectFramworkDAO extends BaseMybatisDAOImpl<ProjectFramwork, Long
     public void delete(ProjectFramwork projectFramwork) {
         getSqlSession().delete(sqlmapNamespace + ".delete", projectFramwork);
     }
+
+    /**
+     * 清空项目关联框架
+     *
+     * @param projectCode 项目编码
+     */
+    public void deleteAll(String projectCode) {
+        getSqlSession().delete(sqlmapNamespace + ".deleteAll", projectCode);
+    }
 }

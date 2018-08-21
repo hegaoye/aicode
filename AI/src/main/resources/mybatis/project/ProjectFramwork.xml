@@ -56,6 +56,10 @@
 		<include refid="ProjectFramwork.where"/>
     </delete>
 
+	<delete id="ProjectFramwork.deleteAll">
+        DELETE FROM `project_framwork` where projectCode = #{projectCode}
+    </delete>
+
     <select id="ProjectFramwork.load" resultMap="rs_base_all">
 		SELECT <include refid="ProjectFramwork.columns" />
 		    FROM `project_framwork`

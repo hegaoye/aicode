@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSON;
 import com.rzhkj.core.base.BaseCtrl;
 import com.rzhkj.core.entity.BeanRet;
 import com.rzhkj.core.entity.Page;
-import com.rzhkj.core.enums.YNEnum;
 import com.rzhkj.core.exceptions.BaseException;
 import com.rzhkj.project.entity.Frameworks;
 import com.rzhkj.project.service.FrameworksSV;
@@ -138,14 +137,39 @@ public class FrameworksCtrl extends BaseCtrl {
             @ApiImplicitParam(name = "code", value = "模板编码", required = true, paramType = "query"),
             @ApiImplicitParam(name = "name", value = "类型名", paramType = "query"),
             @ApiImplicitParam(name = "description", value = "类型说明", paramType = "query"),
-            @ApiImplicitParam(name = "state", value = "状态：停用[Disenable]，启用[Enable]", paramType = "query")
+            @ApiImplicitParam(name = "isPublic", value = "状态：停用[Disenable]，启用[Enable]", paramType = "query")
     })
     @PostMapping("/modify")
     @ResponseBody
     public BeanRet modify(@ApiIgnore Frameworks frameworks) {
         try {
             Assert.hasText(frameworks.getName(), BaseException.BaseExceptionEnum.Empty_Param.toString());
-            frameworksSV.saveOrUpdate(frameworks);
+            frameworksSV.update(frameworks);
+            return BeanRet.create(true, "修改成功", frameworks);
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error(e.getMessage());
+            return BeanRet.create(false, "修改失败");
+        }
+    }
+
+    /**
+     * 修改状态
+     *
+     * @return BeanRet
+     */
+    @ApiOperation(value = "修改状态", notes = "修改状态")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "code", value = "模板编码", required = true, paramType = "query"),
+            @ApiImplicitParam(name = "isPublic", value = "状态：停用[N]，启用[Y]", paramType = "query")
+    })
+    @PostMapping("/updateIsPublic")
+    @ResponseBody
+    public BeanRet updateIsPublic(@ApiIgnore Frameworks frameworks) {
+        try {
+            Assert.hasText(frameworks.getCode(), BaseException.BaseExceptionEnum.Empty_Param.toString());
+            Assert.hasText(frameworks.getIsPublic(), BaseException.BaseExceptionEnum.Empty_Param.toString());
+            frameworksSV.update(frameworks);
             return BeanRet.create(true, "修改成功", frameworks);
         } catch (Exception e) {
             e.printStackTrace();

@@ -112,7 +112,7 @@
     <bean class="com.rzhkj.core.config.SwaggerConfig"/>
 
     <!-- 配置拦截器 -->
-    <mvc:interceptors>
+    <!--<mvc:interceptors>
         <mvc:interceptor>
             <mvc:mapping path="/framework/**"/>
             <mvc:mapping path="/Module/**"/>
@@ -130,6 +130,6 @@
             <bean class="com.rzhkj.core.interceptor.ContextInterceptor">
             </bean>
         </mvc:interceptor>
-    </mvc:interceptors>
+    </mvc:interceptors>-->
 
 </beans>

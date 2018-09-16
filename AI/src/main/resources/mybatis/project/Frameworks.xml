@@ -59,6 +59,12 @@
             <if test="description!=null and description!=''">
                 description = #{description} ,
             </if>
+            <if test="isPublic!=null and isPublic!=''">
+                isPublic = #{isPublic} ,
+            </if>
+            <if test="name!=null and name!=''">
+                name = #{name} ,
+            </if>
         </trim>
         WHERE
         code = #{code}

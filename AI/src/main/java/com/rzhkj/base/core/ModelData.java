@@ -11,13 +11,13 @@ import java.util.List;
 @Data
 public class ModelData {
     private String model;
-    private List<MapClassTable> mapClassTables;
+    private List<MapClassTable> classes;
 
     public ModelData() {
     }
 
-    public ModelData(String model, List<MapClassTable> mapClassTables) {
+    public ModelData(String model, List<MapClassTable> classes) {
         this.model = model;
-        this.mapClassTables = mapClassTables;
+        this.classes = classes;
     }
 }

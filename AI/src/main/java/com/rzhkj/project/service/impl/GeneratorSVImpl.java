@@ -3,6 +3,7 @@ package com.rzhkj.project.service.impl;
 import com.baidu.fsg.uid.UidGenerator;
 import com.google.common.collect.Maps;
 import com.rzhkj.base.core.FreemarkerHelper;
+import com.rzhkj.base.core.StringHelper;
 import com.rzhkj.base.core.TemplateData;
 import com.rzhkj.core.enums.YNEnum;
 import com.rzhkj.core.tools.*;
@@ -297,16 +298,29 @@ public class GeneratorSVImpl implements GenerateSV {
         List<MapFieldColumn> mapFieldColumnPks = new ArrayList<>();
         List<MapFieldColumn> mapFieldColumnNotPks = new ArrayList<>();
         List<MapFieldColumn> mapFieldColumnList = new ArrayList<>();
+        List<MapFieldColumn> mapFieldColumnTable = new ArrayList<>();
         mapClassTable.getMapFieldColumnList().forEach(mapFieldColumn -> {
             if (mapFieldColumn.getIsPrimaryKey().equals(YNEnum.Y.name())) {
                 mapFieldColumnPks.add(mapFieldColumn);
             } else {
                 mapFieldColumnNotPks.add(mapFieldColumn);
             }
+            if (!mapFieldColumn.getIsPrimaryKey().equals(YNEnum.Y.name()) && !mapFieldColumn.getColumn().contains("updateTime") && !mapFieldColumn.getColumn().contains("summary")
+                    && !mapFieldColumn.getColumn().contains("marker") && !mapFieldColumn.getColumn().contains("vn")) {
+                mapFieldColumnTable.add(mapFieldColumn);
+            }
             mapFieldColumnList.add(mapFieldColumn);
         });
 
-        TemplateData templateData = new TemplateData(project, mapClassTable, mapClassTableList, mapFieldColumnList, mapFieldColumnPks, mapFieldColumnNotPks);
+        //各个模块下的所有类集合信息
+        List<MapClassTable> modelClasses=new ArrayList<>();
+        mapClassTableList.forEach(mapClassTableObj -> {
+            if(mapClassTable.getClassModel().equals(mapClassTableObj.getClassModel())){
+                modelClasses.add(mapClassTableObj);
+            }
+        });
+
+        TemplateData templateData = new TemplateData(project, mapClassTable, mapClassTableList, mapFieldColumnList, mapFieldColumnPks, mapFieldColumnNotPks, mapFieldColumnTable,modelClasses);
         Setting settingTemplatePath = settingDAO.loadByKey(Setting.Key.Template_Path.name());
 
         //生成路径处理
@@ -326,6 +340,7 @@ public class GeneratorSVImpl implements GenerateSV {
                 .replace("${basepackage}", project.getBasePackage().replace(".", "/"))
                 .replace("${basePackage}", project.getBasePackage().replace(".", "/"))
                 .replace("${className}", mapClassTable.getClassName())
+                .replace("${classNameLower}", StringHelper.toJavaVariableName(mapClassTable.getClassName()))
                 .replace("${module}", project.getEnglishName())
                 .replace("${model}", templateData.getModel());
 
@@ -333,7 +348,9 @@ public class GeneratorSVImpl implements GenerateSV {
                 + "/" + settingTemplatePath.getV()
                 + "/" + frameworksTemplate.getPath();
         logger.debug("模板路径：" + templatePath);
-        logger.debug("目标文件路径" + targetFilePath);
+        if (targetFilePath.contains("angular")) {
+            logger.debug("目标文件路径" + targetFilePath);
+        }
 
         if (new File(templatePath).exists()) {
             if (!templatePath.contains(".jar")) {

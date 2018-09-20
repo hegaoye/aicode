@@ -3,6 +3,7 @@ package com.rzhkj.project.service.impl;
 import com.baidu.fsg.uid.UidGenerator;
 import com.google.common.collect.Maps;
 import com.rzhkj.base.core.FreemarkerHelper;
+import com.rzhkj.base.core.ModelData;
 import com.rzhkj.base.core.StringHelper;
 import com.rzhkj.base.core.TemplateData;
 import com.rzhkj.core.enums.YNEnum;
@@ -12,6 +13,7 @@ import com.rzhkj.project.entity.*;
 import com.rzhkj.project.service.GenerateSV;
 import com.rzhkj.setting.dao.SettingDAO;
 import com.rzhkj.setting.entity.Setting;
+import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,10 +23,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 用于代码生成业务
@@ -313,14 +312,45 @@ public class GeneratorSVImpl implements GenerateSV {
         });
 
         //各个模块下的所有类集合信息
-        List<MapClassTable> modelClasses=new ArrayList<>();
+        List<MapClassTable> modelClasses = new ArrayList<>();
+        List<String> models = new ArrayList<>();
+        List<ModelData> modelDatas = new ArrayList<>();
+        Map<String, List<MapClassTable>> mapClassTableMap = new HashedMap();
         mapClassTableList.forEach(mapClassTableObj -> {
-            if(mapClassTable.getClassModel().equals(mapClassTableObj.getClassModel())){
+            models.add(mapClassTableObj.getClassModel());
+        });
+        mapClassTableList.forEach(mapClassTableObj -> {
+            List<MapClassTable> mapClassTables = null;
+            if (mapClassTableMap.containsKey(mapClassTableObj.getClassModel())) {
+                mapClassTables = mapClassTableMap.get(mapClassTableObj.getClassModel());
+            } else {
+                mapClassTables = new ArrayList<>();
+            }
+            mapClassTables.add(mapClassTableObj);
+            mapClassTableMap.put(mapClassTableObj.getClassModel(), mapClassTables);
+        });
+
+        models.forEach(model -> {
+            if (mapClassTableMap.containsKey(model)) {
+                List<MapClassTable> mapClassTables = mapClassTableMap.get(model);
+                modelDatas.add(new ModelData(model, mapClassTables));
+            }
+        });
+        HashSet hashSet = new HashSet(modelDatas);
+        modelDatas.clear();
+        modelDatas.addAll(hashSet);
+
+
+
+        mapClassTableList.forEach(mapClassTableObj -> {
+            if (mapClassTable.getClassModel().equals(mapClassTableObj.getClassModel())) {
                 modelClasses.add(mapClassTableObj);
             }
         });
 
-        TemplateData templateData = new TemplateData(project, mapClassTable, mapClassTableList, mapFieldColumnList, mapFieldColumnPks, mapFieldColumnNotPks, mapFieldColumnTable,modelClasses);
+        //根据模块划分类集合信息
+
+        TemplateData templateData = new TemplateData(project, mapClassTable, mapClassTableList, mapFieldColumnList, mapFieldColumnPks, mapFieldColumnNotPks, mapFieldColumnTable, modelClasses, modelDatas);
         Setting settingTemplatePath = settingDAO.loadByKey(Setting.Key.Template_Path.name());
 
         //生成路径处理

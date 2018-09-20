@@ -67,12 +67,13 @@ public class TemplateData implements Serializable {
     private List<MapClassTable> modelClasses;//各个模块下的所有类集合信息
     //**********前端生成代码使用：start***********
     private List<MapFieldColumn> tableFields;  //前端页面显示
+    private List<ModelData> modelDatas;//模型与实体类的关系
 
     //**********前端生成代码使用：end***********
 
 
     //TODO {定义模板变量}
-    public TemplateData(Project project, MapClassTable classTable, List<MapClassTable> classes, List<MapFieldColumn> columns, List<MapFieldColumn> pkColumns, List<MapFieldColumn> notPkColumns, List<MapFieldColumn> tableColumns, List<MapClassTable> modelClasses) {
+    public TemplateData(Project project, MapClassTable classTable, List<MapClassTable> classes, List<MapFieldColumn> columns, List<MapFieldColumn> pkColumns, List<MapFieldColumn> notPkColumns, List<MapFieldColumn> tableColumns, List<MapClassTable> modelClasses, List<ModelData> modelDatas) {
         this.projectName = project.getEnglishName();
         this.basePackage = project.getBasePackage();
         this.copyright = project.getCopyright();
@@ -117,6 +118,7 @@ public class TemplateData implements Serializable {
         } else {
             this.model = classTable.getTableName();
         }
-        this.modelClasses=modelClasses;
+        this.modelClasses = modelClasses;
+        this.modelDatas = modelDatas;
     }
 }

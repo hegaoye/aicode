@@ -371,6 +371,7 @@ public class GeneratorSVImpl implements GenerateSV {
                 .replace("${basePackage}", project.getBasePackage().replace(".", "/"))
                 .replace("${className}", mapClassTable.getClassName())
                 .replace("${classNameLower}", StringHelper.toJavaVariableName(mapClassTable.getClassName()))
+                .replace("${dashedCaseName}", StringTools.humpToLine(mapClassTable.getClassName()))
                 .replace("${module}", project.getEnglishName())
                 .replace("${model}", templateData.getModel());
 

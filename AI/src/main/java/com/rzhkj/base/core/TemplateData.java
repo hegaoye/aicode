@@ -1,5 +1,6 @@
 package com.rzhkj.base.core;
 
+import com.rzhkj.core.tools.StringTools;
 import com.rzhkj.project.entity.MapClassTable;
 import com.rzhkj.project.entity.MapFieldColumn;
 import com.rzhkj.project.entity.Project;
@@ -68,6 +69,7 @@ public class TemplateData implements Serializable {
     //**********前端生成代码使用：start***********
     private List<MapFieldColumn> tableFields;  //前端页面显示
     private List<ModelData> modelDatas;//模型与实体类的关系
+    private String dashedCaseName;//破折号命名 或叫烤串命名 适用于 前端angular ,react, vue
 
     //**********前端生成代码使用：end***********
 
@@ -84,6 +86,7 @@ public class TemplateData implements Serializable {
         this.tableName = classTable.getTableName();
         this.className = classTable.getClassName();
         this.classNameLower = StringHelper.toJavaVariableName(classTable.getClassName());
+        this.dashedCaseName = StringTools.humpToLine(classNameLower);
         for (MapFieldColumn mapFieldColumn : pkColumns) {
             if (mapFieldColumn.getField().equalsIgnoreCase(classTable.getClassName())) {
                 this.classNameLower = StringHelper.toJavaVariableName(classTable.getClassName()) + "Obj";

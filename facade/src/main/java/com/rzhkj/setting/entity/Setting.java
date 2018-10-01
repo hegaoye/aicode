@@ -39,6 +39,7 @@ public class Setting extends BaseEntity implements java.io.Serializable {
         Template_Path,//模板默认路径
         Repository_Path,//zip仓库路径
         GitHome_Default,//默认系统仓库路径
+        SandBox_Path,//沙箱环境目录
         ;
 
     }

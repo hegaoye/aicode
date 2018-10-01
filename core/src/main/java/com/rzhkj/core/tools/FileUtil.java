@@ -8,7 +8,6 @@
 package com.rzhkj.core.tools;
 
 import org.apache.commons.collections.map.HashedMap;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.*;
@@ -418,6 +417,31 @@ public class FileUtil {
         }
         return pathList;
     }
+
+
+    public static void createDir(String filePath, String fileName) {
+        File folder = new File(filePath);
+        //文件夹路径不存在
+        if (!folder.exists() && !folder.isDirectory()) {
+            System.out.println("文件夹路径不存在，创建路径:" + filePath);
+            folder.mkdirs();
+        } else {
+            System.out.println("文件夹路径存在:" + filePath);
+        }
+        // 如果文件不存在就创建
+        if (!"null".equals(fileName) && !StringUtils.isEmpty(fileName)) {
+            File file = new File(filePath + "/" + fileName);
+            if (!file.exists()) {
+                System.out.println("文件不存在，创建文件:" + filePath + "/" + fileName);
+                try {
+                    file.createNewFile();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
 
     public static void main(String[] args) {
 

@@ -476,4 +476,32 @@ public class StringTools {
         return JSON.parseArray(json, calsz);
     }
 
+    /***
+     * 驼峰命名转为“-”命名
+     *
+     * @param para 驼峰命名的字符串
+     */
+    public static String humpToLine(String para) {
+        StringBuilder sb = new StringBuilder(para);
+        int temp = 0;//定位
+        for (int i = 0; i < para.length(); i++) {
+            if (Character.isUpperCase(para.charAt(i))) {
+                sb.insert(i + temp, "-");
+                temp += 1;
+            }
+        }
+        String result = sb.toString();
+        if (result.startsWith("-")) {
+            result = result.replaceFirst("-", "");
+        }
+        return result.toLowerCase();
+    }
+
+    public static void main(String[] args) {
+        System.out.println(humpToLine("GaoJieJie"));
+        System.out.println(humpToLine("zaoJieJie"));
+
+    }
+
+
 }

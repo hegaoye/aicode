@@ -17,8 +17,8 @@ public class FreemarkerHelper {
         map.put("extends", "extends\tPage\timplements\tSerializable\t");
         map.put("basePackage", "package\tcom.szh.test.ctrl;");
         map.put("import", "import\tcom.aixin.core.entity.Page;\nimport\torg.apache.commons.lang.builder.ToStringBuilder;\nimport\torg.apache.commons.lang.builder.ToStringStyle;\nimport\tjava.io.Serializable;");
-        String targetFilePath = "C:\\workspaces\\AI-Code\\AI\\src\\main\\webapp\\workspace\\szh\\sv\\src\\main\\java\\com\\szh\\test\\ctrl\\" + map.get("fileName").toString() + ".java";
-        generate(null, targetFilePath, "C:\\workspaces\\AI-Code\\AI\\src\\main\\webapp\\templates\\Test.java");
+        String targetFilePath = "C:\\worspaces\\template\\src\\main\\webapp\\workspace\\szh\\sv\\src\\main\\java\\com\\szh\\test\\ctrl\\" + map.get("fileName").toString() + ".java";
+        generate(null, targetFilePath, "C:\\worspaces\\template\\AI\\src\\main\\webapp\\templates\\Test.java");
     }
 
 

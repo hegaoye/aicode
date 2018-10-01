@@ -1,5 +1,6 @@
 package com.rzhkj.base.core;
 
+import com.rzhkj.core.tools.StringTools;
 import com.rzhkj.project.entity.MapClassTable;
 import com.rzhkj.project.entity.MapFieldColumn;
 import com.rzhkj.project.entity.Project;
@@ -64,12 +65,17 @@ public class TemplateData implements Serializable {
     private List<MapFieldColumn> fields;  //类属性  集合
     private List<MapFieldColumn> pkFields;  //主键数据信息
     private List<MapFieldColumn> notPkFields;  //非主键主键数据信息
+    private List<MapClassTable> modelClasses;//各个模块下的所有类集合信息
+    //**********前端生成代码使用：start***********
+    private List<MapFieldColumn> tableFields;  //前端页面显示
+    private List<ModelData> modelDatas;//模型与实体类的关系
+    private String dashedCaseName;//破折号命名 或叫烤串命名 适用于 前端angular ,react, vue
 
-    public TemplateData() {
-    }
+    //**********前端生成代码使用：end***********
+
 
     //TODO {定义模板变量}
-    public TemplateData(Project project, MapClassTable classTable, List<MapClassTable> classes, List<MapFieldColumn> columns, List<MapFieldColumn> pkColumns, List<MapFieldColumn> notPkColumns) {
+    public TemplateData(Project project, MapClassTable classTable, List<MapClassTable> classes, List<MapFieldColumn> columns, List<MapFieldColumn> pkColumns, List<MapFieldColumn> notPkColumns, List<MapFieldColumn> tableColumns, List<MapClassTable> modelClasses, List<ModelData> modelDatas) {
         this.projectName = project.getEnglishName();
         this.basePackage = project.getBasePackage();
         this.copyright = project.getCopyright();
@@ -80,6 +86,7 @@ public class TemplateData implements Serializable {
         this.tableName = classTable.getTableName();
         this.className = classTable.getClassName();
         this.classNameLower = StringHelper.toJavaVariableName(classTable.getClassName());
+        this.dashedCaseName = StringTools.humpToLine(classNameLower);
         for (MapFieldColumn mapFieldColumn : pkColumns) {
             if (mapFieldColumn.getField().equalsIgnoreCase(classTable.getClassName())) {
                 this.classNameLower = StringHelper.toJavaVariableName(classTable.getClassName()) + "Obj";
@@ -87,6 +94,13 @@ public class TemplateData implements Serializable {
             }
         }
         for (MapFieldColumn mapFieldColumn : notPkColumns) {
+            if (mapFieldColumn.getField().equalsIgnoreCase(classTable.getClassName())) {
+                this.classNameLower = StringHelper.toJavaVariableName(classTable.getClassName()) + "Obj";
+                break;
+            }
+        }
+
+        for (MapFieldColumn mapFieldColumn : tableColumns) {
             if (mapFieldColumn.getField().equalsIgnoreCase(classTable.getClassName())) {
                 this.classNameLower = StringHelper.toJavaVariableName(classTable.getClassName()) + "Obj";
                 break;
@@ -101,10 +115,13 @@ public class TemplateData implements Serializable {
         this.fields = columns;
         this.pkFields = pkColumns;
         this.notPkFields = notPkColumns;
+        this.tableFields = tableColumns;
         if (classTable.getTableName().contains("_")) {
             this.model = classTable.getTableName().substring(0, classTable.getTableName().indexOf("_"));
         } else {
             this.model = classTable.getTableName();
         }
+        this.modelClasses = modelClasses;
+        this.modelDatas = modelDatas;
     }
 }

@@ -67,7 +67,7 @@ public class SSHResInfo {
 
     @Override
     public String toString() {
-        return "SSHResInfo [exitStuts=" + exitStuts + ", outRes=" + outRes + ", errRes=" + errRes + "]";
+        return "SSHResInfo [exitStuts=" + exitStuts + ", outRes=\n" + outRes + ", errRes=" + errRes + "]";
     }
 
     public void clear() {

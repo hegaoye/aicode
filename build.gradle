@@ -125,6 +125,8 @@ ext {
             "spring-web"                     : 'org.springframework:spring-web:4.3.8.RELEASE',
             "spring-webmvc"                  : 'org.springframework:spring-webmvc:4.3.8.RELEASE',
             "spring-webmvc-portlet"          : 'org.springframework:spring-webmvc-portlet:4.3.8.RELEASE',
+            "spring-websocket"               : 'org.springframework:spring-websocket:4.3.8.RELEASE',
+            "spring-messaging"               : 'org.springframework:spring-messaging:4.3.8.RELEASE',
             //--------------spring end------------------
 
             //--------------Testng begin------------------

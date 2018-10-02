@@ -91,6 +91,8 @@ dependencies {
     compile rootProject.ext.dependencies["spring-web"]
     compile rootProject.ext.dependencies["spring-webmvc"]
     compile rootProject.ext.dependencies["spring-webmvc-portlet"]
+    compile rootProject.ext.dependencies["spring-websocket"]
+    compile rootProject.ext.dependencies["spring-messaging"]
     //------------spring end----------------
 
     compile rootProject.ext.dependencies["testng"]

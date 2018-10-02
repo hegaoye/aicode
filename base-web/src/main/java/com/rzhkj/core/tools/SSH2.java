@@ -10,54 +10,71 @@
 package com.rzhkj.core.tools;
 
 import com.jcraft.jsch.*;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.nio.charset.Charset;
+import java.util.Arrays;
+import java.util.Scanner;
 
 /**
  * java ssh登录linux以后的一些操作方式
  * Created by lixin on 2017/10/18.
  */
-public class SSH {
-    private final static Logger log = LoggerFactory.getLogger(SSH.class);
+@Slf4j
+public class SSH2 {
+    private final static Logger log = LoggerFactory.getLogger(SSH2.class);
 
     public static void main(String[] args) {
-        try {
-            //使用目标服务器机上的用户名和密码登陆
-            SSH helper = new SSH("47.91.246.115", 1989, "root", "!@#$%^{Tutors@2017Ponddy.Com}");
-            try {
-                SSHResInfo resInfo = helper.sendCmd("unzip -d /home/env/ /home/env/1.zip");
-                System.out.println(resInfo.toString());
-                //System.out.println(helper.deleteRemoteFIleOrDir(command));
-                //System.out.println(helper.detectedFileExist(command));
-                helper.close();
-            } catch (Exception e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+        while (true) {
+            Scanner scan = new Scanner(System.in);
+            String read = scan.nextLine();
+            if (read != null) {
+                try {
+                    SSH2 helper = null;
+                    if (helper == null) {
+                        //使用目标服务器机上的用户名和密码登陆
+                        helper = new SSH2("192.168.1.220", 22, "pitop", "0");
+                    }
+                    try {
+                        SSHResInfo resInfo = helper.sendCmd(read);
+                        System.out.println(resInfo.toString());
+                    } catch (Exception e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                        helper.close();
+                    }
+                } catch (JSchException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
             }
-        } catch (JSchException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
         }
     }
 
     private String charset = Charset.defaultCharset().toString();
     private Session session;
 
-    public SSH(String host, Integer port, String user, String password) throws JSchException {
-        connect(host, port, user, password);
+    public SSH2() {
+    }
+
+    public SSH2(String host, Integer port, String user, String password) throws JSchException {
+        this.connect(host, port, user, password);
     }
 
     /**
-     * 连接sftp服务器
+     * 链接ssh服务器
      *
      * @param host     远程主机ip地址
-     * @param port     sftp连接端口，null 时为默认端口
+     * @param port     连接端口，null 时为默认端口
      * @param user     用户名
      * @param password 密码
-     * @return
+     * @return Session 链接会话
      * @throws JSchException
      */
     private Session connect(String host, Integer port, String user, String password) throws JSchException {
@@ -71,13 +88,11 @@ public class SSH {
             session.setPassword(password);
             //设置第一次登陆的时候提示，可选值:(ask | yes | no)
             session.setConfig("StrictHostKeyChecking", "no");
-            //30秒连接超时
+            //50秒连接超时
             session.connect(50000);
-
-
         } catch (JSchException e) {
             e.printStackTrace();
-            System.out.println("SFTPUitl 获取连接发生错误");
+            log.error("ssh 链接失败");
             throw e;
         }
         return session;
@@ -87,14 +102,15 @@ public class SSH {
         return sendCmd(command, 200);
     }
 
-    /*
-    * 执行命令，返回执行结果
-    * @param command 命令
-    * @param delay 估计shell命令执行时间
-    * @return String 执行命令后的返回
-    * @throws IOException
-    * @throws JSchException
-    */
+
+    /**
+     * 执行命令，返回执行结果
+     *
+     * @param command 命令
+     * @param delay   估计shell命令执行时间
+     * @return String 执行命令后的返回
+     * @throws JSchException
+     */
     public SSHResInfo sendCmd(String command, int delay) throws Exception {
         if (delay < 50) {
             delay = 50;
@@ -153,6 +169,48 @@ public class SSH {
 
         return result;
     }
+
+
+    public SSHResInfo shell(String cmd, int delay) throws Exception {
+        if (delay < 50) {
+            delay = 50;
+        }
+        SSHResInfo result = null;
+        byte[] tmp = new byte[1024]; //读数据缓存
+        StringBuffer strBuffer = new StringBuffer();  //执行SSH返回的结果
+        StringBuffer errResult = new StringBuffer();
+
+
+        ChannelShell channelShell = (ChannelShell) session.openChannel("shell");
+        channelShell.connect();
+
+        //从远程端到达的所有数据都能从这个流中读取到
+        InputStream in = channelShell.getInputStream();
+        //写入该流的所有数据都将发送到远程端。
+        OutputStream outputStream = channelShell.getOutputStream();
+        PrintWriter printWriter = new PrintWriter(outputStream,true);
+        printWriter.println(cmd+"\n exit");
+//        printWriter.println("exit");//加上个就是为了，结束本次交互
+        printWriter.flush();
+        while (true) {
+            while (in.available() > 0) {
+                int i = in.read(tmp, 0, 1024);
+                if (i < 0) break;
+                strBuffer.append(new String(tmp, 0, i));
+            }
+
+            if (channelShell.isClosed()) {
+                if (in.available() > 0) continue;
+                int code = channelShell.getExitStatus();
+                result = new SSHResInfo(code, strBuffer.toString(), null);
+                break;
+            }
+        }
+
+
+        return result;
+    }
+
 
     /**
      * @param in

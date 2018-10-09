@@ -90,4 +90,16 @@ public class MapClassTableSVImpl extends BaseMybatisSVImpl<MapClassTable, Long> 
         mapClassTableDAO.batchInsert(mapClassTables);
         return true;
     }
+
+    /**
+     * 根据项目编码查询所有表信息
+     *
+     * @param projectCode 项目编码
+     * @return List<MapClassTable>
+     */
+
+    @Override
+    public List<MapClassTable> query(String projectCode) {
+        return mapClassTableDAO.queryByProductCode(projectCode);
+    }
 }

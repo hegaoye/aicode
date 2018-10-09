@@ -114,4 +114,19 @@ public class MapFieldColumnSVImpl extends BaseMybatisSVImpl<MapFieldColumn, Long
         });
         return true;
     }
+
+    /**
+     * 根据表映射编码，查询表的所有字段信息
+     *
+     * @param mapClassTableCode 映射编码
+     * @return List<MapFieldColumn>
+     */
+    @Override
+    public List<MapFieldColumn> listFields(String mapClassTableCode) {
+        if (StringUtils.isBlank(mapClassTableCode)) {
+            logger.error(BaseException.BaseExceptionEnum.Empty_Param.toString());
+            throw new ColumnInfoException(BaseException.BaseExceptionEnum.Empty_Param);
+        }
+        return  mapFieldColumnDAO.listFields(mapClassTableCode);
+    }
 }

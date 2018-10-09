@@ -14,7 +14,11 @@ import com.rzhkj.core.entity.Page;
 import com.rzhkj.core.tools.StringTools;
 import com.rzhkj.core.tools.redis.RedisUtils;
 import com.rzhkj.project.entity.DisplayAttribute;
+import com.rzhkj.project.entity.MapClassTable;
+import com.rzhkj.project.entity.MapFieldColumn;
 import com.rzhkj.project.service.DisplayAttributeSV;
+import com.rzhkj.project.service.MapClassTableSV;
+import com.rzhkj.project.service.MapFieldColumnSV;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -27,6 +31,7 @@ import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 
 /**
@@ -47,6 +52,12 @@ public class DisplayAttributeCtrl extends BaseCtrl {
 
     @Resource
     private DisplayAttributeSV displayAttributeSV;
+
+    @Resource
+    private MapClassTableSV mapClassTableSV;
+
+    @Resource
+    private MapFieldColumnSV mapFieldColumnSV;
 
 
     /**
@@ -125,26 +136,54 @@ public class DisplayAttributeCtrl extends BaseCtrl {
     }
 
     /**
+     * 查询项目所有的表信息
+     *
+     * @return 分页对象
+     */
+    @ApiOperation(value = "查询项目所有的表信息", notes = "查询项目所有的表信息")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "projectCode", value = "项目编码", paramType = "query", required = true),
+    })
+    @GetMapping(value = "/listClassTable")
+    @ResponseBody
+    public BeanRet listClassTable(String projectCode) {
+        List<MapClassTable> mapClassTables = mapClassTableSV.query(projectCode);
+        return BeanRet.create(true, "查询成功", mapClassTables);
+    }
+
+    /**
+     * 查询项目所有的表信息
+     *
+     * @return 分页对象
+     */
+    @ApiOperation(value = "查询项目所有的表信息", notes = "查询项目所有的表信息")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "mapClassTableCode", value = "映射编码", paramType = "query", required = true),
+    })
+    @GetMapping(value = "/listFields")
+    @ResponseBody
+    public BeanRet listFields(String mapClassTableCode) {
+        List<MapFieldColumn> mapFieldColumns = mapFieldColumnSV.listFields(mapClassTableCode);
+        return BeanRet.create(true, "查询成功", mapFieldColumns);
+    }
+
+    /**
      * 创建显示属性
      *
      * @return BeanRet
      */
     @ApiOperation(value = "创建显示属性", notes = "创建显示属性")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "", paramType = "query", required = true),
-            @ApiImplicitParam(name = "mapFieldColumnCode", value = "字段编码", paramType = "query", required = true),
-            @ApiImplicitParam(name = "isRequired", value = "是否必填 Y,N", paramType = "query", required = true),
-            @ApiImplicitParam(name = "isAllowUpdate", value = "是否允许修改 Y,N", paramType = "query", required = true),
-            @ApiImplicitParam(name = "isListPageDisplay", value = "是否分页列表显示 Y,N", paramType = "query", required = true),
-            @ApiImplicitParam(name = "isDetailPageDisplay", value = "是否详情页显示 Y,N", paramType = "query", required = true),
-            @ApiImplicitParam(name = "isQueryRequired", value = "是否是查询条件 Y,N", paramType = "query", required = true),
-            @ApiImplicitParam(name = "displayType", value = "显示格式 自动完成 Autocomplete,级联选择 Cascader,日期选择框 DatePicker,时间选择 TimePicker,输入框 Input,数字输入框 InputNumber,提及 Mention,邮箱 Email，电话Phone，手机Mobile，备注说明 Summary，选择器 Select，单选 Radio，多选框 Checkbox,评分 Rate,加载展位图 Skeleton,滑动输入条 Silder，开关 Switch,穿梭框 Transfer,选择树 TreeSelect ,上传 Upload,头像 Avatar", paramType = "query", required = true)
-    })
     @PostMapping("/save")
     @ResponseBody
-    public BeanRet save(@ApiIgnore DisplayAttribute displayAttribute) {
-        displayAttributeSV.save(displayAttribute);
-        return BeanRet.create(true, "保存成功");
+    public BeanRet save(@RequestBody List<DisplayAttribute> displayAttributes) {
+        if(displayAttributes != null && displayAttributes.size() >0) {
+            for (DisplayAttribute displayAttribute: displayAttributes) {
+                displayAttributeSV.save(displayAttribute);
+            }
+            return BeanRet.create(true, "保存成功");
+        } else {
+            return BeanRet.create(true, "参数为空");
+        }
     }
 
 

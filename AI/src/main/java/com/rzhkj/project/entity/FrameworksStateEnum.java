@@ -6,7 +6,7 @@
 package com.rzhkj.project.entity;
 
 /**
- * 项目状态：停用[Disenable]，启用[Enable],删除[Delete]
+ * 模板状态：停用[Disenable]，启用[Enable],删除[Delete]
  *
  * @author lixin hegaoye@qq.com
  * @version 1.0

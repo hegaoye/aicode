@@ -37,6 +37,29 @@ public class SSHClient {
     private PrintStream sshout;  // SSH 輸出端
     private StringBuffer conbuf; // 最後一個指令的執行結果
 
+    public static void main(String[] args) {
+        SSHClient sshClient = null;
+        while (true) {
+            Scanner scan = new Scanner(System.in);
+            String read = scan.nextLine();
+            if (read != null) {
+                if (sshClient == null) {
+                    //使用目标服务器机上的用户名和密码登陆
+                    sshClient = new SSHClient("192.168.1.220", "pitop", "0");
+                }
+                try {
+                    String result = sshClient.execute(read);
+                    System.out.println(result);
+                } catch (Exception e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                    sshClient.close();
+                }
+
+            }
+        }
+    }
+
     /**
      * 建立 SSH 連線
      *
@@ -57,8 +80,8 @@ public class SSHClient {
      * @param charset  字串編碼
      */
     public SSHClient(String host, String user, String password, String charset) {
-        PipedInputStream ppis;
-        PipedOutputStream ppos;
+        PipedInputStream pipedInputStream;
+        PipedOutputStream pipedOutputStream;
 
         try {
             // 設定連線方式
@@ -67,26 +90,26 @@ public class SSHClient {
             session.setPassword(password);
             session.setConfig("StrictHostKeyChecking", "no");
             session.connect();
-            ChannelShell ch = (ChannelShell) session.openChannel("shell");
+            ChannelShell channelShell = (ChannelShell) session.openChannel("shell");
 
             // 建立輸入端
-            ppis = new PipedInputStream();
-            ppos = new PipedOutputStream();
-            ppis.connect(ppos);
-            ch.setInputStream(ppis);
-            sshout = new PrintStream(ppos);
+            pipedInputStream = new PipedInputStream();
+            pipedOutputStream = new PipedOutputStream();
+            pipedInputStream.connect(pipedOutputStream);
+            channelShell.setInputStream(pipedInputStream);
+            sshout = new PrintStream(pipedOutputStream);
 
             // 建立輸出端
-            ppis = new PipedInputStream();
-            ppos = new PipedOutputStream();
-            ppis.connect(ppos);
-            ch.setOutputStream(ppos);
-            sshin = new Scanner(ppis, charset);
+            pipedInputStream = new PipedInputStream();
+            pipedOutputStream = new PipedOutputStream();
+            pipedInputStream.connect(pipedOutputStream);
+            channelShell.setOutputStream(pipedOutputStream);
+            sshin = new Scanner(pipedInputStream, charset);
 
             // 連線到主機 (會 block)
-            ch.connect();
-            while (!ch.isConnected()) {
-                if (ch.isClosed()) break;
+            channelShell.connect();
+            while (!channelShell.isConnected()) {
+                if (channelShell.isClosed()) break;
                 try {
                     Thread.sleep(100);
                 } catch (InterruptedException e) {

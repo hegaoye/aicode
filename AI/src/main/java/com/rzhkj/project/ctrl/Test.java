@@ -108,7 +108,7 @@ public class Test {
 
     public static void test3() throws JSchException, IOException {
         JSch jsch = new JSch();
-        Session session = jsch.getSession("pi", "192.168.1.36", 22);
+        Session session = jsch.getSession("pitop", "192.168.1.220", 22);
         session.setPassword("0");
         session.setConfig("StrictHostKeyChecking", "no");
         session.connect(50000);
@@ -159,6 +159,7 @@ public class Test {
     public static void main(String[] args) throws Exception {
 
 
+//        test();
 //        test2();
         test3();
 

@@ -189,7 +189,8 @@ public class SSH2 {
         //写入该流的所有数据都将发送到远程端。
         OutputStream outputStream = channelShell.getOutputStream();
         PrintWriter printWriter = new PrintWriter(outputStream,true);
-        printWriter.println(cmd+"\n exit");
+        printWriter.println(cmd);
+//        printWriter.println(cmd+"\n exit");
 //        printWriter.println("exit");//加上个就是为了，结束本次交互
         printWriter.flush();
         while (true) {
@@ -204,6 +205,12 @@ public class SSH2 {
                 int code = channelShell.getExitStatus();
                 result = new SSHResInfo(code, strBuffer.toString(), null);
                 break;
+            }
+
+            try {
+                Thread.sleep(delay);
+            } catch (Exception ee) {
+                ee.printStackTrace();
             }
         }
 

@@ -5,14 +5,18 @@ import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import com.rzhkj.core.tools.SSH2;
+import com.rzhkj.core.tools.SSHResInfo;
 import com.rzhkj.project.ctrl.SSHClient;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.map.HashedMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.socket.*;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Map;
+import java.util.Scanner;
 
 /**
  * Created by lixin on 2018/9/30.
@@ -47,10 +51,42 @@ public class WSHandler implements WebSocketHandler {
 
 //        this.test(wss, cmd);
         if (sshClient == null) {
-            sshClient = new SSHClient("192.168.1.36", "pi", "0");
+            sshClient = new SSHClient("192.168.1.220", "pitop", "0");
         }
         String result = sshClient.execute(cmd);
         wss.sendMessage(new TextMessage(result));
+//        test2(wss, cmd);
+    }
+
+
+    SSH2 helper = null;
+    Scanner scan = null;
+
+    public void test2(WebSocketSession webSocketSession, String cmd) throws IOException {
+        InputStream inputStream = new ByteArrayInputStream(cmd.getBytes());
+        if (scan == null) {
+            scan = new Scanner(inputStream, "UTF-8");
+        }
+        String read = scan.nextLine();
+        if (read != null) {
+            try {
+                if (helper == null) {
+                    //使用目标服务器机上的用户名和密码登陆
+                    helper = new SSH2("192.168.1.220", 22, "pitop", "0");
+                }
+                try {
+                    SSHResInfo resInfo = helper.shell(read, 200);
+                    System.out.println(resInfo.toString());
+                } catch (Exception e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                    helper.close();
+                }
+            } catch (JSchException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
     }
 
     Session session = null;

@@ -171,6 +171,14 @@
         </if>
     </select>
 
+    <!--根据映射编码查询表的所有字段信息-->
+    <select id="MapFieldColumn.listFields" resultMap="rs_base">
+        SELECT
+        <include refid="MapFieldColumn.columns"/>
+        FROM `map_field_column`
+        WHERE mapClassTableCode = #{mapClassTableCode}
+    </select>
+
 
 </mapper>
 

@@ -31,7 +31,7 @@ public class WSHandler implements WebSocketHandler {
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         log.debug("connect to the websocket success......");
         session.sendMessage(new TextMessage("Server:connected OK!"));
-        wsClientManager.setWSS.add(session);
+        wsClientManager.put(session);
     }
 
     SSHClient sshClient = null;
@@ -142,7 +142,7 @@ public class WSHandler implements WebSocketHandler {
     public void handleTransportError(WebSocketSession wss, Throwable thrwbl) throws Exception {
         if (wss.isOpen()) {
             wss.close();
-            wsClientManager.setWSS.remove(wss);
+            wsClientManager.remove(wss);
         }
         log.debug("websocket connection closed......");
     }
@@ -150,7 +150,7 @@ public class WSHandler implements WebSocketHandler {
     @Override
     public void afterConnectionClosed(WebSocketSession wss, CloseStatus cs) throws Exception {
         log.debug("websocket connection closed......");
-        wsClientManager.setWSS.remove(wss);
+        wsClientManager.remove(wss);
     }
 
     @Override

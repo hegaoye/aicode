@@ -7,6 +7,7 @@ package com.rzhkj.project.service.impl;
 
 import com.baidu.fsg.uid.UidGenerator;
 import com.google.common.collect.Maps;
+import com.rzhkj.base.tools.WSTools;
 import com.rzhkj.core.base.BaseMybatisDAO;
 import com.rzhkj.core.base.BaseMybatisSVImpl;
 import com.rzhkj.core.exceptions.BaseException;
@@ -21,6 +22,7 @@ import com.rzhkj.project.service.GenerateSV;
 import com.rzhkj.project.service.ProjectJobSV;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import org.springframework.web.socket.WebSocketSession;
 
 import javax.annotation.Resource;
 import java.util.Date;
@@ -130,7 +132,41 @@ public class ProjectJobSVImpl extends BaseMybatisSVImpl<ProjectJob, Long> implem
         Executors.cacheThreadExecutor(new Runnable() {
             @Override
             public void run() {
-                generateSV.aiCode(projectCode, projectJob);
+                generateSV.aiCode(projectCode, projectJob, null);
+            }
+        });
+        return projectJob;
+    }
+
+    /**
+     * 执行任务
+     * 1.创建项目
+     * 2.获取类信息
+     * 3.获取模板信息
+     * 4.生成源码
+     * 5.获取模块信息
+     * 6.获取版本控制管理信息
+     *
+     * @param projectCode      任务编码
+     * @param webSocketSession 对象
+     * @return
+     */
+
+    @Override
+    public ProjectJob execute(String projectCode, WebSocketSession webSocketSession) {
+        //创建任务追踪
+        ProjectJob projectJob = new ProjectJob();
+        projectJob.setCode(String.valueOf(uidGenerator.getUID()));
+        projectJob.setProjectCode(projectCode);
+        projectJob.setState(ProjectJob.State.Executing.name());
+        projectJob.setNumber(1);
+        projectJob.setCreateTime(new Date());
+        projectJobDAO.insert(projectJob);
+        WSTools wsTools=new WSTools(webSocketSession);
+        Executors.cacheThreadExecutor(new Runnable() {
+            @Override
+            public void run() {
+                generateSV.aiCode(projectCode, projectJob, wsTools);
             }
         });
         return projectJob;

@@ -115,14 +115,14 @@
     <bean class="com.rzhkj.core.config.SwaggerConfig"/>
 
     <bean id="demoWSHandler" class="com.rzhkj.base.interceptor.WSHandler"/>
-    <bean id="wsClientManager" class="com.rzhkj.base.interceptor.WSClientManager"/>
+    <!--<bean id="wsClientManager" class="com.rzhkj.base.interceptor.WSClientManager"/>-->
     <websocket:handlers allowed-origins="*">
         <websocket:mapping path="/websocket" handler="demoWSHandler"/>
         <websocket:handshake-interceptors>
             <bean class="com.rzhkj.base.interceptor.HandshakeInterceptor"/>
         </websocket:handshake-interceptors>
-
     </websocket:handlers>
+
     <!-- 配置拦截器 -->
     <!--<mvc:interceptors>
         <mvc:interceptor>

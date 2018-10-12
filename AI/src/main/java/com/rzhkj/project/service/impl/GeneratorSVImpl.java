@@ -6,6 +6,7 @@ import com.rzhkj.base.core.FreemarkerHelper;
 import com.rzhkj.base.core.ModelData;
 import com.rzhkj.base.core.StringHelper;
 import com.rzhkj.base.core.TemplateData;
+import com.rzhkj.base.tools.WSTools;
 import com.rzhkj.core.enums.YNEnum;
 import com.rzhkj.core.tools.*;
 import com.rzhkj.project.dao.*;
@@ -62,9 +63,10 @@ public class GeneratorSVImpl implements GenerateSV {
      *
      * @param projectCode 项目编码
      * @param projectJob  项目job
+     * @param webSocket
      */
     @Override
-    public void aiCode(String projectCode, ProjectJob projectJob) {
+    public void aiCode(String projectCode, ProjectJob projectJob, WSTools webSocket) {
         try {
             //1.创建项目
             ProjectJobLogs projectJobLogs = new ProjectJobLogs();
@@ -76,7 +78,9 @@ public class GeneratorSVImpl implements GenerateSV {
             Project project = projectDAO.load(map);
             String projectPath = this.buildProject(project);
             projectDAO.update(projectCode, project.getBuildNumber() != null ? project.getBuildNumber() + 1 : 1);
-            projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), " 已初始化项目 【 " + project.getName() + " ( " + project.getEnglishName() + " )】 工作空间"));
+            String log = " 已初始化项目 【 " + project.getName() + " ( " + project.getEnglishName() + " )】 工作空间";
+            webSocket.send(log);
+            projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), log));
             logger.info("创建工作空间库完成");
 
             //2.获取类信息
@@ -93,7 +97,9 @@ public class GeneratorSVImpl implements GenerateSV {
 
             //4.生成源码
             projectFramworkList.forEach(projectFramwork -> {
-                projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "已获取项目 【" + projectFramwork.getFrameworks().getName() + "】 的模板"));
+                String desc = "已获取项目 【" + projectFramwork.getFrameworks().getName() + "】 的模板";
+                webSocket.send(desc);
+                projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), desc));
                 Map<String, Object> param = new HashMap<>();
                 param.put("frameworkCode", projectFramwork.getFrameworks().getCode());
                 Frameworks frameworks = projectFramwork.getFrameworks();
@@ -103,7 +109,9 @@ public class GeneratorSVImpl implements GenerateSV {
                     projectMapList.forEach(projectMap -> {
                         this.generator(projectPath, project, frameworks, projectMap.getMapClassTable(), frameworksTemplate, mapClassTableList);
                     });
-                    projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), " 【已经生成】 模板 " + frameworksTemplate.getPath() + " 的源码"));
+                    String genLog = " 【已经生成】 模板 " + frameworksTemplate.getPath() + " 的源码";
+                    webSocket.send(genLog);
+                    projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), genLog));
                 });
             });
 
@@ -112,8 +120,11 @@ public class GeneratorSVImpl implements GenerateSV {
 
 
             //生成sql脚本到项目下
-            this.generateTsql(projectPath, project.getEnglishName(), projectCode);
-            projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), " 【已经生成】 " + project.getEnglishName() + "Sql 脚本文件并追加系统配置"));
+            String sql = this.generateTsql(projectPath, project.getEnglishName(), projectCode);
+            webSocket.send(sql);
+            String sqllog = " 【已经生成】 " + project.getEnglishName() + "Sql 脚本文件并追加系统配置";
+            webSocket.send(sqllog);
+            projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), sqllog));
 
             //5.获取模块信息 TODO
 
@@ -122,21 +133,27 @@ public class GeneratorSVImpl implements GenerateSV {
             map.put("projectCode", project.getCode());
             ProjectRepositoryAccount projectRepositoryAccount = projectRepositoryAccountDAO.load(map);
             if (projectRepositoryAccount != null) {
-                projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "获取代码仓库信息: " + projectRepositoryAccount.getAccount()));
+                String gitLog = "获取代码仓库信息: " + projectRepositoryAccount.getAccount();
+                webSocket.send(gitLog);
+                projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), gitLog));
                 GitTools.commitAndPush(new File(projectPath), projectRepositoryAccount.getAccount(), projectRepositoryAccount.getPassword(), "AI-Code 为您构建代码，享受智慧生活");
-                projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "代码已经提交到 ⇛⇛⇛ <a style='text-decoration:underline;' href='" + projectRepositoryAccount.getHome() + "' target='_blank'>" + projectRepositoryAccount.getHome() + " </a>仓库"));
+                gitLog = "代码已经提交到 ⇛⇛⇛ <a style='text-decoration:underline;' href='" + projectRepositoryAccount.getHome() + "' target='_blank'>" + projectRepositoryAccount.getHome() + " </a>仓库";
+                webSocket.send(gitLog);
+                projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), gitLog));
             }
 
             //7.创建压缩文件
             this.zipProject(project);
-
+            String endLog = "代码已打包ZIP,您还可以点击下载 ⇛⇛⇛  <a style='text-decoration:underline;' href='" + project.getDownloadUrl() + "' target='_blank'>" + project.getEnglishName() + ".zip</a>";
+            webSocket.send(endLog);
             //记录日志
-            projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "代码已打包ZIP,您还可以点击下载 ⇛⇛⇛  <a style='text-decoration:underline;' href='" + project.getDownloadUrl() + "' target='_blank'>" + project.getEnglishName() + ".zip</a>"));
+            projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), endLog));
             projectJob.setState(ProjectJob.State.Completed.name());
             projectJobDAO.update(projectJob);
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e.getMessage());
+            webSocket.send(e.getMessage());
             projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "ERROR : " + e.getMessage()));
             projectJob.setState(ProjectJob.State.Error.name());
             projectJobDAO.update(projectJob);
@@ -148,16 +165,19 @@ public class GeneratorSVImpl implements GenerateSV {
                 ProjectJobLogs projectJobLogs = new ProjectJobLogs();
                 projectJobLogs.setCode(projectJob.getCode());
                 projectJobLogs.setLog("Finished: SUCCESS");
+                webSocket.send("Finished: SUCCESS");
                 projectJobLogsDAO.insert(projectJobLogs);
             } else {
                 ProjectJobLogs projectJobLogs = new ProjectJobLogs();
                 projectJobLogs.setCode(projectJob.getCode());
                 projectJobLogs.setLog("Finished: ERROR");
+                webSocket.send("Finished: ERROR");
                 projectJobLogsDAO.insert(projectJobLogs);
             }
             ProjectJobLogs projectJobLogs = new ProjectJobLogs();
             projectJobLogs.setCode(projectJob.getCode());
             projectJobLogs.setLog("End");
+            webSocket.send("End");
             projectJobLogsDAO.insert(projectJobLogs);
         }
     }
@@ -229,7 +249,7 @@ public class GeneratorSVImpl implements GenerateSV {
     }
 
 
-    private void generateTsql(String projectPath, String projectEnglishName, String projectCode) {
+    private String generateTsql(String projectPath, String projectEnglishName, String projectCode) {
         String tsql = "-- AI-Code 为您构建代码，享受智慧生活!\n";
         String tsqlLast = "\nCREATE TABLE `worker_node` (\n" +
                 "  `ID` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'auto increment id',\n" +
@@ -250,6 +270,7 @@ public class GeneratorSVImpl implements GenerateSV {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return tsqlLast;
     }
 
     /**
@@ -339,7 +360,6 @@ public class GeneratorSVImpl implements GenerateSV {
         HashSet hashSet = new HashSet(modelDatas);
         modelDatas.clear();
         modelDatas.addAll(hashSet);
-
 
 
         mapClassTableList.forEach(mapClassTableObj -> {

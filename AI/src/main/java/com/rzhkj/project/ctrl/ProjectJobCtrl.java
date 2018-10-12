@@ -2,6 +2,7 @@ package com.rzhkj.project.ctrl;
 
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Maps;
+import com.rzhkj.base.interceptor.WSClientManager;
 import com.rzhkj.core.base.BaseCtrl;
 import com.rzhkj.core.entity.BeanRet;
 import com.rzhkj.core.entity.Page;
@@ -14,12 +15,15 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.collections.map.HashedMap;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.socket.WebSocketSession;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
 
@@ -41,6 +45,9 @@ public class ProjectJobCtrl extends BaseCtrl {
 
     @Resource
     private ProjectJobSV projectJobSV;
+
+    @Resource
+    private WSClientManager wsClientManager;
 
     /**
      * 查询任务详情信息
@@ -203,11 +210,16 @@ public class ProjectJobCtrl extends BaseCtrl {
     })
     @GetMapping(value = "/execute")
     @ResponseBody
-    public BeanRet execute(String code) {
+    public BeanRet execute(String code, HttpServletRequest request) {
         try {
             Assert.hasText(code, BaseException.BaseExceptionEnum.Empty_Param.toString());
-            ProjectJob projectJob = projectJobSV.execute(code);
-            return BeanRet.create(true, "执行任务成功", projectJob);
+//            ProjectJob projectJob = projectJobSV.execute(code); TODO 测试新日志暂时注释
+            WebSocketSession webSocketSession = wsClientManager.get(request.getRemoteHost());
+            if (webSocketSession != null) {
+                ProjectJob projectJob = projectJobSV.execute(code, webSocketSession);
+                return BeanRet.create(true, "执行任务成功", projectJob);
+            }
+            return BeanRet.create();
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e.getMessage());

@@ -4,9 +4,7 @@ import com.jcraft.jsch.*;
 import com.rzhkj.core.tools.SSH2;
 import com.rzhkj.core.tools.SSHResInfo;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.Scanner;
 
 /**
@@ -156,12 +154,134 @@ public class Test {
     }
 
 
+    public static void test4() throws JSchException, IOException {
+        JSch jsch = new JSch();
+        Session session = jsch.getSession("pitop", "192.168.1.220", 22);
+        session.setPassword("0");
+        session.setConfig("StrictHostKeyChecking", "no");
+        session.connect(50000);
+
+        Channel channel = session.openChannel("shell");
+//        InputStream inputStream = new ByteArrayInputStream(new String("ps -ef").getBytes());
+//        channel.setInputStream(inputStream);
+        channel.setInputStream(System.in);
+//        FileOutputStream fileOutputStream=new FileOutputStream(File.createTempFile("aaa","txt",new File("C:\\")));
+//        channel.setOutputStream(fileOutputStream);
+        InputStream inputStream1 = channel.getInputStream();
+        byte[] tmp1 = new byte[1024];
+
+//        OutputStream outputStream = new ByteArrayOutputStream();
+//        channel.setOutputStream(outputStream);
+//        byte[] tmp = new byte[1024];
+//        outputStream.write(tmp);
+//        outputStream.flush();
+
+//        InputStream inputStream = new ByteArrayInputStream(tmp);
+        channel.connect(3 * 1000);
+
+
+        Scanner scanner = new Scanner(inputStream1);
+        while (scanner.hasNextLine()) {
+            System.out.println(scanner.nextLine());
+        }
+
+
+    }
+
+
+    static Session session = null;
+    static Channel channel = null;
+    static PrintWriter sshout;  // SSH 輸出端
+    static Scanner scan = null;
+
+    public static String test5(String cmd) throws JSchException, IOException {
+        if (session == null) {
+            JSch jsch = new JSch();
+            session = jsch.getSession("pitop", "192.168.1.220", 22);
+            session.setPassword("0");
+            session.setConfig("StrictHostKeyChecking", "no");
+            session.connect(50000);
+
+            channel = session.openChannel("shell");
+            PipedInputStream pipedInputStream;
+            PipedOutputStream pipedOutputStream;
+            pipedInputStream = new PipedInputStream();
+            pipedOutputStream = new PipedOutputStream();
+            pipedInputStream.connect(pipedOutputStream);
+            channel.setInputStream(pipedInputStream);
+            sshout = new PrintWriter(pipedOutputStream, true);
+
+            // 创建输出通道
+            pipedInputStream = new PipedInputStream();
+            pipedOutputStream = new PipedOutputStream();
+            pipedInputStream.connect(pipedOutputStream);
+            channel.setOutputStream(pipedOutputStream);
+            scan = new Scanner(pipedInputStream, "UTF-8");
+            channel.connect(3 * 1000);
+            sshout.print("\n\n");
+            sshout.flush();
+        }
+
+        sshout.println(cmd);
+        sshout.flush();
+        StringBuffer stringBuffer = new StringBuffer();
+        boolean flag = true;
+        while (flag) {
+            if (scan.hasNextLine()) {
+                String r = scan.nextLine();
+//                if (r.contains("~")) {
+//                    break;
+//                }
+                stringBuffer.append(r);
+                stringBuffer.append("\n");
+            }
+
+            try {
+                Thread.sleep(200);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        String result = stringBuffer.toString();
+        System.out.println(result);
+
+        String line = null;
+//        do {
+//            line = scan.nextLine();
+//        } while (!line.matches("^[0-9]+$"));
+
+        return result;
+    }
+
     public static void main(String[] args) throws Exception {
 
 
 //        test();
 //        test2();
-        test3();
+//        test3();
+//        test4();
+
+        while (true) {
+            Scanner scan = new Scanner(System.in);
+            String read = scan.nextLine();
+            if (read != null) {
+                String result = test5(read);
+                System.out.println(result);
+            }
+        }
+
+//        SSHClient sshClient = null;
+//        while (true) {
+//            Scanner scan = new Scanner(System.in);
+//            String read = scan.nextLine();
+//            if (read != null) {
+//                if (sshClient == null) {
+//                    sshClient = new SSHClient("192.168.1.220", "pitop", "0");
+//                }
+//                String result = sshClient.execute(read);
+//                System.out.println(result);
+//            }
+//        }
 
 
     }

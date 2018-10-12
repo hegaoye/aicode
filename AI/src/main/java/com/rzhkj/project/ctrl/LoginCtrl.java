@@ -1,6 +1,10 @@
 package com.rzhkj.project.ctrl;
 
 import com.alibaba.fastjson.JSON;
+import com.jcraft.jsch.Channel;
+import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.Session;
 import com.rzhkj.core.base.BaseCtrl;
 import com.rzhkj.core.base.JwtToken;
 import com.rzhkj.core.common.Constants;
@@ -24,7 +28,9 @@ import springfox.documentation.annotations.ApiIgnore;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
+import java.io.*;
 import java.util.Map;
+import java.util.Scanner;
 
 
 /**
@@ -104,4 +110,141 @@ public class LoginCtrl extends BaseCtrl {
             return BeanRet.create(false, "注册失败");
         }
     }
+
+
+    @ApiOperation(value = "ssh", notes = "ssh")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "cmd", value = "cmd", required = true, paramType = "query")
+    })
+    @PostMapping("/ssh")
+    @ResponseBody
+    public BeanRet ssh(String cmd) {
+        String result = null;
+        try {
+            result = test(cmd);
+
+        } catch (JSchException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return BeanRet.create(true, "", result);
+    }
+
+    Session session = null;
+    Channel channel = null;
+    PrintWriter sshout;  // SSH 輸出端
+    Scanner scan = null;
+    InputStream inputStream = null;
+
+    public String test(String cmd) throws JSchException, IOException {
+        if (session == null) {
+            JSch jsch = new JSch();
+            session = jsch.getSession("pitop", "192.168.1.220", 22);
+            session.setPassword("0");
+            session.setConfig("StrictHostKeyChecking", "no");
+            session.connect(50000);
+
+            channel = session.openChannel("shell");
+            PipedInputStream pipedInputStream;
+            PipedOutputStream pipedOutputStream;
+            pipedInputStream = new PipedInputStream();
+            pipedOutputStream = new PipedOutputStream();
+            pipedInputStream.connect(pipedOutputStream);
+            channel.setInputStream(pipedInputStream);
+            sshout = new PrintWriter(pipedOutputStream, true);
+
+            // 创建输出通道
+            pipedInputStream = new PipedInputStream();
+            pipedOutputStream = new PipedOutputStream();
+            pipedInputStream.connect(pipedOutputStream);
+            channel.setOutputStream(pipedOutputStream);
+//            inputStream = pipedInputStream;
+            scan = new Scanner(pipedInputStream, "UTF-8");
+            channel.connect(3 * 1000);
+            sshout.println("");
+            sshout.flush();
+
+        }
+
+        if (cmd.contains("su")) {
+            switchRoot("0");
+            return "root";
+        }
+        sshout.print(cmd);
+        sshout.print("\n\n");
+        sshout.flush();
+        StringBuffer stringBuffer = new StringBuffer();
+        boolean flag = true;
+//        byte[] tmp = new byte[1024];
+//        while (true) {
+//            if (stringBuffer.length() > 0) {
+//                break;
+//            }
+//            while (inputStream.available() > 0) {
+//                int i = inputStream.read(tmp, 0, 1024);
+//                if (i < 0) break;
+//                String s = new String(tmp, 0, i);
+//                stringBuffer.append(s);
+//                stringBuffer.append("\n");
+//            }
+//            if (channel.isClosed()) {
+//                System.out.println("exit-status: " + channel.getExitStatus());
+//                break;
+//            }
+//            try {
+//                Thread.sleep(150);
+//            } catch (Exception ee) {
+//            }
+//        }
+
+        String line = null;
+        while (scan.hasNext()) {
+            line = scan.nextLine();
+            stringBuffer.append(line);
+            stringBuffer.append("\n");
+            if (line.trim().equals("pitop@pitop:~$")) {
+                break;
+            }
+            if (line.trim().contains("password")) {
+                break;
+            }
+        }
+
+        String result = stringBuffer.toString();
+        System.out.println(result);
+        sshout.print("echo $?\n");
+        sshout.flush();
+
+        do {
+            line = scan.nextLine();
+        } while (!line.matches("^[0-9]+$"));
+
+        return result;
+    }
+
+
+    public void switchRoot(String password) {
+        String line;
+
+        // 搜尋登入成功的提示字串
+        sshout.print("su -\n");
+        sshout.flush();
+
+        // 搜尋密碼輸入的提示字串
+        scan.findWithinHorizon("Password: ", 0);
+        sshout.print(password);
+        sshout.print('\n');
+        sshout.flush();
+
+        // 檢查是否登入成功
+        sshout.print("echo $?\n");
+        sshout.flush();
+        do {
+            line = scan.nextLine();
+        } while (!line.matches("^[0-9]+$"));
+
+    }
+
+
 }

@@ -12,9 +12,7 @@ import org.apache.commons.collections.map.HashedMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.socket.*;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.Map;
 import java.util.Scanner;
 
@@ -49,12 +47,22 @@ public class WSHandler implements WebSocketHandler {
 //        TextMessage returnMessage = new TextMessage(resInfo.toString());
 //        wss.sendMessage(returnMessage);
 
+
+//        scan = new Scanner(cmd);
+//        while (scan.hasNextLine()) {
+//            wss.sendMessage(new TextMessage(scan.nextLine()));
+//        }
+
+
 //        this.test(wss, cmd);
-        if (sshClient == null) {
-            sshClient = new SSHClient("192.168.1.220", "pitop", "0");
-        }
-        String result = sshClient.execute(cmd);
-        wss.sendMessage(new TextMessage(result));
+//        if (sshClient == null) {
+//            sshClient = new SSHClient("192.168.1.220", "pitop", "0");
+//        }
+//        String result = sshClient.execute(cmd);
+//        wss.sendMessage(new TextMessage(result));
+
+
+        test(wss, cmd);
 //        test2(wss, cmd);
     }
 
@@ -78,12 +86,10 @@ public class WSHandler implements WebSocketHandler {
                     SSHResInfo resInfo = helper.shell(read, 200);
                     System.out.println(resInfo.toString());
                 } catch (Exception e) {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
                     helper.close();
                 }
             } catch (JSchException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         }
@@ -91,6 +97,8 @@ public class WSHandler implements WebSocketHandler {
 
     Session session = null;
     Channel channel = null;
+    Scanner scanner = null;
+    PrintWriter sshout;  // SSH 輸出端
 
     public void test(WebSocketSession webSocketSession, String cmd) throws JSchException, IOException {
         if (session == null) {
@@ -99,45 +107,34 @@ public class WSHandler implements WebSocketHandler {
             session.setPassword("0");
             session.setConfig("StrictHostKeyChecking", "no");
             session.connect(50000);
+
+            channel = session.openChannel("shell");
+            PipedInputStream pipedInputStream;
+            PipedOutputStream pipedOutputStream;
+            pipedInputStream = new PipedInputStream();
+            pipedOutputStream = new PipedOutputStream();
+            pipedInputStream.connect(pipedOutputStream);
+            channel.setInputStream(pipedInputStream);
+            sshout = new PrintWriter(pipedOutputStream, true);
+//        channel.setInputStream(new ByteArrayInputStream((cmd + "\n").getBytes()));
+
+            // 创建输出通道
+            pipedInputStream = new PipedInputStream();
+            pipedOutputStream = new PipedOutputStream();
+            pipedInputStream.connect(pipedOutputStream);
+            channel.setOutputStream(pipedOutputStream);
+            scan = new Scanner(pipedInputStream, "UTF-8");
+            channel.connect(3 * 1000);
         }
 
-        channel = session.openChannel("shell");
-        channel.setInputStream(new ByteArrayInputStream((cmd + "\n").getBytes()));
+//        InputStream inputStream1 = channel.getInputStream();
+//        byte[] tmp1 = new byte[1024];
+        sshout.println(cmd);
+        sshout.flush();
+        while (scan.hasNextLine()) {
+            webSocketSession.sendMessage(new TextMessage(scan.nextLine()));
+        }
 
-        InputStream inputStream1 = channel.getInputStream();
-        byte[] tmp1 = new byte[1024];
-
-        channel.connect(3 * 1000);
-
-        new Thread() {
-            public void run() {
-                try {
-                    while (true) {
-                        StringBuffer stringBuffer = new StringBuffer();
-                        while (inputStream1.available() > 0) {
-                            int i = inputStream1.read(tmp1, 0, 1024);
-                            stringBuffer.append(new String(tmp1, 0, i));
-                        }
-                        if (stringBuffer.length() <= 0) {
-                            return;
-                        }
-                        try {
-                            Thread.sleep(150);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                        if (stringBuffer.length() > 0) {
-                            String result = new String(stringBuffer.toString().getBytes("ISO-8859-1"), "UTF-8");
-                            log.debug(result);
-                            webSocketSession.sendMessage(new TextMessage(result));
-//                            return;
-                        }
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }.start();
 
     }
 

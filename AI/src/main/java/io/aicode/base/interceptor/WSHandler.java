@@ -30,7 +30,7 @@ public class WSHandler implements WebSocketHandler {
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         log.debug("connect to the websocket success......");
-        session.sendMessage(new TextMessage("Server:connected OK!"));
+        session.sendMessage(new TextMessage("OK"));
         wsClientManager.put(session);
     }
 
@@ -62,7 +62,9 @@ public class WSHandler implements WebSocketHandler {
 //        wss.sendMessage(new TextMessage(result));
 
 
-        test(wss, cmd);
+        log.info(cmd);
+        wss.sendMessage(new TextMessage(cmd));
+//        test(wss, cmd);
 //        test2(wss, cmd);
     }
 

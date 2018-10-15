@@ -25,41 +25,29 @@ public class FreemarkerHelper {
     /**
      * 生成源文件
      *
-     * @param templateData          模型数据
+     * @param templateData   模型数据
      * @param targetFilePath 目标路径 /xxxx/xxx/{ClassName.java}
      * @param templatePath   模板路径 [/xxx/xxxx|/xxx/xxxx/]
      */
-    public static void generate(TemplateData templateData, String targetFilePath, String templatePath) {
+    public static void generate(TemplateData templateData, String targetFilePath, String templatePath) throws IOException, TemplateException {
         Writer out = null;
-        try {
-            templatePath = templatePath.replace("//", "/").replace("\\", "/");
-            String templateFileName = templatePath.substring(templatePath.lastIndexOf("/") + 1);
-            templatePath = templatePath.substring(0, templatePath.lastIndexOf("/"));
-            targetFilePath = targetFilePath.replace("\\", "/").replace("//", "/");
-            String filePath = targetFilePath.substring(0, targetFilePath.lastIndexOf("/"));
+        templatePath = templatePath.replace("//", "/").replace("\\", "/");
+        String templateFileName = templatePath.substring(templatePath.lastIndexOf("/") + 1);
+        templatePath = templatePath.substring(0, templatePath.lastIndexOf("/"));
+        targetFilePath = targetFilePath.replace("\\", "/").replace("//", "/");
+        String filePath = targetFilePath.substring(0, targetFilePath.lastIndexOf("/"));
 
-            File dirFile = new File(filePath);
-            if (!dirFile.exists()) {
-                dirFile.mkdirs();
-            }
-            Configuration configuration = new Configuration();
-            configuration.setDefaultEncoding("UTF-8");
-            configuration.setDirectoryForTemplateLoading(new File(templatePath));
-            Template temp = configuration.getTemplate(templateFileName);
-            out = new OutputStreamWriter(new FileOutputStream(targetFilePath), Charset.forName("UTF-8"));
-            temp.process(templateData, out);
-            out.flush();
-            out.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (TemplateException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                out.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        File dirFile = new File(filePath);
+        if (!dirFile.exists()) {
+            dirFile.mkdirs();
         }
+        Configuration configuration = new Configuration();
+        configuration.setDefaultEncoding("UTF-8");
+        configuration.setDirectoryForTemplateLoading(new File(templatePath));
+        Template temp = configuration.getTemplate(templateFileName);
+        out = new OutputStreamWriter(new FileOutputStream(targetFilePath), Charset.forName("UTF-8"));
+        temp.process(templateData, out);
+        out.flush();
+        out.close();
     }
 }

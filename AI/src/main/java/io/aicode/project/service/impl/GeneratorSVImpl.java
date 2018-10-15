@@ -2,6 +2,7 @@ package io.aicode.project.service.impl;
 
 import com.baidu.fsg.uid.UidGenerator;
 import com.google.common.collect.Maps;
+import freemarker.template.TemplateException;
 import io.aicode.base.core.FreemarkerHelper;
 import io.aicode.base.core.ModelData;
 import io.aicode.base.core.StringHelper;
@@ -69,15 +70,11 @@ public class GeneratorSVImpl implements GenerateSV {
     public void aiCode(String projectCode, ProjectJob projectJob, WSTools webSocket) {
         try {
             //1.创建项目
-            ProjectJobLogs projectJobLogs = new ProjectJobLogs();
-            projectJobLogs.setCode(projectJob.getCode());
-            projectJobLogs.setLog("Start By AI-Code @Copyright <a href='http://www.aicode.io' target='_blank'>仁中和</a>");
-            webSocket.send("Start By AI-Code @Copyright <a href='http://www.aicode.io' target='_blank'>仁中和</a>");
-            projectJobLogsDAO.insert(projectJobLogs);
+            webSocket.send("Start By AI-Code @Copyright <a href='http://www.aicode.io' target='_blank'>AI-Code</a>");
             Map<String, Object> map = Maps.newHashMap();
             map.put("code", projectCode);
             Project project = projectDAO.load(map);
-            String projectPath = this.buildProject(project);
+            String projectPath = this.buildProject(project, webSocket);
             projectDAO.update(projectCode, project.getBuildNumber() != null ? project.getBuildNumber() + 1 : 1);
             String log = " 已初始化项目 【 " + project.getName() + " ( " + project.getEnglishName() + " )】 工作空间";
             webSocket.send(log);
@@ -85,34 +82,34 @@ public class GeneratorSVImpl implements GenerateSV {
             logger.info("创建工作空间库完成");
 
             //2.获取类信息
+            webSocket.send("转化数据库结构与类模型...");
             List<ProjectMap> projectMapList = project.getProjectMapList();
             List<MapClassTable> mapClassTableList = new ArrayList<>();
             projectMapList.forEach(projectMap -> {
                 mapClassTableList.add(projectMap.getMapClassTable());
             });
+            webSocket.send("转化数据库结构与类模型成功！");
 
             //3.获取模板信息
             List<ProjectFramwork> projectFramworkList = project.getProjectFramworkList();
             //从git中检出技术模板库
+            webSocket.send("开始下载技术模板...");
             this.readyframeworksTemplateList(projectFramworkList);
+            webSocket.send("下载技术模板成功");
 
             //4.生成源码
+            webSocket.send("开始生成源码...");
             projectFramworkList.forEach(projectFramwork -> {
-                String desc = "已获取项目 【" + projectFramwork.getFrameworks().getName() + "】 的模板";
-                webSocket.send(desc);
-                projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), desc));
+                webSocket.send("已获取项目 【" + projectFramwork.getFrameworks().getName() + "】 的模板");
                 Map<String, Object> param = new HashMap<>();
                 param.put("frameworkCode", projectFramwork.getFrameworks().getCode());
                 Frameworks frameworks = projectFramwork.getFrameworks();
                 List<FrameworksTemplate> frameworksTemplateList = frameworksTemplateDAO.query(param);
-//                List<FrameworksTemplate> frameworksTemplateList = projectFramwork.getFrameworks().getFrameworksTemplateList();
                 frameworksTemplateList.forEach(frameworksTemplate -> {
                     projectMapList.forEach(projectMap -> {
-                        this.generator(projectPath, project, frameworks, projectMap.getMapClassTable(), frameworksTemplate, mapClassTableList);
+                        this.generator(projectPath, project, frameworks, projectMap.getMapClassTable(), frameworksTemplate, mapClassTableList, webSocket);
                     });
-                    String genLog = " 【已经生成】 模板 " + frameworksTemplate.getPath() + " 的源码";
-                    webSocket.send(genLog);
-                    projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), genLog));
+                    webSocket.send("[生成] 模板 " + frameworksTemplate.getPath() + " 的源码");
                 });
             });
 
@@ -281,8 +278,9 @@ public class GeneratorSVImpl implements GenerateSV {
      *
      * @param project
      */
-    private String buildProject(Project project) {
+    private String buildProject(Project project, WSTools webSocket) {
         Setting settingWorkspace = settingDAO.loadByKey(Setting.Key.Workspace.name());
+        webSocket.send("创建项目[" + project.getEnglishName() + "]");
         String projectPath = new HandleFuncs().getCurrentClassPath() + settingWorkspace.getV() + "/" + project.getEnglishName();
         projectPath = projectPath.replace("//", "/");
         //1.检测项目工作工作空间是否存在
@@ -290,6 +288,7 @@ public class GeneratorSVImpl implements GenerateSV {
         if (!file.exists()) {
 //            file.mkdirs();
             FileUtil.delFolder(projectPath);
+            webSocket.send("删除已存在[" + project.getEnglishName() + "]项目");
         }
 
         //3.代码仓库检出
@@ -298,7 +297,9 @@ public class GeneratorSVImpl implements GenerateSV {
         ProjectRepositoryAccount projectRepositoryAccount = projectRepositoryAccountDAO.load(map);
         if (projectRepositoryAccount != null) {
             if (ProjectRepositoryTypeEnum.GIT == ProjectRepositoryTypeEnum.getEnum(projectRepositoryAccount.getType())) {
+                webSocket.send("初始化设定git项目");
                 GitTools.cloneGit(projectRepositoryAccount.getHome(), projectPath, projectRepositoryAccount.getAccount(), projectRepositoryAccount.getPassword());
+                webSocket.send("初始化设定git项目完成");
             } else if (ProjectRepositoryTypeEnum.SVN == ProjectRepositoryTypeEnum.getEnum(projectRepositoryAccount.getType())) {
                 //TODO SVN 仓库工具类
             }
@@ -315,7 +316,7 @@ public class GeneratorSVImpl implements GenerateSV {
      * @param mapClassTable      映射对象
      * @param frameworksTemplate 框架模板对象
      */
-    private void generator(String projectPath, Project project, Frameworks frameworks, MapClassTable mapClassTable, FrameworksTemplate frameworksTemplate, List<MapClassTable> mapClassTableList) {
+    private void generator(String projectPath, Project project, Frameworks frameworks, MapClassTable mapClassTable, FrameworksTemplate frameworksTemplate, List<MapClassTable> mapClassTableList, WSTools webSocket) {
         List<MapFieldColumn> mapFieldColumnPks = new ArrayList<>();
         List<MapFieldColumn> mapFieldColumnNotPks = new ArrayList<>();
         List<MapFieldColumn> mapFieldColumnList = new ArrayList<>();
@@ -408,13 +409,22 @@ public class GeneratorSVImpl implements GenerateSV {
             if (!templatePath.contains(".jar")) {
                 //增量判断，默认是增量只创建不存在的文件
                 if (!new File(targetFilePath.replace("//", "/")).exists()) {
-                    FreemarkerHelper.generate(templateData, targetFilePath, templatePath);
+                    try {
+                        FreemarkerHelper.generate(templateData, targetFilePath, templatePath);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        webSocket.send(e.getMessage());
+                    } catch (TemplateException e) {
+                        e.printStackTrace();
+                        webSocket.send(e.getMessage());
+                    }
                 }
             } else {
                 try {
                     FileUtils.copyFileToDirectory(new File(templatePath), new File(targetFilePath.substring(0, targetFilePath.lastIndexOf("/"))));
                 } catch (IOException e) {
                     e.printStackTrace();
+                    webSocket.send(e.getMessage());
                 }
             }
         } else {

@@ -8,8 +8,8 @@
         <setting name="mapUnderscoreToCamelCase" value="true"/>
     </settings>
     <typeAliases>
-        <package name="com.rzhkj.project.entity"/>
-        <package name="com.rzhkj.setting.entity"/>
+        <package name="io.aicode.project.entity"/>
+        <package name="io.aicode.setting.entity"/>
     </typeAliases>
 
     <plugins>

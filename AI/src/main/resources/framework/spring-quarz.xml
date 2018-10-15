@@ -15,7 +15,7 @@
        default-autowire="byName">
 
     <!--重写quartz的job工厂类完成spring的自动注入-->
-    <bean id="jobFactory" class="com.rzhkj.base.core.JobFactory"/>
+    <bean id="jobFactory" class="com.aicode.base.core.JobFactory"/>
     <!--quartz调度管理工厂bean注入-->
     <bean id="schedulerFactoryBean" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
         <!--数据源支持持久化-->

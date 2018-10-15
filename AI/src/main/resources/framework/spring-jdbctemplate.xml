@@ -37,7 +37,7 @@
 
     <!-- 配置那些类的方法进行事务管理 -->
     <aop:config>
-        <aop:pointcut id="executeService" expression="execution(* com.rzhkj.*.service.*SVImpl.*(..))"/>
+        <aop:pointcut id="executeService" expression="execution(* com.aicode.*.service.*SVImpl.*(..))"/>
         <aop:advisor pointcut-ref="executeService" advice-ref="txAdvice"/>
     </aop:config>
 

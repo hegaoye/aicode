@@ -93,9 +93,13 @@ public class GeneratorSVImpl implements GenerateSV {
             //3.获取模板信息
             List<ProjectFramwork> projectFramworkList = project.getProjectFramworkList();
             //从git中检出技术模板库
-            webSocket.send("开始下载技术模板...");
-            this.readyframeworksTemplateList(projectFramworkList);
-            webSocket.send("下载技术模板成功");
+            webSocket.send(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+            webSocket.send("开始 下载技术模板");
+            webSocket.send(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+            this.readyframeworksTemplateList(projectFramworkList, webSocket);
+            webSocket.send(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+            webSocket.send("结束 下载技术模板成功");
+            webSocket.send(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
 
             //4.生成源码
             webSocket.send("开始生成源码...");
@@ -119,7 +123,7 @@ public class GeneratorSVImpl implements GenerateSV {
 
             //生成sql脚本到项目下
             String sql = this.generateTsql(projectPath, project.getEnglishName(), projectCode);
-            webSocket.send(sql);
+            webSocket.send("分布式唯一算法sql " + sql);
             String sqllog = " 【已经生成】 " + project.getEnglishName() + "Sql 脚本文件并追加系统配置";
             webSocket.send(sqllog);
             projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), sqllog));
@@ -135,14 +139,14 @@ public class GeneratorSVImpl implements GenerateSV {
                 webSocket.send(gitLog);
                 projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), gitLog));
                 GitTools.commitAndPush(new File(projectPath), projectRepositoryAccount.getAccount(), projectRepositoryAccount.getPassword(), "AI-Code 为您构建代码，享受智慧生活");
-                gitLog = "代码已经提交到 ⇛⇛⇛ <a style='text-decoration:underline;' href='" + projectRepositoryAccount.getHome() + "' target='_blank'>" + projectRepositoryAccount.getHome() + " </a>仓库";
+                gitLog = "代码已经提交到 ⇛⇛⇛ <a style='text-decoration:underline;' href='" + projectRepositoryAccount.getHome() + "' target='_blank'>[" + projectRepositoryAccount.getHome() + "] </a>仓库";
                 webSocket.send(gitLog);
                 projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), gitLog));
             }
 
             //7.创建压缩文件
             this.zipProject(project);
-            String endLog = "代码已打包ZIP,您还可以点击下载 ⇛⇛⇛  <a style='text-decoration:underline;' href='" + project.getDownloadUrl() + "' target='_blank'>" + project.getEnglishName() + ".zip</a>";
+            String endLog = "代码已打包ZIP, ⇛⇛⇛  <a style='text-decoration:underline;' href='" + project.getDownloadUrl() + "' target='_blank'>[点击下载" + project.getEnglishName() + ".zip]</a>";
             webSocket.send(endLog);
             //记录日志
             projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), endLog));
@@ -196,7 +200,7 @@ public class GeneratorSVImpl implements GenerateSV {
     }
 
     //准备框架模板
-    private void readyframeworksTemplateList(List<ProjectFramwork> projectFramworkList) {
+    private void readyframeworksTemplateList(List<ProjectFramwork> projectFramworkList, WSTools webSocket) {
         Setting setting = settingDAO.loadByKey(Setting.Key.Template_Path.name());
         String template_Path = new HandleFuncs().getCurrentClassPath() + setting.getV();//获得默认仓库地址
         for (ProjectFramwork projectFramwork : projectFramworkList) {
@@ -204,11 +208,13 @@ public class GeneratorSVImpl implements GenerateSV {
             logger.debug(JSON.toJSONString(frameworks));
             if (frameworks.getGitHome() != null) {
                 String project_template_Path = template_Path + frameworks.getGitHome().substring(frameworks.getGitHome().lastIndexOf("/") + 1).replace(".git", "");
+                webSocket.send("已连接到模板仓库，开始克隆已选技术[" + frameworks.getName() + "]的模板");
                 if (YNEnum.Y == YNEnum.getYN(frameworks.getIsPublic())) {
                     GitTools.cloneGit(frameworks.getGitHome(), project_template_Path);
                 } else {
                     GitTools.cloneGit(frameworks.getGitHome(), project_template_Path, frameworks.getAccount(), frameworks.getPassword());
                 }
+
 
                 //删除不相干的模板及目录文件
                 File templateFile = new File(template_Path);
@@ -240,8 +246,10 @@ public class GeneratorSVImpl implements GenerateSV {
                     frameworksTemplate.setCode(String.valueOf(uidGenerator.getUID()));
                     frameworksTemplate.setPath(path);
                     frameworksTemplate.setFrameworkCode(frameworks.getCode());
+                    webSocket.send("[模板] " + frameworksTemplate.getPath().substring(frameworksTemplate.getPath().lastIndexOf("/") + 1));
                     frameworksTemplateDAO.insert(frameworksTemplate);
                 }
+                webSocket.send("模板克隆成功！");
             }
         }
     }

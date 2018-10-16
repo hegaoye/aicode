@@ -117,7 +117,7 @@
     <bean id="demoWSHandler" class="io.aicode.base.interceptor.WSHandler"/>
     <!--<bean id="wsClientManager" class="com.aicodee.base.interceptor.WSClientManager"/>-->
     <websocket:handlers allowed-origins="*">
-        <websocket:mapping path="/websocket" handler="demoWSHandler"/>
+        <websocket:mapping path="/websocket**" handler="demoWSHandler"/>
         <websocket:handshake-interceptors>
             <bean class="io.aicode.base.interceptor.HandshakeInterceptor"/>
         </websocket:handshake-interceptors>

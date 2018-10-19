@@ -413,30 +413,33 @@ public class GeneratorSVImpl implements GenerateSV {
             logger.debug("目标文件路径" + targetFilePath);
         }
 
-        if (new File(templatePath).exists()) {
-            if (!templatePath.contains(".jar")) {
-                //增量判断，默认是增量只创建不存在的文件
-                if (!new File(targetFilePath.replace("//", "/")).exists()) {
+        //目标路径下文件不存在，并且不是增量状态
+        if (YNEnum.getYN(project.getIsIncrement()) == YNEnum.N) {
+            if (new File(templatePath).exists()) {
+                if (!templatePath.contains(".jar")) {
+                    //增量判断，默认是增量只创建不存在的文件
+                    if (!new File(targetFilePath.replace("//", "/")).exists()) {
+                        try {
+                            FreemarkerHelper.generate(templateData, targetFilePath, templatePath);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            webSocket.send(e.getMessage());
+                        } catch (TemplateException e) {
+                            e.printStackTrace();
+                            webSocket.send(e.getMessage());
+                        }
+                    }
+                } else {
                     try {
-                        FreemarkerHelper.generate(templateData, targetFilePath, templatePath);
+                        FileUtils.copyFileToDirectory(new File(templatePath), new File(targetFilePath.substring(0, targetFilePath.lastIndexOf("/"))));
                     } catch (IOException e) {
-                        e.printStackTrace();
-                        webSocket.send(e.getMessage());
-                    } catch (TemplateException e) {
                         e.printStackTrace();
                         webSocket.send(e.getMessage());
                     }
                 }
             } else {
-                try {
-                    FileUtils.copyFileToDirectory(new File(templatePath), new File(targetFilePath.substring(0, targetFilePath.lastIndexOf("/"))));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    webSocket.send(e.getMessage());
-                }
+                logger.error("文件不存在 ===> " + templatePath);
             }
-        } else {
-            logger.error("文件不存在 ===> " + templatePath);
         }
 
     }

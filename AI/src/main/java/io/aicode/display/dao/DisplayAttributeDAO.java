@@ -1,26 +1,23 @@
 /*
- *  *
- *                       http://www.aicode.io
- *
- *
- *      本代码仅用于AI-Code.
+ * http://www.aicode.io
+本代码仅用于AI-Code.
  */
 
-package io.aicode.project.dao;
+package io.aicode.display.dao;
 
 import io.aicode.core.base.BaseMybatisDAOImpl;
-import io.aicode.project.entity.DisplayAttribute;
 import org.springframework.stereotype.Repository;
+import io.aicode.display.entity.DisplayAttribute;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * 显示属性
- * @author berton
+ * @author lixin
  */
 @Repository
-public class DisplayAttributeDAO extends BaseMybatisDAOImpl<DisplayAttribute,Long>{
+public class DisplayAttributeDAO extends BaseMybatisDAOImpl<DisplayAttribute,Long> {
 
     /**
      * 加载一个对象显示属性 通过mapFieldColumnCode

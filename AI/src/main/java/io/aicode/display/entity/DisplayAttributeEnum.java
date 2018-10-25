@@ -3,7 +3,7 @@
  *
  */
 
-package io.aicode.project.entity;
+package io.aicode.display.entity;
 
 /**
  * 显示属性：显示格式 自动完成 Autocomplete,级联选择 Cascader,日期选择框 DatePicker,时间选择 TimePicker,输入框 Input,数字输入框 InputNumber,

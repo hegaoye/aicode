@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2017. 郑州仁中和科技有限公司.保留所有权利.
- *                       http://www.rzhkj.com/
+ *
+ *                       http://www.aicode.io
  *      郑州仁中和科技有限公司保留所有代码著作权.如有任何疑问请访问官方网站与我们联系.
  *      代码遵循Apache License2.0开源协议,可放心使用.
  *

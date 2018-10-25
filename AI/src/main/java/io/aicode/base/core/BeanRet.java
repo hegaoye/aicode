@@ -1,8 +1,5 @@
 /*
- * Copyright (c) 2016. 郑州仁中和科技有限公司.保留所有权利.
- *                       http://www.aicode.io
- *      郑州仁中和科技有限公司保留所有代码著作权.如有任何疑问请访问官方网站与我们联系.
- *      代码只针对特定客户使用，不得在未经允许或授权的情况下对外传播扩散.恶意传播者，法律后果自行承担.
+ *      http://www.aicode.io
  *      本代码仅用于AI-Code.
  */
 
@@ -14,15 +11,18 @@ public class BeanRet implements Serializable {
     private boolean success = false;
     private String info = null;
     private Object data = null;
+
     public static BeanRet create(boolean success, String info) {
         return new BeanRet(success, info);
     }
+
     public static BeanRet create(boolean success, String info, Object data) {
-        return new BeanRet(success,info,data);
+        return new BeanRet(success, info, data);
     }
 
     public BeanRet() {
     }
+
     public BeanRet(boolean success, String info) {
         this.success = success;
         this.info = info;

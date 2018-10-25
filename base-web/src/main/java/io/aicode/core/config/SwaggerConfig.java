@@ -36,7 +36,7 @@ public class SwaggerConfig {
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
                 .title("AI-Code RESTful APIs")
-                .description("郑州仁中和科技有限公司保留所有代码著作权.如有任何疑问请访问官方网站与我们联系.请访问  http://www.aicode.com/")
+                .description("请访问  http://www.aicode.com/")
                 .contact(new Contact("郑州仁中和科技有限公司", "http://www.aicode.com/", "hegaoye@qq.com"))
                 .termsOfServiceUrl("http://www.aicode.com/")
                 .version("1.0")

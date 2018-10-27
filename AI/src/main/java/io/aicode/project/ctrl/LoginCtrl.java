@@ -1,22 +1,24 @@
 package io.aicode.project.ctrl;
 
 import com.alibaba.fastjson.JSON;
-import com.jcraft.jsch.Channel;
-import com.jcraft.jsch.JSch;
-import com.jcraft.jsch.JSchException;
-import com.jcraft.jsch.Session;
+import com.jcraft.jsch.*;
+import io.aicode.base.interceptor.WSClientManager;
+import io.aicode.base.tools.WSTools;
 import io.aicode.core.base.BaseCtrl;
 import io.aicode.core.base.JwtToken;
 import io.aicode.core.common.Constants;
 import io.aicode.core.entity.BeanRet;
 import io.aicode.core.exceptions.BaseException;
 import io.aicode.core.tools.Md5;
+import io.aicode.core.tools.SSH2;
+import io.aicode.core.tools.SSHResInfo;
 import io.aicode.project.entity.Account;
 import io.aicode.project.service.AccountSV;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.map.HashedMap;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.Assert;
@@ -24,12 +26,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.socket.WebSocketSession;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Scanner;
 
 
@@ -38,6 +42,7 @@ import java.util.Scanner;
  *
  * @author lixin
  */
+@Slf4j
 @Controller
 @RequestMapping("/login")
 @Api(value = "登陆控制器", description = "登陆控制器")
@@ -45,6 +50,9 @@ public class LoginCtrl extends BaseCtrl {
 
     @Resource
     private AccountSV accountSV;
+
+    @Resource
+    private WSClientManager wsClientManager;
 
     /**
      * 登陆
@@ -112,6 +120,42 @@ public class LoginCtrl extends BaseCtrl {
     }
 
 
+    @ApiOperation(value = "gencode", notes = "gencode")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "codes", value = "编码", required = true, paramType = "query")
+    })
+    @PostMapping("/gencode")
+    @ResponseBody
+    public BeanRet genCode(String codes) {
+        System.out.println(codes);
+        try {
+            this.upload(codes);
+        } catch (JSchException e) {
+            e.printStackTrace();
+        } catch (SftpException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return BeanRet.create(true, "");
+    }
+
+
+    @ApiOperation(value = "停止程序", notes = "停止程序")
+    @GetMapping("/stop")
+    @ResponseBody
+    public BeanRet stop() {
+        sshout.print("exit");
+        sshout.flush();
+        sshout.close();
+        channel.disconnect();
+        session.disconnect();
+        return BeanRet.create(true, "");
+    }
+
+
     @ApiOperation(value = "ssh", notes = "ssh")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "cmd", value = "cmd", required = true, paramType = "query")
@@ -127,45 +171,113 @@ public class LoginCtrl extends BaseCtrl {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return BeanRet.create(true, "", result);
     }
+
+
+    public void upload(String codes) throws Exception {
+        /** 主机 */
+        String host = "192.168.1.105";
+        /** 端口 */
+        int port = 22;
+        /** 用户名 */
+        String username = "pi";
+        /** 密码 */
+        String password = "0";
+
+        Session session = null;
+        Channel channel = null;
+        ChannelSftp sftp = null;
+
+        JSch jsch = new JSch();
+
+
+        session = jsch.getSession(username, host, port);
+        session.setPassword(password);
+        Properties config = new Properties();
+        config.put("StrictHostKeyChecking", "no"); // 不验证 HostKey
+        session.setConfig(config);
+        try {
+            session.connect();
+        } catch (Exception e) {
+            if (session.isConnected())
+                session.disconnect();
+            log.error("连接服务器失败,请检查主机[" + host + "],端口[" + port
+                    + "],用户名[" + username + "],端口[" + port
+                    + "]是否正确,以上信息正确的情况下请检查网络连接是否正常或者请求被防火墙拒绝.");
+        }
+        channel = session.openChannel("sftp");
+        try {
+            channel.connect();
+        } catch (Exception e) {
+            if (channel.isConnected())
+                channel.disconnect();
+            log.error("连接服务器失败,请检查主机[" + host + "],端口[" + port
+                    + "],用户名[" + username + "],密码是否正确,以上信息正确的情况下请检查网络连接是否正常或者请求被防火墙拒绝.");
+        }
+        sftp = (ChannelSftp) channel;
+
+        sftp.cd("/home/test/");
+        InputStream inputStream = new ByteArrayInputStream(codes.getBytes());
+        sftp.put(inputStream, "led.py");
+
+//        this.exec("python /home/test/led.py");
+        this.test("python /home/test/led.py");
+    }
+
+    public void exec(String cmd) {
+        SSH2 helper = null;
+        try {
+            helper = new SSH2("192.168.1.105", 22, "pi", "0");
+            SSHResInfo resInfo = helper.sendCmd(cmd);
+            System.out.println(resInfo.toString());
+            helper.close();
+        } catch (JSchException e) {
+            e.printStackTrace();
+            helper.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 
     Session session = null;
     Channel channel = null;
     PrintWriter sshout;  // SSH 輸出端
     Scanner scan = null;
-    InputStream inputStream = null;
 
-    public String test(String cmd) throws JSchException, IOException {
-        if (session == null) {
-            JSch jsch = new JSch();
-            session = jsch.getSession("pitop", "192.168.1.220", 22);
-            session.setPassword("0");
-            session.setConfig("StrictHostKeyChecking", "no");
-            session.connect(50000);
+    public String test(String cmd) throws Exception {
+        WebSocketSession webSocketSession = wsClientManager.get("192.168.1.95");
+//        WebSocketSession webSocketSession = wsClientManager.get(request.getRemoteHost());
+        WSTools wsTools = new WSTools(webSocketSession);
+        PipedOutputStream pipedOutputStream = null;
+        JSch jsch = new JSch();
+        session = jsch.getSession("pi", "192.168.1.105", 22);
+        session.setPassword("0");
+        session.setConfig("StrictHostKeyChecking", "no");
+        session.connect(50000);
 
-            channel = session.openChannel("shell");
-            PipedInputStream pipedInputStream;
-            PipedOutputStream pipedOutputStream;
-            pipedInputStream = new PipedInputStream();
-            pipedOutputStream = new PipedOutputStream();
-            pipedInputStream.connect(pipedOutputStream);
-            channel.setInputStream(pipedInputStream);
-            sshout = new PrintWriter(pipedOutputStream, true);
+        channel = session.openChannel("shell");
+        PipedInputStream pipedInputStream;
 
-            // 创建输出通道
-            pipedInputStream = new PipedInputStream();
-            pipedOutputStream = new PipedOutputStream();
-            pipedInputStream.connect(pipedOutputStream);
-            channel.setOutputStream(pipedOutputStream);
-//            inputStream = pipedInputStream;
-            scan = new Scanner(pipedInputStream, "UTF-8");
-            channel.connect(3 * 1000);
-            sshout.println("");
-            sshout.flush();
+        pipedInputStream = new PipedInputStream();
+        pipedOutputStream = new PipedOutputStream();
+        pipedInputStream.connect(pipedOutputStream);
+        channel.setInputStream(pipedInputStream);
+        sshout = new PrintWriter(pipedOutputStream, true);
 
-        }
+        // 创建输出通道
+        pipedInputStream = new PipedInputStream();
+        pipedOutputStream = new PipedOutputStream();
+        pipedInputStream.connect(pipedOutputStream);
+        channel.setOutputStream(pipedOutputStream);
+        scan = new Scanner(pipedInputStream, "UTF-8");
+        channel.connect(3 * 1000);
+        sshout.println("");
+        sshout.flush();
 
         if (cmd.contains("su")) {
             switchRoot("0");
@@ -175,32 +287,11 @@ public class LoginCtrl extends BaseCtrl {
         sshout.print("\n\n");
         sshout.flush();
         StringBuffer stringBuffer = new StringBuffer();
-        boolean flag = true;
-//        byte[] tmp = new byte[1024];
-//        while (true) {
-//            if (stringBuffer.length() > 0) {
-//                break;
-//            }
-//            while (inputStream.available() > 0) {
-//                int i = inputStream.read(tmp, 0, 1024);
-//                if (i < 0) break;
-//                String s = new String(tmp, 0, i);
-//                stringBuffer.append(s);
-//                stringBuffer.append("\n");
-//            }
-//            if (channel.isClosed()) {
-//                System.out.println("exit-status: " + channel.getExitStatus());
-//                break;
-//            }
-//            try {
-//                Thread.sleep(150);
-//            } catch (Exception ee) {
-//            }
-//        }
-
         String line = null;
         while (scan.hasNext()) {
             line = scan.nextLine();
+            System.out.println(line);
+            wsTools.send(line);
             stringBuffer.append(line);
             stringBuffer.append("\n");
             if (line.trim().equals("pitop@pitop:~$")) {
@@ -210,16 +301,16 @@ public class LoginCtrl extends BaseCtrl {
                 break;
             }
         }
-
         String result = stringBuffer.toString();
         System.out.println(result);
         sshout.print("echo $?\n");
         sshout.flush();
 
-        do {
-            line = scan.nextLine();
-        } while (!line.matches("^[0-9]+$"));
-
+        if (scan.hasNext()) {
+            do {
+                line = scan.nextLine();
+            } while (!line.matches("^[0-9]+$"));
+        }
         return result;
     }
 

@@ -20,7 +20,7 @@ public class WSTools {
     public void send(String msg) {
         try {
             if (this.webSocketSession.isOpen()) {
-                this.webSocketSession.sendMessage(new TextMessage("> " + msg));
+                this.webSocketSession.sendMessage(new TextMessage("# " + msg));
             } else {
                 log.warning("WebSocket 连接已经关闭");
             }

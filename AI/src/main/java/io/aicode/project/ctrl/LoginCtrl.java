@@ -33,9 +33,11 @@ import springfox.documentation.annotations.ApiIgnore;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
+import java.io.IOException;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
+import java.io.PrintWriter;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Scanner;
 
 
@@ -145,9 +147,10 @@ public class LoginCtrl extends BaseCtrl {
         System.out.println(codes);
         try {
             sShSV.close(sshout, channel);
-            sShSV.sftpUpload(codes, "led.py", "/home/test/", new SSh("192.168.1.37", 22, "pi", "0"));
-            this.test("python /home/test/led.py");
-//            this.upload(codes);
+            SSh sSh = new SSh("192.168.1.37", 22, "pi", "0");
+            sShSV.sftpUpload(codes, "led.py", "/home/test/", sSh);
+            WebSocketSession webSocketSession = wsClientManager.get("192.168.1.95");
+            sShSV.shell(sSh, "python /home/test/led.py", new WSTools(webSocketSession));
         } catch (JSchException e) {
             e.printStackTrace();
         } catch (SftpException e) {
@@ -165,17 +168,7 @@ public class LoginCtrl extends BaseCtrl {
     @GetMapping("/stop")
     @ResponseBody
     public BeanRet stop() {
-        if (sshout != null) {
-            sshout.print("exit");
-            sshout.flush();
-            sshout.close();
-        }
-        if (channel != null) {
-            if (channel.isConnected()) {
-                channel.disconnect();
-            }
-        }
-//        session.disconnect();
+        sShSV.close(sshout, channel);
         return BeanRet.create(true, "");
     }
 
@@ -201,57 +194,6 @@ public class LoginCtrl extends BaseCtrl {
         return BeanRet.create(true, "", result);
     }
 
-
-    public void upload(String codes) throws Exception {
-        this.stop();
-        /** 主机 */
-        String host = "192.168.1.37";
-        /** 端口 */
-        int port = 22;
-        /** 用户名 */
-        String username = "pi";
-        /** 密码 */
-        String password = "0";
-
-        Session session = null;
-        Channel channel = null;
-        ChannelSftp sftp = null;
-
-        JSch jsch = new JSch();
-
-
-        session = jsch.getSession(username, host, port);
-        session.setPassword(password);
-        Properties config = new Properties();
-        config.put("StrictHostKeyChecking", "no"); // 不验证 HostKey
-        session.setConfig(config);
-        try {
-            session.connect();
-        } catch (Exception e) {
-            if (session.isConnected())
-                session.disconnect();
-            log.error("连接服务器失败,请检查主机[" + host + "],端口[" + port
-                    + "],用户名[" + username + "],端口[" + port
-                    + "]是否正确,以上信息正确的情况下请检查网络连接是否正常或者请求被防火墙拒绝.");
-        }
-        channel = session.openChannel("sftp");
-        try {
-            channel.connect();
-        } catch (Exception e) {
-            if (channel.isConnected())
-                channel.disconnect();
-            log.error("连接服务器失败,请检查主机[" + host + "],端口[" + port
-                    + "],用户名[" + username + "],密码是否正确,以上信息正确的情况下请检查网络连接是否正常或者请求被防火墙拒绝.");
-        }
-        sftp = (ChannelSftp) channel;
-
-        sftp.cd("/home/test/");
-        InputStream inputStream = new ByteArrayInputStream(codes.getBytes());
-        sftp.put(inputStream, "led.py");
-
-//        this.exec("python /home/test/led.py");
-        this.test("python /home/test/led.py");
-    }
 
     public void exec(String cmd) {
         SSH2 helper = null;

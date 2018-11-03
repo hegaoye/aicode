@@ -6,21 +6,27 @@
 package io.aicode.project.service.impl;
 
 import com.jcraft.jsch.*;
+import io.aicode.base.tools.WSTools;
 import io.aicode.project.entity.SSh;
 import io.aicode.project.service.SShSV;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.io.PrintWriter;
+import java.io.*;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
+import java.util.Scanner;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 @Slf4j
 @Component
 @Service
 public class SShSVImpl implements SShSV {
+    private ConcurrentMap<String, Session> connectors = new ConcurrentHashMap<>();
+    private Map<String, Channel> channels = new HashMap<>();
 
     /**
      * 关闭ssh shell连接
@@ -33,6 +39,10 @@ public class SShSVImpl implements SShSV {
      */
     @Override
     public boolean close(PrintWriter printWriter, Channel channel) {
+        String key = "test";
+        if (channels.containsKey(key + "channels")) {
+            channel = channels.get(key + "channels");
+        }
         //1.关闭输出流
         if (printWriter != null) {
             printWriter.print("exit");
@@ -97,5 +107,74 @@ public class SShSVImpl implements SShSV {
         sftp.cd(path);//进入到指定目录下
         InputStream inputStream = new ByteArrayInputStream(codes.getBytes());
         sftp.put(inputStream, fileName);
+    }
+
+    /**
+     * 执行命令
+     *
+     * @param cmd 命令
+     */
+    @Override
+    public void shell(SSh sSh, String cmd, WSTools wsTools) throws JSchException, IOException {
+        PipedOutputStream pipedOutputStream = null;
+        JSch jsch = new JSch();
+        String key = "test";
+        Session session = null;
+        if (connectors.containsKey(key)) {
+            session = connectors.get(key);
+        }
+
+        if (session == null || !session.isConnected()) {
+            session = jsch.getSession(sSh.getUser(), sSh.getHost(), sSh.getPort());
+            session.setPassword(sSh.getPassword());
+            session.setConfig("StrictHostKeyChecking", "no");
+            session.connect(50000);
+            connectors.put(key, session);
+        }
+
+        Channel channel = session.openChannel("shell");
+        channels.put(key + "channels", channel);
+        PipedInputStream pipedInputStream = new PipedInputStream();
+        pipedOutputStream = new PipedOutputStream();
+        pipedInputStream.connect(pipedOutputStream);
+        channel.setInputStream(pipedInputStream);
+        PrintWriter sshout = new PrintWriter(pipedOutputStream, true);
+
+        // 创建输出通道
+        pipedInputStream = new PipedInputStream();
+        pipedOutputStream = new PipedOutputStream();
+        pipedInputStream.connect(pipedOutputStream);
+        channel.setOutputStream(pipedOutputStream);
+        Scanner scan = new Scanner(pipedInputStream, "UTF-8");
+        channel.connect(3 * 1000);
+        sshout.println("");
+        sshout.flush();
+
+        sshout.println(cmd);
+        sshout.println("\n\n");
+        sshout.flush();
+        StringBuffer stringBuffer = new StringBuffer();
+        String line = null;
+        while (scan.hasNext()) {
+            line = scan.nextLine();
+            System.out.println(line);
+            wsTools.send(line);
+            stringBuffer.append(line);
+            stringBuffer.append("\n");
+            if (line.trim().equals("pitop@pitop:~$")) {
+                break;
+            }
+        }
+        String result = stringBuffer.toString();
+        log.debug(result);
+        sshout.println("echo $?\n");
+        sshout.flush();
+
+        if (scan.hasNext()) {
+            do {
+                line = scan.nextLine();
+                log.debug(line);
+            } while (!line.matches("^[0-9]+$"));
+        }
     }
 }

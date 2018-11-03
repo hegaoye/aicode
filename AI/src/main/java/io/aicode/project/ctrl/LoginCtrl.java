@@ -13,7 +13,9 @@ import io.aicode.core.tools.Md5;
 import io.aicode.core.tools.SSH2;
 import io.aicode.core.tools.SSHResInfo;
 import io.aicode.project.entity.Account;
+import io.aicode.project.entity.SSh;
 import io.aicode.project.service.AccountSV;
+import io.aicode.project.service.SShSV;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -53,6 +55,9 @@ public class LoginCtrl extends BaseCtrl {
 
     @Resource
     private WSClientManager wsClientManager;
+
+    @Resource
+    private SShSV sShSV;
 
     /**
      * 登陆
@@ -139,7 +144,10 @@ public class LoginCtrl extends BaseCtrl {
                 "    time.sleep(1)";
         System.out.println(codes);
         try {
-            this.upload(codes);
+            sShSV.close(sshout, channel);
+            sShSV.sftpUpload(codes, "led.py", "/home/test/", new SSh("192.168.1.37", 22, "pi", "0"));
+            this.test("python /home/test/led.py");
+//            this.upload(codes);
         } catch (JSchException e) {
             e.printStackTrace();
         } catch (SftpException e) {

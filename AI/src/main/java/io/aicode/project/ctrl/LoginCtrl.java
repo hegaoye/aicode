@@ -127,6 +127,16 @@ public class LoginCtrl extends BaseCtrl {
     @PostMapping("/gencode")
     @ResponseBody
     public BeanRet genCode(String codes) {
+        codes = "from gpiozero import LED\n" +
+                "import time\n" +
+                "\n" +
+                "led=LED(4)\n" +
+                "while True:\n" +
+                "    led.on()\n" +
+                "    print(\"on....\")\n" +
+                "    time.sleep(1)\n" +
+                "    led.off()\n" +
+                "    time.sleep(1)";
         System.out.println(codes);
         try {
             this.upload(codes);
@@ -147,11 +157,17 @@ public class LoginCtrl extends BaseCtrl {
     @GetMapping("/stop")
     @ResponseBody
     public BeanRet stop() {
-        sshout.print("exit");
-        sshout.flush();
-        sshout.close();
-        channel.disconnect();
-        session.disconnect();
+        if (sshout != null) {
+            sshout.print("exit");
+            sshout.flush();
+            sshout.close();
+        }
+        if (channel != null) {
+            if (channel.isConnected()) {
+                channel.disconnect();
+            }
+        }
+//        session.disconnect();
         return BeanRet.create(true, "");
     }
 
@@ -179,8 +195,9 @@ public class LoginCtrl extends BaseCtrl {
 
 
     public void upload(String codes) throws Exception {
+        this.stop();
         /** 主机 */
-        String host = "192.168.1.105";
+        String host = "192.168.1.37";
         /** 端口 */
         int port = 22;
         /** 用户名 */
@@ -255,10 +272,12 @@ public class LoginCtrl extends BaseCtrl {
         WSTools wsTools = new WSTools(webSocketSession);
         PipedOutputStream pipedOutputStream = null;
         JSch jsch = new JSch();
-        session = jsch.getSession("pi", "192.168.1.105", 22);
-        session.setPassword("0");
-        session.setConfig("StrictHostKeyChecking", "no");
-        session.connect(50000);
+        if (session == null) {
+            session = jsch.getSession("pi", "192.168.1.37", 22);
+            session.setPassword("0");
+            session.setConfig("StrictHostKeyChecking", "no");
+            session.connect(50000);
+        }
 
         channel = session.openChannel("shell");
         PipedInputStream pipedInputStream;
@@ -302,7 +321,7 @@ public class LoginCtrl extends BaseCtrl {
             }
         }
         String result = stringBuffer.toString();
-        System.out.println(result);
+        log.debug(result);
         sshout.print("echo $?\n");
         sshout.flush();
 

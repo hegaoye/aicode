@@ -1,9 +1,13 @@
 package io.aicode.base.interceptor;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
+import io.aicode.base.tools.TerminalEmulator;
 import io.aicode.core.tools.SSH2;
 import io.aicode.core.tools.SSHResInfo;
 import io.aicode.project.ctrl.SSHClient;
@@ -15,6 +19,8 @@ import org.springframework.web.socket.*;
 import java.io.*;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * Created by lixin on 2018/9/30.
@@ -24,6 +30,8 @@ public class WSHandler implements WebSocketHandler {
     @Autowired
     private WSClientManager wsClientManager;
     public static Map<String, Object> map = new HashedMap();
+    private ConcurrentMap<String, TerminalEmulator> connectors = new ConcurrentHashMap<>();
+    private Multimap<String, String> sessions = HashMultimap.create();
 
     private SSH2 ssh2 = null;
 
@@ -36,10 +44,76 @@ public class WSHandler implements WebSocketHandler {
 
     SSHClient sshClient = null;
 
+    public void itermOpen(WebSocketSession wss, String spaceHome) {
+        try {
+            Map<String, String> envs = Maps.newHashMap(System.getenv());
+            String shell = envs.get("SHELL");
+
+            if (shell == null) {
+                shell = "/bin/bash";
+            }
+
+            String[] command = new String[]{shell, "--login"};
+            envs.put("TERM", "xterm");
+
+            TerminalEmulator emulator = new TerminalEmulator("1",
+                    wss,
+                    command,
+                    envs,
+                    spaceHome);
+
+            connectors.put("test", emulator);
+            sessions.put("test", "1");
+
+            emulator.start();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void itermInput(String cmd) throws IOException {
+        String key = "test";
+        TerminalEmulator emulator = connectors.get(key);
+
+        if (emulator != null) {
+            connectors.get(key).write(cmd);
+        }
+    }
+
+    private void itermClose() {
+        String key = "test";
+
+
+        TerminalEmulator emulator = connectors.get(key);
+        if (emulator != null) {
+            emulator.close();
+        }
+
+        connectors.remove(key);
+        sessions.remove("test", "1");
+    }
+
+
     @Override
     public void handleMessage(WebSocketSession wss, WebSocketMessage<?> wsm) throws Exception {
         String cmd = wsm.getPayload().toString();
         log.debug(wss.getHandshakeHeaders().getFirst("Cookie"));
+
+//        switch (cmd) {
+//            case "open":
+//                this.itermOpen(wss, "/home/");
+//                break;
+//            case "input":
+//                itermInput(cmd);
+//                break;
+//            case "close":
+//                itermClose();
+//                break;
+//            default:
+//                System.out.println("command " + cmd + " not found.");
+//                break;
+//        }
+
 //        if (ssh2 == null) {
 //            ssh2 = new SSH2("192.168.1.220", 22, "pitop", "0");
 //        }
@@ -63,7 +137,7 @@ public class WSHandler implements WebSocketHandler {
 
 
         log.info(cmd);
-        wss.sendMessage(new TextMessage(cmd));
+//        wss.sendMessage(new TextMessage(cmd));
 //        test(wss, cmd);
 //        test2(wss, cmd);
     }

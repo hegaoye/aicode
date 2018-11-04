@@ -28,4 +28,17 @@ public class WSTools {
             e.printStackTrace();
         }
     }
+
+
+    public void send(String username, String host, String path, String msg) {
+        try {
+            if (this.webSocketSession.isOpen()) {
+                this.webSocketSession.sendMessage(new TextMessage(username + "@" + host + ":" + path + "# " + msg));
+            } else {
+                log.warning("WebSocket 连接已经关闭");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

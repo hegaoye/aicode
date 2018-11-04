@@ -33,27 +33,34 @@ public class SShSVImpl implements SShSV {
      * 1.关闭输出流
      * 2.关闭通讯管道
      *
-     * @param printWriter 写出流
-     * @param channel     通讯管道
+     * @param key 通讯key
      * @return
      */
     @Override
-    public boolean close(PrintWriter printWriter, Channel channel) {
-        String key = "test";
+    public boolean close(String key) {
+        return this.close(key, null);
+    }
+
+    @Override
+    public boolean close(String key, WSTools wsTools) {
+        Channel channel = null;
         if (channels.containsKey(key + "channels")) {
             channel = channels.get(key + "channels");
         }
         //1.关闭输出流
-        if (printWriter != null) {
-            printWriter.print("exit");
-            printWriter.flush();
-            printWriter.close();
-        }
+//        if (printWriter != null) {
+//            printWriter.print("exit");
+//            printWriter.flush();
+//            printWriter.close();
+//        }
 
         //2.关闭通讯管道
         if (channel != null) {
             if (channel.isConnected()) {
                 channel.disconnect();
+                if (wsTools != null) {
+                    wsTools.send("exit");
+                }
             }
         }
         return true;
@@ -112,13 +119,17 @@ public class SShSVImpl implements SShSV {
     /**
      * 执行命令
      *
-     * @param cmd 命令
+     * @param sSh     ssh 信息对象
+     * @param cmd     命令
+     * @param key     session key
+     * @param wsTools websocket对象
+     * @throws JSchException
+     * @throws IOException
      */
     @Override
-    public void shell(SSh sSh, String cmd, WSTools wsTools) throws JSchException, IOException {
+    public void shell(SSh sSh, String cmd, String key, WSTools wsTools) throws JSchException, IOException {
         PipedOutputStream pipedOutputStream = null;
         JSch jsch = new JSch();
-        String key = "test";
         Session session = null;
         if (connectors.containsKey(key)) {
             session = connectors.get(key);
@@ -157,8 +168,8 @@ public class SShSVImpl implements SShSV {
         String line = null;
         while (scan.hasNext()) {
             line = scan.nextLine();
-            System.out.println(line);
-            wsTools.send(line);
+            log.debug(line);
+            wsTools.send(sSh.getUser(), sSh.getHost(), sSh.getHome(), line);
             stringBuffer.append(line);
             stringBuffer.append("\n");
             if (line.trim().equals("pitop@pitop:~$")) {

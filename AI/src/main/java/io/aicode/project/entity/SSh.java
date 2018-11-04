@@ -23,6 +23,7 @@ public class SSh extends BaseEntity implements java.io.Serializable {
     private String host;//数据库字段:host  属性显示:主机
     private int port;//数据库字段:port  属性显示:端口
     private String user;//数据库字段:user  属性显示:用户名
+    private String home;//数据库字段:home  属性显示:home
     @JSONField(serialize = false)
     private String password;//数据库字段:password  属性显示:密码
 

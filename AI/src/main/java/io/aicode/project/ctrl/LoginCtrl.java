@@ -146,11 +146,13 @@ public class LoginCtrl extends BaseCtrl {
                 "    time.sleep(1)";
         System.out.println(codes);
         try {
-            sShSV.close(sshout, channel);
-            SSh sSh = new SSh("192.168.1.37", 22, "pi", "0");
+            String key = "hegaoye";
+            WebSocketSession webSocketSession = wsClientManager.get("192.168.10.95");
+            sShSV.close(key);
+            SSh sSh = new SSh("192.168.10.188", 22, "pi", "0");
+            sSh.setHome("/home/test");
             sShSV.sftpUpload(codes, "led.py", "/home/test/", sSh);
-            WebSocketSession webSocketSession = wsClientManager.get("192.168.1.95");
-            sShSV.shell(sSh, "python /home/test/led.py", new WSTools(webSocketSession));
+            sShSV.shell(sSh, "python /home/test/led.py", key, new WSTools(webSocketSession));
         } catch (JSchException e) {
             e.printStackTrace();
         } catch (SftpException e) {
@@ -168,7 +170,8 @@ public class LoginCtrl extends BaseCtrl {
     @GetMapping("/stop")
     @ResponseBody
     public BeanRet stop() {
-        sShSV.close(sshout, channel);
+        WebSocketSession webSocketSession = wsClientManager.get("192.168.10.95");
+        sShSV.close("hegaoye", new WSTools(webSocketSession));
         return BeanRet.create(true, "");
     }
 

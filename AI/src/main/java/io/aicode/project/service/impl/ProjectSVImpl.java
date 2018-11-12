@@ -114,7 +114,9 @@ public class ProjectSVImpl extends BaseMybatisSVImpl<Project, Long> implements P
         project.setBasePackage(basePackage);
         project.setCode(String.valueOf(uidGenerator.getUID()));
         project.setState(ProjectStateEnum.Enable.name());
-        project.setIsIncrement(YNEnum.N.name());
+        if (StringUtils.isBlank(project.getIsIncrement())) {
+            project.setIsIncrement(YNEnum.N.name());
+        }
         project.setDownloadUrl("DownloadUrl");
         project.setCreateTime(new Date());
         project.setUpdateTime(new Date());

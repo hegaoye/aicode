@@ -13,11 +13,11 @@ import io.aicode.core.tools.FileUtil;
 import io.aicode.core.tools.HandleFuncs;
 import io.aicode.core.tools.JSON;
 import io.aicode.core.tools.StringTools;
+import io.aicode.project.dao.*;
+import io.aicode.project.entity.*;
 import io.aicode.project.service.ProjectSV;
 import io.aicode.setting.dao.SettingDAO;
 import io.aicode.setting.entity.Setting;
-import io.aicode.project.dao.*;
-import io.aicode.project.entity.*;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
@@ -114,6 +114,7 @@ public class ProjectSVImpl extends BaseMybatisSVImpl<Project, Long> implements P
         project.setBasePackage(basePackage);
         project.setCode(String.valueOf(uidGenerator.getUID()));
         project.setState(ProjectStateEnum.Enable.name());
+        project.setIsIncrement(YNEnum.N.name());
         project.setDownloadUrl("DownloadUrl");
         project.setCreateTime(new Date());
         project.setUpdateTime(new Date());

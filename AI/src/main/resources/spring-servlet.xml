@@ -3,15 +3,18 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
        xmlns:mvc="http://www.springframework.org/schema/mvc"
        xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:websocket="http://www.springframework.org/schema/websocket"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
     http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/websocket
+    http://www.springframework.org/schema/websocket/spring-websocket.xsd
     http://code.alibabatech.com/schema/dubbo
     http://code.alibabatech.com/schema/dubbo/dubbo.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
     <!--
     自动扫描controller包下的所有类，如果@Controller注入为bean
     并将bean依赖注入，即dubbo服务端暴露的Service注入到Controller中
     -->
-    <dubbo:annotation package="com"/>
+    <dubbo:annotation package="io"/>
 
     <!--此处配置决定了，可以使用htm做后缀，如果没有此处后缀会出现406  begin-->
     <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping"/>
@@ -50,7 +53,7 @@
     <mvc:resources mapping="/**" location="/"/>
 
     <!--异常统一处理-->
-    <bean class="com.rzhkj.core.base.handler.ExceptionHandler"/>
+    <bean class="io.aicode.core.base.handler.ExceptionHandler"/>
 
 
     <bean id="contentNegotiationManager" class="org.springframework.web.accept.ContentNegotiationManagerFactoryBean">
@@ -109,7 +112,16 @@
         </property>
     </bean>
     <!--开启swagger-->
-    <bean class="com.rzhkj.core.config.SwaggerConfig"/>
+    <bean class="io.aicode.core.config.SwaggerConfig"/>
+
+    <bean id="demoWSHandler" class="io.aicode.base.interceptor.WSHandler"/>
+    <!--<bean id="wsClientManager" class="com.aicodee.base.interceptor.WSClientManager"/>-->
+    <websocket:handlers allowed-origins="*">
+        <websocket:mapping path="/websocket**" handler="demoWSHandler"/>
+        <websocket:handshake-interceptors>
+            <bean class="io.aicode.base.interceptor.HandshakeInterceptor"/>
+        </websocket:handshake-interceptors>
+    </websocket:handlers>
 
     <!-- 配置拦截器 -->
     <!--<mvc:interceptors>
@@ -120,14 +132,14 @@
             <mvc:exclude-mapping path="/swagger**"/>
             <mvc:exclude-mapping path="/swagger-resources/**"/>
             <mvc:exclude-mapping path="/login/signin**"/>
-            <bean id="loginInterceptor" class="com.rzhkj.core.interceptor.LoginInterceptor">
+            <bean id="loginInterceptor" class="com.aicodee.core.interceptor.LoginInterceptor">
             </bean>
         </mvc:interceptor>
 
         <mvc:interceptor>
             <mvc:mapping path="/**/**"/>
             <mvc:exclude-mapping path="/swagger-resources/**"/>
-            <bean class="com.rzhkj.core.interceptor.ContextInterceptor">
+            <bean class="com.aicodee.core.interceptor.ContextInterceptor">
             </bean>
         </mvc:interceptor>
     </mvc:interceptors>-->

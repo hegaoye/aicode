@@ -59,7 +59,7 @@ public class ProjectSqlSVImpl extends BaseMybatisSVImpl<ProjectSql, Long> implem
         //是否存在 drop  database  if  exists
         tsql = tsql.replaceAll("\\s*(drop|DROP)\\s+(database|DATABASE)\\s+(if|IF){0,1}\\s+(exists|EXISTS){0,1}\\s+\\w+;{0,1}", "");
         tsql = tsql.replaceAll("\\s*(create|CREATE)\\s+(database|DATABASE)\\s+\\w+;{0,1}", "");
-        tsql = tsql.replaceAll("\\s*(use|USE)\\s+\\w+;{0,1}", "");
+        tsql = tsql.replaceAll("^\\s*(use|USE)\\s+\\w+;", "");
         sqlHeader = "DROP DATABASE if EXISTS " + project.getEnglishName() + ";\n";
         sqlHeader += "CREATE DATABASE " + project.getEnglishName() + ";\n";
         sqlHeader += "USE " + project.getEnglishName() + ";\n";

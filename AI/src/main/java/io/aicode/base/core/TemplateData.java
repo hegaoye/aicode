@@ -1,8 +1,11 @@
 package io.aicode.base.core;
 
 import io.aicode.core.tools.StringTools;
+import io.aicode.display.ctrl.DisplayAttributeCtrl;
+import io.aicode.display.entity.DisplayAttribute;
 import io.aicode.project.entity.MapClassTable;
 import io.aicode.project.entity.MapFieldColumn;
+import io.aicode.project.entity.MapRelationship;
 import io.aicode.project.entity.Project;
 import lombok.Data;
 
@@ -66,7 +69,10 @@ public class TemplateData implements Serializable {
     private List<MapFieldColumn> pkFields;  //主键数据信息
     private List<MapFieldColumn> notPkFields;  //非主键主键数据信息
     private List<MapClassTable> modelClasses;//各个模块下的所有类集合信息
+    private List<MapRelationship> relationships;//类与类之间的关联关系模型集合信息
+
     //**********前端生成代码使用：start***********
+    private List<DisplayAttribute> displayAttributes;//所有类下面的属性集合信息
     private List<MapFieldColumn> tableFields;  //前端页面显示
     private List<ModelData> modelDatas;//模型与实体类的关系
     private String dashedCaseName;//破折号命名 或叫烤串命名 适用于 前端angular ,react, vue

@@ -16,32 +16,32 @@ import java.util.List;
  * 需要新参数在此类中定义即可
  * 模板采用freemarker
  * 模板可以拿到如下数据：
- * ${projectName} //项目英文名
- * ${model}   //模块中的模型 -> ${basePackage}.${model}.service
- * ${module} //模块 一个项目的模块化 不参与java的包定义只是项目管理分离办法
+ * ${projectName} 项目英文名
+ * ${model}   模块中的模型 -> ${basePackage}.${model}.service
+ * ${module} 模块 一个项目的模块化 不参与java的包定义只是项目管理分离办法
+ * ${basePackage}  包名
+ * ${table}  表对象
+ * ${clazz}  类对象
+ * ${tableName}  表名
+ * ${className}  类名
+ * ${classNameLower}  类名小写
+ * ${notes}  类注释
+ * ${copyright}  项目版权
+ * ${author}  作者
  * <p>
- * ${basePackage}  //包名
- * <p>
- * ${table}  //表对象
- * ${tableName}  //表名
- * <p>
- * ${classes}  //类信息对象  集合
- * ${class}  //类对象
- * ${className}  //类名
- * ${classNameLower}  //类名小写
- * <p>
- * ${columns}  //列对象  集合
- * ${pkColumns}  //主键数据信息
- * ${notPkColumns}  //非主键数据信息
- * <p>
- * <p>
- * ${fields}  //类属性  集合
- * ${pkFields}  //主键数据信息
- * ${notPkFields}  //非主键主键数据信息
- * <p>
- * ${notes}  //类注释
- * ${copyright}  //项目版权
- * ${author}  //作者
+ * ${classes}  类信息对象  集合
+ * ${columns}  列对象  集合
+ * ${pkColumns}  主键数据信息
+ * ${notPkColumns}  非主键数据信息
+ * ${fields}  类属性  集合
+ * ${pkFields}  主键数据信息
+ * ${notPkFields}  非主键主键数据信息
+ * ${modelClasses} 各个模块下的所有类集合信息
+ * ${relationships} 类与类之间的关联关系模型集合信息
+ * ${displayAttributes} 所有类下面的属性集合信息
+ * ${tableFields} 前端页面显示
+ * ${modelDatas} 模型与实体类的关系
+ * ${dashedCaseName} 破折号命名 或叫烤串命名 适用于 前端angular ,react, vue
  * <p>
  * Created by lixin on 2018/1/25.
  */

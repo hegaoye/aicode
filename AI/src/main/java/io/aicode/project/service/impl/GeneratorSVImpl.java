@@ -10,6 +10,7 @@ import io.aicode.base.core.TemplateData;
 import io.aicode.base.tools.WSTools;
 import io.aicode.core.enums.YNEnum;
 import io.aicode.core.tools.*;
+import io.aicode.display.entity.DisplayAttribute;
 import io.aicode.project.dao.*;
 import io.aicode.project.entity.*;
 import io.aicode.project.service.GenerateSV;
@@ -329,17 +330,23 @@ public class GeneratorSVImpl implements GenerateSV {
         List<MapFieldColumn> mapFieldColumnNotPks = new ArrayList<>();
         List<MapFieldColumn> mapFieldColumnList = new ArrayList<>();
         List<MapFieldColumn> mapFieldColumnTable = new ArrayList<>();
+        List<DisplayAttribute> displayAttributes = new ArrayList<>();
         mapClassTable.getMapFieldColumnList().forEach(mapFieldColumn -> {
             if (mapFieldColumn.getIsPrimaryKey().equals(YNEnum.Y.name())) {
                 mapFieldColumnPks.add(mapFieldColumn);
             } else {
                 mapFieldColumnNotPks.add(mapFieldColumn);
             }
-            if (!mapFieldColumn.getIsPrimaryKey().equals(YNEnum.Y.name()) && !mapFieldColumn.getColumn().contains("updateTime") && !mapFieldColumn.getColumn().contains("summary")
-                    && !mapFieldColumn.getColumn().contains("marker") && !mapFieldColumn.getColumn().contains("vn")) {
+            if (!mapFieldColumn.getIsPrimaryKey().equals(YNEnum.Y.name())
+                    && !mapFieldColumn.getColumn().contains("updateTime")
+                    && !mapFieldColumn.getColumn().contains("summary")
+                    && !mapFieldColumn.getColumn().contains("marker")
+                    && !mapFieldColumn.getColumn().contains("vn")) {
                 mapFieldColumnTable.add(mapFieldColumn);
             }
             mapFieldColumnList.add(mapFieldColumn);
+            //封装类属性的显示显示属性
+            displayAttributes.add(mapFieldColumn.getDisplayAttribute());
         });
 
         //各个模块下的所有类集合信息
@@ -350,6 +357,7 @@ public class GeneratorSVImpl implements GenerateSV {
         mapClassTableList.forEach(mapClassTableObj -> {
             models.add(mapClassTableObj.getClassModel());
         });
+
         mapClassTableList.forEach(mapClassTableObj -> {
             List<MapClassTable> mapClassTables = null;
             if (mapClassTableMap.containsKey(mapClassTableObj.getClassModel())) {
@@ -378,9 +386,13 @@ public class GeneratorSVImpl implements GenerateSV {
             }
         });
 
+
         //根据模块划分类集合信息
 
         TemplateData templateData = new TemplateData(project, mapClassTable, mapClassTableList, mapFieldColumnList, mapFieldColumnPks, mapFieldColumnNotPks, mapFieldColumnTable, modelClasses, modelDatas);
+        templateData.setDisplayAttributes(displayAttributes);
+        templateData.setRelationships(mapClassTable.getMapRelationshipList());
+
         Setting settingTemplatePath = settingDAO.loadByKey(Setting.Key.Template_Path.name());
 
         //生成路径处理

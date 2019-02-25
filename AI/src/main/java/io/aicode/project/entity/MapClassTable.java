@@ -31,8 +31,8 @@ public class MapClassTable extends BaseEntity implements java.io.Serializable {
     private String classModel;//类所在模块
     private String dashedCaseName;//破折号命名 或叫烤串命名 适用于 前端angular ,react, vue
 
-    private List<MapFieldColumn> mapFieldColumnList;//one to many
-    private List<MapRelationship> mapRelationshipList;//one to many
+    private List<MapFieldColumn> mapFieldColumnList;
+    private List<MapRelationship> mapRelationshipList;//类模型的关联关系
 
     public MapClassTable() {
     }

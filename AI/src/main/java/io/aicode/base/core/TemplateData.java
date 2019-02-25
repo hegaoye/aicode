@@ -1,7 +1,6 @@
 package io.aicode.base.core;
 
 import io.aicode.core.tools.StringTools;
-import io.aicode.display.ctrl.DisplayAttributeCtrl;
 import io.aicode.display.entity.DisplayAttribute;
 import io.aicode.project.entity.MapClassTable;
 import io.aicode.project.entity.MapFieldColumn;

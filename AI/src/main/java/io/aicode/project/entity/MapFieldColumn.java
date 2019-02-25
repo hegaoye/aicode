@@ -9,6 +9,7 @@ import io.aicode.base.core.StringHelper;
 import io.aicode.base.core.typemapping.DatabaseDataTypesUtils;
 import io.aicode.core.base.BaseEntity;
 import io.aicode.core.enums.YNEnum;
+import io.aicode.display.entity.DisplayAttribute;
 import lombok.Data;
 
 
@@ -39,6 +40,8 @@ public class MapFieldColumn extends BaseEntity implements java.io.Serializable {
     private boolean checkState;
     private boolean checkPk;
     private boolean checkDigit = false;
+
+    private DisplayAttribute displayAttribute;
 
     public MapFieldColumn() {
     }

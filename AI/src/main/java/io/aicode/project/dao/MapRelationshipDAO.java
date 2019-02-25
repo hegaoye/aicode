@@ -18,9 +18,9 @@ import java.util.Map;
 public class MapRelationshipDAO extends BaseMybatisDAOImpl<MapRelationship, Long> {
 
 
-    public void delete(String mapClassTableCode) {
+    public void delete(String code) {
         Map<String, Object> map = Maps.newHashMap();
-        map.put("mapClassTableCode", mapClassTableCode);
+        map.put("code", code);
         getSqlSession().delete(sqlmapNamespace + ".delete", map);
     }
 }

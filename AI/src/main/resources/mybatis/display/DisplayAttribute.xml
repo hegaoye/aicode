@@ -189,9 +189,6 @@
             </if>
         </trim>
         <where>
-            <if test="id!=null and id!=''">
-                AND id = #{id}
-            </if>
             <if test="mapFieldColumnCode!=null and mapFieldColumnCode!=''">
                 AND mapFieldColumnCode = #{mapFieldColumnCode}
             </if>
@@ -206,6 +203,14 @@
         <include refid="columns"/>
         FROM `display_attribute`
         <include refid="where"/>
+    </select>
+
+    <!--根据mapFieldColumnCode加载一条display_attribute的数据-->
+    <select id="loadByMapFieldColumnCode" resultMap="rs_base">
+        SELECT
+        <include refid="columns"/>
+        FROM `display_attribute`
+        WHERE mapFieldColumnCode = #{mapFieldColumnCode}
     </select>
 
     <!--根据任何条件统计display_attribute数据条数-->

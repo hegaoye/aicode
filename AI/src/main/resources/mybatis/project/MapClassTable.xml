@@ -18,7 +18,7 @@
     <!--查询表信息关联信息-->
     <resultMap id="rs_base_all" type="MapClassTable" extends="rs_base">
         <collection property="mapFieldColumnList" column="{mapClassTableCode=code}" select="MapFieldColumn.query"/>
-        <collection property="mapRelationshipList" column="{mapClassTableCode=code}" select="MapRelationship.query"/>
+        <!--<collection property="mapRelationshipList" column="{mapClassTableCode=code}" select="MapRelationship.query"/>-->
     </resultMap>
 
     <!-- 用于select查询公用抽取的列 -->

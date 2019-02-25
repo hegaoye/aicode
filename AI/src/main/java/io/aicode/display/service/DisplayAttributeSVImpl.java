@@ -6,15 +6,18 @@ package io.aicode.display.service;
 
 import io.aicode.core.base.BaseMybatisDAO;
 import io.aicode.core.base.BaseMybatisSVImpl;
+import io.aicode.display.dao.DisplayAttributeDAO;
+import io.aicode.display.entity.DisplayAttribute;
+import io.aicode.display.facade.DisplayAttributeSV;
+import io.aicode.project.dao.MapFieldColumnDAO;
+import io.aicode.project.entity.MapFieldColumn;
+import org.apache.commons.collections.map.HashedMap;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-
-
-import io.aicode.display.facade.DisplayAttributeSV;
-import io.aicode.display.dao.DisplayAttributeDAO;
-import io.aicode.display.entity.DisplayAttribute;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -29,6 +32,9 @@ public class DisplayAttributeSVImpl extends BaseMybatisSVImpl<DisplayAttribute, 
 
     @Resource
     private DisplayAttributeDAO displayAttributeDAO;
+
+    @Resource
+    private MapFieldColumnDAO mapFieldColumnDAO;
 
     @Override
     protected BaseMybatisDAO getBaseMybatisDAO() {
@@ -55,6 +61,31 @@ public class DisplayAttributeSVImpl extends BaseMybatisSVImpl<DisplayAttribute, 
     @Override
     public void delete(Long id, String mapFieldColumnCode) {
         displayAttributeDAO.delete(id, mapFieldColumnCode);
+    }
+
+    /**
+     * 添加或修改
+     * @param displayAttributes  显示属性
+     */
+    @Override
+    public void saveOrUpdate(List<DisplayAttribute> displayAttributes) {
+        //2.遍历参数数据
+        DisplayAttribute displayAttributeFlag;
+        Map<String, Object> params ;
+        for (DisplayAttribute displayAttribute : displayAttributes) {
+            params = new HashedMap();
+            params.put("code", displayAttribute.getMapFieldColumnCode());
+            MapFieldColumn mapFieldColumn = mapFieldColumnDAO.load(params);
+            if(mapFieldColumn == null) {
+                continue;
+            }
+            displayAttributeFlag = displayAttributeDAO.loadByMapFieldColumnCode(displayAttribute.getMapFieldColumnCode());
+            if(displayAttributeFlag == null) {
+                displayAttributeDAO.insert(displayAttribute);
+            } else {
+                displayAttributeDAO.update(displayAttribute);
+            }
+        }
     }
 
 

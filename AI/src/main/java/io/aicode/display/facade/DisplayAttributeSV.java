@@ -7,6 +7,8 @@ package io.aicode.display.facade;
 import io.aicode.core.base.BaseMybatisSV;
 import io.aicode.display.entity.DisplayAttribute;
 
+import java.util.List;
+
 /**
  * 显示属性
  *
@@ -30,6 +32,13 @@ public interface DisplayAttributeSV extends BaseMybatisSV<DisplayAttribute, Long
      * @return DisplayAttribute
      */
     void delete(Long id, String mapFieldColumnCode);
+
+
+    /**
+     * 添加或修改
+     * @param displayAttributes  显示属性
+     */
+    void saveOrUpdate(List<DisplayAttribute> displayAttributes);
 
 
 }

@@ -3,8 +3,6 @@ package io.aicode.project.service;
 import io.aicode.base.tools.WSTools;
 import io.aicode.project.entity.ProjectJob;
 
-import java.util.Date;
-
 /**
  * 生成文件接口定义
  * Created by lixin on 2018/2/1.
@@ -15,7 +13,6 @@ public interface GenerateSV {
      * @param projectCode 项目编码
      * @param projectJob  项目job
      * @param webSocketSession  socket连接
-     * @param date          构建时间
      */
-    void aiCode(String projectCode, ProjectJob projectJob, WSTools webSocketSession, Date date);
+    void aiCode(String projectCode, ProjectJob projectJob, WSTools webSocketSession);
 }

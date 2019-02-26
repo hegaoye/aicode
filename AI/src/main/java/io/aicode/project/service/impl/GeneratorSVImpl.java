@@ -66,14 +66,13 @@ public class GeneratorSVImpl implements GenerateSV {
 
     /**
      * 根据项目码创建项目代码
-     *  @param projectCode  项目编码
+     * @param projectCode  项目编码
      * @param projectJob    项目job
      * @param webSocket     socket连接
-     * @param date          构建时间
      */
     @Override
-    public void aiCode(String projectCode, ProjectJob projectJob, WSTools webSocket, Date date) {
-        String path = logsSV.createLogFiles(projectCode, date);
+    public void aiCode(String projectCode, ProjectJob projectJob, WSTools webSocket) {
+        String path = logsSV.createLogFiles(projectCode, projectJob.getCreateTime());
         try {
             //1.创建项目
             String log = "Start By AI-Code @Copyright <a href='http://www.aicode.io' target='_blank'>AI-Code</a>";

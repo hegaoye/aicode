@@ -58,12 +58,11 @@ public class LogsCtrl extends BaseCtrl {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "logs", value = "日志信息", required = true, paramType = "query"),
             @ApiImplicitParam(name = "path", value = "日志路径", required = true, paramType = "query"),
-            @ApiImplicitParam(name = "isClose", value = "是否关闭", required = true, paramType = "query"),
     })
     @PostMapping("/saveLogs")
     @ResponseBody
-    public BeanRet saveLogs(String logs, String path, Boolean isClose) {
-        Boolean result = logsSV.saveLogs(logs, path, isClose);
+    public BeanRet saveLogs(String logs, String path) {
+        Boolean result = logsSV.saveLogs(logs, path);
         if(result) {
             return BeanRet.create(true, "成功");
         } else {

@@ -6,7 +6,6 @@
 package io.aicode.project.service.impl;
 
 
-import com.baidu.fsg.uid.UidGenerator;
 import io.aicode.core.entity.BeanRet;
 import io.aicode.core.enums.SuffixTypeEnum;
 import io.aicode.core.exceptions.BaseException;
@@ -36,9 +35,6 @@ import java.util.Map;
 @Component
 @Service
 public class LogsSVImpl implements LogsSV {
-
-    @Resource
-    private UidGenerator uidGenerator;
 
     @Resource
     private SettingSV settingSV;
@@ -99,19 +95,15 @@ public class LogsSVImpl implements LogsSV {
      *
      * @param logs    日志
      * @param path    日志路径
-     * @param isClose 是否关闭连接
      * @return String
      */
     @Override
-    public boolean saveLogs(String logs, String path, Boolean isClose) {
+    public boolean saveLogs(String logs, String path) {
         //参数为空判断
         if (StringTools.isEmpty(logs)) {
             throw new BaseException(BaseException.BaseExceptionEnum.Empty_Param);
         }
         if (StringTools.isEmpty(path)) {
-            throw new BaseException(BaseException.BaseExceptionEnum.Empty_Param);
-        }
-        if (isClose == null) {
             throw new BaseException(BaseException.BaseExceptionEnum.Empty_Param);
         }
         String workspace = settingSV.load(Setting.Key.SandBox_Path);

@@ -24,10 +24,9 @@ public interface LogsSV {
      *
      * @param logs    日志
      * @param path    日志路径
-     * @param isClose 是否关闭连接
      * @return String
      */
-    boolean saveLogs(String logs, String path, Boolean isClose);
+    boolean saveLogs(String logs, String path);
 
 
     /**

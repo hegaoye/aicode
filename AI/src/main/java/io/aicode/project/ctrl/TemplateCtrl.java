@@ -1,12 +1,11 @@
 package io.aicode.project.ctrl;
 
-import io.aicode.base.core.model.java.Log;
-import io.aicode.base.tools.LogTools;
 import io.aicode.core.base.BaseCtrl;
 import io.aicode.core.entity.BeanRet;
 import io.aicode.core.tools.FileUtil;
 import io.aicode.core.tools.HandleFuncs;
 import io.aicode.core.tools.StringTools;
+import io.aicode.project.service.LogsSV;
 import io.aicode.setting.entity.Setting;
 import io.aicode.setting.service.SettingSV;
 import io.swagger.annotations.Api;
@@ -44,7 +43,26 @@ public class TemplateCtrl extends BaseCtrl {
    @Resource
    SettingSV settingSV;
 
+   @Resource
+   private LogsSV logsSV;
 
+
+
+    /**
+     * 创建日志文件
+     *
+     * @return BeanRet
+     */
+    @ApiOperation(value = "创建日志文件", notes = "创建日志文件")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "projectCode", value = "项目code", required = true, paramType = "query"),
+    })
+    @PostMapping("/createLogFiles")
+    @ResponseBody
+    public BeanRet createLogFiles( String projectCode) {
+        String path = logsSV.createLogFiles(projectCode);
+        return BeanRet.create(true, "成功", path);
+    }
 
     /**
      * 创建模板
@@ -61,7 +79,7 @@ public class TemplateCtrl extends BaseCtrl {
     public BeanRet createFramework( String filePath, String fileName) {
         try {
 
-            String workspace = settingSV.load(Setting.Key.SandBox_Path);
+          /*  String workspace = settingSV.load(Setting.Key.SandBox_Path);
             String path = new HandleFuncs().getCurrentClassPath() + workspace + filePath;
             FileUtil.createDir(path , fileName);
             //创建log文件
@@ -72,7 +90,7 @@ public class TemplateCtrl extends BaseCtrl {
             LogTools.logMsg(Class.class.toString() +"已成功创建模板：" + filePath, path  +"/"+ logName);
             Log log = LogTools.realtimeShowLog(path  +"/"+ logName,0);
             System.out.print(log.getLogInfo());
-            //保存数据
+            //保存数据*/
             return BeanRet.create(true, "删除成功");
         } catch (Exception e) {
             e.printStackTrace();
@@ -86,7 +104,7 @@ public class TemplateCtrl extends BaseCtrl {
      *
      * @return BeanRet
      */
-    @ApiOperation(value = "保存数据", notes = "保存数据")
+   /* @ApiOperation(value = "保存数据", notes = "保存数据")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "filePath", value = "路径", required = true, paramType = "query"),
             @ApiImplicitParam(name = "content", value = "文件内容", paramType = "query"),
@@ -111,7 +129,7 @@ public class TemplateCtrl extends BaseCtrl {
             e.printStackTrace();
         }
         return BeanRet.create(true, "保存数据");
-    }
+    }*/
 
     /**
      * 查询文件路径

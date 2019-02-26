@@ -81,6 +81,7 @@ public class DisplayAttributeSVImpl extends BaseMybatisSVImpl<DisplayAttribute, 
             }
             displayAttributeFlag = displayAttributeDAO.loadByMapFieldColumnCode(displayAttribute.getMapFieldColumnCode());
             if(displayAttributeFlag == null) {
+                displayAttribute.setMapClassTableCode(mapFieldColumn.getMapClassTableCode());
                 displayAttributeDAO.insert(displayAttribute);
             } else {
                 displayAttributeDAO.update(displayAttribute);

@@ -73,6 +73,12 @@
         FROM `map_class_table`
         <include refid="MapClassTable.where"/>
     </select>
+    <select id="MapClassTable.loadForMapRelationShop" resultMap="rs_base">
+        SELECT
+        <include refid="MapClassTable.columns"/>
+        FROM `map_class_table`
+        <include refid="MapClassTable.where"/>
+    </select>
 
     <sql id="MapClassTable.where">
         <where>

@@ -8,6 +8,7 @@
 
     <resultMap id="rs_base" type="DisplayAttribute">
         <result property="id" column="id"/>
+        <result property="mapClassTableCode" column="mapClassTableCode"/>
         <result property="mapFieldColumnCode" column="mapFieldColumnCode"/>
         <result property="isRequired" column="isRequired"/>
         <result property="isInsert" column="isInsert"/>
@@ -28,7 +29,7 @@
 
     <!-- 用于select查询公用抽取的列 -->
     <sql id="columns">
-        id,mapFieldColumnCode,isRequired,isInsert,isDeleteCondition,isAllowUpdate,isListPageDisplay,isDetailPageDisplay,isQueryRequired,isLineNew,matchType,displayType,displayName,displayNo,fieldValidationMode,validateText,displayCss
+        id,mapClassTableCode,mapFieldColumnCode,isRequired,isInsert,isDeleteCondition,isAllowUpdate,isListPageDisplay,isDetailPageDisplay,isQueryRequired,isLineNew,matchType,displayType,displayName,displayNo,fieldValidationMode,validateText,displayCss
      </sql>
 
     <!--全局where条件-->
@@ -36,6 +37,9 @@
         <where>
             <if test="id!=null and id!=''">
                 AND id = #{id}
+            </if>
+            <if test="mapClassTableCode!=null and mapClassTableCode!=''">
+                AND mapClassTableCode = #{mapClassTableCode}
             </if>
             <if test="mapFieldColumnCode!=null and mapFieldColumnCode!=''">
                 AND mapFieldColumnCode = #{mapFieldColumnCode}
@@ -92,6 +96,7 @@
     <insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="DisplayAttribute">
         INSERT INTO `display_attribute` (
         id ,
+        mapClassTableCode ,
         mapFieldColumnCode ,
         isRequired ,
         isInsert ,
@@ -110,6 +115,7 @@
         displayCss
         ) VALUES (
         #{id} ,
+        #{mapClassTableCode} ,
         #{mapFieldColumnCode} ,
         #{isRequired} ,
         #{isInsert} ,

@@ -74,6 +74,7 @@ public class GeneratorSVImpl implements GenerateSV {
     public void aiCode(String projectCode, ProjectJob projectJob, WSTools webSocket) {
         String path = logsSV.createLogFiles(projectCode, projectJob.getCreateTime());
         try {
+
             //1.创建项目
             String log = "Start By AI-Code @Copyright <a href='http://www.aicode.io' target='_blank'>AI-Code</a>";
             webSocket.send(log);
@@ -89,6 +90,7 @@ public class GeneratorSVImpl implements GenerateSV {
             projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), log));
             logger.info("创建工作空间库完成");
             logsSV.saveLogs("创建工作空间库完成", path);
+
 
             //2.获取类信息
             log = "转化数据库结构与类模型...";

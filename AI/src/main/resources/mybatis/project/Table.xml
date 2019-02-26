@@ -18,6 +18,7 @@
         <result property="defaultCollationName" column="default_collation_name"/>
     </resultMap>
 
+    <!--查询指定数据库下指定表的信息-->
     <select id="Table.load" resultMap="rs_base">
         SELECT table_name,table_comment
         FROM `information_schema.tables`
@@ -26,20 +27,18 @@
         and table_type='base table'
     </select>
 
+    <!--统计数据库下有多少个表-->
     <select id="Table.count" resultType="long">
         select count(1)
 		from information_schema.tables
 		where table_schema=#{database} and table_type='base table'
     </select>
 
+    <!--查询数据库下所有表信息-->
     <select id="Table.query" resultMap="rs_base">
 		select table_name,table_comment
 		from information_schema.tables
 		where table_schema=#{database} and table_type='base table'
-    </select>
-
-    <select id="Table.getDatabase" resultMap="database">
-		SELECT * FROM information_schema.SCHEMATA where SCHEMA_NAME=#{value};
     </select>
 </mapper>
 

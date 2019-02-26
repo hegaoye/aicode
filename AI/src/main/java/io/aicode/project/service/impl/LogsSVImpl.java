@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.io.*;
+import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -53,10 +54,11 @@ public class LogsSVImpl implements LogsSV {
      * 4.返回文件路径
      *
      * @param projectCode 项目编码
+     * @param date
      * @return String
      */
     @Override
-    public String createLogFiles(String projectCode) {
+    public String createLogFiles(String projectCode, Date date) {
         String filePath = null;
         try {
             //1.根据项目编码查询出用户和项目信息
@@ -73,13 +75,13 @@ public class LogsSVImpl implements LogsSV {
             String accountName = account.getAccount();
             String name = project.getName();
             //2.用户名+项目名生成唯一的文件夹
-            String fileName = accountName + "-" + name;
-            String workspace = settingSV.load(Setting.Key.SandBox_Path);
+            String fileName = accountName + "_" + name + "_logs";
+            String workspace = settingSV.load(Setting.Key.Workspace);
             String path = new HandleFuncs().getCurrentClassPath() + workspace + fileName;
             FileUtil.createDir(path, null);
             //3.根据时间戳生成文件
-            String date = DateTools.dateToNum14(new Date());
-            String logName = date + SuffixTypeEnum.Log.val;
+            String dateStr = DateTools.dateToNum14(date);
+            String logName = dateStr + SuffixTypeEnum.Log.val;
             FileUtil.createDir(path, logName);
             //文件路径
             filePath = fileName + "/" + logName;
@@ -93,8 +95,8 @@ public class LogsSVImpl implements LogsSV {
     /**
      * 保存日志数据
      *
-     * @param logs    日志
-     * @param path    日志路径
+     * @param logs 日志
+     * @param path 日志路径
      * @return String
      */
     @Override
@@ -106,7 +108,7 @@ public class LogsSVImpl implements LogsSV {
         if (StringTools.isEmpty(path)) {
             throw new BaseException(BaseException.BaseExceptionEnum.Empty_Param);
         }
-        String workspace = settingSV.load(Setting.Key.SandBox_Path);
+        String workspace = settingSV.load(Setting.Key.Workspace);
         path = new HandleFuncs().getCurrentClassPath() + workspace + path;
         FileOutputStream fop;
         File file;
@@ -145,31 +147,48 @@ public class LogsSVImpl implements LogsSV {
         String accountName = account.getAccount();
         String name = project.getName();
         //2.用户名+项目名生成唯一的文件夹
-        String fileName = accountName + "-" + name;
-        return  fileName;
+        String fileName = accountName + "_" + name + "_logs";
+        return fileName;
     }
 
+    /**
+     * 查询日志信息
+     *
+     * @param projectCode 文件路径
+     * @param datetime    构建时间
+     * @return String
+     */
     @Override
-    public BeanRet scanPath(String filePath) {
-        String workspace = settingSV.load(Setting.Key.SandBox_Path);
-        String path = new HandleFuncs().getCurrentClassPath() + workspace;
-        if (StringTools.isNotEmpty(filePath)) {
-            path = path + filePath;
-        }
-        File file = new File(path);
-        if (file.isDirectory()) {
-            List<Map<String, String>> mapList = FileUtil.sanDirFiles(path, filePath);
-            return BeanRet.create(true, "成功", mapList);
+    public BeanRet scanPath(String projectCode, String datetime) {
+        String name = this.loadFilePath(projectCode);
+        String filePath = null;
+        try {
+            String date = DateTools.stringToNum14(datetime, "yyyy-MM-dd HH:mm:ss");
+            if (StringTools.isNotEmpty(date)) {
+                filePath = name + "/" + date + SuffixTypeEnum.Log.val;
+            }
+            String workspace = settingSV.load(Setting.Key.Workspace);
+            String path = new HandleFuncs().getCurrentClassPath() + workspace;
+            if (StringTools.isNotEmpty(filePath)) {
+                path = path + filePath;
+            }
+            File file = new File(path);
+            if (file.isDirectory()) {
+                List<Map<String, String>> mapList = FileUtil.sanDirFiles(path, filePath);
+                return BeanRet.create(true, "成功", mapList);
+            }
+            if (file.isFile() && !filePath.contains(".jar")) {
+                try {
+                    String fileStr = FileUtils.readFileToString(new File(path), "UTF-8");
+                    return BeanRet.create(true, "成功", fileStr);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
         }
 
-        if (file.isFile() && !filePath.contains(".jar")) {
-            try {
-                String fileStr = FileUtils.readFileToString(new File(path), "UTF-8");
-                return BeanRet.create(true, "成功", fileStr);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
         return BeanRet.create(true, "", filePath.replaceAll("/\\w*\\.jar", ""));
     }
 }

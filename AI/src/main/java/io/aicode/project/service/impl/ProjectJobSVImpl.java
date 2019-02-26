@@ -132,7 +132,7 @@ public class ProjectJobSVImpl extends BaseMybatisSVImpl<ProjectJob, Long> implem
         Executors.cacheThreadExecutor(new Runnable() {
             @Override
             public void run() {
-                generateSV.aiCode(projectCode, projectJob, null);
+                generateSV.aiCode(projectCode, projectJob, null, null);
             }
         });
         return projectJob;
@@ -160,13 +160,14 @@ public class ProjectJobSVImpl extends BaseMybatisSVImpl<ProjectJob, Long> implem
         projectJob.setProjectCode(projectCode);
         projectJob.setState(ProjectJob.State.Executing.name());
         projectJob.setNumber(1);
-        projectJob.setCreateTime(new Date());
+        Date date = new Date();
+        projectJob.setCreateTime(date);
         projectJobDAO.insert(projectJob);
         WSTools wsTools=new WSTools(webSocketSession);
         Executors.cacheThreadExecutor(new Runnable() {
             @Override
             public void run() {
-                generateSV.aiCode(projectCode, projectJob, wsTools);
+                generateSV.aiCode(projectCode, projectJob, wsTools, date);
             }
         });
         return projectJob;

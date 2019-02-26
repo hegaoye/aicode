@@ -14,6 +14,7 @@ import io.aicode.display.entity.DisplayAttribute;
 import io.aicode.project.dao.*;
 import io.aicode.project.entity.*;
 import io.aicode.project.service.GenerateSV;
+import io.aicode.project.service.LogsSV;
 import io.aicode.setting.dao.SettingDAO;
 import io.aicode.setting.entity.Setting;
 import org.apache.commons.collections.map.HashedMap;
@@ -57,55 +58,75 @@ public class GeneratorSVImpl implements GenerateSV {
     private SettingDAO settingDAO;
 
     @Resource
+    private LogsSV logsSV;
+
+    @Resource
     private UidGenerator uidGenerator;
 
 
     /**
      * 根据项目码创建项目代码
-     *
-     * @param projectCode 项目编码
-     * @param projectJob  项目job
-     * @param webSocket
+     *  @param projectCode  项目编码
+     * @param projectJob    项目job
+     * @param webSocket     socket连接
+     * @param date          构建时间
      */
     @Override
-    public void aiCode(String projectCode, ProjectJob projectJob, WSTools webSocket) {
+    public void aiCode(String projectCode, ProjectJob projectJob, WSTools webSocket, Date date) {
+        String path = logsSV.createLogFiles(projectCode, date);
         try {
             //1.创建项目
-            webSocket.send("Start By AI-Code @Copyright <a href='http://www.aicode.io' target='_blank'>AI-Code</a>");
+            String log = "Start By AI-Code @Copyright <a href='http://www.aicode.io' target='_blank'>AI-Code</a>";
+            webSocket.send(log);
+            logsSV.saveLogs(log, path);
             Map<String, Object> map = Maps.newHashMap();
             map.put("code", projectCode);
             Project project = projectDAO.load(map);
             String projectPath = this.buildProject(project, webSocket);
             projectDAO.update(projectCode, project.getBuildNumber() != null ? project.getBuildNumber() + 1 : 1);
-            String log = " 已初始化项目 【 " + project.getName() + " ( " + project.getEnglishName() + " )】 工作空间";
+            log = "已初始化项目 【 " + project.getName() + " ( " + project.getEnglishName() + " )】 工作空间";
             webSocket.send(log);
+            logsSV.saveLogs(log, path);
             projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), log));
             logger.info("创建工作空间库完成");
+            logsSV.saveLogs("创建工作空间库完成", path);
 
             //2.获取类信息
-            webSocket.send("转化数据库结构与类模型...");
+            log = "转化数据库结构与类模型...";
+            webSocket.send(log);
+            logsSV.saveLogs(log, path);
             List<ProjectMap> projectMapList = project.getProjectMapList();
             List<MapClassTable> mapClassTableList = new ArrayList<>();
             projectMapList.forEach(projectMap -> {
                 mapClassTableList.add(projectMap.getMapClassTable());
             });
             webSocket.send("转化数据库结构与类模型成功！");
+            logsSV.saveLogs("转化数据库结构与类模型成功！", path);
 
             //3.获取模板信息
             List<ProjectFramwork> projectFramworkList = project.getProjectFramworkList();
             //从git中检出技术模板库
-            webSocket.send(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+            log = ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>";
+            webSocket.send(log);
             webSocket.send("开始 下载技术模板");
-            webSocket.send(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-            this.readyframeworksTemplateList(projectFramworkList, webSocket);
-            webSocket.send(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+            webSocket.send(log);
+            logsSV.saveLogs(log, path);
+            logsSV.saveLogs("开始 下载技术模板", path);
+            logsSV.saveLogs(log, path);
+            this.readyframeworksTemplateList(projectFramworkList, webSocket, path);
+            webSocket.send(log);
             webSocket.send("结束 下载技术模板成功");
-            webSocket.send(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+            webSocket.send(log);
+            logsSV.saveLogs(log, path);
+            logsSV.saveLogs("结束 下载技术模板成功", path);
+            logsSV.saveLogs(log, path);
 
             //4.生成源码
             webSocket.send("开始生成源码...");
+            logsSV.saveLogs("开始生成源码...", path);
             projectFramworkList.forEach(projectFramwork -> {
                 webSocket.send("已获取项目 【" + projectFramwork.getFrameworks().getName() + "】 的模板");
+                logsSV.saveLogs("已获取项目 【" + projectFramwork.getFrameworks().getName() + "】 的模板", path);
                 Map<String, Object> param = new HashMap<>();
                 param.put("frameworkCode", projectFramwork.getFrameworks().getCode());
                 Frameworks frameworks = projectFramwork.getFrameworks();
@@ -115,6 +136,7 @@ public class GeneratorSVImpl implements GenerateSV {
                         this.generator(projectPath, project, frameworks, projectMap.getMapClassTable(), frameworksTemplate, mapClassTableList, webSocket);
                     });
                     webSocket.send("[生成] 模板 " + frameworksTemplate.getPath() + " 的源码");
+                    logsSV.saveLogs("[生成] 模板 " + frameworksTemplate.getPath() + " 的源码", path);
                 });
             });
 
@@ -125,8 +147,10 @@ public class GeneratorSVImpl implements GenerateSV {
             //生成sql脚本到项目下
             String sql = this.generateTsql(projectPath, project.getEnglishName(), projectCode);
             webSocket.send("分布式唯一算法sql " + sql);
-            String sqllog = " 【已经生成】 " + project.getEnglishName() + "Sql 脚本文件并追加系统配置";
+            logsSV.saveLogs("分布式唯一算法sql " + sql, path);
+            String sqllog = "【已经生成】 " + project.getEnglishName() + "Sql 脚本文件并追加系统配置";
             webSocket.send(sqllog);
+            logsSV.saveLogs(sqllog, path);
             projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), sqllog));
 
             //5.获取模块信息 TODO
@@ -138,10 +162,12 @@ public class GeneratorSVImpl implements GenerateSV {
             if (projectRepositoryAccount != null) {
                 String gitLog = "获取代码仓库信息: " + projectRepositoryAccount.getAccount();
                 webSocket.send(gitLog);
+                logsSV.saveLogs(gitLog, path);
                 projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), gitLog));
                 GitTools.commitAndPush(new File(projectPath), projectRepositoryAccount.getAccount(), projectRepositoryAccount.getPassword(), "AI-Code 为您构建代码，享受智慧生活");
                 gitLog = "代码已经提交到 ⇛⇛⇛ <a style='text-decoration:underline;' href='" + projectRepositoryAccount.getHome() + "' target='_blank'>[" + projectRepositoryAccount.getHome() + "] </a>仓库";
                 webSocket.send(gitLog);
+                logsSV.saveLogs(gitLog, path);
                 projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), gitLog));
             }
 
@@ -149,6 +175,7 @@ public class GeneratorSVImpl implements GenerateSV {
             this.zipProject(project);
             String endLog = "代码已打包ZIP, ⇛⇛⇛  <a style='text-decoration:underline;' href='" + project.getDownloadUrl() + "' target='_blank'>[点击下载" + project.getEnglishName() + ".zip]</a>";
             webSocket.send(endLog);
+            logsSV.saveLogs(endLog, path);
             //记录日志
             projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), endLog));
             projectJob.setState(ProjectJob.State.Completed.name());
@@ -157,6 +184,7 @@ public class GeneratorSVImpl implements GenerateSV {
             e.printStackTrace();
             logger.error(e.getMessage());
             webSocket.send(e.getMessage());
+            logsSV.saveLogs(e.getMessage(), path);
             projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "ERROR : " + e.getMessage()));
             projectJob.setState(ProjectJob.State.Error.name());
             projectJobDAO.update(projectJob);
@@ -169,12 +197,14 @@ public class GeneratorSVImpl implements GenerateSV {
                 projectJobLogs.setCode(projectJob.getCode());
                 projectJobLogs.setLog("Finished: SUCCESS");
                 webSocket.send("Finished: SUCCESS");
+                logsSV.saveLogs("Finished: SUCCESS", path);
                 projectJobLogsDAO.insert(projectJobLogs);
             } else {
                 ProjectJobLogs projectJobLogs = new ProjectJobLogs();
                 projectJobLogs.setCode(projectJob.getCode());
                 projectJobLogs.setLog("Finished: ERROR");
                 webSocket.send("Finished: ERROR");
+                logsSV.saveLogs("Finished: ERROR", path);
                 projectJobLogsDAO.insert(projectJobLogs);
             }
             ProjectJobLogs projectJobLogs = new ProjectJobLogs();
@@ -201,7 +231,7 @@ public class GeneratorSVImpl implements GenerateSV {
     }
 
     //准备框架模板
-    private void readyframeworksTemplateList(List<ProjectFramwork> projectFramworkList, WSTools webSocket) {
+    private void readyframeworksTemplateList(List<ProjectFramwork> projectFramworkList, WSTools webSocket, String logsPath) {
         Setting setting = settingDAO.loadByKey(Setting.Key.Template_Path.name());
         String template_Path = new HandleFuncs().getCurrentClassPath() + setting.getV();//获得默认仓库地址
         for (ProjectFramwork projectFramwork : projectFramworkList) {
@@ -210,6 +240,7 @@ public class GeneratorSVImpl implements GenerateSV {
             if (frameworks.getGitHome() != null) {
                 String project_template_Path = template_Path + frameworks.getGitHome().substring(frameworks.getGitHome().lastIndexOf("/") + 1).replace(".git", "");
                 webSocket.send("已连接到模板仓库，开始克隆已选技术[" + frameworks.getName() + "]的模板");
+                logsSV.saveLogs("已连接到模板仓库，开始克隆已选技术[" + frameworks.getName() + "]的模板", logsPath);
                 if (YNEnum.Y == YNEnum.getYN(frameworks.getIsPublic())) {
                     GitTools.cloneGit(frameworks.getGitHome(), project_template_Path);
                 } else {
@@ -248,9 +279,11 @@ public class GeneratorSVImpl implements GenerateSV {
                     frameworksTemplate.setPath(path);
                     frameworksTemplate.setFrameworkCode(frameworks.getCode());
                     webSocket.send("[模板] " + frameworksTemplate.getPath().substring(frameworksTemplate.getPath().lastIndexOf("/") + 1));
+                    logsSV.saveLogs("[模板] " + frameworksTemplate.getPath().substring(frameworksTemplate.getPath().lastIndexOf("/") + 1), logsPath);
                     frameworksTemplateDAO.insert(frameworksTemplate);
                 }
                 webSocket.send("模板克隆成功！");
+                logsSV.saveLogs("模板克隆成功！", logsPath);
             }
         }
     }

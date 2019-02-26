@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
 import java.io.*;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -60,7 +61,7 @@ public class TemplateCtrl extends BaseCtrl {
     @PostMapping("/createLogFiles")
     @ResponseBody
     public BeanRet createLogFiles( String projectCode) {
-        String path = logsSV.createLogFiles(projectCode);
+        String path = logsSV.createLogFiles(projectCode, new Date());
         return BeanRet.create(true, "成功", path);
     }
 

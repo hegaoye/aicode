@@ -2,6 +2,7 @@ package io.aicode.project.ctrl;
 
 import io.aicode.core.base.BaseCtrl;
 import io.aicode.core.entity.BeanRet;
+import io.aicode.core.exceptions.BaseException;
 import io.aicode.project.service.LogsSV;
 import io.aicode.setting.service.SettingSV;
 import io.swagger.annotations.Api;
@@ -9,11 +10,14 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.Assert;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
+import java.util.Date;
 
 
 /**
@@ -45,7 +49,7 @@ public class LogsCtrl extends BaseCtrl {
     @PostMapping("/createLogFiles")
     @ResponseBody
     public BeanRet createLogFiles(String projectCode) {
-        String path = logsSV.createLogFiles(projectCode);
+        String path = logsSV.createLogFiles(projectCode, new Date());
         return BeanRet.create(true, "成功", path);
     }
 
@@ -79,7 +83,7 @@ public class LogsCtrl extends BaseCtrl {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "projectCode", value = "项目code", required = true, paramType = "query"),
     })
-    @PostMapping("/loadFilePath")
+    @GetMapping("/loadFilePath")
     @ResponseBody
     public BeanRet loadFilePath(String projectCode) {
         String path = logsSV.loadFilePath(projectCode);
@@ -94,12 +98,15 @@ public class LogsCtrl extends BaseCtrl {
      */
     @ApiOperation(value = "查看文件信息", notes = "查看文件信息")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "filePath", value = "项目code", required = true, paramType = "query"),
+            @ApiImplicitParam(name = "datetime", value = "时间", required = true, paramType = "query"),
+            @ApiImplicitParam(name = "projectCode", value = "项目编码", required = true, paramType = "query"),
     })
-    @PostMapping("/scanPath")
+    @GetMapping("/load")
     @ResponseBody
-    public BeanRet scanPath(String filePath) {
-        return logsSV.scanPath(filePath);
+    public BeanRet load(String projectCode, String datetime) {
+        Assert.notNull(projectCode, BaseException.BaseExceptionEnum.Empty_Param.toString());
+        Assert.notNull(datetime, BaseException.BaseExceptionEnum.Empty_Param.toString());
+        return logsSV.scanPath(projectCode, datetime);
     }
 
 

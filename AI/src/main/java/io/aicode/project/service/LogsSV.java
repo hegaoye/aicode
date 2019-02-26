@@ -8,15 +8,18 @@ package io.aicode.project.service;
 
 import io.aicode.core.entity.BeanRet;
 
+import java.util.Date;
+
 public interface LogsSV {
 
     /**
      * 创建日志文件
      *
      * @param projectCode 项目编码
+     * @param date
      * @return String
      */
-    String createLogFiles(String projectCode);
+    String createLogFiles(String projectCode, Date date);
 
 
     /**
@@ -40,9 +43,10 @@ public interface LogsSV {
     /**
      * 查询日志信息
      *
-     * @param path 文件路径
+     * @param projectCode 文件路径
+     * @param datetime    构建时间
      * @return String
      */
-    BeanRet scanPath(String path);
+    BeanRet scanPath(String projectCode, String datetime);
 
 }

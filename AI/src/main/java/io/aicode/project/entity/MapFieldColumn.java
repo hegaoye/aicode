@@ -42,6 +42,7 @@ public class MapFieldColumn extends BaseEntity implements java.io.Serializable {
     private boolean checkDigit = false;
 
     private DisplayAttribute displayAttribute;
+    private MapRelationship mapRelationship;
 
     public MapFieldColumn() {
     }

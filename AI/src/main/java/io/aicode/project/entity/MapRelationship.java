@@ -26,6 +26,8 @@ public class MapRelationship extends BaseEntity implements java.io.Serializable 
     private String associateCode;//数据库字段:associateCode  属性显示:被关联编码
     private String isOneToOne;//数据库字段:isOneToOne  属性显示:是否一对一 Y N
     private String isOneToMany;//数据库字段:isOneToMany  属性显示:是否一对多Y N
+    private String mainField;//数据库字段:mainField  属性显示:主表关联属性
+    private String joinField;//数据库字段:joinField  属性显示:从表关联属性
 
     private MapClassTable mapClassTable;
 

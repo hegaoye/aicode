@@ -366,8 +366,8 @@ public class GeneratorSVImpl implements GenerateSV {
         List<MapFieldColumn> mapFieldColumnList = new ArrayList<>();
         List<MapFieldColumn> mapFieldColumnTable = new ArrayList<>();
         List<DisplayAttribute> displayAttributes = new ArrayList<>();
-        List<MapClassTable> oneToOneList = new ArrayList<>();
-        List<MapClassTable> oneToManyList = new ArrayList<>();
+        List<TemplateData> oneToOneList = new ArrayList<>();
+        List<TemplateData> oneToManyList = new ArrayList<>();
         mapClassTable.getMapFieldColumnList().forEach(mapFieldColumn -> {
             if (mapFieldColumn.getIsPrimaryKey().equals(YNEnum.Y.name())) {
                 mapFieldColumnPks.add(mapFieldColumn);
@@ -389,10 +389,10 @@ public class GeneratorSVImpl implements GenerateSV {
         //获取1对1,1对多关系集合
         mapClassTable.getMapRelationshipList().forEach(mapRelationship -> {
             if (YNEnum.getYN(mapRelationship.getIsOneToOne()) == YNEnum.Y) {
-                oneToOneList.add(mapRelationship.getMapClassTable());
+                oneToOneList.add(new TemplateData(project, mapRelationship.getMapClassTable()));
             }
             if (YNEnum.getYN(mapRelationship.getIsOneToMany()) == YNEnum.Y) {
-                oneToManyList.add(mapRelationship.getMapClassTable());
+                oneToManyList.add(new TemplateData(project, mapRelationship.getMapClassTable()));
             }
         });
 
@@ -437,7 +437,7 @@ public class GeneratorSVImpl implements GenerateSV {
         //根据模块划分类集合信息
 
         TemplateData templateData = new TemplateData(project, mapClassTable, mapClassTableList, mapFieldColumnList,
-                mapFieldColumnPks, mapFieldColumnNotPks, mapFieldColumnTable, modelClasses, modelDatas,oneToOneList,oneToManyList);
+                mapFieldColumnPks, mapFieldColumnNotPks, mapFieldColumnTable, modelClasses, modelDatas, oneToOneList, oneToManyList);
         templateData.setDisplayAttributes(displayAttributes);
 
         Setting settingTemplatePath = settingDAO.loadByKey(Setting.Key.Template_Path.name());

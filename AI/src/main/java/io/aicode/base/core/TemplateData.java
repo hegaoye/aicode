@@ -68,8 +68,8 @@ public class TemplateData implements Serializable {
     private List<MapFieldColumn> pkFields;  //主键数据信息
     private List<MapFieldColumn> notPkFields;  //非主键主键数据信息
     private List<MapClassTable> modelClasses;//各个模块下的所有类集合信息
-    private List<MapClassTable> oneToOneList;//1对1集合
-    private List<MapClassTable> oneToManyList;//1对多集合
+    private List<TemplateData> oneToOneList;//1对1集合
+    private List<TemplateData> oneToManyList;//1对多集合
     private boolean isRelation;//是否有关联关系
 
 
@@ -85,8 +85,8 @@ public class TemplateData implements Serializable {
     //TODO {定义模板变量}
     public TemplateData(Project project, MapClassTable classTable, List<MapClassTable> classes, List<MapFieldColumn> columns,
                         List<MapFieldColumn> pkColumns, List<MapFieldColumn> notPkColumns, List<MapFieldColumn> tableColumns,
-                        List<MapClassTable> modelClasses, List<ModelData> modelDatas, List<MapClassTable> oneToOneList,
-                        List<MapClassTable> oneToManyList) {
+                        List<MapClassTable> modelClasses, List<ModelData> modelDatas, List<TemplateData> oneToOneList,
+                        List<TemplateData> oneToManyList) {
         this.projectName = project.getEnglishName();
         this.basePackage = project.getBasePackage();
         this.copyright = project.getCopyright();
@@ -137,8 +137,29 @@ public class TemplateData implements Serializable {
         this.oneToOneList = oneToOneList;
         this.oneToManyList = oneToManyList;
         this.isRelation = false;
-        if (!oneToManyList.isEmpty() || !oneToOneList.isEmpty()) {
-            this.isRelation = true;
+        if (oneToManyList != null && oneToOneList != null) {
+            if (!oneToManyList.isEmpty() || !oneToOneList.isEmpty()) {
+                this.isRelation = true;
+            }
+        }
+    }
+
+
+    public TemplateData(Project project, MapClassTable classTable){
+        this.projectName = project.getEnglishName();
+        this.basePackage = project.getBasePackage();
+        this.copyright = project.getCopyright();
+        this.author = project.getAuthor();
+        this.table = classTable;
+        this.clazz = classTable;
+        this.tableName = classTable.getTableName();
+        this.className = classTable.getClassName();
+        this.classNameLower = StringHelper.toJavaVariableName(classTable.getClassName());
+        this.notes = classTable.getNotes();
+        if (classTable.getTableName().contains("_")) {
+            this.model = classTable.getTableName().substring(0, classTable.getTableName().indexOf("_"));
+        } else {
+            this.model = classTable.getTableName();
         }
     }
 }

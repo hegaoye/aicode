@@ -266,7 +266,7 @@ public class ProjectSVImpl extends BaseMybatisSVImpl<Project, Long> implements P
         map.clear();
         map.put("schemaName", database);
         int i = databaseDAO.count(map);
-        if (i == 0) {
+        if (i <= 0) {
             Setting setting = settingDAO.loadByKey(Setting.Key.DefaultDatabase.name());
             if (!project.getProjectSqlList().isEmpty()) {
                 project.getProjectSqlList().forEach(projectSql -> {

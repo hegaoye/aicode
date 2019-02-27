@@ -216,10 +216,6 @@ public class ProjectSVImpl extends BaseMybatisSVImpl<Project, Long> implements P
     public void execute(String code) {
         //1.创建数据库
         boolean flag = this.createDatabase(code);
-        if (!flag) {
-            logger.error(BaseException.BaseExceptionEnum.Server_Error.toString());
-            throw new ProjectException(BaseException.BaseExceptionEnum.Server_Error);
-        }
 
         //2.解析数据库信息
         if (flag) {

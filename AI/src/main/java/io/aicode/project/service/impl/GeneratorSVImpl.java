@@ -389,10 +389,10 @@ public class GeneratorSVImpl implements GenerateSV {
         //获取1对1,1对多关系集合
         mapClassTable.getMapRelationshipList().forEach(mapRelationship -> {
             if (YNEnum.getYN(mapRelationship.getIsOneToOne()) == YNEnum.Y) {
-                oneToOneList.add(new TemplateData(project, mapRelationship.getMapClassTable()));
+                oneToOneList.add(new TemplateData(project, mapRelationship.getMapClassTable(), mapRelationship.getMainField(), mapRelationship.getJoinField()));
             }
             if (YNEnum.getYN(mapRelationship.getIsOneToMany()) == YNEnum.Y) {
-                oneToManyList.add(new TemplateData(project, mapRelationship.getMapClassTable()));
+                oneToManyList.add(new TemplateData(project, mapRelationship.getMapClassTable(), mapRelationship.getMainField(), mapRelationship.getJoinField()));
             }
         });
 

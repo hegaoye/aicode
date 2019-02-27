@@ -4,7 +4,6 @@ import io.aicode.core.tools.StringTools;
 import io.aicode.display.entity.DisplayAttribute;
 import io.aicode.project.entity.MapClassTable;
 import io.aicode.project.entity.MapFieldColumn;
-import io.aicode.project.entity.MapRelationship;
 import io.aicode.project.entity.Project;
 import lombok.Data;
 
@@ -71,7 +70,8 @@ public class TemplateData implements Serializable {
     private List<TemplateData> oneToOneList;//1对1集合
     private List<TemplateData> oneToManyList;//1对多集合
     private boolean isRelation;//是否有关联关系
-
+    private String mainField;//主表关联属性
+    private String joinField;//从表关联属性
 
     //**********前端生成代码使用：start***********
     private List<DisplayAttribute> displayAttributes;//所有类下面的属性集合信息
@@ -145,7 +145,7 @@ public class TemplateData implements Serializable {
     }
 
 
-    public TemplateData(Project project, MapClassTable classTable){
+    public TemplateData(Project project, MapClassTable classTable, String mainField, String joinField) {
         this.projectName = project.getEnglishName();
         this.basePackage = project.getBasePackage();
         this.copyright = project.getCopyright();
@@ -155,6 +155,8 @@ public class TemplateData implements Serializable {
         this.tableName = classTable.getTableName();
         this.className = classTable.getClassName();
         this.classNameLower = StringHelper.toJavaVariableName(classTable.getClassName());
+        this.mainField = mainField;
+        this.joinField = joinField;
         this.notes = classTable.getNotes();
         if (classTable.getTableName().contains("_")) {
             this.model = classTable.getTableName().substring(0, classTable.getTableName().indexOf("_"));

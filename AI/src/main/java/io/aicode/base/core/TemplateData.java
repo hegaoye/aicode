@@ -8,6 +8,7 @@ import io.aicode.project.entity.Project;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -59,24 +60,24 @@ public class TemplateData implements Serializable {
     private String copyright;  //项目版权
     private String author;  //作者
 
-    private List<MapClassTable> classes;//类信息对象  集合
-    private List<MapFieldColumn> columns;  //列对象  集合
-    private List<MapFieldColumn> pkColumns;//主键数据信息
-    private List<MapFieldColumn> notPkColumns;  //非主键数据信息
-    private List<MapFieldColumn> fields;  //类属性  集合
-    private List<MapFieldColumn> pkFields;  //主键数据信息
-    private List<MapFieldColumn> notPkFields;  //非主键主键数据信息
-    private List<MapClassTable> modelClasses;//各个模块下的所有类集合信息
-    private List<TemplateData> oneToOneList;//1对1集合
-    private List<TemplateData> oneToManyList;//1对多集合
+    private List<MapClassTable> classes = new ArrayList<>();//类信息对象  集合
+    private List<MapFieldColumn> columns = new ArrayList<>();  //列对象  集合
+    private List<MapFieldColumn> pkColumns = new ArrayList<>();//主键数据信息
+    private List<MapFieldColumn> notPkColumns = new ArrayList<>();  //非主键数据信息
+    private List<MapFieldColumn> fields = new ArrayList<>();  //类属性  集合
+    private List<MapFieldColumn> pkFields = new ArrayList<>();  //主键数据信息
+    private List<MapFieldColumn> notPkFields = new ArrayList<>();  //非主键主键数据信息
+    private List<MapClassTable> modelClasses = new ArrayList<>();//各个模块下的所有类集合信息
+    private List<TemplateData> oneToOneList = new ArrayList<>();//1对1集合
+    private List<TemplateData> oneToManyList = new ArrayList<>();//1对多集合
     private boolean isRelation;//是否有关联关系
     private String mainField;//主表关联属性
     private String joinField;//从表关联属性
 
     //**********前端生成代码使用：start***********
-    private List<DisplayAttribute> displayAttributes;//所有类下面的属性集合信息
-    private List<MapFieldColumn> tableFields;  //前端页面显示
-    private List<ModelData> modelDatas;//模型与实体类的关系
+    private List<DisplayAttribute> displayAttributes = new ArrayList<>();//所有类下面的属性集合信息
+    private List<MapFieldColumn> tableFields = new ArrayList<>();  //前端页面显示
+    private List<ModelData> modelDatas = new ArrayList<>();//模型与实体类的关系
     private String dashedCaseName;//破折号命名 或叫烤串命名 适用于 前端angular ,react, vue
 
     //**********前端生成代码使用：end***********

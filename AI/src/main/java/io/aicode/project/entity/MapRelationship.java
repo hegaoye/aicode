@@ -29,14 +29,8 @@ public class MapRelationship extends BaseEntity implements java.io.Serializable 
 
     private MapClassTable mapClassTable;
 
-    //for template
-    private MapClassTable relatioinClazz;//关联类
     private boolean oneToOne;
     private boolean oneToMany;
-
-    public MapClassTable getRelatioinClazz() {
-        return mapClassTable;
-    }
 
     public boolean getOneToOne() {
         return isOneToOne.equals(YNEnum.Y.name()) ? true : false;

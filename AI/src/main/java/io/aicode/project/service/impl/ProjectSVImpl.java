@@ -115,6 +115,7 @@ public class ProjectSVImpl extends BaseMybatisSVImpl<Project, Long> implements P
         project.setCode(String.valueOf(uidGenerator.getUID()));
         project.setState(ProjectStateEnum.Enable.name());
         project.setDownloadUrl("DownloadUrl");
+        project.setIsIncrement(YNEnum.N.name());
         project.setCreateTime(new Date());
         project.setUpdateTime(new Date());
 

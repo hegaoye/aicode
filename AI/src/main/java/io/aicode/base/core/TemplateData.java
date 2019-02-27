@@ -68,7 +68,8 @@ public class TemplateData implements Serializable {
     private List<MapFieldColumn> pkFields;  //主键数据信息
     private List<MapFieldColumn> notPkFields;  //非主键主键数据信息
     private List<MapClassTable> modelClasses;//各个模块下的所有类集合信息
-    private List<MapRelationship> relationships;//类与类之间的关联关系模型集合信息
+    private List<MapClassTable> oneToOneList;//1对1集合
+    private List<MapClassTable> oneToManyList;//1对多集合
 
     //**********前端生成代码使用：start***********
     private List<DisplayAttribute> displayAttributes;//所有类下面的属性集合信息

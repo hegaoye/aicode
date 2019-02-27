@@ -6,6 +6,7 @@
 package io.aicode.project.entity;
 
 import io.aicode.core.base.BaseEntity;
+import io.aicode.core.enums.YNEnum;
 import lombok.Data;
 
 
@@ -28,8 +29,14 @@ public class MapRelationship extends BaseEntity implements java.io.Serializable 
 
     private MapClassTable mapClassTable;
 
-    /*private boolean oneToOne;
+    //for template
+    private MapClassTable relatioinClazz;//关联类
+    private boolean oneToOne;
     private boolean oneToMany;
+
+    public MapClassTable getRelatioinClazz() {
+        return mapClassTable;
+    }
 
     public boolean getOneToOne() {
         return isOneToOne.equals(YNEnum.Y.name()) ? true : false;
@@ -37,7 +44,7 @@ public class MapRelationship extends BaseEntity implements java.io.Serializable 
 
     public boolean getOneToMany() {
         return isOneToMany.equals(YNEnum.Y.name()) ? true : false;
-    }*/
+    }
 
 }
 

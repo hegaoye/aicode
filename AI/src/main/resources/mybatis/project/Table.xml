@@ -40,5 +40,6 @@
 		from information_schema.tables
 		where table_schema=#{database} and table_type='base table'
     </select>
+
 </mapper>
 

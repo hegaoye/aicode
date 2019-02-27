@@ -66,9 +66,10 @@ public class GeneratorSVImpl implements GenerateSV {
 
     /**
      * 根据项目码创建项目代码
-     * @param projectCode  项目编码
-     * @param projectJob    项目job
-     * @param webSocket     socket连接
+     *
+     * @param projectCode 项目编码
+     * @param projectJob  项目job
+     * @param webSocket   socket连接
      */
     @Override
     public void aiCode(String projectCode, ProjectJob projectJob, WSTools webSocket) {
@@ -365,6 +366,8 @@ public class GeneratorSVImpl implements GenerateSV {
         List<MapFieldColumn> mapFieldColumnList = new ArrayList<>();
         List<MapFieldColumn> mapFieldColumnTable = new ArrayList<>();
         List<DisplayAttribute> displayAttributes = new ArrayList<>();
+        List<MapClassTable> oneToOneList = new ArrayList<>();
+        List<MapClassTable> oneToManyList = new ArrayList<>();
         mapClassTable.getMapFieldColumnList().forEach(mapFieldColumn -> {
             if (mapFieldColumn.getIsPrimaryKey().equals(YNEnum.Y.name())) {
                 mapFieldColumnPks.add(mapFieldColumn);
@@ -381,6 +384,16 @@ public class GeneratorSVImpl implements GenerateSV {
             mapFieldColumnList.add(mapFieldColumn);
             //封装类属性的显示显示属性
             displayAttributes.add(mapFieldColumn.getDisplayAttribute());
+        });
+
+        //获取1对1,1对多关系集合
+        mapClassTable.getMapRelationshipList().forEach(mapRelationship -> {
+            if (YNEnum.getYN(mapRelationship.getIsOneToOne()) == YNEnum.Y) {
+                oneToOneList.add(mapRelationship.getMapClassTable());
+            }
+            if (YNEnum.getYN(mapRelationship.getIsOneToMany()) == YNEnum.Y) {
+                oneToManyList.add(mapRelationship.getMapClassTable());
+            }
         });
 
         //各个模块下的所有类集合信息
@@ -425,7 +438,8 @@ public class GeneratorSVImpl implements GenerateSV {
 
         TemplateData templateData = new TemplateData(project, mapClassTable, mapClassTableList, mapFieldColumnList, mapFieldColumnPks, mapFieldColumnNotPks, mapFieldColumnTable, modelClasses, modelDatas);
         templateData.setDisplayAttributes(displayAttributes);
-        templateData.setRelationships(mapClassTable.getMapRelationshipList());
+        templateData.setOneToManyList(oneToManyList);
+        templateData.setOneToOneList(oneToOneList);
 
         Setting settingTemplatePath = settingDAO.loadByKey(Setting.Key.Template_Path.name());
 

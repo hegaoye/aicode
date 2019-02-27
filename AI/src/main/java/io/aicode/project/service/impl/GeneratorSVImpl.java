@@ -436,10 +436,9 @@ public class GeneratorSVImpl implements GenerateSV {
 
         //根据模块划分类集合信息
 
-        TemplateData templateData = new TemplateData(project, mapClassTable, mapClassTableList, mapFieldColumnList, mapFieldColumnPks, mapFieldColumnNotPks, mapFieldColumnTable, modelClasses, modelDatas);
+        TemplateData templateData = new TemplateData(project, mapClassTable, mapClassTableList, mapFieldColumnList,
+                mapFieldColumnPks, mapFieldColumnNotPks, mapFieldColumnTable, modelClasses, modelDatas,oneToOneList,oneToManyList);
         templateData.setDisplayAttributes(displayAttributes);
-        templateData.setOneToManyList(oneToManyList);
-        templateData.setOneToOneList(oneToOneList);
 
         Setting settingTemplatePath = settingDAO.loadByKey(Setting.Key.Template_Path.name());
 

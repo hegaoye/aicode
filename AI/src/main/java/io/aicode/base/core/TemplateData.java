@@ -70,6 +70,8 @@ public class TemplateData implements Serializable {
     private List<MapClassTable> modelClasses;//各个模块下的所有类集合信息
     private List<MapClassTable> oneToOneList;//1对1集合
     private List<MapClassTable> oneToManyList;//1对多集合
+    private boolean isRelation;//是否有关联关系
+
 
     //**********前端生成代码使用：start***********
     private List<DisplayAttribute> displayAttributes;//所有类下面的属性集合信息
@@ -81,7 +83,10 @@ public class TemplateData implements Serializable {
 
 
     //TODO {定义模板变量}
-    public TemplateData(Project project, MapClassTable classTable, List<MapClassTable> classes, List<MapFieldColumn> columns, List<MapFieldColumn> pkColumns, List<MapFieldColumn> notPkColumns, List<MapFieldColumn> tableColumns, List<MapClassTable> modelClasses, List<ModelData> modelDatas) {
+    public TemplateData(Project project, MapClassTable classTable, List<MapClassTable> classes, List<MapFieldColumn> columns,
+                        List<MapFieldColumn> pkColumns, List<MapFieldColumn> notPkColumns, List<MapFieldColumn> tableColumns,
+                        List<MapClassTable> modelClasses, List<ModelData> modelDatas, List<MapClassTable> oneToOneList,
+                        List<MapClassTable> oneToManyList) {
         this.projectName = project.getEnglishName();
         this.basePackage = project.getBasePackage();
         this.copyright = project.getCopyright();
@@ -129,5 +134,11 @@ public class TemplateData implements Serializable {
         }
         this.modelClasses = modelClasses;
         this.modelDatas = modelDatas;
+        this.oneToOneList = oneToOneList;
+        this.oneToManyList = oneToManyList;
+        this.isRelation = false;
+        if (!oneToManyList.isEmpty() || !oneToOneList.isEmpty()) {
+            this.isRelation = true;
+        }
     }
 }

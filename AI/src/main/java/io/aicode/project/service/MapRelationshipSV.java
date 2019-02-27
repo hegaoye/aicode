@@ -36,14 +36,18 @@ public interface MapRelationshipSV extends BaseMybatisSV<MapRelationship, Long> 
     List<MapRelationship> listByProjectCode(String mapClassTableCode) ;
 
 
-
-
-
     /**
      * 根据code删除模型关系
      * @param code   模型关系code
      */
     void deleteByCode(String code);
+
+    /**
+     * 根据项目编码统计是否已经设置表关系
+     * @param projectCode    项目编码
+     * @return int
+     */
+    int countByProjectCode(String projectCode);
 
 
 

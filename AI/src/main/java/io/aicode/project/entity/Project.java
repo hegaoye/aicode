@@ -51,5 +51,6 @@ public class Project extends BaseEntity implements java.io.Serializable {
     private List<ProjectModule> projectModuleList;
     private List<ProjectRepositoryAccount> projectRepositoryAccountList;
     private List<ProjectSql> projectSqlList;
+    private String relationshipAndDisplay;//表关系或字段显示属性，只要有一个设置是Y，两个都没设置是N
 }
 

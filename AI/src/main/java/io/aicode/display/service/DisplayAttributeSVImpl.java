@@ -89,5 +89,15 @@ public class DisplayAttributeSVImpl extends BaseMybatisSVImpl<DisplayAttribute, 
         }
     }
 
+    /**
+     * 根据项目编码统计是否已经设置显示属性
+     * @param projectCode    项目编码
+     * @return int
+     */
+    @Override
+    public int countByProjectCode(String projectCode) {
+        return displayAttributeDAO.countByProjectCode(projectCode);
+    }
+
 
 }

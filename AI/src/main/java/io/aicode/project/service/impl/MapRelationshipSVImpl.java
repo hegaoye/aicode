@@ -117,5 +117,15 @@ public class MapRelationshipSVImpl extends BaseMybatisSVImpl<MapRelationship, Lo
         mapRelationshipDAO.delete(code);
     }
 
+    /**
+     * 根据项目编码统计是否已经设置表关系
+     * @param projectCode    项目编码
+     * @return int
+     */
+    @Override
+    public int countByProjectCode(String projectCode) {
+        return mapRelationshipDAO.countByProjectCode(projectCode);
+    }
+
 
 }

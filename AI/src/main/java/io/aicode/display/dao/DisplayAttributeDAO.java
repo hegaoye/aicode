@@ -5,6 +5,7 @@
 
 package io.aicode.display.dao;
 
+import com.google.common.collect.Maps;
 import io.aicode.core.base.BaseMybatisDAOImpl;
 import org.springframework.stereotype.Repository;
 import io.aicode.display.entity.DisplayAttribute;
@@ -53,4 +54,15 @@ public class DisplayAttributeDAO extends BaseMybatisDAOImpl<DisplayAttribute,Lon
         }
         getSqlSession().delete(this.sqlmapNamespace+".delete",map);
    }
+
+    /**
+     * 根据项目编码统计是否已经设置显示属性
+     * @param projectCode    项目编码
+     * @return int
+     */
+    public int countByProjectCode(String projectCode) {
+        Map<String, Object> map = Maps.newHashMap();
+        map.put("projectCode", projectCode);
+        return getSqlSession().selectOne(sqlmapNamespace + ".countByProjectCode", map);
+    }
 }

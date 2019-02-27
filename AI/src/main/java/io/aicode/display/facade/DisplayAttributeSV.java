@@ -41,4 +41,12 @@ public interface DisplayAttributeSV extends BaseMybatisSV<DisplayAttribute, Long
     void saveOrUpdate(List<DisplayAttribute> displayAttributes);
 
 
+    /**
+     * 根据项目编码统计是否已经设置显示属性
+     * @param projectCode    项目编码
+     * @return int
+     */
+    int countByProjectCode(String projectCode);
+
+
 }

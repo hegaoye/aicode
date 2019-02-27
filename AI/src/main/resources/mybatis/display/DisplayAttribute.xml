@@ -237,6 +237,13 @@
         </if>
     </select>
 
+<!--根据项目编码统计是否已经设置了显示属性-->
+    <select id="countByProjectCode" resultType="int">
+        SELECT count(mr.id)
+        FROM project_map pm, map_relationship mr
+        WHERE pm.mapClassTableCode = mr.mapClassTableCode AND pm.projectCode = #{projectCode}
+    </select>
+
 
 </mapper>
 

@@ -273,21 +273,21 @@ public class GeneratorSVImpl implements GenerateSV {
                     }
                 }
 
-                List<File> Files = FileUtil.getDirFiles(template_Path);
+                List<File> Files = FileUtil.getDirFiles(template_root_path);
                 for (File file : Files) {
                     if (file.getAbsoluteFile().toString().contains("\\.git\\") || file.getAbsoluteFile().toString().contains("README.md")) {
                         continue;
                     }
-                    String path = ("/" + file.getAbsoluteFile().toString()).replace("\\", "/").replace(template_Path, "");
+                    String path = ("/" + file.getAbsoluteFile().toString()).replace("\\", "/").replace(template_root_path, "");
                     path = "/" + path;
                     path = path.replace("//", "/");
                     FrameworksTemplate frameworksTemplate = new FrameworksTemplate();
                     frameworksTemplate.setCode(String.valueOf(uidGenerator.getUID()));
                     frameworksTemplate.setPath(path);
                     frameworksTemplate.setFrameworkCode(frameworks.getCode());
+                    frameworksTemplateDAO.insert(frameworksTemplate);
                     webSocket.send("[模板] " + frameworksTemplate.getPath().substring(frameworksTemplate.getPath().lastIndexOf("/") + 1));
                     logsSV.saveLogs("[模板] " + frameworksTemplate.getPath().substring(frameworksTemplate.getPath().lastIndexOf("/") + 1), logsPath);
-                    frameworksTemplateDAO.insert(frameworksTemplate);
                 }
                 webSocket.send("模板克隆成功！");
                 logsSV.saveLogs("模板克隆成功！", logsPath);

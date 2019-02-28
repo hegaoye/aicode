@@ -88,6 +88,17 @@ public class Field implements Serializable {
     private boolean checkPk;
     private boolean checkDigit = false;
 
+    private boolean checkIsRequired;
+    private boolean checkIsInsert;
+    private boolean checkIsDeleteCondition;
+    private boolean checkIsAllowUpdate;
+    private boolean checkIsListPageDisplay;
+    private boolean checkIsDetailPageDisplay;
+    private boolean checkIsQueryRequired;
+    private boolean checkIsLineNew;
+
+
+
     public void toJava() {
         this.field = StringHelper.toJavaVariableName(this.column);
         if (this.field.equals("id")) {
@@ -116,6 +127,38 @@ public class Field implements Serializable {
             this.checkDigit = DatabaseDataTypesUtils.isFloatNumber(this.fieldType);
         }
         return checkDigit;
+    }
+
+    public boolean getCheckIsRequired() {
+        return isRequired.equals(YNEnum.Y.name()) ? true : false;
+    }
+
+    public boolean getCheckIsInsert() {
+        return isInsert.equals(YNEnum.Y.name()) ? true : false;
+    }
+
+    public boolean getCheckIsDeleteCondition() {
+        return isDeleteCondition.equals(YNEnum.Y.name()) ? true : false;
+    }
+
+    public boolean getCheckIsAllowUpdate() {
+        return isAllowUpdate.equals(YNEnum.Y.name()) ? true : false;
+    }
+
+    public boolean getCheckIsListPageDisplay() {
+        return isListPageDisplay.equals(YNEnum.Y.name()) ? true : false;
+    }
+
+    public boolean getCheckIsDetailPageDisplay() {
+        return isDetailPageDisplay.equals(YNEnum.Y.name()) ? true : false;
+    }
+
+    public boolean getCheckIsQueryRequired() {
+        return isQueryRequired.equals(YNEnum.Y.name()) ? true : false;
+    }
+
+    public boolean getCheckIsLineNew() {
+        return isLineNew.equals(YNEnum.Y.name()) ? true : false;
     }
 
 }

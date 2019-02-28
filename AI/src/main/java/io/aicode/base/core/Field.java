@@ -109,15 +109,15 @@ public class Field implements Serializable {
     }
 
 
-    public boolean getCheckDate() {
+    public boolean getIsDate() {
         return isDate.equals(YNEnum.Y.name()) ? true : false;
     }
 
-    public boolean getCheckState() {
+    public boolean getIsState() {
         return isState.equals(YNEnum.Y.name()) ? true : false;
     }
 
-    public boolean getCheckPk() {
+    public boolean getIsPrimaryKey() {
         return isPrimaryKey.equals(YNEnum.Y.name()) ? true : false;
     }
 
@@ -129,35 +129,35 @@ public class Field implements Serializable {
         return checkDigit;
     }
 
-    public boolean getCheckIsRequired() {
+    public boolean getIsRequired() {
         return isRequired.equals(YNEnum.Y.name()) ? true : false;
     }
 
-    public boolean getCheckIsInsert() {
+    public boolean getIsInsert() {
         return isInsert.equals(YNEnum.Y.name()) ? true : false;
     }
 
-    public boolean getCheckIsDeleteCondition() {
+    public boolean getIsDeleteCondition() {
         return isDeleteCondition.equals(YNEnum.Y.name()) ? true : false;
     }
 
-    public boolean getCheckIsAllowUpdate() {
+    public boolean getIsAllowUpdate() {
         return isAllowUpdate.equals(YNEnum.Y.name()) ? true : false;
     }
 
-    public boolean getCheckIsListPageDisplay() {
+    public boolean getIsListPageDisplay() {
         return isListPageDisplay.equals(YNEnum.Y.name()) ? true : false;
     }
 
-    public boolean getCheckIsDetailPageDisplay() {
+    public boolean getIsDetailPageDisplay() {
         return isDetailPageDisplay.equals(YNEnum.Y.name()) ? true : false;
     }
 
-    public boolean getCheckIsQueryRequired() {
+    public boolean getIsQueryRequired() {
         return isQueryRequired.equals(YNEnum.Y.name()) ? true : false;
     }
 
-    public boolean getCheckIsLineNew() {
+    public boolean getIsLineNew() {
         return isLineNew.equals(YNEnum.Y.name()) ? true : false;
     }
 

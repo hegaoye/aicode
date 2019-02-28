@@ -135,9 +135,10 @@ public class TemplateData implements Serializable {
             for (MapFieldColumn mapFieldColumn : columns) {
                 String json = JSON.toJSONString(mapFieldColumn);
                 Field field = JSON.parseObject(json, Field.class);
-                field.setIsAllowUpdate(mapFieldColumn.getDisplayAttribute().getIsAllowUpdate());
+                field.setIsRequired(mapFieldColumn.getDisplayAttribute().getIsRequired());
                 field.setIsInsert(mapFieldColumn.getDisplayAttribute().getIsInsert());
                 field.setIsDeleteCondition(mapFieldColumn.getDisplayAttribute().getIsDeleteCondition());
+                field.setIsAllowUpdate(mapFieldColumn.getDisplayAttribute().getIsAllowUpdate());
                 field.setIsListPageDisplay(mapFieldColumn.getDisplayAttribute().getIsListPageDisplay());
                 field.setIsDetailPageDisplay(mapFieldColumn.getDisplayAttribute().getIsDetailPageDisplay());
                 field.setIsQueryRequired(mapFieldColumn.getDisplayAttribute().getIsQueryRequired());

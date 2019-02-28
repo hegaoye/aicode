@@ -353,6 +353,21 @@ public class GeneratorSVImpl implements GenerateSV {
                 //TODO SVN 仓库工具类
             }
         }
+
+        if (file.exists()) {
+            List<ProjectFramwork> frameworksList = project.getProjectFramworkList();
+            webSocket.send("判断是否是选择多技术项目....");
+            if (frameworksList.size() > 1) {
+                webSocket.send("多技术框架项目，将生成多个框架源码....");
+                for (ProjectFramwork projectFramwork : frameworksList) {
+                    File frameworkFile = new File(projectPath + "/" + projectFramwork.getFrameworks().getName());
+                    if (!frameworkFile.exists()) {
+                        frameworkFile.mkdir();
+                        webSocket.send("创建" + projectFramwork.getFrameworks().getName() + "文件夹成功!");
+                    }
+                }
+            }
+        }
         return projectPath;
     }
 
@@ -460,7 +475,14 @@ public class GeneratorSVImpl implements GenerateSV {
             }
         }
 
-        String targetFilePath = projectPath + "/" + frameworksTemplatePath.replace(".ftl", "")
+        //确立文件生成路径
+        String targetFilePath = "";
+        if (project.getProjectFramworkList().size() > 1) {
+            targetFilePath = projectPath + "/" + frameworks.getName() + "/";
+        } else {
+            targetFilePath = projectPath + "/";
+        }
+        targetFilePath = targetFilePath + frameworksTemplatePath.replace(".ftl", "")
                 .replace("${basepackage}", project.getBasePackage().replace(".", "/"))
                 .replace("${basePackage}", project.getBasePackage().replace(".", "/"))
                 .replace("${className}", mapClassTable.getClassName())

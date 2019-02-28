@@ -132,7 +132,7 @@ public class GeneratorSVImpl implements GenerateSV {
                 Map<String, Object> param = new HashMap<>();
                 param.put("frameworkCode", projectFramwork.getFrameworks().getCode());
                 Frameworks frameworks = projectFramwork.getFrameworks();
-                List<FrameworksTemplate> frameworksTemplateList = frameworksTemplateDAO.query(param);
+                List<FrameworksTemplate> frameworksTemplateList = frameworks.getFrameworksTemplateList();//frameworksTemplateDAO.query(param);
                 frameworksTemplateList.forEach(frameworksTemplate -> {
                     projectMapList.forEach(projectMap -> {
                         this.generator(projectPath, project, frameworks, projectMap.getMapClassTable(), frameworksTemplate, mapClassTableList, webSocket);

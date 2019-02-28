@@ -66,6 +66,7 @@ public class TemplateData implements Serializable {
     private List<MapFieldColumn> pkColumns = new ArrayList<>();//主键数据信息
     private List<MapFieldColumn> notPkColumns = new ArrayList<>();  //非主键数据信息
     //    private List<MapFieldColumn> fields = new ArrayList<>();  //类属性  集合
+    private List<Field> fields = new ArrayList<>();//所有类下面的属性集合信息
     private List<MapFieldColumn> pkFields = new ArrayList<>();  //主键数据信息
     private List<MapFieldColumn> notPkFields = new ArrayList<>();  //非主键主键数据信息
     private List<MapClassTable> modelClasses = new ArrayList<>();//各个模块下的所有类集合信息
@@ -76,7 +77,6 @@ public class TemplateData implements Serializable {
     private String joinField;//从表关联属性
 
     //**********前端生成代码使用：start***********
-    private List<Field> fields = new ArrayList<>();//所有类下面的属性集合信息
     private List<DisplayAttribute> displayAttributes = new ArrayList<>();//所有类下面的属性集合信息
     private List<MapFieldColumn> tableFields = new ArrayList<>();  //前端页面显示
     private List<ModelData> modelDatas = new ArrayList<>();//模型与实体类的关系

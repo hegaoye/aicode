@@ -219,7 +219,7 @@ public class ProjectJobCtrl extends BaseCtrl {
             WebSocketSession webSocketSession = wsClientManager.get(request.getRemoteHost());
             if (webSocketSession != null) {
                 //检查数据库初始化
-                projectSV.execute(code);
+//                projectSV.execute(code);
                 //生成代码
                 ProjectJob projectJob = projectJobSV.execute(code, webSocketSession);
                 return BeanRet.create(true, "执行任务成功", projectJob);

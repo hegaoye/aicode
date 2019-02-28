@@ -3,7 +3,10 @@ package io.aicode.project.service.impl;
 import com.baidu.fsg.uid.UidGenerator;
 import com.google.common.collect.Maps;
 import freemarker.template.TemplateException;
-import io.aicode.base.core.*;
+import io.aicode.base.core.FreemarkerHelper;
+import io.aicode.base.core.ModelData;
+import io.aicode.base.core.StringHelper;
+import io.aicode.base.core.TemplateData;
 import io.aicode.base.tools.WSTools;
 import io.aicode.core.enums.YNEnum;
 import io.aicode.core.tools.*;
@@ -233,6 +236,12 @@ public class GeneratorSVImpl implements GenerateSV {
     private void readyframeworksTemplateList(List<ProjectFramwork> projectFramworkList, WSTools webSocket, String logsPath) {
         Setting setting = settingDAO.loadByKey(Setting.Key.Template_Path.name());
         String template_Path = new HandleFuncs().getCurrentClassPath() + setting.getV();//获得默认仓库地址
+        //拼接项目框架字符串，用于判断
+        String projectFramworkKeyWords = "";
+        for (ProjectFramwork projectFramwork : projectFramworkList) {
+            projectFramworkKeyWords = projectFramworkKeyWords + projectFramwork.getFrameworks().getName() + "|";
+        }
+
         for (ProjectFramwork projectFramwork : projectFramworkList) {
             Frameworks frameworks = projectFramwork.getFrameworks();
             logger.debug(JSON.toJSONString(frameworks));
@@ -246,22 +255,19 @@ public class GeneratorSVImpl implements GenerateSV {
                     GitTools.cloneGit(frameworks.getGitHome(), project_template_Path, frameworks.getAccount(), frameworks.getPassword());
                 }
 
-                //搜索项目的模板路径
-                template_Path = FileHelper.findPath(template_Path, frameworks.getName());
+                String template_root_path = this.findPath(template_Path, frameworks.getName());
 
                 //删除不相干的模板及目录文件
-                File templateFile = new File(template_Path);
+                File templateFile = new File(template_root_path.replace(frameworks.getName(), ""));
                 File[] files = templateFile.listFiles();
                 for (File file : files) {
                     if (file.isDirectory()) {
-                        for (File file2 : file.listFiles()) {
-                            if (!frameworks.getName().equalsIgnoreCase(file2.getName())) {
-                                if (file2.isDirectory()) {
-                                    logger.debug("del:" + file2.getAbsolutePath());
-                                    FileUtil.delFolder(file2.getAbsolutePath());
-                                } else {
-                                    file2.delete();
-                                }
+                        if (!projectFramworkKeyWords.contains(file.getName())) {
+                            if (file.isDirectory()) {
+                                logger.debug("del:" + file.getAbsolutePath());
+                                FileUtil.delFolder(file.getAbsolutePath());
+                            } else {
+                                file.delete();
                             }
                         }
                     }
@@ -528,5 +534,28 @@ public class GeneratorSVImpl implements GenerateSV {
         projectDAO.update(project);
     }
 
+    /**
+     * 查找指定的路径
+     *
+     * @param root       根路径
+     * @param targetPath 目标路径
+     * @return 目标路径绝对路径
+     */
+    public String findPath(String root, String targetPath) {
+        File templateFile = new File(root);
+        File[] files = templateFile.listFiles();
+        String path = null;
+        for (File file : files) {
+            if (file.isDirectory()) {
+                if (!file.getName().equals(targetPath)) {
+                    path = findPath(file.getAbsolutePath(), targetPath);
+                } else {
+                    path = file.getAbsolutePath();
+                    break;
+                }
+            }
+        }
+        return path;
+    }
 
 }

@@ -129,6 +129,9 @@ public class TemplateData implements Serializable {
 
 //        this.fields = columns;
         if (columns != null && !columns.isEmpty()) {
+            if (this.fields == null) {
+                this.fields = new ArrayList<>();
+            }
             for (MapFieldColumn mapFieldColumn : columns) {
                 String json = JSON.toJSONString(mapFieldColumn);
                 Field field = JSON.parseObject(json, Field.class);

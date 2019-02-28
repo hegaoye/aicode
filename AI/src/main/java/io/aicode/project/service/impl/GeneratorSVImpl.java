@@ -3,10 +3,7 @@ package io.aicode.project.service.impl;
 import com.baidu.fsg.uid.UidGenerator;
 import com.google.common.collect.Maps;
 import freemarker.template.TemplateException;
-import io.aicode.base.core.FreemarkerHelper;
-import io.aicode.base.core.ModelData;
-import io.aicode.base.core.StringHelper;
-import io.aicode.base.core.TemplateData;
+import io.aicode.base.core.*;
 import io.aicode.base.tools.WSTools;
 import io.aicode.core.enums.YNEnum;
 import io.aicode.core.tools.*;
@@ -249,6 +246,8 @@ public class GeneratorSVImpl implements GenerateSV {
                     GitTools.cloneGit(frameworks.getGitHome(), project_template_Path, frameworks.getAccount(), frameworks.getPassword());
                 }
 
+                //搜索项目的模板路径
+                template_Path = FileHelper.findPath(template_Path, frameworks.getName());
 
                 //删除不相干的模板及目录文件
                 File templateFile = new File(template_Path);
@@ -528,4 +527,6 @@ public class GeneratorSVImpl implements GenerateSV {
         project.setDownloadUrl((Repository_Path.getV() + "/" + project.getEnglishName() + ".zip").replace("//", "/"));
         projectDAO.update(project);
     }
+
+
 }

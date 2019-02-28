@@ -21,6 +21,11 @@
         <result property="isState" column="isState"/>
     </resultMap>
 
+    <!--查询表信息关联信息-->
+    <resultMap id="rs_base_all" type="MapFieldColumn" extends="rs_base">
+        <collection property="displayAttribute" column="{mapFieldColumnCode=code}" select="DisplayAttribute.load"/>
+    </resultMap>
+
     <!-- 用于select查询公用抽取的列 -->
     <sql id="MapFieldColumn.columns">
 		id,mapClassTableCode,code,`column`,field,sqlType,fieldType,notes,defaultValue,isPrimaryKey,isDate,isState
@@ -105,7 +110,7 @@
         <include refid="MapFieldColumn.where"/>
     </delete>
 
-    <select id="MapFieldColumn.load" resultMap="rs_base">
+    <select id="MapFieldColumn.load" resultMap="rs_base_all">
         SELECT
         <include refid="MapFieldColumn.columns"/>
         FROM `map_field_column`
@@ -160,7 +165,7 @@
     </select>
 
 
-    <select id="MapFieldColumn.query" resultMap="rs_base">
+    <select id="MapFieldColumn.query" resultMap="rs_base_all">
         SELECT
         <include refid="MapFieldColumn.columns"/>
         FROM `map_field_column`

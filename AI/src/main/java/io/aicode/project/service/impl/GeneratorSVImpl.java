@@ -58,7 +58,11 @@ public class GeneratorSVImpl implements GenerateSV {
     private SettingDAO settingDAO;
 
     @Resource
+    private MapFieldColumnDAO mapFieldColumnDAO;
+
+    @Resource
     private LogsSV logsSV;
+
 
     @Resource
     private UidGenerator uidGenerator;
@@ -408,14 +412,18 @@ public class GeneratorSVImpl implements GenerateSV {
 
         //获取1对1,1对多关系集合
         mapClassTable.getMapRelationshipList().forEach(mapRelationship -> {
+            Map<String, Object> param = new HashMap<>();
+            param.put("mapClassTableCode", mapRelationship.getAssociateClass().getCode());
+            List<MapFieldColumn> associateClassColumns = mapFieldColumnDAO.query(param);
             if (YNEnum.getYN(mapRelationship.getIsOneToOne()) == YNEnum.Y) {
-                oneToOneList.add(new TemplateData(project, mapRelationship.getMapClassTable(), mapRelationship.getMainField(),
-                        mapRelationship.getJoinField(), mapRelationship.getMapClassTable().getMapFieldColumnList()));
+                oneToOneList.add(new TemplateData(project, mapRelationship.getAssociateClass(), mapRelationship.getMainField(),
+                        mapRelationship.getJoinField(), associateClassColumns));
             }
             if (YNEnum.getYN(mapRelationship.getIsOneToMany()) == YNEnum.Y) {
-                oneToManyList.add(new TemplateData(project, mapRelationship.getMapClassTable(), mapRelationship.getMainField(),
-                        mapRelationship.getJoinField(), mapRelationship.getMapClassTable().getMapFieldColumnList()));
+                oneToManyList.add(new TemplateData(project, mapRelationship.getAssociateClass(), mapRelationship.getMainField(),
+                        mapRelationship.getJoinField(), associateClassColumns));
             }
+            logger.debug(JSON.toJSONString(mapRelationship.getAssociateClass().getMapFieldColumnList()));
         });
 
         //各个模块下的所有类集合信息

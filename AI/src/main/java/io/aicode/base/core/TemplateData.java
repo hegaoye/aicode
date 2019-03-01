@@ -174,7 +174,7 @@ public class TemplateData implements Serializable {
     }
 
 
-    public TemplateData(Project project, MapClassTable classTable, String mainField, String joinField) {
+    public TemplateData(Project project, MapClassTable classTable, String mainField, String joinField, List<MapFieldColumn> columns) {
         this.projectName = project.getEnglishName();
         this.basePackage = project.getBasePackage();
         this.copyright = project.getCopyright();
@@ -191,6 +191,32 @@ public class TemplateData implements Serializable {
             this.model = classTable.getTableName().substring(0, classTable.getTableName().indexOf("_"));
         } else {
             this.model = classTable.getTableName();
+        }
+
+        if (columns != null && !columns.isEmpty()) {
+            if (this.fields == null) {
+                this.fields = new ArrayList<>();
+            }
+            for (MapFieldColumn mapFieldColumn : columns) {
+                String json = JSON.toJSONString(mapFieldColumn);
+                Field field = JSON.parseObject(json, Field.class);
+                field.setIsRequired(mapFieldColumn.getDisplayAttribute().getIsRequired());
+                field.setIsInsert(mapFieldColumn.getDisplayAttribute().getIsInsert());
+                field.setIsDeleteCondition(mapFieldColumn.getDisplayAttribute().getIsDeleteCondition());
+                field.setIsAllowUpdate(mapFieldColumn.getDisplayAttribute().getIsAllowUpdate());
+                field.setIsListPageDisplay(mapFieldColumn.getDisplayAttribute().getIsListPageDisplay());
+                field.setIsDetailPageDisplay(mapFieldColumn.getDisplayAttribute().getIsDetailPageDisplay());
+                field.setIsQueryRequired(mapFieldColumn.getDisplayAttribute().getIsQueryRequired());
+                field.setIsLineNew(mapFieldColumn.getDisplayAttribute().getIsLineNew());
+                field.setMatchType(mapFieldColumn.getDisplayAttribute().getMatchType());
+                field.setDisplayType(mapFieldColumn.getDisplayAttribute().getDisplayType());
+                field.setDisplayCss(mapFieldColumn.getDisplayAttribute().getDisplayCss());
+                field.setDisplayName(mapFieldColumn.getDisplayAttribute().getDisplayName());
+                field.setDisplayNo(mapFieldColumn.getDisplayAttribute().getDisplayNo());
+                field.setFieldValidationMode(mapFieldColumn.getDisplayAttribute().getFieldValidationMode());
+                field.setValidateText(mapFieldColumn.getDisplayAttribute().getValidateText());
+                this.fields.add(field);
+            }
         }
     }
 }

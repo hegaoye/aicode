@@ -88,15 +88,6 @@ public class Field implements Serializable {
     private boolean checkPk;
     private boolean checkDigit = false;
 
-    private boolean checkIsRequired;
-    private boolean checkIsInsert;
-    private boolean checkIsDeleteCondition;
-    private boolean checkIsAllowUpdate;
-    private boolean checkIsListPageDisplay;
-    private boolean checkIsDetailPageDisplay;
-    private boolean checkIsQueryRequired;
-    private boolean checkIsLineNew;
-
 
 
     public void toJava() {
@@ -109,15 +100,15 @@ public class Field implements Serializable {
     }
 
 
-    public boolean getIsDate() {
+    public boolean getCheckDate() {
         return isDate.equals(YNEnum.Y.name()) ? true : false;
     }
 
-    public boolean getIsState() {
+    public boolean getCheckState() {
         return isState.equals(YNEnum.Y.name()) ? true : false;
     }
 
-    public boolean getIsPrimaryKey() {
+    public boolean getCheckPk() {
         return isPrimaryKey.equals(YNEnum.Y.name()) ? true : false;
     }
 

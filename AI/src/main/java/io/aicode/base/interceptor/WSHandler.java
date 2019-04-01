@@ -44,75 +44,11 @@ public class WSHandler implements WebSocketHandler {
 
     SSHClient sshClient = null;
 
-//    public void itermOpen(WebSocketSession wss, String spaceHome) {
-//        try {
-//            Map<String, String> envs = Maps.newHashMap(System.getenv());
-//            String shell = envs.get("SHELL");
-//
-//            if (shell == null) {
-//                shell = "/bin/bash";
-//            }
-//
-//            String[] command = new String[]{shell, "--login"};
-//            envs.put("TERM", "xterm");
-//
-//            TerminalEmulator emulator = new TerminalEmulator("1",
-//                    wss,
-//                    command,
-//                    envs,
-//                    spaceHome);
-//
-//            connectors.put("test", emulator);
-//            sessions.put("test", "1");
-//
-//            emulator.start();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
-//
-//    public void itermInput(String cmd) throws IOException {
-//        String key = "test";
-//        TerminalEmulator emulator = connectors.get(key);
-//
-//        if (emulator != null) {
-//            connectors.get(key).write(cmd);
-//        }
-//    }
-//
-//    private void itermClose() {
-//        String key = "test";
-//
-//
-//        TerminalEmulator emulator = connectors.get(key);
-//        if (emulator != null) {
-//            emulator.close();
-//        }
-//
-//        connectors.remove(key);
-//        sessions.remove("test", "1");
-//    }
-
 
     @Override
     public void handleMessage(WebSocketSession wss, WebSocketMessage<?> wsm) throws Exception {
         String cmd = wsm.getPayload().toString();
         log.debug(wss.getHandshakeHeaders().getFirst("Cookie"));
-
-//        switch (cmd) {
-//            case "open":
-//                this.itermOpen(wss, "/home/");
-//                break;
-//            case "input":
-//                itermInput(cmd);
-//                break;
-//            case "close":
-//                itermClose();
-//                break;
-//            default:
-//                System.out.println("command " + cmd + " not found.");
-//                break;
-//        }
 
 //        if (ssh2 == null) {
 //            ssh2 = new SSH2("192.168.1.220", 22, "pitop", "0");

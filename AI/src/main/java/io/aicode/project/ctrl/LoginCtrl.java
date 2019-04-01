@@ -147,12 +147,12 @@ public class LoginCtrl extends BaseCtrl {
         System.out.println(codes);
         try {
             String key = "hegaoye";
-            WebSocketSession webSocketSession = wsClientManager.get("192.168.10.95");
+            WebSocketSession webSocketSession = wsClientManager.get("192.168.1.95");
             sShSV.close(key);
-            SSh sSh = new SSh("192.168.10.188", 22, "pi", "0");
+            SSh sSh = new SSh("192.168.1.160", 22, "root", "0");
             sSh.setHome("/home/test");
-            sShSV.sftpUpload(codes, "led.py", "/home/test/", sSh);
-            sShSV.shell(sSh, "python /home/test/led.py", key, new WSTools(webSocketSession));
+            sShSV.sftpUpload(codes, "led.py", "/home/", sSh);
+            sShSV.shell(sSh, "python /home/led.py", key, new WSTools(webSocketSession));
         } catch (JSchException e) {
             e.printStackTrace();
         } catch (SftpException e) {
@@ -226,7 +226,7 @@ public class LoginCtrl extends BaseCtrl {
         PipedOutputStream pipedOutputStream = null;
         JSch jsch = new JSch();
         if (session == null) {
-            session = jsch.getSession("pi", "192.168.1.37", 22);
+            session = jsch.getSession("root", "192.168.1.160", 22);
             session.setPassword("0");
             session.setConfig("StrictHostKeyChecking", "no");
             session.connect(50000);

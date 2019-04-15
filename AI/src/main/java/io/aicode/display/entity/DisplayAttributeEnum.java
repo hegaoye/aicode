@@ -18,7 +18,7 @@ public enum DisplayAttributeEnum implements java.io.Serializable {
     Autocomplete("自动完成"), Cascader("级联选择"), DatePicker("日期选择框"), TimePicker("时间选择框"),
     Input("单行文本框"), Textarea("多行文本框"), InputNumber("数字输入框"), Mobile("手机"), Phone("固话"), MobileOrPhone("手机或固话"),
     Password("密码"), Email("邮箱"), Website("网址"), IdCard("身份证"), Mention("提及(@)"),
-    Select("单项选择器"), MultiSelect("多项选择器"), Radio("单选按钮"), Checkbox("复选框"), Rate("评分"), Silder("滑动条"),
+    Select("下拉单项选择器"), MultiSelect("下拉多项选择器"), Radio("单选按钮"), Checkbox("复选框"), Rate("评分"), Silder("滑动条"),
     Switch("开关按钮"), TreeSelect("选择树"), Upload("上传"),
 //    Skeleton("加载展位图"),Transfer("穿梭框"),Avatar("头像"),
     ;

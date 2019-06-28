@@ -2,15 +2,16 @@
 一个基于freemarker为核心的代码生成框架，本项目目前支持sql进行反向生成java的代码，代码生成的程度取决于用的模板，目前整合的模板中
 有如下：
 ```
-ssm+redis+swagger+lombok
-springboot-redis-swagger-lombok
-ssm+dubbo+redis+swagger+lombok
-ssh+redis+swagger+lombok
-spring-cloud-redis-lombok-sentry
-angular-template
-springboot-redis-swagger-lombok-frontend
-angular-template-i18n
+- ssm+redis+swagger+lombok
+- springboot-redis-swagger-lombok
+- ssm+dubbo+redis+swagger+lombok
+- ssh+redis+swagger+lombok
+- spring-cloud-redis-lombok-sentry
+- angular-template
+- springboot-redis-swagger-lombok-frontend
+- angular-template-i18n
 ```
+模板分享地址: https://gitee.com/helixin/aicode_template
 以上框架为基本常用的框架，目前只需要准备好你的sql脚本在此项目页上进行创建即可，然后``aicode`` 会自动帮你把数据库创建出来用于反向生成代码使用，
 自动从你的模板仓库中下载框架，当然也可以是用我们已经开发好的，代码会从``dao->service->ctrl->frontend`` 一条龙生成，接口自动根据规则对接完
 毕，也就是说你可以生成后直接运行你的项目代码，另外项目代码将会根据你的需要配置上``git svn`` 地址后自动提交到对应的仓库中省去手工拷贝的麻烦，只

@@ -77,6 +77,8 @@ uml信息可以自己打开vpp文件查看详细，仅仅放两张用于参考
 - websocket
 - java reflection
 - angular framework
+- git,svn client
+- jwt
 - gradle
 
 

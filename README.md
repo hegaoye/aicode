@@ -38,6 +38,19 @@ jdbc.password=xxxxx
 
 ![Image text](https://gitee.com/helixin/AI-Code/raw/feature/displayAndRelation/images/index.png)
 
+参考已有项目的效果
+![Image text](https://gitee.com/helixin/AI-Code/raw/feature/displayAndRelation/images/aicode_index.png)
+
+### 模板仓库添加
+在你登陆后你可以添加自己的模板仓库
+
+![Image text](https://gitee.com/helixin/AI-Code/raw/feature/displayAndRelation/images/aicode_templates.png)
+
+### 创建项目
+有了模板之后可以创业见一个项目，然后按照``下一步``的指引操作下去即可完成操作
+
+![Image text](https://gitee.com/helixin/AI-Code/raw/feature/displayAndRelation/images/aicode_build.png)
+
 
 ### 编写模板说明：
 模板语法采用freemarker编写，定义了一个实体类可以在项目``io.aicode.base.core.TemplateData`` 下找到此类，大致的内置变量可以如下图

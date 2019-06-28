@@ -121,7 +121,7 @@ alter table "order" comment '订单';
 /*==============================================================*/
 /* Table: order                                               */
 /*==============================================================*/
-create table order
+create table `order`
 (
    id                   bigint not null auto_increment,
    code                 varchar(64) not null comment '编码',
@@ -129,10 +129,10 @@ create table order
    primary key (id, code, order_no)
 );
 
-alter table "order" comment '订单';
+alter table `order` comment '订单';
 ```
 
-去处后即可合法使用，一定要报账sql可以正常执行再用来跑代码，否则会失败
+去处后即可合法使用，一定要保障sql可以正常执行再用来跑代码，否则会失败
 
 
 # 子项目

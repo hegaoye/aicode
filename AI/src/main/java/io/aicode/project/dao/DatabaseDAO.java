@@ -20,7 +20,11 @@ public class DatabaseDAO extends BaseMybatisDAOImpl<Database, Long> {
      * @param defaultDatabase 默认数据库
      */
     public void createDatabase(String sql, String defaultDatabase) {
-        getSqlSession().selectOne(sqlmapNamespace + ".createDatabase", sql);
-        getSqlSession().selectOne(sqlmapNamespace + ".useDatabase", defaultDatabase);
+        try {
+            getSqlSession().selectOne(sqlmapNamespace + ".createDatabase", sql);
+        } finally {
+            //无论执行成功或失败，始终切换到默认数据库
+            getSqlSession().selectOne(sqlmapNamespace + ".useDatabase", defaultDatabase);
+        }
     }
 }

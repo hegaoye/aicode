@@ -118,6 +118,7 @@ public class ProjectSVImpl extends BaseMybatisSVImpl<Project, Long> implements P
             project.setIsIncrement(YNEnum.N.name());
         }
         project.setDownloadUrl("DownloadUrl");
+        project.setIsIncrement(YNEnum.N.name());
         project.setCreateTime(new Date());
         project.setUpdateTime(new Date());
 
@@ -219,18 +220,15 @@ public class ProjectSVImpl extends BaseMybatisSVImpl<Project, Long> implements P
     public void execute(String code) {
         //1.创建数据库
         boolean flag = this.createDatabase(code);
-        if (!flag) {
-            logger.error(BaseException.BaseExceptionEnum.Server_Error.toString());
-            throw new ProjectException(BaseException.BaseExceptionEnum.Server_Error);
-        }
 
         //2.解析数据库信息
-        flag = this.parse(code);
-        if (!flag) {
-            logger.error(BaseException.BaseExceptionEnum.Server_Error.toString());
-            throw new ProjectException(BaseException.BaseExceptionEnum.Server_Error);
+        if (flag) {
+            flag = this.parse(code);
+            if (!flag) {
+                logger.error(BaseException.BaseExceptionEnum.Server_Error.toString());
+                throw new ProjectException(BaseException.BaseExceptionEnum.Server_Error);
+            }
         }
-
     }
 
 
@@ -268,7 +266,7 @@ public class ProjectSVImpl extends BaseMybatisSVImpl<Project, Long> implements P
         map.clear();
         map.put("schemaName", database);
         int i = databaseDAO.count(map);
-        if (i == 0) {
+        if (i <= 0) {
             Setting setting = settingDAO.loadByKey(Setting.Key.DefaultDatabase.name());
             if (!project.getProjectSqlList().isEmpty()) {
                 project.getProjectSqlList().forEach(projectSql -> {
@@ -276,6 +274,7 @@ public class ProjectSVImpl extends BaseMybatisSVImpl<Project, Long> implements P
                         databaseDAO.createDatabase(projectSql.getTsql(), setting.getV());
                     }
                 });
+                return true;
             }
         }
 
@@ -283,7 +282,7 @@ public class ProjectSVImpl extends BaseMybatisSVImpl<Project, Long> implements P
         //3.记录任务日志
 //        ProjectJobLogs projectJobLogs = new ProjectJobLogs();
 //        projectJobLogsDAO.insert(projectJobLogs);
-        return true;
+        return false;
     }
 
     /**

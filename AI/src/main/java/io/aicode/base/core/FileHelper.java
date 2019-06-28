@@ -254,4 +254,28 @@ public class FileHelper {
             }
         }
     }
+
+    /**
+     * 查找指定的路径
+     *
+     * @param root       根路径
+     * @param targetPath 目标路径
+     * @return 目标路径绝对路径
+     */
+    public static String findPath(String root, String targetPath) {
+        File templateFile = new File(root);
+        File[] files = templateFile.listFiles();
+        String path = null;
+        for (File file : files) {
+            if (file.isDirectory()) {
+                if (!file.getName().equals(targetPath)) {
+                    path = findPath(file.getAbsolutePath(), targetPath);
+                } else {
+                    path = file.getAbsolutePath();
+                    break;
+                }
+            }
+        }
+        return path;
+    }
 }

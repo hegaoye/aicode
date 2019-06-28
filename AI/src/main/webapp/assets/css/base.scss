@@ -116,3 +116,20 @@ html,body{
 
 /***************************************公共样式定义 end***************************************************************/
 
+/*页面顶部信息*/
+.page-title {
+  padding: 15px 25px;
+  border-bottom: 1px solid #dedede;
+  background-color: #ffffff;
+  .title {
+    font-size: 22px;
+    color: #009688;
+    display: inline;
+    font-weight: normal;
+  }
+}
+
+.subtitle {
+  border-left: 4px solid #f70;
+  padding-left: 10px;
+}

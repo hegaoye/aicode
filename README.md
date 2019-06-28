@@ -83,6 +83,56 @@ uml信息可以自己打开vpp文件查看详细，仅仅放两张用于参考
 - gradle
 
 
+### 注意
+关于自己的sql脚本比如如下
+```
+/*==============================================================*/
+/* Table: goods                                                 */
+/*==============================================================*/
+create table goods
+(
+   id                   bigint not null auto_increment,
+   code                 varchar(64) not null comment '编码',
+   name                 varchar(32) comment '商品名',
+   stock                bigint comment '库存',
+   status               varchar(32) comment '状态',
+   primary key (id, code)
+);
+
+alter table goods comment '产品';
+
+/*==============================================================*/
+/* Table: "order"                                               */
+/*==============================================================*/
+create table "order"
+(
+   id                   bigint not null auto_increment,
+   code                 varchar(64) not null comment '编码',
+   order_no             varchar(32) not null comment '订单号',   
+   primary key (id, code, order_no)
+);
+
+alter table "order" comment '订单';
+```
+
+这个sql在执行中失败，失败的原因在于 ``"order"`` 双引号不合法将无法执行，所以请检查后修改为``order`` 的和发sql语句，比如下面的
+
+```
+/*==============================================================*/
+/* Table: order                                               */
+/*==============================================================*/
+create table order
+(
+   id                   bigint not null auto_increment,
+   code                 varchar(64) not null comment '编码',
+   order_no             varchar(32) not null comment '订单号',   
+   primary key (id, code, order_no)
+);
+
+alter table "order" comment '订单';
+```
+
+去处后即可合法使用，一定要报账sql可以正常执行再用来跑代码，否则会失败
 
 
 # 子项目

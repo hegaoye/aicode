@@ -151,9 +151,10 @@ public class TemplateData implements Serializable {
                     field.setDisplayNo(mapFieldColumn.getDisplayAttribute().getDisplayNo());
                     field.setFieldValidationMode(mapFieldColumn.getDisplayAttribute().getFieldValidationMode());
                     field.setValidateText(mapFieldColumn.getDisplayAttribute().getValidateText());
-                    this.fields.add(field);
                 }
+                this.fields.add(field);
             }
+
         }
         this.pkFields = pkColumns;
         this.notPkFields = notPkColumns;

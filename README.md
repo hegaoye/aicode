@@ -43,3 +43,6 @@ jdbc.password=xxxxx
 模板语法采用freemarker编写，定义了一个实体类可以在项目``io.aicode.base.core.TemplateData`` 下找到此类，大致的内置变量可以如下图
 
 ![Image text](https://gitee.com/helixin/AI-Code/raw/feature/displayAndRelation/images/aicode_help.png)
+
+如果你需要编写自己的模板按照这里面的规则即可完成编写，如果需要参考已有模板请看顶部的连接分享你可以根据自己的需求修改一个出来然后也分享出来让大家
+享受你的技术带来的便捷。

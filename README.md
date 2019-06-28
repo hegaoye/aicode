@@ -21,7 +21,7 @@
 完成对代码的生成管理，你可以通过页面来完成模型关系的设置，以及对显示属性的设置，快速完成从数据库层到页面的定制化开发。
 
 # 使用方法
-### 1.连接数据库：
+### 连接数据库：
 -首先要做的就是建立``aicode``的数据库，建议使用``mysql``,脚本请用最新的版本日期，你可以在项目根目录下``sql/aicodexxxxx.sql``中找到合适的
 sql脚本,比如创建数据库名为``aicode``,数据库的ip为``192.168.1.220``,账户密码为``username=root,password=xxxxx``;
 
@@ -39,32 +39,7 @@ jdbc.password=xxxxx
 ![Image text](https://gitee.com/helixin/AI-Code/raw/feature/displayAndRelation/images/index.png)
 
 
-### 2.编写模板说明：
-模板采用freemarker 
-模板可以拿到如下数据：
-${projectName} //项目英文名
-${model}   //模块中的模型 -> ${basePackage}.${model}.service
-${module} //模块 一个项目的模块化 不参与java的包定义只是项目管理分离办法
+### 编写模板说明：
+模板语法采用freemarker编写，定义了一个实体类可以在项目``io.aicode.base.core.TemplateData`` 下找到此类，大致的内置变量可以如下图
 
-${basePackage}  //包名
-
-${table}  //表对象
-${tableName}  //表名
-
-${classes}  //类信息对象  集合
-${class}  //类对象
-${className}  //类名
-${classNameLower}  //类名小写
-
-${columns}  //列对象  集合
-${pkColumns}  //主键数据信息
-${notPkColumns}  //非主键数据信息
-
-
-${fields}  //类属性  集合
-${pkFields}  //主键数据信息
-${notPkFields}  //非主键主键数据信息
-
-${notes}  //类注释
-${copyright}  //项目版权
-${author}  //作者
+![Image text](https://gitee.com/helixin/AI-Code/raw/feature/displayAndRelation/images/aicode_help.png)

@@ -34,7 +34,7 @@ jdbc.password=xxxxx
 修改完毕后可以直接启动,启动默认为``8080``端口
 浏览器中打开输入：``http://127.0.0.1:8080/index.html``
 默认账户:``lixin  888888``尝试登录，你可以在数据库中修改次账户数据表明为``account``
-![Image text](https://gitee.com/helixin/AI-Code/blob/feature/displayAndRelation/images/index.png)
+![Image text](https://gitee.com/helixin/AI-Code/raw/feature/displayAndRelation/images/index.png)
 
 
 ###2.编写模板说明：

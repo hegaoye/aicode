@@ -54,6 +54,7 @@ jdbc.password=xxxxx
 创建后效果
 ![Image text](https://gitee.com/helixin/AI-Code/raw/feature/displayAndRelation/images/aicode_build.png)
 
+之后点击``构建项目`` 按钮就开始进行想的自动构建了
 
 ### 编写模板说明：
 模板语法采用freemarker编写，定义了一个实体类可以在项目``io.aicode.base.core.TemplateData`` 下找到此类，大致的内置变量可以如下图
@@ -62,3 +63,26 @@ jdbc.password=xxxxx
 
 如果你需要编写自己的模板按照这里面的规则即可完成编写，如果需要参考已有模板请看顶部的连接分享你可以根据自己的需求修改一个出来然后也分享出来让大家
 享受你的技术带来的便捷。
+### UML参考
+uml信息可以自己打开vpp文件查看详细，仅仅放两张用于参考
+![Image text](https://gitee.com/helixin/AI-Code/raw/feature/displayAndRelation/images/models.jpg)
+
+![Image text](https://gitee.com/helixin/AI-Code/raw/feature/displayAndRelation/images/active.jpg)
+
+
+### 项目技术点
+- spring mvc
+- mybatis
+- freemarker
+- websocket
+- java reflection
+- angular framework
+- gradle
+
+
+
+
+# 参考项目
+前端参考地址 https://gitee.com/helixin/ai-code-frontend
+
+设计文档地址 https://gitee.com/helixin/AI-Code-Doc

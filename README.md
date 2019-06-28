@@ -49,6 +49,9 @@ jdbc.password=xxxxx
 ### 创建项目
 有了模板之后可以创业见一个项目，然后按照``下一步``的指引操作下去即可完成操作
 
+![Image text](https://gitee.com/helixin/AI-Code/raw/feature/displayAndRelation/images/aicode_start.png)
+
+创建后效果
 ![Image text](https://gitee.com/helixin/AI-Code/raw/feature/displayAndRelation/images/aicode_build.png)
 
 

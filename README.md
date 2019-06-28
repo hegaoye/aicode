@@ -52,6 +52,7 @@ jdbc.password=xxxxx
 
 ![Image text](https://gitee.com/helixin/AI-Code/raw/dev/images/show.gif)
 
+### 构建项目
 ![Image text](https://gitee.com/helixin/AI-Code/raw/dev/images/build.gif)
 
 之后点击``构建项目`` 按钮就开始进行想的自动构建了

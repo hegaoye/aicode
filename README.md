@@ -84,7 +84,7 @@ uml信息可以自己打开vpp文件查看详细，仅仅放两张用于参考
 
 
 
-# 参考项目
+# 子项目
 前端参考地址 https://gitee.com/helixin/ai-code-frontend
 
 设计文档地址 https://gitee.com/helixin/AI-Code-Doc

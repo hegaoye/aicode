@@ -20,7 +20,7 @@ angular-template-i18n
 完成对代码的生成管理，你可以通过页面来完成模型关系的设置，以及对显示属性的设置，快速完成从数据库层到页面的定制化开发。
 
 # 使用方法
-###1.连接数据库：
+### 1.连接数据库：
 -首先要做的就是建立``aicode``的数据库，建议使用``mysql``,脚本请用最新的版本日期，你可以在项目根目录下``sql/aicodexxxxx.sql``中找到合适的
 sql脚本,比如创建数据库名为``aicode``,数据库的ip为``192.168.1.220``,账户密码为``username=root,password=xxxxx``;
 
@@ -38,7 +38,7 @@ jdbc.password=xxxxx
 ![Image text](https://gitee.com/helixin/AI-Code/raw/feature/displayAndRelation/images/index.png)
 
 
-###2.编写模板说明：
+### 2.编写模板说明：
 模板采用freemarker 
 模板可以拿到如下数据：
 ${projectName} //项目英文名

@@ -10,6 +10,7 @@ import io.aicode.core.exceptions.BaseException;
 import io.aicode.core.tools.StringTools;
 import io.aicode.project.entity.ProjectJob;
 import io.aicode.project.service.ProjectJobSV;
+import io.aicode.project.service.ProjectSV;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -44,6 +45,8 @@ public class ProjectJobCtrl extends BaseCtrl {
 
     @Resource
     private ProjectJobSV projectJobSV;
+    @Resource
+    private ProjectSV projectSV;
 
     @Resource
     private WSClientManager wsClientManager;
@@ -215,6 +218,9 @@ public class ProjectJobCtrl extends BaseCtrl {
 //            ProjectJob projectJob = projectJobSV.execute(code); TODO 测试新日志暂时注释
             WebSocketSession webSocketSession = wsClientManager.get(request.getRemoteHost());
             if (webSocketSession != null) {
+                //检查数据库初始化
+//                projectSV.execute(code);
+                //生成代码
                 ProjectJob projectJob = projectJobSV.execute(code, webSocketSession);
                 return BeanRet.create(true, "执行任务成功", projectJob);
             }

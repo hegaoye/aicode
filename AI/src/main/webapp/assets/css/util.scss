@@ -3,11 +3,6 @@
  */
 
 /*定义margin基础属性*/
-.m0 { margin: 0 !important; }
-.ml0 { margin-left: 0 !important; }
-.mr0 { margin-right: 0 !important; }
-.mt0 { margin-top: 0 !important; }
-.mb0 { margin-bottom: 0 !important; }
 .m-1{margin: 1px !important;}
 .m-2{margin: 2px !important;}
 .m-3{margin: 3px !important;}
@@ -32,6 +27,16 @@
 .mr-20 { margin-right: 20px !important; }
 .mt-20 { margin-top: 20px !important; }
 .mb-20 { margin-bottom: 20px !important; }
+.m-30  { margin: 30px !important; }
+.ml-30 { margin-left: 30px !important; }
+.mr-30 { margin-right: 30px !important; }
+.mt-30 { margin-top: 30px !important; }
+.mb-30 { margin-bottom: 30px !important; }
+.m0 { margin: 0 !important; }
+.ml0 { margin-left: 0 !important; }
+.mr0 { margin-right: 0 !important; }
+.mt0 { margin-top: 0 !important; }
+.mb0 { margin-bottom: 0 !important; }
 
 /*定义padding基础属性*/
 .p0 { padding: 0 !important; }
@@ -112,6 +117,7 @@
 
 /*鼠标手型*/
 .cursor{cursor: pointer;}
+.cursor-text{cursor: text;}
 
 /*背景色*/
 .bg-white{background-color: #ffffff;}

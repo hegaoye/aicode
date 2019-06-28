@@ -7,10 +7,13 @@ import io.aicode.core.base.JwtToken;
 import io.aicode.core.common.Constants;
 import io.aicode.core.entity.BeanRet;
 import io.aicode.core.entity.Page;
+import io.aicode.core.enums.YNEnum;
 import io.aicode.core.exceptions.BaseException;
 import io.aicode.core.tools.FileUtil;
 import io.aicode.core.tools.HandleFuncs;
+import io.aicode.display.facade.DisplayAttributeSV;
 import io.aicode.project.entity.Project;
+import io.aicode.project.service.MapRelationshipSV;
 import io.aicode.project.service.ProjectSV;
 import io.aicode.setting.entity.Setting;
 import io.aicode.setting.service.SettingSV;
@@ -53,6 +56,12 @@ public class ProjectCtrl extends BaseCtrl {
     @Resource
     private SettingSV settingSV;
 
+    @Resource
+    private DisplayAttributeSV displayAttributeSV;
+
+    @Resource
+    private MapRelationshipSV mapRelationshipSV;
+
     /**
      * 查询一个详情信息
      *
@@ -70,6 +79,15 @@ public class ProjectCtrl extends BaseCtrl {
         Map<String, Object> map = new HashedMap();
         map.put("code", code);
         Project project = projectSV.load(map);
+        //查询表关系
+        int count = mapRelationshipSV.countByProjectCode(code);
+        //查询显示属性
+        int displayCount = displayAttributeSV.countByProjectCode(code);
+        if (count > 0 || displayCount > 0) {
+            project.setRelationshipAndDisplay(YNEnum.Y.name());
+        } else {
+            project.setRelationshipAndDisplay(YNEnum.N.name());
+        }
         logger.info(JSON.toJSONString(project));
         return BeanRet.create(true, "查询一个详情信息", project);
     }

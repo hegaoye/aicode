@@ -10,6 +10,7 @@
 
     <typeAliases>
         <package name="io.aicode.project.entity"/>
+        <package name="io.aicode.display.entity"/>
         <package name="io.aicode.setting.entity"/>
     </typeAliases>
 

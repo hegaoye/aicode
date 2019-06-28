@@ -27,7 +27,7 @@ public class SwaggerConfig {
         return new Docket(DocumentationType.SWAGGER_2)
                 .apiInfo(apiInfo())
                 .select()
-                .apis(RequestHandlerSelectors.basePackage("com.aicode"))//controller路径
+                .apis(RequestHandlerSelectors.basePackage("io.aicode"))//controller路径
                 .paths(PathSelectors.any())
                 .build()
                 .ignoredParameterTypes(ApiIgnore.class);
@@ -36,9 +36,9 @@ public class SwaggerConfig {
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
                 .title("AI-Code RESTful APIs")
-                .description("请访问  http://www.aicode.com/")
-                .contact(new Contact("郑州仁中和科技有限公司", "http://www.aicode.com/", "hegaoye@qq.com"))
-                .termsOfServiceUrl("http://www.aicode.com/")
+                .description("请访问  http://www.aicode.io/")
+                .contact(new Contact("hegaoye@qq.io", "http://www.aicode.io/", "hegaoye@qq.com"))
+                .termsOfServiceUrl("http://www.aicode.io/")
                 .version("1.0")
                 .build();
     }

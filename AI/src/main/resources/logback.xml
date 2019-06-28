@@ -18,12 +18,6 @@
         </encoder>
     </appender>
 
-    <!-- Configure the Sentry appender, overriding the logging threshold to the WARN level -->
-    <appender name="Sentry" class="io.sentry.logback.SentryAppender">
-        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-            <level>WARN</level>
-        </filter>
-    </appender>
 
     <!--按照每天生成日志文件-->
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
@@ -73,7 +67,6 @@
 
     <!-- 日志输出级别 -->
     <root level="DEBUG">
-        <appender-ref ref="Sentry"/>
         <appender-ref ref="STDOUT"/>
         <appender-ref ref="FILE"/>
     </root>

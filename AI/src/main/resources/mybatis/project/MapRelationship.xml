@@ -10,19 +10,22 @@
         <result property="id" column="id"/>
         <result property="code" column="code"/>
         <result property="mapClassTableCode" column="mapClassTableCode"/>
+        <result property="associateCode" column="associateCode"/>
         <result property="isOneToOne" column="isOneToOne"/>
         <result property="isOneToMany" column="isOneToMany"/>
+        <result property="mainField" column="mainField"/>
+        <result property="joinField" column="joinField"/>
     </resultMap>
 
 
     <!--查询表信息关联信息-->
     <resultMap id="rs_base_all" type="MapRelationship" extends="rs_base">
-        <association property="mapClassTable" column="{code=mapClassTableCode}" select="MapClassTable.load"/>
+        <association property="associateClass" column="{code=associateCode}" select="MapClassTable.loadForMapRelationShop"/>
     </resultMap>
 
     <!-- 用于select查询公用抽取的列 -->
     <sql id="MapRelationship.columns">
-		id,code,mapClassTableCode,isOneToOne,isOneToMany
+		id,code,mapClassTableCode,associateCode,isOneToOne,isOneToMany,mainField,joinField
 	</sql>
 
     <insert id="MapRelationship.insert" useGeneratedKeys="true" keyProperty="id" parameterType="MapRelationship">
@@ -30,14 +33,20 @@
         id ,
         code ,
         mapClassTableCode ,
+        associateCode ,
         isOneToOne ,
-        isOneToMany
+        isOneToMany,
+        mainField,
+        joinField
         ) VALUES (
         #{id} ,
         #{code} ,
         #{mapClassTableCode} ,
+        #{associateCode} ,
         #{isOneToOne} ,
-        isOneToMany
+        #{isOneToMany},
+        #{mainField},
+        #{joinField}
         )
         <selectKey keyProperty="id" resultType="long">
             select LAST_INSERT_ID()
@@ -49,6 +58,8 @@
         <trim prefix="set" suffixOverrides=",">
             <if test="mapClassTableCode!=null and mapClassTableCode!=''">
                 mapClassTableCode = #{mapClassTableCode} ,
+            </if><if test="associateCode!=null and associateCode!=''">
+            associateCode = #{associateCode} ,
             </if>
             <if test="isOneToOne!=null and isOneToOne!=''">
                 isOneToOne = #{isOneToOne}
@@ -81,6 +92,9 @@
             <if test="mapClassTableCode!=null and mapClassTableCode!=''">
                 AND mapClassTableCode = #{mapClassTableCode}
             </if>
+            <if test="associateCode!=null and associateCode!=''">
+                AND associateCode = #{associateCode}
+            </if>
             <if test="isOneToOne!=null and isOneToOne!=''">
                 AND isOneToOne = #{isOneToOne}
             </if>
@@ -106,6 +120,12 @@
         <if test="sortColumns!=null and sortColumns!=''">
             ORDER BY ${sortColumns}
         </if>
+    </select>
+
+    <select id="MapRelationship.countByProjectCode" resultType="int">
+        SELECT count(mr.id)
+        FROM project_map pm,map_relationship mr
+        WHERE pm.mapClassTableCode = mr.mapClassTableCode AND pm.projectCode = #{projectCode}
     </select>
 
 

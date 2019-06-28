@@ -18,9 +18,20 @@ import java.util.Map;
 public class MapRelationshipDAO extends BaseMybatisDAOImpl<MapRelationship, Long> {
 
 
-    public void delete(String mapClassTableCode) {
+    public void delete(String code) {
         Map<String, Object> map = Maps.newHashMap();
-        map.put("mapClassTableCode", mapClassTableCode);
+        map.put("code", code);
         getSqlSession().delete(sqlmapNamespace + ".delete", map);
+    }
+
+    /**
+     * 根据项目编码统计是否已经设置表关系
+     * @param projectCode    项目编码
+     * @return int
+     */
+    public int countByProjectCode(String projectCode) {
+        Map<String, Object> map = Maps.newHashMap();
+        map.put("projectCode", projectCode);
+        return getSqlSession().selectOne(sqlmapNamespace + ".countByProjectCode", map);
     }
 }

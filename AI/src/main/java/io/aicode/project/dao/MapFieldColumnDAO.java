@@ -30,4 +30,5 @@ public class MapFieldColumnDAO extends BaseMybatisDAOImpl<MapFieldColumn, Long> 
         params.put("mapClassTableCode", mapClassTableCode);
         return  getSqlSession().selectList(sqlmapNamespace + ".listFields", params);
     }
+
 }

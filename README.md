@@ -54,15 +54,15 @@ jdbc.password=xxxxx
 修改完毕后可以直接启动,启动默认为``8080``端口
 浏览器中打开输入：``http://127.0.0.1:8080/index.html``
 默认账户:``lixin  888888``尝试登录，你可以在数据库中修改次账户数据表明为``account``
-![Image text](https://gitee.com/helixin/AI-Code/raw/master/images/index.png)
+![Image text](https://gitee.com/helixin/AI-Code/raw/dev/images/index.png)
 
 参考已有项目的效果
-![Image text](https://gitee.com/helixin/AI-Code/raw/master/images/aicode_index.png)
+![Image text](https://gitee.com/helixin/AI-Code/raw/dev/images/aicode_index.png)
 
 ### 模板仓库添加
 在你登陆后你可以添加自己的模板仓库
 
-![Image text](https://gitee.com/helixin/AI-Code/raw/master/images/aicode_templates.png)
+![Image text](https://gitee.com/helixin/AI-Code/raw/dev/images/aicode_templates.png)
 
 ### 创建项目
 有了模板之后可以创业见一个项目，然后按照``下一步``的指引操作下去即可完成操作
@@ -91,28 +91,28 @@ swagger界面如下，我只用了一个简单的表来演示，你的要有多�
 ### 编写模板说明：
 模板语法采用freemarker编写，定义了一个实体类可以在项目``io.aicode.base.core.TemplateData`` 下找到此类，大致的内置变量可以如下图
 
-![Image text](https://gitee.com/helixin/AI-Code/raw/master/images/aicode_help.png)
+![Image text](https://gitee.com/helixin/AI-Code/raw/dev/images/aicode_help.png)
 
 如果你需要编写自己的模板按照这里面的规则即可完成编写，如果需要参考已有模板请看顶部的连接分享你可以根据自己的需求修改一个出来然后也分享出来让大家
 享受你的技术带来的便捷。
 ### UML参考
 uml信息可以自己打开vpp文件查看详细，仅仅放两张用于参考
-![Image text](https://gitee.com/helixin/AI-Code/raw/master/images/models.jpg)
+![Image text](https://gitee.com/helixin/AI-Code/raw/dev/images/models.jpg)
 
-![Image text](https://gitee.com/helixin/AI-Code/raw/master/images/active.jpg)
+![Image text](https://gitee.com/helixin/AI-Code/raw/dev/images/active.jpg)
 
 ### 模板长啥样？
 模块化模板样貌
-![Image text](https://gitee.com/helixin/AI-Code/raw/master/images/tmp4.png)
+![Image text](https://gitee.com/helixin/AI-Code/raw/dev/images/tmp4.png)
 
 service模板类
-![Image text](https://gitee.com/helixin/AI-Code/raw/master/images/tmp1.png)
+![Image text](https://gitee.com/helixin/AI-Code/raw/dev/images/tmp1.png)
 
 mybatis sql 模板注意观察有关联关系哦
-![Image text](https://gitee.com/helixin/AI-Code/raw/master/images/tm2.png.png)
+![Image text](https://gitee.com/helixin/AI-Code/raw/dev/images/tm2.png.png)
 
 前端模板抽离样貌
-![Image text](https://gitee.com/helixin/AI-Code/raw/master/images/tm2.png.png)
+![Image text](https://gitee.com/helixin/AI-Code/raw/dev/images/tm2.png.png)
 
 
 

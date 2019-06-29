@@ -112,7 +112,7 @@ mybatis sql 模板注意观察有关联关系哦
 ![Image text](https://gitee.com/helixin/AI-Code/raw/dev/images/tm2.png)
 
 前端模板抽离样貌
-![Image text](https://gitee.com/helixin/AI-Code/raw/dev/images/tm2.png)
+![Image text](https://gitee.com/helixin/AI-Code/raw/dev/images/tmp3.png)
 
 
 

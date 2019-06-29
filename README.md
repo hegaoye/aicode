@@ -66,11 +66,10 @@ jdbc.password=xxxxx
 
 ### 创建项目
 有了模板之后可以创业见一个项目，然后按照``下一步``的指引操作下去即可完成操作
-
-![WAI](https://gitee.com/helixin/AI-Code/raw/dev/images/show.gif)
+![image text](https://gitee.com/helixin/AI-Code/raw/dev/images/show.gif)
 
 ### 构建项目
-![WAI](https://gitee.com/helixin/AI-Code/raw/dev/images/build.gif)
+![Image text](https://gitee.com/helixin/AI-Code/raw/dev/images/build.gif)
 
 之后点击``构建项目`` 按钮就开始进行想的自动构建了
 

@@ -101,6 +101,20 @@ uml信息可以自己打开vpp文件查看详细，仅仅放两张用于参考
 
 ![Image text](https://gitee.com/helixin/AI-Code/raw/master/images/active.jpg)
 
+### 模板长啥样？
+模块化模板样貌
+![Image text](https://gitee.com/helixin/AI-Code/raw/master/images/tmp4.png)
+
+service模板类
+![Image text](https://gitee.com/helixin/AI-Code/raw/master/images/tmp1.png)
+
+mybatis sql 模板注意观察有关联关系哦
+![Image text](https://gitee.com/helixin/AI-Code/raw/master/images/tm2.png.png)
+
+前端模板抽离样貌
+![Image text](https://gitee.com/helixin/AI-Code/raw/master/images/tm2.png.png)
+
+
 
 ### 项目技术点
 - spring mvc
@@ -171,3 +185,5 @@ alter table `order` comment '订单';
 前端参考地址 https://gitee.com/helixin/ai-code-frontend
 
 设计文档地址 https://gitee.com/helixin/AI-Code-Doc
+
+模板仓库地址 https://gitee.com/helixin/aicode_template

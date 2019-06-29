@@ -57,6 +57,20 @@ jdbc.password=xxxxx
 
 之后点击``构建项目`` 按钮就开始进行想的自动构建了
 
+### 启动项目
+当你生成项目代码后你可以在你的``git svn``仓库中找到源码，也可以直接下载源码自行导入到开发工具中，然后运行，这里需要注意的是配置文件和
+数据库的连接一定要修改，否则默认的将无法使用，一下为测试演示的界面图供参考
+代码界面和运行启动项目 我用的是Idea 最好用的java开发工具，没有之一，开发用就用最好的工具，不将就
+![Image text](https://gitee.com/helixin/AI-Code/raw/dev/images/running.png)
+
+swagger界面如下，我只用了一个简单的表来演示，你的要有多复杂就有多复杂均可以实现
+![Image text](https://gitee.com/helixin/AI-Code/raw/dev/images/swagger.png)
+
+如果你体验了高效的代码生成和抽象思维把规律的重复的代码进行模板化后可以服务你未来更久的时间，那时候就体验到，编程除了用coding还可以用设计
+来编码，所谓武功至高境界就是``无招胜有招`` 就是这个意思，让代码服务你更久才有时间学习更多的技术和知识，让今天的一行代码在未来体现出更大价
+值才是我们要思考和做的，期待大家的分享和模板的壮大，目前正在整理``rabbitmq, kafka, rocketmq``的分布式，微服务框架模板整合，后面将会
+更好玩哦，模板链接再次推荐可以参考：https://gitee.com/helixin/aicode_template，祝你和你的团队编程愉快，coding让世界更美好。
+
 ### 编写模板说明：
 模板语法采用freemarker编写，定义了一个实体类可以在项目``io.aicode.base.core.TemplateData`` 下找到此类，大致的内置变量可以如下图
 

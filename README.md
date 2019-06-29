@@ -66,9 +66,13 @@ jdbc.password=xxxxx
 
 ### 创建项目
 有了模板之后可以创业见一个项目，然后按照``下一步``的指引操作下去即可完成操作
+(此处为gif动画需要你登录账户才能看，osc的限制)
 ![image text](https://gitee.com/helixin/AI-Code/raw/dev/images/show.gif)
 
 ### 构建项目
+构建很简单，点击即可自动完成对项目的生成，下载模板，生成代码，提交到git仓库，这个地方的日志输出是websocket，存储文档log可以反复查看
+十分方便
+(此处为gif动画需要你登录账户才能看，osc的限制)
 ![Image text](https://gitee.com/helixin/AI-Code/raw/dev/images/build.gif)
 
 之后点击``构建项目`` 按钮就开始进行想的自动构建了

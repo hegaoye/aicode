@@ -180,6 +180,11 @@ alter table `order` comment '订单';
 
 去处后即可合法使用，一定要保障sql可以正常执行再用来跑代码，否则会失败
 
+### 下阶段
+1.增加docker 用法支持和梳理，让使用只需简单的命令即可搞定
+2.发布第一版正式版本，供大家下载使用
+3.建立ai-code 官网用于管理和交流
+4.增加使用培训的视频
 
 # 子项目
 前端参考地址 https://gitee.com/helixin/ai-code-frontend

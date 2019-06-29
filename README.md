@@ -105,7 +105,7 @@ uml信息可以自己打开vpp文件查看详细，仅仅放两张用于参考
 模块化模板样貌
 ![Image text](https://gitee.com/helixin/AI-Code/raw/dev/images/tmp4.png)
 
-service模板类
+Ctrl模板类
 ![Image text](https://gitee.com/helixin/AI-Code/raw/dev/images/tmp1.png)
 
 mybatis sql 模板注意观察有关联关系哦

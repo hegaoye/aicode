@@ -55,8 +55,8 @@
 
     <servlet-mapping>
         <servlet-name>springMVC</servlet-name>
-        <url-pattern>/*</url-pattern>
-        <!--<url-pattern>*.shtml</url-pattern>-->
+        <!--<url-pattern>/*</url-pattern>-->
+        <url-pattern>*.shtml</url-pattern>
     </servlet-mapping>
 
 
@@ -94,6 +94,7 @@
         <servlet-name>default</servlet-name>
         <url-pattern>*.css</url-pattern>
         <url-pattern>*.js</url-pattern>
+        <url-pattern>*.JS</url-pattern>
         <url-pattern>*.ico</url-pattern>
         <url-pattern>*.gif</url-pattern>
         <url-pattern>*.jpeg</url-pattern>
@@ -126,6 +127,7 @@
         <url-pattern>*.rmvb</url-pattern>
         <url-pattern>*.rm</url-pattern>
         <url-pattern>*.ttf</url-pattern>
+        <url-pattern>*.svg</url-pattern>
     </servlet-mapping>
 
     <welcome-file-list>

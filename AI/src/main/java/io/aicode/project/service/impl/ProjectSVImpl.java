@@ -1,6 +1,7 @@
 package io.aicode.project.service.impl;
 
 import com.alibaba.dubbo.common.utils.StringUtils;
+import com.alibaba.fastjson.JSON;
 import com.baidu.fsg.uid.UidGenerator;
 import com.google.common.collect.Maps;
 import io.aicode.base.core.typemapping.DatabaseDataTypesUtils;
@@ -11,7 +12,6 @@ import io.aicode.base.exceptions.BaseException;
 import io.aicode.base.exceptions.ProjectException;
 import io.aicode.base.tools.FileUtil;
 import io.aicode.base.tools.HandleFuncs;
-import io.aicode.base.tools.JSON;
 import io.aicode.base.tools.StringTools;
 import io.aicode.project.dao.*;
 import io.aicode.project.entity.*;

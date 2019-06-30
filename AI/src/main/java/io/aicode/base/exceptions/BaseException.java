@@ -7,7 +7,7 @@
  */
 package io.aicode.base.exceptions;
 
-import io.aicode.base.tools.JSON;
+import com.alibaba.fastjson.JSON;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

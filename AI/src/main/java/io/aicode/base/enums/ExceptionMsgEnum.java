@@ -8,7 +8,8 @@
 
 package io.aicode.base.enums;
 
-import io.aicode.base.tools.JSON;
+
+import com.alibaba.fastjson.JSON;
 
 /**
  * 项目中异常处理枚举类

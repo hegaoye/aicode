@@ -10,13 +10,13 @@
 
 package io.aicode.setting.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.baidu.fsg.uid.UidGenerator;
 import com.google.common.collect.Maps;
 import io.aicode.base.BaseMybatisDAO;
 import io.aicode.base.BaseMybatisSVImpl;
 import io.aicode.base.exceptions.BaseException;
 import io.aicode.base.exceptions.SettingException;
-import io.aicode.base.tools.JSON;
 import io.aicode.setting.dao.SettingDAO;
 import io.aicode.setting.entity.Setting;
 import io.aicode.setting.service.SettingSV;

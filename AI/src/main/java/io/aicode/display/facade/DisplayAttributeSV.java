@@ -4,7 +4,7 @@
  */
 package io.aicode.display.facade;
 
-import io.aicode.core.base.BaseMybatisSV;
+import io.aicode.base.BaseMybatisSV;
 import io.aicode.display.entity.DisplayAttribute;
 
 import java.util.List;
@@ -36,14 +36,16 @@ public interface DisplayAttributeSV extends BaseMybatisSV<DisplayAttribute, Long
 
     /**
      * 添加或修改
-     * @param displayAttributes  显示属性
+     *
+     * @param displayAttributes 显示属性
      */
     void saveOrUpdate(List<DisplayAttribute> displayAttributes);
 
 
     /**
      * 根据项目编码统计是否已经设置显示属性
-     * @param projectCode    项目编码
+     *
+     * @param projectCode 项目编码
      * @return int
      */
     int countByProjectCode(String projectCode);

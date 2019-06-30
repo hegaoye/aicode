@@ -1,7 +1,7 @@
 package io.aicode.base.core;
 
 import io.aicode.base.core.typemapping.DatabaseDataTypesUtils;
-import io.aicode.core.enums.YNEnum;
+import io.aicode.base.enums.YNEnum;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -87,7 +87,6 @@ public class Field implements Serializable {
     private boolean checkState;
     private boolean checkPk;
     private boolean checkDigit = false;
-
 
 
     public void toJava() {

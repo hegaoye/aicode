@@ -45,9 +45,9 @@ public class DefaultParanamer implements Paranamer {
     private static final String SPACE = " ";
 
     public static final String __PARANAMER_DATA = "v1.0 \n"
-        + "lookupParameterNames java.lang.AccessibleObject methodOrConstructor \n"
-        + "lookupParameterNames java.lang.AccessibleObject,boolean methodOrCtor,throwExceptionIfMissing \n"
-        + "getParameterTypeName java.lang.Class cls\n";
+            + "lookupParameterNames java.lang.AccessibleObject methodOrConstructor \n"
+            + "lookupParameterNames java.lang.AccessibleObject,boolean methodOrCtor,throwExceptionIfMissing \n"
+            + "getParameterTypeName java.lang.Class cls\n";
 
     public DefaultParanamer() {
     }
@@ -78,10 +78,10 @@ public class DefaultParanamer implements Paranamer {
         }
         final String parameterTypeNames = getParameterTypeNamesCSV(types);
         final String[] names = getParameterNames(declaringClass, parameterTypeNames, name + SPACE);
-        if ( names == null ){
+        if (names == null) {
             if (throwExceptionIfMissing) {
-            throw new ParameterNamesNotFoundException("No parameter names found for class '"+declaringClass+"', methodOrCtor " + name
-                    +" and parameter types "+parameterTypeNames);
+                throw new ParameterNamesNotFoundException("No parameter names found for class '" + declaringClass + "', methodOrCtor " + name
+                        + " and parameter types " + parameterTypeNames);
             } else {
                 return Paranamer.EMPTY_NAMES;
             }
@@ -120,7 +120,7 @@ public class DefaultParanamer implements Paranamer {
             // TODO create acc test what to do with private? access anyway?
             // TODO create acc test with non static field?
             // TODO create acc test with another type of field?
-            if(!Modifier.isStatic(field.getModifiers()) || !field.getType().equals(String.class)) {
+            if (!Modifier.isStatic(field.getModifiers()) || !field.getType().equals(String.class)) {
                 return null;
             }
             return (String) field.get(null);
@@ -133,7 +133,8 @@ public class DefaultParanamer implements Paranamer {
 
     /**
      * Filter the mappings and only return lines matching the prefix passed in.
-     * @param data the data encoding the mappings
+     *
+     * @param data   the data encoding the mappings
      * @param prefix the String prefix
      * @return A list of lines that match the prefix
      */
@@ -144,28 +145,28 @@ public class DefaultParanamer implements Paranamer {
         int ix = data.indexOf(prefix);
         if (ix >= 0) {
             int iy = data.indexOf("\n", ix);
-            if(iy >0) {
-                return data.substring(ix,iy);
+            if (iy > 0) {
+                return data.substring(ix, iy);
             }
         }
         return "";
     }
 
 
-    private static String getParameterTypeName(Class<?> cls){
+    private static String getParameterTypeName(Class<?> cls) {
         String parameterTypeNameName = cls.getName();
         int arrayNestingDepth = 0;
         int ix = parameterTypeNameName.indexOf("[");
-        while (ix>-1){
+        while (ix > -1) {
             arrayNestingDepth++;
-            parameterTypeNameName=parameterTypeNameName.replaceFirst("(\\[\\w)|(\\[)","");
+            parameterTypeNameName = parameterTypeNameName.replaceFirst("(\\[\\w)|(\\[)", "");
             ix = parameterTypeNameName.indexOf("[");
         }
-        parameterTypeNameName =parameterTypeNameName.replaceFirst(";","");
-        for (int k=0;k<arrayNestingDepth;k++){
-            parameterTypeNameName = parameterTypeNameName+"[]";
+        parameterTypeNameName = parameterTypeNameName.replaceFirst(";", "");
+        for (int k = 0; k < arrayNestingDepth; k++) {
+            parameterTypeNameName = parameterTypeNameName + "[]";
         }
-        return    parameterTypeNameName;
+        return parameterTypeNameName;
 
     }
 }

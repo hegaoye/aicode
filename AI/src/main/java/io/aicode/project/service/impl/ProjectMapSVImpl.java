@@ -7,8 +7,8 @@ package io.aicode.project.service.impl;
 
 
 import com.baidu.fsg.uid.UidGenerator;
-import io.aicode.core.base.BaseMybatisDAO;
-import io.aicode.core.base.BaseMybatisSVImpl;
+import io.aicode.base.BaseMybatisDAO;
+import io.aicode.base.BaseMybatisSVImpl;
 import io.aicode.project.dao.ProjectMapDAO;
 import io.aicode.project.entity.ProjectMap;
 import io.aicode.project.service.ProjectMapSV;

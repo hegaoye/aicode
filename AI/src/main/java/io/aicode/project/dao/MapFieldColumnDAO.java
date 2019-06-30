@@ -7,7 +7,7 @@ package io.aicode.project.dao;
 
 
 import com.google.common.collect.Maps;
-import io.aicode.core.base.BaseMybatisDAOImpl;
+import io.aicode.base.BaseMybatisDAOImpl;
 import io.aicode.project.entity.MapFieldColumn;
 import org.springframework.stereotype.Repository;
 
@@ -28,7 +28,7 @@ public class MapFieldColumnDAO extends BaseMybatisDAOImpl<MapFieldColumn, Long> 
     public List<MapFieldColumn> listFields(String mapClassTableCode) {
         Map<String, Object> params = Maps.newHashMap();
         params.put("mapClassTableCode", mapClassTableCode);
-        return  getSqlSession().selectList(sqlmapNamespace + ".listFields", params);
+        return getSqlSession().selectList(sqlmapNamespace + ".listFields", params);
     }
 
 }

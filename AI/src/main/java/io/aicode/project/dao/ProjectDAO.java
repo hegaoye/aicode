@@ -7,7 +7,7 @@ package io.aicode.project.dao;
 
 
 import com.google.common.collect.Maps;
-import io.aicode.core.base.BaseMybatisDAOImpl;
+import io.aicode.base.BaseMybatisDAOImpl;
 import io.aicode.project.entity.Project;
 import org.springframework.stereotype.Repository;
 

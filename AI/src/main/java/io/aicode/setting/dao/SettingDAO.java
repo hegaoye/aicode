@@ -10,7 +10,7 @@
 
 package io.aicode.setting.dao;
 
-import io.aicode.core.base.BaseMybatisDAOImpl;
+import io.aicode.base.BaseMybatisDAOImpl;
 import io.aicode.setting.entity.Setting;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;

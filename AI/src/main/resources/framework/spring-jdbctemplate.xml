@@ -25,7 +25,8 @@
         <property name="dataSource" ref="dataSource"/>
     </bean>
 
-    <bean id="namedJdbcTemplate" class="org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate" lazy-init="false">
+    <bean id="namedJdbcTemplate" class="org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate"
+          lazy-init="false">
         <constructor-arg ref="dataSource"/>
     </bean>
 

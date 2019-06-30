@@ -6,7 +6,7 @@
 package io.aicode.project.entity;
 
 
-import io.aicode.core.base.BaseEntity;
+import io.aicode.base.BaseEntity;
 import lombok.Data;
 
 /**

@@ -1,7 +1,7 @@
 package io.aicode.base.core;
 
 import com.alibaba.fastjson.JSON;
-import io.aicode.core.tools.StringTools;
+import io.aicode.base.tools.StringTools;
 import io.aicode.display.entity.DisplayAttribute;
 import io.aicode.project.entity.MapClassTable;
 import io.aicode.project.entity.MapFieldColumn;

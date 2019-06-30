@@ -7,10 +7,10 @@ package io.aicode.project.service.impl;
 
 import com.baidu.fsg.uid.UidGenerator;
 import com.google.common.collect.Maps;
-import io.aicode.core.base.BaseMybatisDAO;
-import io.aicode.core.base.BaseMybatisSVImpl;
-import io.aicode.core.exceptions.BaseException;
-import io.aicode.core.tools.Md5;
+import io.aicode.base.BaseMybatisDAO;
+import io.aicode.base.BaseMybatisSVImpl;
+import io.aicode.base.exceptions.BaseException;
+import io.aicode.base.tools.Md5;
 import io.aicode.project.dao.AccountDAO;
 import io.aicode.project.entity.Account;
 import io.aicode.project.service.AccountSV;

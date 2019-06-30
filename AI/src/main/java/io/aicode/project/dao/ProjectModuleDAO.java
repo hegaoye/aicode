@@ -5,17 +5,16 @@
 
 package io.aicode.project.dao;
 
-import io.aicode.core.base.BaseMybatisDAOImpl;
+import io.aicode.base.BaseMybatisDAOImpl;
 import io.aicode.project.entity.ProjectModule;
 import org.springframework.stereotype.Repository;
 
 
 @Repository
-public class ProjectModuleDAO extends BaseMybatisDAOImpl<ProjectModule,Long> {
+public class ProjectModuleDAO extends BaseMybatisDAOImpl<ProjectModule, Long> {
 
     /**
      * 删除
-     *
      */
     public void delete(ProjectModule projectModule) {
         getSqlSession().delete(sqlmapNamespace + ".delete", projectModule);

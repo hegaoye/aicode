@@ -7,8 +7,8 @@ package io.aicode.project.entity;
 
 import io.aicode.base.core.StringHelper;
 import io.aicode.base.core.typemapping.DatabaseDataTypesUtils;
-import io.aicode.core.base.BaseEntity;
-import io.aicode.core.enums.YNEnum;
+import io.aicode.base.BaseEntity;
+import io.aicode.base.enums.YNEnum;
 import io.aicode.display.entity.DisplayAttribute;
 import lombok.Data;
 

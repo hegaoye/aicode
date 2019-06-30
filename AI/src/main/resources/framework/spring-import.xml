@@ -16,13 +16,8 @@
        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
 
-    <!--
-    自动扫描controller包下的所有类，如果@Controller注入为bean
-    并将bean依赖注入，即dubbo服务端暴露的Service注入到Controller中
-    -->
-
     <context:annotation-config/>
-    <context:component-scan base-package="com"/>
+    <context:component-scan base-package="io"/>
     <!-- 导入数据源配置 -->
     <import resource="classpath:/framework/spring-datasource.xml"/>
     <!-- 导入mybatis配置 -->
@@ -31,7 +26,5 @@
     <import resource="classpath:/framework/spring-jdbctemplate.xml"/>
     <!--导入uid配置-->
     <import resource="classpath:framework/spring-uid.xml"/>
-    <!-- 导入redis配置 -->
-    <import resource="classpath:/framework/spring-data-redis.xml"/>
 
 </beans>

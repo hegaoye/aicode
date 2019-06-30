@@ -6,13 +6,12 @@
 package io.aicode.project.service.impl;
 
 
-import com.alibaba.dubbo.common.utils.StringUtils;
 import com.baidu.fsg.uid.UidGenerator;
 import com.google.common.collect.Maps;
-import io.aicode.core.base.BaseMybatisDAO;
-import io.aicode.core.base.BaseMybatisSVImpl;
-import io.aicode.core.exceptions.BaseException;
-import io.aicode.core.exceptions.ProjectException;
+import io.aicode.base.BaseMybatisDAO;
+import io.aicode.base.BaseMybatisSVImpl;
+import io.aicode.base.exceptions.BaseException;
+import io.aicode.base.exceptions.ProjectException;
 import io.aicode.project.dao.MapClassTableDAO;
 import io.aicode.project.dao.ProjectDAO;
 import io.aicode.project.dao.TableDAO;
@@ -20,6 +19,7 @@ import io.aicode.project.entity.MapClassTable;
 import io.aicode.project.entity.Project;
 import io.aicode.project.entity.Table;
 import io.aicode.project.service.MapClassTableSV;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 

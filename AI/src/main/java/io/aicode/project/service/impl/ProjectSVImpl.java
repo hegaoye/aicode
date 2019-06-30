@@ -1,23 +1,23 @@
 package io.aicode.project.service.impl;
 
-import com.alibaba.dubbo.common.utils.StringUtils;
+import com.alibaba.fastjson.JSON;
 import com.baidu.fsg.uid.UidGenerator;
 import com.google.common.collect.Maps;
+import io.aicode.base.BaseMybatisDAO;
+import io.aicode.base.BaseMybatisSVImpl;
 import io.aicode.base.core.typemapping.DatabaseDataTypesUtils;
-import io.aicode.core.base.BaseMybatisDAO;
-import io.aicode.core.base.BaseMybatisSVImpl;
-import io.aicode.core.enums.YNEnum;
-import io.aicode.core.exceptions.BaseException;
-import io.aicode.core.exceptions.ProjectException;
-import io.aicode.core.tools.FileUtil;
-import io.aicode.core.tools.HandleFuncs;
-import io.aicode.core.tools.JSON;
-import io.aicode.core.tools.StringTools;
+import io.aicode.base.enums.YNEnum;
+import io.aicode.base.exceptions.BaseException;
+import io.aicode.base.exceptions.ProjectException;
+import io.aicode.base.tools.FileUtil;
+import io.aicode.base.tools.HandleFuncs;
+import io.aicode.base.tools.StringTools;
 import io.aicode.project.dao.*;
 import io.aicode.project.entity.*;
 import io.aicode.project.service.ProjectSV;
 import io.aicode.setting.dao.SettingDAO;
 import io.aicode.setting.entity.Setting;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 

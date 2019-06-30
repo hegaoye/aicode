@@ -6,7 +6,6 @@
 package io.aicode.project.service.impl;
 
 
-import com.alibaba.dubbo.common.utils.StringUtils;
 import com.baidu.fsg.uid.UidGenerator;
 import com.google.common.collect.Maps;
 import io.aicode.base.BaseMybatisDAO;
@@ -23,6 +22,7 @@ import io.aicode.project.entity.MapClassTable;
 import io.aicode.project.entity.MapFieldColumn;
 import io.aicode.project.entity.Project;
 import io.aicode.project.service.MapFieldColumnSV;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 

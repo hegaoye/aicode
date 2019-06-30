@@ -1,9 +1,9 @@
 package io.aicode.base.interceptor;
 
-import com.alibaba.dubbo.common.utils.StringUtils;
 import com.alibaba.fastjson.JSON;
 import io.aicode.base.JwtToken;
 import io.aicode.base.core.BeanRet;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;

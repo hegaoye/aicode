@@ -233,7 +233,7 @@ public class StringTools {
         }
         boolean flag = false;
         for (String str : strs) {
-            if (com.alibaba.dubbo.common.utils.StringUtils.isNotEmpty(str)) {
+            if (StringUtils.isNotBlank(str)) {
                 flag = true;
             } else {
                 flag = false;

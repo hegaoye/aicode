@@ -97,8 +97,6 @@ ext {
             "logback-access"                 : 'ch.qos.logback:logback-access:1.2.3',
             "Memcached-Java-Client"          : 'com.whalin:Memcached-Java-Client:3.0.2',
             "mysql-connector"                : 'mysql:mysql-connector-java:5.1.38',
-            "netty"                          : 'org.jboss.netty:netty:3.2.2.Final',
-            "quartz"                         : 'org.quartz-scheduler:quartz:2.2.1',
             "slf4j-api"                      : 'org.slf4j:slf4j-api:1.7.5',
 //            "slf4j-log4j12"                  : 'org.slf4j:slf4j-log4j12:1.7.5',
 //            "xstream"                        : 'com.thoughtworks.xstream:1.2.0',
@@ -162,16 +160,6 @@ ext {
             "standard"                       : 'taglibs:standard:1.1.2',
             //----------jstl end---------------
 
-            //----------reids缓存 begin----------
-            "jedis"                          : 'redis.clients:jedis:2.9.0',
-            "spring-data-redis"              : 'org.springframework.data:spring-data-redis:1.8.1.RELEASE',
-            //----------reids缓存 end----------
-
-            //-----------poi 导入/导出 start--------------
-            "poi"                            : 'org.apache.poi:poi:3.15',
-            "poi-ooxml"                      : 'org.apache.poi:poi-ooxml:3.15',
-            //-----------poi 导入/导出 end--------------
-
             //-----------jwt Nimbus JOSE+JWT  start--------------
             "java-jwt"                       : 'com.auth0:java-jwt:3.3.0',
             //-----------jwt Nimbus JOSE+JWT  end--------------
@@ -189,15 +177,6 @@ ext {
             "swagger-ui"                     : 'io.springfox:springfox-swagger-ui:2.6.1',
             "swagger-annotations"            : 'io.swagger:swagger-annotations:1.5.10',
             //-----------swagger end--------------
-
-            //-----------Quartz begin-----------
-            "quartz"                         : 'org.quartz-scheduler:quartz:2.3.0',
-            "quartz-jobs"                    : 'org.quartz-scheduler:quartz-jobs:2.3.0',
-            //-----------Quartz end-----------
-
-            //-----------Sentry begin-----------
-            "sentry-logback"                 : 'io.sentry:sentry-logback:1.2.2',
-            //-----------Sentry end-----------
 
             // -----------jgit java 操作git begin-----------
             "jgit"                           : 'org.eclipse.jgit:org.eclipse.jgit:4.9.2.201712150930-r',

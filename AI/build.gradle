@@ -1,4 +1,4 @@
-apply plugin: 'org.akhikhl.gretty' // 应用gretty插件
+apply plugin: 'org.akhikhl.gretty'
 apply plugin: 'war'
 dependencies {
     compile rootProject.ext.dependencies["aopalliance"]
@@ -38,8 +38,6 @@ dependencies {
     compile rootProject.ext.dependencies["mysql-connector"]
     compile rootProject.ext.dependencies["mybatis-paginator"]
     //-----------mybatis end---------------
-
-
 
     //-----------junit begin------------------
     compile rootProject.ext.dependencies["hamcrest-core"]

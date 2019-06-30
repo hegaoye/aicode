@@ -3,7 +3,7 @@ package io.aicode.project.ctrl;
 import com.alibaba.fastjson.JSON;
 import io.aicode.base.BaseCtrl;
 import io.aicode.base.JwtToken;
-import io.aicode.base.common.Constants;
+import io.aicode.base.tools.Constants;
 import io.aicode.base.core.BeanRet;
 import io.aicode.base.exceptions.BaseException;
 import io.aicode.base.interceptor.WSClientManager;

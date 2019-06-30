@@ -53,7 +53,7 @@
     <mvc:resources mapping="/**" location="/"/>
 
     <!--异常统一处理-->
-    <bean class="io.aicode.base.handler.ExceptionHandler"/>
+    <bean class="io.aicode.base.tools.ExceptionHandler"/>
 
 
     <bean id="contentNegotiationManager" class="org.springframework.web.accept.ContentNegotiationManagerFactoryBean">

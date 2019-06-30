@@ -1,6 +1,6 @@
 package io.aicode.base;
 
-import io.aicode.base.core.entity.Page;
+import io.aicode.base.tools.Page;
 import io.aicode.base.exceptions.BaseException;
 import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.Logger;

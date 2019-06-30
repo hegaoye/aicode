@@ -1,4 +1,4 @@
-package io.aicode.base.handler;
+package io.aicode.base.tools;
 
 import io.aicode.base.exceptions.BaseException;
 import org.springframework.web.servlet.HandlerExceptionResolver;

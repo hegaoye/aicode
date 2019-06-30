@@ -2,7 +2,7 @@ package io.aicode.base;
 
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Maps;
-import io.aicode.base.annotation.Ignore;
+import io.aicode.base.tools.Ignore;
 import io.aicode.base.exceptions.BaseException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -83,7 +83,6 @@ public class EnumCtrl {
         DisplayAttributeEnum(1007, io.aicode.display.entity.DisplayAttributeEnum.class)/*显示属性*/,
         DisplayAttributeMatchType(1008, io.aicode.display.entity.DisplayAttributeMatchType.class)/*匹配方式*/,
         YNEnum(1101, io.aicode.base.enums.YNEnum.class)/*是否*/,
-        SexEnum(1102, io.aicode.base.enums.SexEnum.class)/*性别枚举*/,
         OperateEnum(1103, io.aicode.base.enums.OperateEnum.class)/*操作名称定义*/,
         ModuleEnum(1104, io.aicode.base.enums.ModuleEnum.class)/*模块定义*/,
 

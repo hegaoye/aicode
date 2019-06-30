@@ -6,7 +6,7 @@
  *      本代码仅用于AI-Code.
  */
 
-package io.aicode.base.common;
+package io.aicode.base.tools;
 
 /**
  * 常量表

@@ -7,7 +7,7 @@
  *
  */
 
-package io.aicode.base.annotation;
+package io.aicode.base.tools;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

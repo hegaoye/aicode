@@ -7,7 +7,7 @@ package io.aicode.project.ctrl;
 import com.alibaba.fastjson.JSON;
 import io.aicode.base.BaseCtrl;
 import io.aicode.base.core.BeanRet;
-import io.aicode.base.core.entity.Page;
+import io.aicode.base.tools.Page;
 import io.aicode.base.tools.StringTools;
 import io.aicode.project.entity.ProjectModelClass;
 import io.aicode.project.service.ProjectModelClassSV;

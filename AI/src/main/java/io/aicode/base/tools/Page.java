@@ -6,10 +6,7 @@
  *
  */
 
-package io.aicode.base.core.entity;
-
-import io.aicode.base.tools.SortTools;
-import io.aicode.base.tools.StringTools;
+package io.aicode.base.tools;
 
 import java.util.ArrayList;
 import java.util.HashMap;

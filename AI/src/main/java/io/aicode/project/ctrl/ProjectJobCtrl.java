@@ -5,7 +5,7 @@ import com.google.common.collect.Maps;
 import io.aicode.base.interceptor.WSClientManager;
 import io.aicode.base.BaseCtrl;
 import io.aicode.base.core.BeanRet;
-import io.aicode.base.core.entity.Page;
+import io.aicode.base.tools.Page;
 import io.aicode.base.exceptions.BaseException;
 import io.aicode.base.tools.StringTools;
 import io.aicode.project.entity.ProjectJob;

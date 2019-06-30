@@ -4,7 +4,7 @@
  */
 package io.aicode.display.facade;
 
-import io.aicode.core.base.BaseMybatisSV;
+import io.aicode.base.BaseMybatisSV;
 import io.aicode.display.entity.DisplayAttribute;
 
 import java.util.List;

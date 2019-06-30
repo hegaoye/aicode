@@ -5,7 +5,7 @@
 
 package io.aicode.project.dao;
 
-import io.aicode.core.base.BaseMybatisDAOImpl;
+import io.aicode.base.BaseMybatisDAOImpl;
 import org.springframework.stereotype.Repository;
 import io.aicode.project.entity.ProjectModel;
 

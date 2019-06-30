@@ -5,10 +5,10 @@
 package io.aicode.project.ctrl;
 
 import com.alibaba.fastjson.JSON;
-import io.aicode.core.entity.BeanRet;
-import io.aicode.core.entity.Page;
-import io.aicode.core.tools.StringTools;
-import io.aicode.core.tools.redis.RedisUtils;
+import io.aicode.base.core.BeanRet ;
+import io.aicode.base.core.entity.Page;
+import io.aicode.base.tools.StringTools;
+import io.aicode.base.tools.redis.RedisUtils;
 import io.aicode.project.service.ProjectModelSV;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Resource;
 
-import io.aicode.core.base.BaseCtrl;
+import io.aicode.base.BaseCtrl;
 import io.aicode.project.entity.ProjectModel;
 
 

@@ -1,7 +1,7 @@
 package io.aicode.base.core;
 
 
-import io.aicode.core.tools.ConfigUtil;
+import io.aicode.base.tools.ConfigUtil;
 import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

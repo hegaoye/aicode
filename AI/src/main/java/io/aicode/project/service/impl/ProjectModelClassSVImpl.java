@@ -4,8 +4,8 @@
  */
 package io.aicode.project.service.impl;
 
-import io.aicode.core.base.BaseMybatisDAO;
-import io.aicode.core.base.BaseMybatisSVImpl;
+import io.aicode.base.BaseMybatisDAO;
+import io.aicode.base.BaseMybatisSVImpl;
 import io.aicode.project.service.ProjectModelClassSV;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;

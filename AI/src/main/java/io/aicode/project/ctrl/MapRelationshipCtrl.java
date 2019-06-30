@@ -2,11 +2,11 @@ package io.aicode.project.ctrl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.baidu.fsg.uid.UidGenerator;
-import io.aicode.core.base.BaseCtrl;
-import io.aicode.core.entity.BeanRet;
-import io.aicode.core.enums.YNEnum;
-import io.aicode.core.exceptions.BaseException;
-import io.aicode.core.tools.StringTools;
+import io.aicode.base.BaseCtrl;
+import io.aicode.base.core.BeanRet ;
+import io.aicode.base.enums.YNEnum;
+import io.aicode.base.exceptions.BaseException;
+import io.aicode.base.tools.StringTools;
 import io.aicode.project.entity.MapClassTable;
 import io.aicode.project.entity.MapFieldColumn;
 import io.aicode.project.entity.MapRelationship;

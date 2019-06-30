@@ -1,8 +1,8 @@
 package io.aicode.project.ctrl;
 
-import io.aicode.core.base.BaseCtrl;
-import io.aicode.core.entity.BeanRet;
-import io.aicode.core.exceptions.BaseException;
+import io.aicode.base.BaseCtrl;
+import io.aicode.base.core.BeanRet ;
+import io.aicode.base.exceptions.BaseException;
 import io.aicode.project.service.LogsSV;
 import io.aicode.setting.service.SettingSV;
 import io.swagger.annotations.Api;

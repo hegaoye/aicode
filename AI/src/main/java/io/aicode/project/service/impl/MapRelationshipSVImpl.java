@@ -6,8 +6,8 @@
 package io.aicode.project.service.impl;
 
 
-import io.aicode.core.base.BaseMybatisDAO;
-import io.aicode.core.base.BaseMybatisSVImpl;
+import io.aicode.base.BaseMybatisDAO;
+import io.aicode.base.BaseMybatisSVImpl;
 import io.aicode.project.dao.MapClassTableDAO;
 import io.aicode.project.dao.MapRelationshipDAO;
 import io.aicode.project.dao.ProjectMapDAO;

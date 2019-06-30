@@ -1,15 +1,14 @@
 package io.aicode.base.interceptor;
 
 import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 //import io.aicode.base.tools.TerminalEmulator;
-import io.aicode.core.tools.SSH2;
-import io.aicode.core.tools.SSHResInfo;
+import io.aicode.base.tools.SSH2;
+import io.aicode.base.tools.SSHResInfo;
 import io.aicode.project.ctrl.SSHClient;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.map.HashedMap;
@@ -19,8 +18,6 @@ import org.springframework.web.socket.*;
 import java.io.*;
 import java.util.Map;
 import java.util.Scanner;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 /**
  * Created by lixin on 2018/9/30.

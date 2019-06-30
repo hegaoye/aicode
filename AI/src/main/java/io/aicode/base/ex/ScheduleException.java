@@ -8,7 +8,7 @@
 package io.aicode.base.ex;
 
 
-import io.aicode.core.exceptions.BaseException;
+import io.aicode.base.exceptions.BaseException;
 
 /**
  * 基础数据配置异常

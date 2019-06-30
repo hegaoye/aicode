@@ -39,6 +39,8 @@ dependencies {
     compile rootProject.ext.dependencies["mybatis-paginator"]
     //-----------mybatis end---------------
 
+
+
     //-----------junit begin------------------
     compile rootProject.ext.dependencies["hamcrest-core"]
     compile rootProject.ext.dependencies["junit"]
@@ -93,6 +95,7 @@ dependencies {
     compile rootProject.ext.dependencies["spring-messaging"]
     //------------spring end----------------
 
+
     compile rootProject.ext.dependencies["testng"]
 
     //----------reids缓存 begin----------
@@ -124,10 +127,8 @@ dependencies {
     compile rootProject.ext.dependencies["purejavacomm"]
     compile rootProject.ext.dependencies["gson"]
     compile rootProject.ext.dependencies["pty4j"]
+    compile rootProject.ext.dependencies["lombok"]
 
     compile fileTree(dir: '../libs', include: ['*.jar'])
-    compile project(":facade")
-    compile project(":core")
-    compile project(":base-web")
-    compile project(":base-sv")
+
 }

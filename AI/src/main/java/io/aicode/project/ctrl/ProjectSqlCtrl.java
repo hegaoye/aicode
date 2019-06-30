@@ -2,9 +2,9 @@ package io.aicode.project.ctrl;
 
 import com.alibaba.fastjson.JSON;
 import com.beust.jcommander.internal.Maps;
-import io.aicode.core.base.BaseCtrl;
-import io.aicode.core.entity.BeanRet;
-import io.aicode.core.exceptions.BaseException;
+import io.aicode.base.BaseCtrl;
+import io.aicode.base.core.BeanRet ;
+import io.aicode.base.exceptions.BaseException;
 import io.aicode.project.entity.ProjectSql;
 import io.aicode.project.service.ProjectSV;
 import io.aicode.project.service.ProjectSqlSV;

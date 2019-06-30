@@ -4,8 +4,8 @@
  */
 package io.aicode.project.service.impl;
 
-import io.aicode.core.base.BaseMybatisDAO;
-import io.aicode.core.base.BaseMybatisSVImpl;
+import io.aicode.base.BaseMybatisDAO;
+import io.aicode.base.BaseMybatisSVImpl;
 import io.aicode.project.dao.ProjectModelDAO;
 import io.aicode.project.entity.ProjectModel;
 import io.aicode.project.service.ProjectModelSV;

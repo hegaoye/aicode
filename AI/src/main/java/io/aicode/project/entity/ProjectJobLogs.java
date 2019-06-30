@@ -5,8 +5,8 @@
 
 package io.aicode.project.entity;
 
-import io.aicode.core.base.BaseEntity;
-import io.aicode.core.tools.DateTools;
+import io.aicode.base.BaseEntity;
+import io.aicode.base.tools.DateTools;
 import lombok.Data;
 
 import java.util.Date;

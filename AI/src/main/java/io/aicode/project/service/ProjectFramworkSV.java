@@ -5,7 +5,7 @@
 
 package io.aicode.project.service;
 
-import io.aicode.core.base.BaseMybatisSV;
+import io.aicode.base.BaseMybatisSV;
 import io.aicode.project.entity.ProjectFramwork;
 
 import java.util.List;

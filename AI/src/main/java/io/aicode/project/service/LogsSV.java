@@ -6,7 +6,7 @@
 package io.aicode.project.service;
 
 
-import io.aicode.core.entity.BeanRet;
+import io.aicode.base.core.BeanRet ;
 
 import java.util.Date;
 

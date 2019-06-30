@@ -1,8 +1,8 @@
 package io.aicode.project.ctrl;
 
 import com.jcraft.jsch.*;
-import io.aicode.core.tools.SSH2;
-import io.aicode.core.tools.SSHResInfo;
+import io.aicode.base.tools.SSH2;
+import io.aicode.base.tools.SSHResInfo;
 
 import java.io.*;
 import java.util.Scanner;

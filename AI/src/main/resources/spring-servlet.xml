@@ -53,7 +53,7 @@
     <mvc:resources mapping="/**" location="/"/>
 
     <!--异常统一处理-->
-    <bean class="io.aicode.core.base.handler.ExceptionHandler"/>
+    <bean class="io.aicode.base.handler.ExceptionHandler"/>
 
 
     <bean id="contentNegotiationManager" class="org.springframework.web.accept.ContentNegotiationManagerFactoryBean">
@@ -112,7 +112,7 @@
         </property>
     </bean>
     <!--开启swagger-->
-    <bean class="io.aicode.core.config.SwaggerConfig"/>
+    <bean class="io.aicode.base.SwaggerConfig"/>
 
     <bean id="demoWSHandler" class="io.aicode.base.interceptor.WSHandler"/>
     <!--<bean id="wsClientManager" class="com.aicodee.base.interceptor.WSClientManager"/>-->

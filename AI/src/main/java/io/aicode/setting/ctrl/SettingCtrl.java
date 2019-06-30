@@ -10,9 +10,9 @@
 package io.aicode.setting.ctrl;
 
 import com.google.common.collect.Maps;
-import io.aicode.core.base.BaseUploadCtrl;
-import io.aicode.core.entity.BeanRet;
-import io.aicode.core.exceptions.BaseException;
+import io.aicode.base.BaseUploadCtrl;
+import io.aicode.base.core.BeanRet ;
+import io.aicode.base.exceptions.BaseException;
 import io.aicode.setting.entity.Setting;
 import io.aicode.setting.service.SettingSV;
 import io.swagger.annotations.Api;

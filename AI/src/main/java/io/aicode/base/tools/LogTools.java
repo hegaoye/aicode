@@ -1,7 +1,6 @@
 package io.aicode.base.tools;
 
 import io.aicode.base.core.model.java.Log;
-import io.aicode.core.tools.HandleFuncs;
 
 import java.io.*;
 import java.text.SimpleDateFormat;

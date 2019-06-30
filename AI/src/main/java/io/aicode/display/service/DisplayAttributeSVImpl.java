@@ -4,8 +4,8 @@
  */
 package io.aicode.display.service;
 
-import io.aicode.core.base.BaseMybatisDAO;
-import io.aicode.core.base.BaseMybatisSVImpl;
+import io.aicode.base.BaseMybatisDAO;
+import io.aicode.base.BaseMybatisSVImpl;
 import io.aicode.display.dao.DisplayAttributeDAO;
 import io.aicode.display.entity.DisplayAttribute;
 import io.aicode.display.facade.DisplayAttributeSV;

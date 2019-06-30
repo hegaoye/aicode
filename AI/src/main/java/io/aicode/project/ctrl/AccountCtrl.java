@@ -1,12 +1,12 @@
 package io.aicode.project.ctrl;
 
 import com.beust.jcommander.internal.Maps;
-import io.aicode.core.base.BaseCtrl;
-import io.aicode.core.base.JwtToken;
-import io.aicode.core.common.Constants;
-import io.aicode.core.entity.BeanRet;
-import io.aicode.core.exceptions.BaseException;
-import io.aicode.core.tools.Md5;
+import io.aicode.base.BaseCtrl;
+import io.aicode.base.JwtToken;
+import io.aicode.base.common.Constants;
+import io.aicode.base.core.BeanRet;
+import io.aicode.base.exceptions.BaseException;
+import io.aicode.base.tools.Md5;
 import io.aicode.project.entity.Account;
 import io.aicode.project.service.AccountSV;
 import io.swagger.annotations.Api;

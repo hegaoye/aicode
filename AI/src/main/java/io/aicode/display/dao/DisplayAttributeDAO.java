@@ -6,7 +6,7 @@
 package io.aicode.display.dao;
 
 import com.google.common.collect.Maps;
-import io.aicode.core.base.BaseMybatisDAOImpl;
+import io.aicode.base.BaseMybatisDAOImpl;
 import org.springframework.stereotype.Repository;
 import io.aicode.display.entity.DisplayAttribute;
 

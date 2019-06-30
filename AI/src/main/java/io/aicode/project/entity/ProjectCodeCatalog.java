@@ -6,8 +6,8 @@
 package io.aicode.project.entity;
 
 
-import io.aicode.core.base.BaseEntity;
-import io.aicode.core.tools.HandleFuncs;
+import io.aicode.base.BaseEntity;
+import io.aicode.base.tools.HandleFuncs;
 import lombok.Data;
 
 /**

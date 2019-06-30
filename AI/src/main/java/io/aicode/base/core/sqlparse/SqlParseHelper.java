@@ -25,7 +25,8 @@ public class SqlParseHelper {
         public NameWithAlias(String name, String alias) {
             if (name == null) throw new IllegalArgumentException("name must be not null");
             if (name.trim().indexOf(' ') >= 0) throw new IllegalArgumentException("error name:" + name);
-            if (alias != null && alias.trim().indexOf(' ') >= 0) throw new IllegalArgumentException("error alias:" + alias);
+            if (alias != null && alias.trim().indexOf(' ') >= 0)
+                throw new IllegalArgumentException("error alias:" + alias);
             this.name = name.trim();
             this.alias = alias == null ? null : alias.trim();
         }

@@ -1,4 +1,4 @@
-apply plugin: 'org.akhikhl.gretty' // 应用gretty插件
+apply plugin: 'org.akhikhl.gretty'
 apply plugin: 'war'
 dependencies {
     compile rootProject.ext.dependencies["aopalliance"]
@@ -28,7 +28,6 @@ dependencies {
     compile rootProject.ext.dependencies["fastjson"]
     compile rootProject.ext.dependencies["guava"]
     compile rootProject.ext.dependencies["jcaptcha"]
-    compile rootProject.ext.dependencies["netty"]
     //------------通用工具 begin-----------------
 
     //-----------mybatis begin---------------
@@ -65,10 +64,6 @@ dependencies {
     compile rootProject.ext.dependencies["standard"]
     //--------------jstl end-----------------
 
-    //------------Memcached begin-------------
-    compile rootProject.ext.dependencies["Memcached-Java-Client"]
-    //------------Memcached begin-------------
-
     //------------spring begin----------------
     compile rootProject.ext.dependencies["aspectjweaver"]
     compile rootProject.ext.dependencies["spring-aop"]
@@ -93,12 +88,8 @@ dependencies {
     compile rootProject.ext.dependencies["spring-messaging"]
     //------------spring end----------------
 
-    compile rootProject.ext.dependencies["testng"]
 
-    //----------reids缓存 begin----------
-    compile rootProject.ext.dependencies["jedis"]
-    compile rootProject.ext.dependencies["spring-data-redis"]
-    //----------reids缓存 end------------
+    compile rootProject.ext.dependencies["testng"]
 
     // ----------jwt Nimbus JOSE+JWT begin----------
     compile rootProject.ext.dependencies["java-jwt"]
@@ -108,10 +99,6 @@ dependencies {
     compile rootProject.ext.dependencies["swagger2"]
     compile rootProject.ext.dependencies["swagger-ui"]
     //------------swagger end-------------------
-
-    //------------Sentry start-------------------
-    compile rootProject.ext.dependencies["sentry-logback"]
-    //------------Sentry end-------------------
 
     // ------------jgit start-------------------
     compile rootProject.ext.dependencies["jgit"]
@@ -124,10 +111,8 @@ dependencies {
     compile rootProject.ext.dependencies["purejavacomm"]
     compile rootProject.ext.dependencies["gson"]
     compile rootProject.ext.dependencies["pty4j"]
+    compile rootProject.ext.dependencies["lombok"]
 
     compile fileTree(dir: '../libs', include: ['*.jar'])
-    compile project(":facade")
-    compile project(":core")
-    compile project(":base-web")
-    compile project(":base-sv")
+
 }

@@ -6,7 +6,7 @@
 package io.aicode.project.service;
 
 
-import io.aicode.core.entity.BeanRet;
+import io.aicode.base.core.BeanRet;
 
 import java.util.Date;
 
@@ -25,8 +25,8 @@ public interface LogsSV {
     /**
      * 保存日志数据
      *
-     * @param logs    日志
-     * @param path    日志路径
+     * @param logs 日志
+     * @param path 日志路径
      * @return String
      */
     boolean saveLogs(String logs, String path);

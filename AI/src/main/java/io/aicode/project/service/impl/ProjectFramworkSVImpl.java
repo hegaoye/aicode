@@ -7,11 +7,11 @@ package io.aicode.project.service.impl;
 
 
 import com.baidu.fsg.uid.UidGenerator;
-import io.aicode.core.base.BaseMybatisDAO;
-import io.aicode.core.base.BaseMybatisSVImpl;
-import io.aicode.core.exceptions.BaseException;
-import io.aicode.core.exceptions.ProjectException;
-import io.aicode.core.tools.StringTools;
+import io.aicode.base.BaseMybatisDAO;
+import io.aicode.base.BaseMybatisSVImpl;
+import io.aicode.base.exceptions.BaseException;
+import io.aicode.base.exceptions.ProjectException;
+import io.aicode.base.tools.StringTools;
 import io.aicode.project.dao.ProjectFramworkDAO;
 import io.aicode.project.entity.ProjectFramwork;
 import io.aicode.project.service.ProjectFramworkSV;

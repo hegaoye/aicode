@@ -7,7 +7,7 @@ package io.aicode.project.dao;
 
 
 import com.beust.jcommander.internal.Maps;
-import io.aicode.core.base.BaseMybatisDAOImpl;
+import io.aicode.base.BaseMybatisDAOImpl;
 import io.aicode.project.entity.Frameworks;
 import org.springframework.stereotype.Repository;
 

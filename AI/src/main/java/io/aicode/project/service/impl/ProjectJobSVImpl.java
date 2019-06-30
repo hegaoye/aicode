@@ -8,12 +8,12 @@ package io.aicode.project.service.impl;
 import com.baidu.fsg.uid.UidGenerator;
 import com.google.common.collect.Maps;
 import io.aicode.base.tools.WSTools;
-import io.aicode.core.base.BaseMybatisDAO;
-import io.aicode.core.base.BaseMybatisSVImpl;
-import io.aicode.core.exceptions.BaseException;
-import io.aicode.core.exceptions.ProjectJobException;
-import io.aicode.core.tools.Executors;
-import io.aicode.core.tools.StringTools;
+import io.aicode.base.BaseMybatisDAO;
+import io.aicode.base.BaseMybatisSVImpl;
+import io.aicode.base.exceptions.BaseException;
+import io.aicode.base.exceptions.ProjectJobException;
+import io.aicode.base.tools.Executors;
+import io.aicode.base.tools.StringTools;
 import io.aicode.project.dao.ProjectJobDAO;
 import io.aicode.project.dao.ProjectJobLogsDAO;
 import io.aicode.project.entity.ProjectJob;
@@ -162,7 +162,7 @@ public class ProjectJobSVImpl extends BaseMybatisSVImpl<ProjectJob, Long> implem
         projectJob.setNumber(1);
         projectJob.setCreateTime(new Date());
         projectJobDAO.insert(projectJob);
-        WSTools wsTools=new WSTools(webSocketSession);
+        WSTools wsTools = new WSTools(webSocketSession);
         Executors.cacheThreadExecutor(new Runnable() {
             @Override
             public void run() {

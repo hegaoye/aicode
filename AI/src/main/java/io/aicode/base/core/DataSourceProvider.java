@@ -1,7 +1,6 @@
 package io.aicode.base.core;
 
 
-import io.aicode.core.tools.ConfigUtil;
 import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -165,23 +164,5 @@ public class DataSourceProvider {
         return this;
     }
 
-
-    public static void main(String[] args) {
-        try {
-            String driver = ConfigUtil.getValue("jdbc.driver", "ai_jdbc.properties");
-            String url = ConfigUtil.getValue("jdbc.url", "ai_jdbc.properties");
-            String username = ConfigUtil.getValue("jdbc.username", "ai_jdbc.properties");
-            String password = ConfigUtil.getValue("jdbc.password", "ai_jdbc.properties");
-            logger.info(url);
-            logger.info(username);
-            logger.info(password);
-            new DataSourceProvider()
-                    .getConnection(driver, url, username, password)
-                    .createDatabase("tt")
-                    .executeSqlScript("C:\\workspaces\\AI-Code\\AI\\src\\main\\webapp\\workspace\\szh\\tt.sql");
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-    }
 
 }

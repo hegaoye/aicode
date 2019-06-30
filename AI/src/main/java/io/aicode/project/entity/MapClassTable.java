@@ -5,9 +5,9 @@
 
 package io.aicode.project.entity;
 
+import io.aicode.base.BaseEntity;
 import io.aicode.base.core.StringHelper;
-import io.aicode.core.base.BaseEntity;
-import io.aicode.core.tools.StringTools;
+import io.aicode.base.tools.StringTools;
 import lombok.Data;
 
 import java.util.List;

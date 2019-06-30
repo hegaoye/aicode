@@ -18,7 +18,6 @@ import org.springframework.web.socket.TextMessage;
 public class WSTestCtrl {
 
 
-
     //http://localhost:8080/TestSpring4/HelloWorld/testReturnJSON.do
     @RequestMapping(value = "/testReturnJSON")
     @ResponseBody

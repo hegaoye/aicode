@@ -5,10 +5,9 @@
 package io.aicode.display.ctrl;
 
 import com.alibaba.fastjson.JSON;
+import io.aicode.base.BaseCtrl;
 import io.aicode.base.core.BeanRet;
-import io.aicode.core.base.BaseCtrl;
-import io.aicode.core.tools.StringTools;
-import io.aicode.core.tools.redis.RedisUtils;
+import io.aicode.base.tools.StringTools;
 import io.aicode.display.entity.DisplayAttribute;
 import io.aicode.display.facade.DisplayAttributeSV;
 import io.aicode.project.entity.MapFieldColumn;
@@ -20,7 +19,6 @@ import io.swagger.annotations.ApiOperation;
 import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
@@ -40,11 +38,6 @@ import java.util.Map;
 @Api(value = "显示属性控制器", description = "显示属性控制器")
 public class DisplayAttributeCtrl extends BaseCtrl {
     private final static Logger logger = LoggerFactory.getLogger(DisplayAttributeCtrl.class);
-
-    @Resource
-    protected RedisTemplate<String, Object> redisTemplate;
-    @Resource
-    protected RedisUtils redisUtils;
 
     @Resource
     private DisplayAttributeSV displayAttributeSV;
@@ -117,9 +110,9 @@ public class DisplayAttributeCtrl extends BaseCtrl {
         List<MapFieldColumn> mapFieldColumns = mapFieldColumnSV.queryList(params);
         String fieldCode;
         DisplayAttribute displayAttribute;
-        if(!mapFieldColumns.isEmpty()) {
-            for (MapFieldColumn mapFieldColumn: mapFieldColumns) {
-                fieldCode =  mapFieldColumn.getCode();
+        if (!mapFieldColumns.isEmpty()) {
+            for (MapFieldColumn mapFieldColumn : mapFieldColumns) {
+                fieldCode = mapFieldColumn.getCode();
                 displayAttribute = displayAttributeSV.loadByMapFieldColumnCode(fieldCode);
                 mapFieldColumn.setDisplayAttribute(displayAttribute);
             }
@@ -141,7 +134,7 @@ public class DisplayAttributeCtrl extends BaseCtrl {
     @PostMapping("/save")
     @ResponseBody
     public BeanRet save(@RequestBody List<DisplayAttribute> displayAttributes) {
-        if(displayAttributes == null || displayAttributes.size() <=0) {
+        if (displayAttributes == null || displayAttributes.size() <= 0) {
             return BeanRet.create(false, "参数不能为空");
         }
         displayAttributeSV.saveOrUpdate(displayAttributes);

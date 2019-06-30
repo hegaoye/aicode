@@ -12,6 +12,14 @@ public class BeanRet implements Serializable {
     private String info = null;
     private Object data = null;
 
+    public static BeanRet create() {
+        return new BeanRet(false, "操作失败");
+    }
+
+    public static BeanRet create(String info) {
+        return new BeanRet(false, info);
+    }
+
     public static BeanRet create(boolean success, String info) {
         return new BeanRet(success, info);
     }

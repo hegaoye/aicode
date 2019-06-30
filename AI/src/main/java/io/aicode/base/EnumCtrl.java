@@ -2,19 +2,16 @@ package io.aicode.base;
 
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Maps;
-import io.aicode.core.annotation.Ignore;
-import io.aicode.core.exceptions.BaseException;
-import io.aicode.core.tools.redis.RedisUtils;
+import io.aicode.base.tools.Ignore;
+import io.aicode.base.exceptions.BaseException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,12 +26,6 @@ import java.util.Map;
 @Slf4j
 @Api(value = "枚举资源接口", description = "系统中的枚举查询接口通过此控制器可以获得，资源是从类映射到缓存中存放，最后通过接口返回")
 public class EnumCtrl {
-
-    @Resource
-    public RedisTemplate<String, Object> redisTemplate;
-    @Resource
-    private RedisUtils redisUtils;
-
 
     /**
      * 通用枚举获取接口
@@ -91,10 +82,9 @@ public class EnumCtrl {
         FileTypeEnum(1006, io.aicode.project.entity.FileTypeEnum.class)/*文件类型*/,
         DisplayAttributeEnum(1007, io.aicode.display.entity.DisplayAttributeEnum.class)/*显示属性*/,
         DisplayAttributeMatchType(1008, io.aicode.display.entity.DisplayAttributeMatchType.class)/*匹配方式*/,
-        YNEnum(1101, io.aicode.core.enums.YNEnum.class)/*是否*/,
-        SexEnum(1102, io.aicode.core.enums.SexEnum.class)/*性别枚举*/,
-        OperateEnum(1103, io.aicode.core.enums.OperateEnum.class)/*操作名称定义*/,
-        ModuleEnum(1104, io.aicode.core.enums.ModuleEnum.class)/*模块定义*/,
+        YNEnum(1101, io.aicode.base.enums.YNEnum.class)/*是否*/,
+        OperateEnum(1103, io.aicode.base.enums.OperateEnum.class)/*操作名称定义*/,
+        ModuleEnum(1104, io.aicode.base.enums.ModuleEnum.class)/*模块定义*/,
 
 
         /**/;

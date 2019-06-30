@@ -6,7 +6,7 @@
 package io.aicode.project.dao;
 
 
-import io.aicode.core.base.BaseMybatisDAOImpl;
+import io.aicode.base.BaseMybatisDAOImpl;
 import io.aicode.project.entity.ProjectRepositoryAccount;
 import org.springframework.stereotype.Repository;
 
@@ -25,7 +25,6 @@ public class ProjectRepositoryAccountDAO extends BaseMybatisDAOImpl<ProjectRepos
 
     /**
      * 删除
-     *
      */
     public void delete(ProjectRepositoryAccount projectRepositoryAccount) {
         getSqlSession().delete(sqlmapNamespace + ".delete", projectRepositoryAccount);

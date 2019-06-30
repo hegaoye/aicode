@@ -23,8 +23,7 @@ public enum TemplateSuffixEnum {
     Sql(".sql"),
     Md(".md"),
     Property(".properties"),
-    Yml(".yml"),
-    ;
+    Yml(".yml"),;
     public String suffix;
 
     TemplateSuffixEnum(String suffix) {

@@ -54,13 +54,13 @@ public class BytecodeReadingParanamer implements Paranamer {
 
     private static final Map<String, String> primitives = new HashMap<String, String>() {
         {
-            put("int","I");
-            put("boolean","Z");
-            put("char","C");
-            put("short","B");
-            put("float","F");
-            put("long","J");
-            put("double","D");
+            put("int", "I");
+            put("boolean", "Z");
+            put("char", "C");
+            put("short", "B");
+            put("float", "F");
+            put("long", "J");
+            put("double", "D");
         }
     };
 
@@ -199,7 +199,7 @@ public class BytecodeReadingParanamer implements Paranamer {
                 if (primitives.containsKey(prefix)) {
                     s = "[" + primitives.get(prefix);
                 } else {
-                s = "[L" + prefix + ";";
+                    s = "[L" + prefix + ";";
                 }
             }
             return s;
@@ -442,8 +442,8 @@ public class BytecodeReadingParanamer implements Paranamer {
                             max = size;
                         }
                         break;
-                        // case HamConstants.CLASS:
-                        // case HamConstants.STR:
+                    // case HamConstants.CLASS:
+                    // case HamConstants.STR:
                     default:
                         size = 3;
                         break;
@@ -867,56 +867,56 @@ public class BytecodeReadingParanamer implements Paranamer {
         /**
          * The <tt>void</tt> type.
          */
-        private final static Type VOID_TYPE = new Type(VOID, null, ('V' << 24) 
-            | (5 << 16) | (0 << 8) | 0, 1);
+        private final static Type VOID_TYPE = new Type(VOID, null, ('V' << 24)
+                | (5 << 16) | (0 << 8) | 0, 1);
 
         /**
          * The <tt>boolean</tt> type.
          */
-        private final static Type BOOLEAN_TYPE = new Type(BOOLEAN, null, ('Z' << 24) 
-            | (0 << 16) | (5 << 8) | 1, 1);
+        private final static Type BOOLEAN_TYPE = new Type(BOOLEAN, null, ('Z' << 24)
+                | (0 << 16) | (5 << 8) | 1, 1);
 
         /**
          * The <tt>char</tt> type.
          */
-        private final static Type CHAR_TYPE = new Type(CHAR, null, ('C' << 24) 
-            | (0 << 16) | (6 << 8) | 1, 1);
+        private final static Type CHAR_TYPE = new Type(CHAR, null, ('C' << 24)
+                | (0 << 16) | (6 << 8) | 1, 1);
 
         /**
          * The <tt>byte</tt> type.
          */
-        private final static Type BYTE_TYPE = new Type(BYTE, null, ('B' << 24) 
-            | (0 << 16) | (5 << 8) | 1, 1);
+        private final static Type BYTE_TYPE = new Type(BYTE, null, ('B' << 24)
+                | (0 << 16) | (5 << 8) | 1, 1);
 
         /**
          * The <tt>short</tt> type.
          */
-        private final static Type SHORT_TYPE = new Type(SHORT, null, ('S' << 24) 
-            | (0 << 16) | (7 << 8) | 1, 1);
+        private final static Type SHORT_TYPE = new Type(SHORT, null, ('S' << 24)
+                | (0 << 16) | (7 << 8) | 1, 1);
 
         /**
          * The <tt>int</tt> type.
          */
-        private final static Type INT_TYPE = new Type(INT, null, ('I' << 24) 
-            | (0 << 16) | (0 << 8) | 1, 1);
+        private final static Type INT_TYPE = new Type(INT, null, ('I' << 24)
+                | (0 << 16) | (0 << 8) | 1, 1);
 
         /**
          * The <tt>float</tt> type.
          */
-        private final static Type FLOAT_TYPE = new Type(FLOAT, null, ('F' << 24) 
-            | (2 << 16) | (2 << 8) | 1, 1);
+        private final static Type FLOAT_TYPE = new Type(FLOAT, null, ('F' << 24)
+                | (2 << 16) | (2 << 8) | 1, 1);
 
         /**
          * The <tt>long</tt> type.
          */
-        private final static Type LONG_TYPE = new Type(LONG, null, ('J' << 24) 
-            | (1 << 16) | (1 << 8) | 2, 1);
+        private final static Type LONG_TYPE = new Type(LONG, null, ('J' << 24)
+                | (1 << 16) | (1 << 8) | 2, 1);
 
         /**
          * The <tt>double</tt> type.
          */
-        private final static Type DOUBLE_TYPE = new Type(DOUBLE, null, ('D' << 24) 
-            | (3 << 16) | (3 << 8) | 2, 1);
+        private final static Type DOUBLE_TYPE = new Type(DOUBLE, null, ('D' << 24)
+                | (3 << 16) | (3 << 8) | 2, 1);
 
         // ------------------------------------------------------------------------
         // Fields
@@ -982,7 +982,7 @@ public class BytecodeReadingParanamer implements Paranamer {
          *
          * @param methodDescriptor a method descriptor.
          * @return the Java types corresponding to the argument types of the given
-         *         method descriptor.
+         * method descriptor.
          */
         private static Type[] getArgumentTypes(final String methodDescriptor) {
             char[] buf = methodDescriptor.toCharArray();
@@ -1053,7 +1053,7 @@ public class BytecodeReadingParanamer implements Paranamer {
                         }
                     }
                     return new Type(ARRAY, buf, off, len + 1);
-                    // case 'L':
+                // case 'L':
                 default:
                     len = 1;
                     while (buf[off + len] != ';') {
@@ -1122,7 +1122,7 @@ public class BytecodeReadingParanamer implements Paranamer {
                         b.append("[]");
                     }
                     return b.toString();
-                    // case OBJECT:
+                // case OBJECT:
                 default:
                     return new String(buf, off, len).replace('/', '.');
             }

@@ -12,7 +12,7 @@ import org.springframework.stereotype.Repository;
 
 
 @Repository
-public class ModuleFileDAO extends BaseMybatisDAOImpl<ModuleFile,Long> {
+public class ModuleFileDAO extends BaseMybatisDAOImpl<ModuleFile, Long> {
 
 
 }

@@ -127,6 +127,6 @@ public class MapFieldColumnSVImpl extends BaseMybatisSVImpl<MapFieldColumn, Long
             logger.error(BaseException.BaseExceptionEnum.Empty_Param.toString());
             throw new ColumnInfoException(BaseException.BaseExceptionEnum.Empty_Param);
         }
-        return  mapFieldColumnDAO.listFields(mapClassTableCode);
+        return mapFieldColumnDAO.listFields(mapClassTableCode);
     }
 }

@@ -22,15 +22,14 @@ public class ProjectSqlDAO extends BaseMybatisDAOImpl<ProjectSql, Long> {
      * @param code tsql编码
      */
     public void delete(String code) {
-        Map<String,Object> map= Maps.newHashMap();
-        map.put("code",code);
+        Map<String, Object> map = Maps.newHashMap();
+        map.put("code", code);
         getSqlSession().delete(sqlmapNamespace + ".delete", map);
     }
 
 
     /**
      * 删除项目sql
-     *
      */
     public void delete(ProjectSql projectSql) {
         getSqlSession().delete(sqlmapNamespace + ".delete", projectSql);

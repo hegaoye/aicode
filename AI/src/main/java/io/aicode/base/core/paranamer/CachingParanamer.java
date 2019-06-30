@@ -35,19 +35,19 @@ import java.util.WeakHashMap;
 
 /**
  * Implementation of Paranamer which delegate to another Paranamer implementation, adding caching functionality to speed up usage.
- * 
+ *
  * @author Paul Hammant
  * @author Mauro Talevi
  */
 public class CachingParanamer implements Paranamer {
 
     public static final String __PARANAMER_DATA = "v1.0 \n"
-        + "com.thoughtworks.paranamer.CachingParanamer <init> com.thoughtworks.paranamer.Paranamer delegate \n"
-        + "com.thoughtworks.paranamer.CachingParanamer lookupParameterNames java.lang.AccessibleObject methodOrConstructor \n"
-        + "com.thoughtworks.paranamer.CachingParanamer lookupParameterNames java.lang.AccessibleObject, boolean methodOrCtor,throwExceptionIfMissing \n";
+            + "com.thoughtworks.paranamer.CachingParanamer <init> com.thoughtworks.paranamer.Paranamer delegate \n"
+            + "com.thoughtworks.paranamer.CachingParanamer lookupParameterNames java.lang.AccessibleObject methodOrConstructor \n"
+            + "com.thoughtworks.paranamer.CachingParanamer lookupParameterNames java.lang.AccessibleObject, boolean methodOrCtor,throwExceptionIfMissing \n";
 
     private final Paranamer delegate;
-    private final WeakHashMap<AccessibleObject,String[]> methodCache = new WeakHashMap<AccessibleObject,String[]>();
+    private final WeakHashMap<AccessibleObject, String[]> methodCache = new WeakHashMap<AccessibleObject, String[]>();
 
     /**
      * Uses a DefaultParanamer as the implementation it delegates to.
@@ -58,6 +58,7 @@ public class CachingParanamer implements Paranamer {
 
     /**
      * Specify a Paranamer instance to delegates to.
+     *
      * @param delegate the paranamer instance to use
      */
     public CachingParanamer(Paranamer delegate) {
@@ -69,7 +70,7 @@ public class CachingParanamer implements Paranamer {
     }
 
     public String[] lookupParameterNames(AccessibleObject methodOrCtor, boolean throwExceptionIfMissing) {
-        if(methodCache.containsKey(methodOrCtor)) {
+        if (methodCache.containsKey(methodOrCtor)) {
             return methodCache.get(methodOrCtor);
         }
 

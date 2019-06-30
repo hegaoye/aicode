@@ -4,6 +4,7 @@
  */
 
 package io.aicode.display.entity;
+
 /**
  * 匹配方式 =,!=,>=,<=,>,<,like,左like，右like,between,in
  *
@@ -12,10 +13,9 @@ package io.aicode.display.entity;
  * @since 1.0
  */
 public enum DisplayAttributeMatchType implements java.io.Serializable {
-    Equal("="), NotEqual("!="),Than(">"), ThanOrEqual(">="), LessOrEqual("<="),Less("<"),
-    Like("like"), LefLike("左 like"), RightLike("右 like"),In("in"),
-    Between("between"),
-    ;
+    Equal("="), NotEqual("!="), Than(">"), ThanOrEqual(">="), LessOrEqual("<="), Less("<"),
+    Like("like"), LefLike("左 like"), RightLike("右 like"), In("in"),
+    Between("between"),;
     public String val;
 
     DisplayAttributeMatchType(String val) {

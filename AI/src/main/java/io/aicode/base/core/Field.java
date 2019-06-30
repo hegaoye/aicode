@@ -89,7 +89,6 @@ public class Field implements Serializable {
     private boolean checkDigit = false;
 
 
-
     public void toJava() {
         this.field = StringHelper.toJavaVariableName(this.column);
         if (this.field.equals("id")) {

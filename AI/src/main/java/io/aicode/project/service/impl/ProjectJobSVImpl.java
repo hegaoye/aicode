@@ -162,7 +162,7 @@ public class ProjectJobSVImpl extends BaseMybatisSVImpl<ProjectJob, Long> implem
         projectJob.setNumber(1);
         projectJob.setCreateTime(new Date());
         projectJobDAO.insert(projectJob);
-        WSTools wsTools=new WSTools(webSocketSession);
+        WSTools wsTools = new WSTools(webSocketSession);
         Executors.cacheThreadExecutor(new Runnable() {
             @Override
             public void run() {

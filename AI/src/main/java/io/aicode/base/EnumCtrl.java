@@ -4,17 +4,14 @@ import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Maps;
 import io.aicode.base.annotation.Ignore;
 import io.aicode.base.exceptions.BaseException;
-import io.aicode.base.tools.redis.RedisUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,12 +26,6 @@ import java.util.Map;
 @Slf4j
 @Api(value = "枚举资源接口", description = "系统中的枚举查询接口通过此控制器可以获得，资源是从类映射到缓存中存放，最后通过接口返回")
 public class EnumCtrl {
-
-    @Resource
-    public RedisTemplate<String, Object> redisTemplate;
-    @Resource
-    private RedisUtils redisUtils;
-
 
     /**
      * 通用枚举获取接口

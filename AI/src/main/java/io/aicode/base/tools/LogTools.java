@@ -27,7 +27,7 @@ public class LogTools {
         //txtWriter.close();
     }
 
-    public static void main(String[] args) throws  Exception{
+    public static void main(String[] args) throws Exception {
         logMsg("aa", "a");
     }
 

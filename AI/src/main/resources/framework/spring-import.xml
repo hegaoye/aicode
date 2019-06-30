@@ -32,6 +32,6 @@
     <!--导入uid配置-->
     <import resource="classpath:framework/spring-uid.xml"/>
     <!-- 导入redis配置 -->
-    <import resource="classpath:/framework/spring-data-redis.xml"/>
+    <!--<import resource="classpath:/framework/spring-data-redis.xml"/>-->
 
 </beans>

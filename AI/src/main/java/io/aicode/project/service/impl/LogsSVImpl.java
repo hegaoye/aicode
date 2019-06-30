@@ -6,7 +6,7 @@
 package io.aicode.project.service.impl;
 
 
-import io.aicode.base.core.BeanRet ;
+import io.aicode.base.core.BeanRet;
 import io.aicode.base.enums.SuffixTypeEnum;
 import io.aicode.base.exceptions.BaseException;
 import io.aicode.base.tools.DateTools;

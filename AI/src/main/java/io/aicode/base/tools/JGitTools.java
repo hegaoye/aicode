@@ -20,6 +20,7 @@ public class JGitTools {
 
     /**
      * 建立与远程仓库的联系，仅需执行一次
+     *
      * @throws GitAPIException
      */
     public static void setupRepo() throws GitAPIException {
@@ -28,7 +29,8 @@ public class JGitTools {
 
     /**
      * 新建分支并同步到远程仓库
-     * @param branchName    分支名称
+     *
+     * @param branchName 分支名称
      * @return
      */
     public static String newBranch(String branchName) {
@@ -59,6 +61,7 @@ public class JGitTools {
 
     /**
      * 提交文件并同步到远程仓库
+     *
      * @throws IOException
      * @throws GitAPIException
      */
@@ -78,8 +81,9 @@ public class JGitTools {
 
     /**
      * 根据地址从远程仓库拉取代码到本地
+     *
      * @param cloneURL
-     * @return  boolean
+     * @return boolean
      */
     public static boolean pullBranchToLocal(String cloneURL) {
         boolean resultFlat = false;

@@ -104,7 +104,7 @@ public class MapRelationshipSVImpl extends BaseMybatisSVImpl<MapRelationship, Lo
         //2.根据映射编码查询模型关系
         Map<String, Object> params = new HashMap<>();
         params.put("mapClassTableCode", mapClassTableCode);
-        return  mapRelationshipDAO.query(params);
+        return mapRelationshipDAO.query(params);
     }
 
     /**
@@ -119,7 +119,8 @@ public class MapRelationshipSVImpl extends BaseMybatisSVImpl<MapRelationship, Lo
 
     /**
      * 根据项目编码统计是否已经设置表关系
-     * @param projectCode    项目编码
+     *
+     * @param projectCode 项目编码
      * @return int
      */
     @Override

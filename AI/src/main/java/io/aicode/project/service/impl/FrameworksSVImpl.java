@@ -45,6 +45,7 @@ public class FrameworksSVImpl extends BaseMybatisSVImpl<Frameworks, Long> implem
     /**
      * 保存技术框架
      * 如果发现githome为null则自动设置为系统默认的模板仓库
+     *
      * @param entity 实体
      * @throws BaseException
      */

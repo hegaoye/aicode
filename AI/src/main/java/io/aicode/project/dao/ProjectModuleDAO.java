@@ -11,11 +11,10 @@ import org.springframework.stereotype.Repository;
 
 
 @Repository
-public class ProjectModuleDAO extends BaseMybatisDAOImpl<ProjectModule,Long> {
+public class ProjectModuleDAO extends BaseMybatisDAOImpl<ProjectModule, Long> {
 
     /**
      * 删除
-     *
      */
     public void delete(ProjectModule projectModule) {
         getSqlSession().delete(sqlmapNamespace + ".delete", projectModule);

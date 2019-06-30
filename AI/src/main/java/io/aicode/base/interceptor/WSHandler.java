@@ -27,7 +27,7 @@ public class WSHandler implements WebSocketHandler {
     @Autowired
     private WSClientManager wsClientManager;
     public static Map<String, Object> map = new HashedMap();
-//    private ConcurrentMap<String, TerminalEmulator> connectors = new ConcurrentHashMap<>();
+    //    private ConcurrentMap<String, TerminalEmulator> connectors = new ConcurrentHashMap<>();
     private Multimap<String, String> sessions = HashMultimap.create();
 
     private SSH2 ssh2 = null;

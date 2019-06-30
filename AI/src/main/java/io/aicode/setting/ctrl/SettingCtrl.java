@@ -10,8 +10,8 @@
 package io.aicode.setting.ctrl;
 
 import com.google.common.collect.Maps;
-import io.aicode.base.BaseUploadCtrl;
-import io.aicode.base.core.BeanRet ;
+import io.aicode.base.BaseCtrl;
+import io.aicode.base.core.BeanRet;
 import io.aicode.base.exceptions.BaseException;
 import io.aicode.setting.entity.Setting;
 import io.aicode.setting.service.SettingSV;
@@ -40,7 +40,7 @@ import java.util.Map;
 @Controller
 @RequestMapping("/setting")
 @Api(value = "系统中的参数设置", description = "系统中的参数设置接口")
-public class SettingCtrl extends BaseUploadCtrl {
+public class SettingCtrl extends BaseCtrl {
     private final static Logger logger = LoggerFactory.getLogger(SettingCtrl.class);
 
     @Resource

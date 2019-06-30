@@ -65,22 +65,23 @@ public class DisplayAttributeSVImpl extends BaseMybatisSVImpl<DisplayAttribute, 
 
     /**
      * 添加或修改
-     * @param displayAttributes  显示属性
+     *
+     * @param displayAttributes 显示属性
      */
     @Override
     public void saveOrUpdate(List<DisplayAttribute> displayAttributes) {
         //2.遍历参数数据
         DisplayAttribute displayAttributeFlag;
-        Map<String, Object> params ;
+        Map<String, Object> params;
         for (DisplayAttribute displayAttribute : displayAttributes) {
             params = new HashedMap();
             params.put("code", displayAttribute.getMapFieldColumnCode());
             MapFieldColumn mapFieldColumn = mapFieldColumnDAO.load(params);
-            if(mapFieldColumn == null) {
+            if (mapFieldColumn == null) {
                 continue;
             }
             displayAttributeFlag = displayAttributeDAO.loadByMapFieldColumnCode(displayAttribute.getMapFieldColumnCode());
-            if(displayAttributeFlag == null) {
+            if (displayAttributeFlag == null) {
                 displayAttribute.setMapClassTableCode(mapFieldColumn.getMapClassTableCode());
                 displayAttributeDAO.insert(displayAttribute);
             } else {
@@ -91,7 +92,8 @@ public class DisplayAttributeSVImpl extends BaseMybatisSVImpl<DisplayAttribute, 
 
     /**
      * 根据项目编码统计是否已经设置显示属性
-     * @param projectCode    项目编码
+     *
+     * @param projectCode 项目编码
      * @return int
      */
     @Override

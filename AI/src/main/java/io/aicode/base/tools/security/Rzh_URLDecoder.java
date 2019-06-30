@@ -38,7 +38,7 @@ public class Rzh_URLDecoder {
      * @param str
      * @return
      */
-    public static final String TwiceURLDecoder(String str){
+    public static final String TwiceURLDecoder(String str) {
         String return_str = "";
         try {
             str = Rzh_URLDecoder.decodeBase64(str);  // 先解密成十六进制
@@ -65,6 +65,7 @@ public class Rzh_URLDecoder {
         }
         return return_str;
     }
+
     /**
      * This method takes a string which may contain newline characters
      * '\n' which it converts to html newline tags.

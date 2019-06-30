@@ -59,7 +59,6 @@ public class BaseException extends RuntimeException implements Serializable {
         Build_Exist(9500, "build exist"),;
 
 
-
         public int code;//错误编码
         public String error;//错误信息
 

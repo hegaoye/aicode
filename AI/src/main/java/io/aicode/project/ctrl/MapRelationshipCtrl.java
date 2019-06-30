@@ -3,7 +3,7 @@ package io.aicode.project.ctrl;
 import com.alibaba.fastjson.JSONObject;
 import com.baidu.fsg.uid.UidGenerator;
 import io.aicode.base.BaseCtrl;
-import io.aicode.base.core.BeanRet ;
+import io.aicode.base.core.BeanRet;
 import io.aicode.base.enums.YNEnum;
 import io.aicode.base.exceptions.BaseException;
 import io.aicode.base.tools.StringTools;

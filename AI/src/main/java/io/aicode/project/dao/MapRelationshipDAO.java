@@ -26,7 +26,8 @@ public class MapRelationshipDAO extends BaseMybatisDAOImpl<MapRelationship, Long
 
     /**
      * 根据项目编码统计是否已经设置表关系
-     * @param projectCode    项目编码
+     *
+     * @param projectCode 项目编码
      * @return int
      */
     public int countByProjectCode(String projectCode) {

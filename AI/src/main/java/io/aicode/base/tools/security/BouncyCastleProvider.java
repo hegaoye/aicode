@@ -25,13 +25,14 @@ import java.security.Provider;
  * most prefered).
  * <p>Note: JCE algorithm names should be uppercase only so the case insensitive
  * test for getInstance works.
+ *
  * @author ShenHuaJie
  * @version $Id: BouncyCastleProvider.java, v 0.1 2014年3月25日 上午9:40:17 ShenHuaJie Exp $
  */
 @SuppressWarnings("serial")
 public class BouncyCastleProvider extends Provider {
-    private static final String info          = "BouncyCastle Security Provider v1.23";
-    public static final String  PROVIDER_NAME = "BC";
+    private static final String info = "BouncyCastle Security Provider v1.23";
+    public static final String PROVIDER_NAME = "BC";
 
     /**
      * Construct a new provider.  This should only be required when
@@ -48,7 +49,7 @@ public class BouncyCastleProvider extends Provider {
         put("KeyStore.PKCS12", "org.bouncycastle.jce.provider.JDKPKCS12KeyStore$BCPKCS12KeyStore");
         put("KeyStore.BCPKCS12", "org.bouncycastle.jce.provider.JDKPKCS12KeyStore$BCPKCS12KeyStore");
         put("KeyStore.PKCS12-DEF",
-            "org.bouncycastle.jce.provider.JDKPKCS12KeyStore$DefPKCS12KeyStore");
+                "org.bouncycastle.jce.provider.JDKPKCS12KeyStore$DefPKCS12KeyStore");
         put("Alg.Alias.KeyStore.UBER", "BouncyCastle");
         put("Alg.Alias.KeyStore.BOUNCYCASTLE", "BouncyCastle");
         put("Alg.Alias.KeyStore.bouncycastle", "BouncyCastle");
@@ -61,33 +62,33 @@ public class BouncyCastleProvider extends Provider {
         // algorithm parameter generators
         //
         put("AlgorithmParameterGenerator.DH",
-            "org.bouncycastle.jce.provider.JDKAlgorithmParameterGenerator$DH");
+                "org.bouncycastle.jce.provider.JDKAlgorithmParameterGenerator$DH");
         put("AlgorithmParameterGenerator.DSA",
-            "org.bouncycastle.jce.provider.JDKAlgorithmParameterGenerator$DSA");
+                "org.bouncycastle.jce.provider.JDKAlgorithmParameterGenerator$DSA");
         put("AlgorithmParameterGenerator.ELGAMAL",
-            "org.bouncycastle.jce.provider.JDKAlgorithmParameterGenerator$ElGamal");
+                "org.bouncycastle.jce.provider.JDKAlgorithmParameterGenerator$ElGamal");
         put("AlgorithmParameterGenerator.DES",
-            "org.bouncycastle.jce.provider.JDKAlgorithmParameterGenerator$DES");
+                "org.bouncycastle.jce.provider.JDKAlgorithmParameterGenerator$DES");
         put("AlgorithmParameterGenerator.DESEDE",
-            "org.bouncycastle.jce.provider.JDKAlgorithmParameterGenerator$DES");
+                "org.bouncycastle.jce.provider.JDKAlgorithmParameterGenerator$DES");
         put("AlgorithmParameterGenerator.1.2.840.113549.3.7",
-            "org.bouncycastle.jce.provider.JDKAlgorithmParameterGenerator$DES");
+                "org.bouncycastle.jce.provider.JDKAlgorithmParameterGenerator$DES");
         put("AlgorithmParameterGenerator.1.3.14.3.2.7",
-            "org.bouncycastle.jce.provider.JDKAlgorithmParameterGenerator$DES");
+                "org.bouncycastle.jce.provider.JDKAlgorithmParameterGenerator$DES");
         put("AlgorithmParameterGenerator.IDEA",
-            "org.bouncycastle.jce.provider.JDKAlgorithmParameterGenerator$IDEA");
+                "org.bouncycastle.jce.provider.JDKAlgorithmParameterGenerator$IDEA");
         put("AlgorithmParameterGenerator.1.3.6.1.4.1.188.7.1.1.2",
-            "org.bouncycastle.jce.provider.JDKAlgorithmParameterGenerator$IDEA");
+                "org.bouncycastle.jce.provider.JDKAlgorithmParameterGenerator$IDEA");
         put("AlgorithmParameterGenerator.RC2",
-            "org.bouncycastle.jce.provider.JDKAlgorithmParameterGenerator$RC2");
+                "org.bouncycastle.jce.provider.JDKAlgorithmParameterGenerator$RC2");
         put("AlgorithmParameterGenerator.1.2.840.113549.3.2",
-            "org.bouncycastle.jce.provider.JDKAlgorithmParameterGenerator$RC2");
+                "org.bouncycastle.jce.provider.JDKAlgorithmParameterGenerator$RC2");
         put("AlgorithmParameterGenerator.CAST5",
-            "org.bouncycastle.jce.provider.JDKAlgorithmParameterGenerator$CAST5");
+                "org.bouncycastle.jce.provider.JDKAlgorithmParameterGenerator$CAST5");
         put("AlgorithmParameterGenerator.1.2.840.113533.7.66.10",
-            "org.bouncycastle.jce.provider.JDKAlgorithmParameterGenerator$CAST5");
+                "org.bouncycastle.jce.provider.JDKAlgorithmParameterGenerator$CAST5");
         put("AlgorithmParameterGenerator.AES",
-            "org.bouncycastle.jce.provider.JDKAlgorithmParameterGenerator$AES");
+                "org.bouncycastle.jce.provider.JDKAlgorithmParameterGenerator$AES");
         put("Alg.Alias.AlgorithmParameterGenerator.2.16.840.1.101.3.4.2", "AES"); // these first 3 are wrong, but seem to have got around
         put("Alg.Alias.AlgorithmParameterGenerator.2.16.840.1.101.3.4.22", "AES");
         put("Alg.Alias.AlgorithmParameterGenerator.2.16.840.1.101.3.4.42", "AES");
@@ -100,20 +101,20 @@ public class BouncyCastleProvider extends Provider {
         put("AlgorithmParameters.DH", "org.bouncycastle.jce.provider.JDKAlgorithmParameters$DH");
         put("AlgorithmParameters.DSA", "org.bouncycastle.jce.provider.JDKAlgorithmParameters$DSA");
         put("AlgorithmParameters.ELGAMAL",
-            "org.bouncycastle.jce.provider.JDKAlgorithmParameters$ElGamal");
+                "org.bouncycastle.jce.provider.JDKAlgorithmParameters$ElGamal");
         put("AlgorithmParameters.IES", "org.bouncycastle.jce.provider.JDKAlgorithmParameters$IES");
         put("AlgorithmParameters.PKCS12PBE",
-            "org.bouncycastle.jce.provider.JDKAlgorithmParameters$PKCS12PBE");
+                "org.bouncycastle.jce.provider.JDKAlgorithmParameters$PKCS12PBE");
         put("AlgorithmParameters.1.2.840.113549.3.7",
-            "org.bouncycastle.jce.provider.JDKAlgorithmParameters$IVAlgorithmParameters");
+                "org.bouncycastle.jce.provider.JDKAlgorithmParameters$IVAlgorithmParameters");
         put("AlgorithmParameters.IDEA",
-            "org.bouncycastle.jce.provider.JDKAlgorithmParameters$IDEAAlgorithmParameters");
+                "org.bouncycastle.jce.provider.JDKAlgorithmParameters$IDEAAlgorithmParameters");
         put("AlgorithmParameters.1.3.6.1.4.1.188.7.1.1.2",
-            "org.bouncycastle.jce.provider.JDKAlgorithmParameters$IDEAAlgorithmParameters");
+                "org.bouncycastle.jce.provider.JDKAlgorithmParameters$IDEAAlgorithmParameters");
         put("AlgorithmParameters.CAST5",
-            "org.bouncycastle.jce.provider.JDKAlgorithmParameters$CAST5AlgorithmParameters");
+                "org.bouncycastle.jce.provider.JDKAlgorithmParameters$CAST5AlgorithmParameters");
         put("AlgorithmParameters.1.2.840.113533.7.66.10",
-            "org.bouncycastle.jce.provider.JDKAlgorithmParameters$CAST5AlgorithmParameters");
+                "org.bouncycastle.jce.provider.JDKAlgorithmParameters$CAST5AlgorithmParameters");
         put("Alg.Alias.AlgorithmParameters.PBEWITHSHA1ANDRC2", "PKCS12PBE");
         put("Alg.Alias.AlgorithmParameters.PBEWITHSHAAND3-KEYTRIPLEDES", "PKCS12PBE");
         put("Alg.Alias.AlgorithmParameters.PBEWITHSHAAND2-KEYTRIPLEDES", "PKCS12PBE");
@@ -142,14 +143,14 @@ public class BouncyCastleProvider extends Provider {
         put("Cipher.1.3.14.3.2.7", "org.bouncycastle.jce.provider.JCEBlockCipher$DESCBC");
         put("Cipher.DESEDEWRAP", "org.bouncycastle.jce.provider.WrapCipherSpi$DESEDEWrap");
         put("Cipher.1.2.840.113549.1.9.16.3.6",
-            "org.bouncycastle.jce.provider.WrapCipherSpi$DESEDEWrap");
+                "org.bouncycastle.jce.provider.WrapCipherSpi$DESEDEWrap");
         put("Cipher.SKIPJACK", "org.bouncycastle.jce.provider.JCEBlockCipher$Skipjack");
         put("Cipher.BLOWFISH", "org.bouncycastle.jce.provider.JCEBlockCipher$Blowfish");
         put("Cipher.TWOFISH", "org.bouncycastle.jce.provider.JCEBlockCipher$Twofish");
         put("Cipher.RC2", "org.bouncycastle.jce.provider.JCEBlockCipher$RC2");
         put("Cipher.RC2WRAP", "org.bouncycastle.jce.provider.WrapCipherSpi$RC2Wrap");
         put("Cipher.1.2.840.113549.1.9.16.3.7",
-            "org.bouncycastle.jce.provider.WrapCipherSpi$RC2Wrap");
+                "org.bouncycastle.jce.provider.WrapCipherSpi$RC2Wrap");
         put("Cipher.ARC4", "org.bouncycastle.jce.provider.JCEStreamCipher$RC4");
         put("Cipher.RC4", "org.bouncycastle.jce.provider.JCEStreamCipher$RC4");
         put("Alg.Alias.Cipher.1.2.840.113549.3.4", "RC4");
@@ -170,11 +171,11 @@ public class BouncyCastleProvider extends Provider {
         put("Cipher.SERPENT", "org.bouncycastle.jce.provider.JCEBlockCipher$Serpent");
         put("Cipher.CAST5", "org.bouncycastle.jce.provider.JCEBlockCipher$CAST5");
         put("Cipher.1.2.840.113533.7.66.10",
-            "org.bouncycastle.jce.provider.JCEBlockCipher$CAST5CBC");
+                "org.bouncycastle.jce.provider.JCEBlockCipher$CAST5CBC");
         put("Cipher.CAST6", "org.bouncycastle.jce.provider.JCEBlockCipher$CAST6");
         put("Cipher.IDEA", "org.bouncycastle.jce.provider.JCEBlockCipher$IDEA");
         put("Cipher.1.3.6.1.4.1.188.7.1.1.2",
-            "org.bouncycastle.jce.provider.JCEBlockCipher$IDEACBC");
+                "org.bouncycastle.jce.provider.JCEBlockCipher$IDEACBC");
         /*
         put("Cipher.DES/CFB8", "org.bouncycastle.jce.provider.JCEStreamCipher$DES_CFB8");
         put("Cipher.DESEDE/CFB8", "org.bouncycastle.jce.provider.JCEStreamCipher$DESede_CFB8");
@@ -205,19 +206,19 @@ public class BouncyCastleProvider extends Provider {
         put("Cipher.RSA/RAW", "org.bouncycastle.jce.provider.JCERSACipher$NoPadding");
         put("Cipher.RSA/PKCS1", "org.bouncycastle.jce.provider.JCERSACipher$PKCS1v1_5Padding");
         put("Cipher.1.2.840.113549.1.1.1",
-            "org.bouncycastle.jce.provider.JCERSACipher$PKCS1v1_5Padding");
+                "org.bouncycastle.jce.provider.JCERSACipher$PKCS1v1_5Padding");
         put("Cipher.2.5.8.1.1", "org.bouncycastle.jce.provider.JCERSACipher$PKCS1v1_5Padding");
         put("Cipher.RSA/1",
-            "org.bouncycastle.jce.provider.JCERSACipher$PKCS1v1_5Padding_PrivateOnly");
+                "org.bouncycastle.jce.provider.JCERSACipher$PKCS1v1_5Padding_PrivateOnly");
         put("Cipher.RSA/2",
-            "org.bouncycastle.jce.provider.JCERSACipher$PKCS1v1_5Padding_PublicOnly");
+                "org.bouncycastle.jce.provider.JCERSACipher$PKCS1v1_5Padding_PublicOnly");
         put("Cipher.RSA/OAEP", "org.bouncycastle.jce.provider.JCERSACipher$OAEPPadding");
         put("Cipher.1.2.840.113549.1.1.7", "org.bouncycastle.jce.provider.JCERSACipher$OAEPPadding");
         put("Cipher.RSA/ISO9796-1", "org.bouncycastle.jce.provider.JCERSACipher$ISO9796d1Padding");
         put("Cipher.ECIES", "org.bouncycastle.jce.provider.JCEIESCipher$ECIES");
         put("Cipher.ELGAMAL", "org.bouncycastle.jce.provider.JCEElGamalCipher$NoPadding");
         put("Cipher.ELGAMAL/PKCS1",
-            "org.bouncycastle.jce.provider.JCEElGamalCipher$PKCS1v1_5Padding");
+                "org.bouncycastle.jce.provider.JCEElGamalCipher$PKCS1v1_5Padding");
         put("Alg.Alias.Cipher.RSA//RAW", "RSA");
         put("Alg.Alias.Cipher.RSA//NOPADDING", "RSA");
         put("Alg.Alias.Cipher.RSA//PKCS1PADDING", "RSA/PKCS1");
@@ -236,41 +237,41 @@ public class BouncyCastleProvider extends Provider {
         put("Alg.Alias.Cipher.ELGAMAL/ECB/PKCS1PADDING", "ELGAMAL/PKCS1");
         put("Alg.Alias.Cipher.ELGAMAL/NONE/PKCS1PADDING", "ELGAMAL/PKCS1");
         put("Cipher.PBEWITHMD5ANDDES",
-            "org.bouncycastle.jce.provider.JCEBlockCipher$PBEWithMD5AndDES");
+                "org.bouncycastle.jce.provider.JCEBlockCipher$PBEWithMD5AndDES");
         put("Cipher.BROKENPBEWITHMD5ANDDES",
-            "org.bouncycastle.jce.provider.BrokenJCEBlockCipher$BrokePBEWithMD5AndDES");
+                "org.bouncycastle.jce.provider.BrokenJCEBlockCipher$BrokePBEWithMD5AndDES");
         put("Cipher.PBEWITHMD5ANDRC2",
-            "org.bouncycastle.jce.provider.JCEBlockCipher$PBEWithMD5AndRC2");
+                "org.bouncycastle.jce.provider.JCEBlockCipher$PBEWithMD5AndRC2");
         put("Cipher.PBEWITHSHA1ANDDES",
-            "org.bouncycastle.jce.provider.JCEBlockCipher$PBEWithSHA1AndDES");
+                "org.bouncycastle.jce.provider.JCEBlockCipher$PBEWithSHA1AndDES");
         put("Cipher.BROKENPBEWITHSHA1ANDDES",
-            "org.bouncycastle.jce.provider.BrokenJCEBlockCipher$BrokePBEWithSHA1AndDES");
+                "org.bouncycastle.jce.provider.BrokenJCEBlockCipher$BrokePBEWithSHA1AndDES");
         put("Cipher.PBEWITHSHA1ANDRC2",
-            "org.bouncycastle.jce.provider.JCEBlockCipher$PBEWithSHA1AndRC2");
+                "org.bouncycastle.jce.provider.JCEBlockCipher$PBEWithSHA1AndRC2");
         put("Cipher.PBEWITHSHAAND3-KEYTRIPLEDES-CBC",
-            "org.bouncycastle.jce.provider.JCEBlockCipher$PBEWithSHAAndDES3Key");
+                "org.bouncycastle.jce.provider.JCEBlockCipher$PBEWithSHAAndDES3Key");
         put("Cipher.BROKENPBEWITHSHAAND3-KEYTRIPLEDES-CBC",
-            "org.bouncycastle.jce.provider.BrokenJCEBlockCipher$BrokePBEWithSHAAndDES3Key");
+                "org.bouncycastle.jce.provider.BrokenJCEBlockCipher$BrokePBEWithSHAAndDES3Key");
         put("Cipher.OLDPBEWITHSHAAND3-KEYTRIPLEDES-CBC",
-            "org.bouncycastle.jce.provider.BrokenJCEBlockCipher$OldPBEWithSHAAndDES3Key");
+                "org.bouncycastle.jce.provider.BrokenJCEBlockCipher$OldPBEWithSHAAndDES3Key");
         put("Cipher.PBEWITHSHAAND2-KEYTRIPLEDES-CBC",
-            "org.bouncycastle.jce.provider.JCEBlockCipher$PBEWithSHAAndDES2Key");
+                "org.bouncycastle.jce.provider.JCEBlockCipher$PBEWithSHAAndDES2Key");
         put("Cipher.BROKENPBEWITHSHAAND2-KEYTRIPLEDES-CBC",
-            "org.bouncycastle.jce.provider.BrokenJCEBlockCipher$BrokePBEWithSHAAndDES2Key");
+                "org.bouncycastle.jce.provider.BrokenJCEBlockCipher$BrokePBEWithSHAAndDES2Key");
         put("Cipher.PBEWITHSHAAND128BITRC2-CBC",
-            "org.bouncycastle.jce.provider.JCEBlockCipher$PBEWithSHAAnd128BitRC2");
+                "org.bouncycastle.jce.provider.JCEBlockCipher$PBEWithSHAAnd128BitRC2");
         put("Cipher.PBEWITHSHAAND40BITRC2-CBC",
-            "org.bouncycastle.jce.provider.JCEBlockCipher$PBEWithSHAAnd40BitRC2");
+                "org.bouncycastle.jce.provider.JCEBlockCipher$PBEWithSHAAnd40BitRC2");
         put("Cipher.PBEWITHSHAAND128BITRC4",
-            "org.bouncycastle.jce.provider.JCEStreamCipher$PBEWithSHAAnd128BitRC4");
+                "org.bouncycastle.jce.provider.JCEStreamCipher$PBEWithSHAAnd128BitRC4");
         put("Cipher.PBEWITHSHAAND40BITRC4",
-            "org.bouncycastle.jce.provider.JCEStreamCipher$PBEWithSHAAnd40BitRC4");
+                "org.bouncycastle.jce.provider.JCEStreamCipher$PBEWithSHAAnd40BitRC4");
         put("Cipher.PBEWITHSHAANDTWOFISH-CBC",
-            "org.bouncycastle.jce.provider.JCEBlockCipher$PBEWithSHAAndTwofish");
+                "org.bouncycastle.jce.provider.JCEBlockCipher$PBEWithSHAAndTwofish");
         put("Cipher.OLDPBEWITHSHAANDTWOFISH-CBC",
-            "org.bouncycastle.jce.provider.BrokenJCEBlockCipher$OldPBEWithSHAAndTwofish");
+                "org.bouncycastle.jce.provider.BrokenJCEBlockCipher$OldPBEWithSHAAndTwofish");
         put("Cipher.PBEWITHSHAANDIDEA-CBC",
-            "org.bouncycastle.jce.provider.JCEBlockCipher$PBEWithSHAAndIDEA");
+                "org.bouncycastle.jce.provider.JCEBlockCipher$PBEWithSHAAndIDEA");
         put("Alg.Alias.Cipher.1.2.840.113549.1.12.1.1", "PBEWITHSHAAND128BITRC4");
         put("Alg.Alias.Cipher.1.2.840.113549.1.12.1.2", "PBEWITHSHAAND40BITRC4");
         put("Alg.Alias.Cipher.1.2.840.113549.1.12.1.3", "PBEWITHSHAAND3-KEYTRIPLEDES-CBC");
@@ -284,7 +285,7 @@ public class BouncyCastleProvider extends Provider {
         put("Alg.Alias.KeyGenerator.1.3.14.3.2.7", "DES");
         put("KeyGenerator.DESEDE", "org.bouncycastle.jce.provider.JCEKeyGenerator$DESede");
         put("KeyGenerator.1.2.840.113549.3.7",
-            "org.bouncycastle.jce.provider.JCEKeyGenerator$DESede3");
+                "org.bouncycastle.jce.provider.JCEKeyGenerator$DESede3");
         put("KeyGenerator.DESEDEWRAP", "org.bouncycastle.jce.provider.JCEKeyGenerator$DESede");
         put("KeyGenerator.SKIPJACK", "org.bouncycastle.jce.provider.JCEKeyGenerator$Skipjack");
         put("KeyGenerator.BLOWFISH", "org.bouncycastle.jce.provider.JCEKeyGenerator$Blowfish");
@@ -301,33 +302,33 @@ public class BouncyCastleProvider extends Provider {
         put("KeyGenerator.RIJNDAEL", "org.bouncycastle.jce.provider.JCEKeyGenerator$Rijndael");
         put("KeyGenerator.AES", "org.bouncycastle.jce.provider.JCEKeyGenerator$AES");
         put("KeyGenerator.2.16.840.1.101.3.4.2",
-            "org.bouncycastle.jce.provider.JCEKeyGenerator$AES128");
+                "org.bouncycastle.jce.provider.JCEKeyGenerator$AES128");
         put("KeyGenerator.2.16.840.1.101.3.4.22",
-            "org.bouncycastle.jce.provider.JCEKeyGenerator$AES192");
+                "org.bouncycastle.jce.provider.JCEKeyGenerator$AES192");
         put("KeyGenerator.2.16.840.1.101.3.4.42",
-            "org.bouncycastle.jce.provider.JCEKeyGenerator$AES256");
+                "org.bouncycastle.jce.provider.JCEKeyGenerator$AES256");
         put("KeyGenerator.2.16.840.1.101.3.4.1.2",
-            "org.bouncycastle.jce.provider.JCEKeyGenerator$AES128");
+                "org.bouncycastle.jce.provider.JCEKeyGenerator$AES128");
         put("KeyGenerator.2.16.840.1.101.3.4.1.22",
-            "org.bouncycastle.jce.provider.JCEKeyGenerator$AES192");
+                "org.bouncycastle.jce.provider.JCEKeyGenerator$AES192");
         put("KeyGenerator.2.16.840.1.101.3.4.1.42",
-            "org.bouncycastle.jce.provider.JCEKeyGenerator$AES256");
+                "org.bouncycastle.jce.provider.JCEKeyGenerator$AES256");
         put("KeyGenerator.AESWRAP", "org.bouncycastle.jce.provider.JCEKeyGenerator$AES");
         put("KeyGenerator.SERPENT", "org.bouncycastle.jce.provider.JCEKeyGenerator$Serpent");
         put("KeyGenerator.CAST5", "org.bouncycastle.jce.provider.JCEKeyGenerator$CAST5");
         put("KeyGenerator.1.2.840.113533.7.66.10",
-            "org.bouncycastle.jce.provider.JCEKeyGenerator$CAST5");
+                "org.bouncycastle.jce.provider.JCEKeyGenerator$CAST5");
         put("KeyGenerator.CAST6", "org.bouncycastle.jce.provider.JCEKeyGenerator$CAST6");
         put("KeyGenerator.IDEA", "org.bouncycastle.jce.provider.JCEKeyGenerator$IDEA");
         put("KeyGenerator.1.3.6.1.4.1.188.7.1.1.2",
-            "org.bouncycastle.jce.provider.JCEKeyGenerator$IDEA");
+                "org.bouncycastle.jce.provider.JCEKeyGenerator$IDEA");
         put("KeyGenerator.HMACMD2", "org.bouncycastle.jce.provider.JCEKeyGenerator$MD2HMAC");
         put("KeyGenerator.HMACMD4", "org.bouncycastle.jce.provider.JCEKeyGenerator$MD4HMAC");
         put("KeyGenerator.HMACMD5", "org.bouncycastle.jce.provider.JCEKeyGenerator$MD5HMAC");
         put("KeyGenerator.HMACRIPEMD128",
-            "org.bouncycastle.jce.provider.JCEKeyGenerator$RIPEMD128HMAC");
+                "org.bouncycastle.jce.provider.JCEKeyGenerator$RIPEMD128HMAC");
         put("KeyGenerator.HMACRIPEMD160",
-            "org.bouncycastle.jce.provider.JCEKeyGenerator$RIPEMD160HMAC");
+                "org.bouncycastle.jce.provider.JCEKeyGenerator$RIPEMD160HMAC");
         put("KeyGenerator.HMACSHA1", "org.bouncycastle.jce.provider.JCEKeyGenerator$HMACSHA1");
         put("KeyGenerator.HMACTIGER", "org.bouncycastle.jce.provider.JCEKeyGenerator$HMACTIGER");
         //
@@ -360,32 +361,32 @@ public class BouncyCastleProvider extends Provider {
         // Algorithm parameters
         //
         put("AlgorithmParameters.DES",
-            "org.bouncycastle.jce.provider.JDKAlgorithmParameters$IVAlgorithmParameters");
+                "org.bouncycastle.jce.provider.JDKAlgorithmParameters$IVAlgorithmParameters");
         put("Alg.Alias.AlgorithmParameters.1.3.14.3.2.7", "DES");
         put("AlgorithmParameters.DESEDE",
-            "org.bouncycastle.jce.provider.JDKAlgorithmParameters$IVAlgorithmParameters");
+                "org.bouncycastle.jce.provider.JDKAlgorithmParameters$IVAlgorithmParameters");
         put("AlgorithmParameters.1.2.840.113549.3.7",
-            "org.bouncycastle.jce.provider.JDKAlgorithmParameters$IVAlgorithmParameters");
+                "org.bouncycastle.jce.provider.JDKAlgorithmParameters$IVAlgorithmParameters");
         put("AlgorithmParameters.RC2",
-            "org.bouncycastle.jce.provider.JDKAlgorithmParameters$RC2AlgorithmParameters");
+                "org.bouncycastle.jce.provider.JDKAlgorithmParameters$RC2AlgorithmParameters");
         put("AlgorithmParameters.1.2.840.113549.3.2",
-            "org.bouncycastle.jce.provider.JDKAlgorithmParameters$RC2AlgorithmParameters");
+                "org.bouncycastle.jce.provider.JDKAlgorithmParameters$RC2AlgorithmParameters");
         put("AlgorithmParameters.RC5",
-            "org.bouncycastle.jce.provider.JDKAlgorithmParameters$IVAlgorithmParameters");
+                "org.bouncycastle.jce.provider.JDKAlgorithmParameters$IVAlgorithmParameters");
         put("AlgorithmParameters.RC6",
-            "org.bouncycastle.jce.provider.JDKAlgorithmParameters$IVAlgorithmParameters");
+                "org.bouncycastle.jce.provider.JDKAlgorithmParameters$IVAlgorithmParameters");
         put("AlgorithmParameters.IDEA",
-            "org.bouncycastle.jce.provider.JDKAlgorithmParameters$IDEAAlgorithmParameters");
+                "org.bouncycastle.jce.provider.JDKAlgorithmParameters$IDEAAlgorithmParameters");
         put("AlgorithmParameters.BLOWFISH",
-            "org.bouncycastle.jce.provider.JDKAlgorithmParameters$IVAlgorithmParameters");
+                "org.bouncycastle.jce.provider.JDKAlgorithmParameters$IVAlgorithmParameters");
         put("AlgorithmParameters.TWOFISH",
-            "org.bouncycastle.jce.provider.JDKAlgorithmParameters$IVAlgorithmParameters");
+                "org.bouncycastle.jce.provider.JDKAlgorithmParameters$IVAlgorithmParameters");
         put("AlgorithmParameters.SKIPJACK",
-            "org.bouncycastle.jce.provider.JDKAlgorithmParameters$IVAlgorithmParameters");
+                "org.bouncycastle.jce.provider.JDKAlgorithmParameters$IVAlgorithmParameters");
         put("AlgorithmParameters.RIJNDAEL",
-            "org.bouncycastle.jce.provider.JDKAlgorithmParameters$IVAlgorithmParameters");
+                "org.bouncycastle.jce.provider.JDKAlgorithmParameters$IVAlgorithmParameters");
         put("AlgorithmParameters.AES",
-            "org.bouncycastle.jce.provider.JDKAlgorithmParameters$IVAlgorithmParameters");
+                "org.bouncycastle.jce.provider.JDKAlgorithmParameters$IVAlgorithmParameters");
         put("Alg.Alias.AlgorithmParameters.2.16.840.1.101.3.4.2", "AES");
         put("Alg.Alias.AlgorithmParameters.2.16.840.1.101.3.4.22", "AES");
         put("Alg.Alias.AlgorithmParameters.2.16.840.1.101.3.4.42", "AES");
@@ -396,9 +397,9 @@ public class BouncyCastleProvider extends Provider {
         // secret key factories.
         //
         put("SecretKeyFactory.PBE/PKCS5",
-            "org.bouncycastle.jce.provider.JCESecretKeyFactory$PBE_PKCS5");
+                "org.bouncycastle.jce.provider.JCESecretKeyFactory$PBE_PKCS5");
         put("SecretKeyFactory.PBE/PKCS12",
-            "org.bouncycastle.jce.provider.JCESecretKeyFactory$PBE_PKCS12");
+                "org.bouncycastle.jce.provider.JCESecretKeyFactory$PBE_PKCS12");
         put("SecretKeyFactory.DES", "org.bouncycastle.jce.provider.JCESecretKeyFactory$DES");
         put("SecretKeyFactory.DESEDE", "org.bouncycastle.jce.provider.JCESecretKeyFactory$DESede");
         put("SecretKeyFactory.DESEDE", "org.bouncycastle.jce.provider.JCESecretKeyFactory$DESede");
@@ -504,7 +505,7 @@ public class BouncyCastleProvider extends Provider {
         put("MessageDigest.MD4", "org.bouncycastle.jce.provider.JDKMessageDigest$MD4");
         put("MessageDigest.MD5", "org.bouncycastle.jce.provider.JDKMessageDigest$MD5");
         put("MessageDigest.1.2.840.113549.2.5",
-            "org.bouncycastle.jce.provider.JDKMessageDigest$MD5");
+                "org.bouncycastle.jce.provider.JDKMessageDigest$MD5");
         put("MessageDigest.RIPEMD128", "org.bouncycastle.jce.provider.JDKMessageDigest$RIPEMD128");
         put("MessageDigest.RIPEMD160", "org.bouncycastle.jce.provider.JDKMessageDigest$RIPEMD160");
         put("MessageDigest.RIPEMD256", "org.bouncycastle.jce.provider.JDKMessageDigest$RIPEMD256");
@@ -514,32 +515,32 @@ public class BouncyCastleProvider extends Provider {
         // signature algorithms.
         //
         put("Signature.MD2WithRSAEncryption",
-            "org.bouncycastle.jce.provider.JDKDigestSignature$MD2WithRSAEncryption");
+                "org.bouncycastle.jce.provider.JDKDigestSignature$MD2WithRSAEncryption");
         put("Signature.MD5WithRSAEncryption",
-            "org.bouncycastle.jce.provider.JDKDigestSignature$MD5WithRSAEncryption");
+                "org.bouncycastle.jce.provider.JDKDigestSignature$MD5WithRSAEncryption");
         put("Signature.SHA1WithRSAEncryption",
-            "org.bouncycastle.jce.provider.JDKDigestSignature$SHA1WithRSAEncryption");
+                "org.bouncycastle.jce.provider.JDKDigestSignature$SHA1WithRSAEncryption");
         put("Signature.RIPEMD160WithRSAEncryption",
-            "org.bouncycastle.jce.provider.JDKDigestSignature$RIPEMD160WithRSAEncryption");
+                "org.bouncycastle.jce.provider.JDKDigestSignature$RIPEMD160WithRSAEncryption");
         put("Signature.RIPEMD128WithRSAEncryption",
-            "org.bouncycastle.jce.provider.JDKDigestSignature$RIPEMD128WithRSAEncryption");
+                "org.bouncycastle.jce.provider.JDKDigestSignature$RIPEMD128WithRSAEncryption");
         put("Signature.RIPEMD256WithRSAEncryption",
-            "org.bouncycastle.jce.provider.JDKDigestSignature$RIPEMD256WithRSAEncryption");
+                "org.bouncycastle.jce.provider.JDKDigestSignature$RIPEMD256WithRSAEncryption");
         put("Signature.DSA", "org.bouncycastle.jce.provider.JDKDSASigner$stdDSA");
         put("Signature.ECDSA", "org.bouncycastle.jce.provider.JDKDSASigner$ecDSA");
         put("Signature.SHA1withRSA/ISO9796-2",
-            "org.bouncycastle.jce.provider.JDKISOSignature$SHA1WithRSAEncryption");
+                "org.bouncycastle.jce.provider.JDKISOSignature$SHA1WithRSAEncryption");
         put("Signature.MD5withRSA/ISO9796-2",
-            "org.bouncycastle.jce.provider.JDKISOSignature$MD5WithRSAEncryption");
+                "org.bouncycastle.jce.provider.JDKISOSignature$MD5WithRSAEncryption");
         put("Signature.RIPEMD160withRSA/ISO9796-2",
-            "org.bouncycastle.jce.provider.JDKISOSignature$RIPEMD160WithRSAEncryption");
+                "org.bouncycastle.jce.provider.JDKISOSignature$RIPEMD160WithRSAEncryption");
         put("Signature.SHA1withRSA/PSS", "org.bouncycastle.jce.provider.JDKPSSSigner$SHA1withRSA");
         put("Signature.SHA256withRSA/PSS",
-            "org.bouncycastle.jce.provider.JDKPSSSigner$SHA256withRSA");
+                "org.bouncycastle.jce.provider.JDKPSSSigner$SHA256withRSA");
         put("Signature.SHA384withRSA/PSS",
-            "org.bouncycastle.jce.provider.JDKPSSSigner$SHA384withRSA");
+                "org.bouncycastle.jce.provider.JDKPSSSigner$SHA384withRSA");
         put("Signature.SHA512withRSA/PSS",
-            "org.bouncycastle.jce.provider.JDKPSSSigner$SHA512withRSA");
+                "org.bouncycastle.jce.provider.JDKPSSSigner$SHA512withRSA");
         put("Alg.Alias.Signature.MD2withRSAEncryption", "MD2WithRSAEncryption");
         put("Alg.Alias.Signature.MD5withRSAEncryption", "MD5WithRSAEncryption");
         put("Alg.Alias.Signature.SHA1withRSAEncryption", "SHA1WithRSAEncryption");
@@ -569,7 +570,7 @@ public class BouncyCastleProvider extends Provider {
         put("Alg.Alias.Signature.1.3.14.3.2.26with1.2.840.113549.1.1.1", "SHA1WithRSAEncryption");
         put("Alg.Alias.Signature.1.3.14.3.2.26with1.2.840.113549.1.1.5", "SHA1WithRSAEncryption");
         put("Alg.Alias.Signature.1.2.840.113549.2.5with1.2.840.113549.1.1.1",
-            "MD5WithRSAEncryption");
+                "MD5WithRSAEncryption");
         put("Alg.Alias.Signature.RIPEMD160WithRSA", "RIPEMD160WithRSAEncryption");
         put("Alg.Alias.Signature.RIPEMD160withRSA", "RIPEMD160WithRSAEncryption");
         put("Alg.Alias.Signature.RIPEMD128WithRSA", "RIPEMD128WithRSAEncryption");

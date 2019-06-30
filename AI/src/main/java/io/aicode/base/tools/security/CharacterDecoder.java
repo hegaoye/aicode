@@ -34,14 +34,14 @@ import java.nio.ByteBuffer;
  * original binary form. 41 * 42 * The character encoders, in general, have been
  * structured 43 * around a central theme that binary data can be encoded into
  * 44 * text that has the form: 45 * 46 *
- * 
+ * <p>
  * <pre>
  *    47    *      [Buffer Prefix]
  *    48    *      [Line Prefix][encoded data atoms][Line Suffix]
  *    49    *      [Buffer Suffix]
  *    50    *
  * </pre>
- * 
+ * <p>
  * 51 * 52 * Of course in the simplest encoding schemes, the buffer has no 53 *
  * distinct prefix of suffix, however all have some fixed relationship 54 *
  * between the text in an 'atom' and the binary data itself. 55 * 56 * In the
@@ -60,12 +60,12 @@ import java.nio.ByteBuffer;
  * </DL>
  * 70 * 71 * In general, the character decoders return error in the form of a 72
  * * CEFormatException. The syntax of the detail string is 73 *
- * 
+ * <p>
  * <pre>
  *    74    *      DecoderClassName: Error message.
  *    75    *
  * </pre>
- * 
+ * <p>
  * 76 * 77 * Several useful decoders have already been written and are 78 *
  * referenced in the See Also list below. 79 * 80 * @author Chuck McManis 81 * @see
  * CEFormatException 82 * @see CharacterEncoder 83 * @see UCDecoder 84 * @see
@@ -74,17 +74,25 @@ import java.nio.ByteBuffer;
 
 public abstract class CharacterDecoder {
 
-    /** Return the number of bytes per atom of decoding */
+    /**
+     * Return the number of bytes per atom of decoding
+     */
     abstract protected int bytesPerAtom();
 
-    /** Return the maximum number of bytes that can be encoded per line */
+    /**
+     * Return the maximum number of bytes that can be encoded per line
+     */
     abstract protected int bytesPerLine();
 
-    /** decode the beginning of the buffer, by default this is a NOP. */
+    /**
+     * decode the beginning of the buffer, by default this is a NOP.
+     */
     protected void decodeBufferPrefix(PushbackInputStream aStream, OutputStream bStream) throws IOException {
     }
 
-    /** decode the buffer suffix, again by default it is a NOP. */
+    /**
+     * decode the buffer suffix, again by default it is a NOP.
+     */
     protected void decodeBufferSuffix(PushbackInputStream aStream, OutputStream bStream) throws IOException {
     }
 
@@ -125,7 +133,7 @@ public abstract class CharacterDecoder {
         for (int i = 0; i < len; i++) {
             int q = in.read();
             if (q == -1) return ((i == 0) ? -1 : i);
-            buffer[i + offset] = (byte)q;
+            buffer[i + offset] = (byte) q;
         }
         return len;
     }
@@ -174,7 +182,7 @@ public abstract class CharacterDecoder {
      * CEFormatException An error has occured while decoding 185
      */
     @SuppressWarnings("deprecation")
-    public byte decodeBuffer(String inputString)[] throws IOException {
+    public byte decodeBuffer(String inputString)[]throws IOException {
         byte inputBuffer[] = new byte[inputString.length()];
         ByteArrayInputStream inStream;
         ByteArrayOutputStream outStream;
@@ -189,7 +197,7 @@ public abstract class CharacterDecoder {
     /**
      * 199 * Decode the contents of the inputstream into a buffer. 200
      */
-    public byte decodeBuffer(InputStream in)[] throws IOException {
+    public byte decodeBuffer(InputStream in)[]throws IOException {
         ByteArrayOutputStream outStream = new ByteArrayOutputStream();
         decodeBuffer(in, outStream);
         return (outStream.toByteArray());

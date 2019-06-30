@@ -103,7 +103,7 @@ public class SortTools implements Serializable {
     }
 
     private static SortTools _formString(String orderSegment, String orderExpr) {
-        SortTools sortTools=null;
+        SortTools sortTools = null;
         if (orderSegment == null || orderSegment.trim().equals("") ||
                 orderSegment.startsWith("null.") || orderSegment.startsWith(".")) {
             return null;
@@ -113,10 +113,10 @@ public class SortTools implements Serializable {
         if (array.length != 1 && array.length != 2 && array.length != 3) {
             throw new IllegalArgumentException("orderSegment pattern must be {property}.{direction}, input is: " + orderSegment);
         }
-        if(array.length==3){
-            sortTools=create(array[0]+"."+array[1], array[2], orderExpr);
-        }else{
-            sortTools=create(array[0], array.length == 2 ? array[1] : "asc", orderExpr);
+        if (array.length == 3) {
+            sortTools = create(array[0] + "." + array[1], array[2], orderExpr);
+        } else {
+            sortTools = create(array[0], array.length == 2 ? array[1] : "asc", orderExpr);
         }
 
         return sortTools;

@@ -4,7 +4,7 @@ import java.io.*;
 
 /**
  * 密码器类
- * 
+ *
  * @author ShenHuaJie
  * @since 2011-12-31
  */
@@ -14,15 +14,15 @@ public class BASE64Encoder {
      * 译码数据源
      */
     private static final char[] PEM_ARRAY = {
-        // 0  1   2   3    4    5    6    7
-        'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', // 0
-        'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', // 1
-        'q', 'r', 's', 't', 'u', 'v', 'w', 'x', // 2
-        'y', 'z', '1', '2', '3', '4', '5', '6', // 3
-        '7', '8', '9', '0', 'A', 'B', 'C', 'D', // 4
-        'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', // 5
-        'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', // 6
-        'U', 'V', 'W', 'X', 'Y', 'Z', '+', '/' // 7
+            // 0  1   2   3    4    5    6    7
+            'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', // 0
+            'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', // 1
+            'q', 'r', 's', 't', 'u', 'v', 'w', 'x', // 2
+            'y', 'z', '1', '2', '3', '4', '5', '6', // 3
+            '7', '8', '9', '0', 'A', 'B', 'C', 'D', // 4
+            'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', // 5
+            'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', // 6
+            'U', 'V', 'W', 'X', 'Y', 'Z', '+', '/' // 7
     };
 
     private static final byte[] pem_convert_array = new byte[256];
@@ -43,30 +43,30 @@ public class BASE64Encoder {
         while (curPos < totalBits) {
             int bytePos = curPos / 8;
             switch (curPos % 8) {
-            case 0:
-                toReturn.append(PEM_ARRAY[(bt[bytePos] & 0xfc) >> 2]);
-                break;
-            case 2:
-                toReturn.append(PEM_ARRAY[(bt[bytePos] & 0x3f)]);
-                break;
-            case 4:
-                if (bytePos == bt.length - 1) {
-                    toReturn.append(PEM_ARRAY[((bt[bytePos] & 0x0f) << 2) & 0x3f]);
-                } else {
-                    int pos = (((bt[bytePos] & 0x0f) << 2) | ((bt[bytePos + 1] & 0xc0) >> 6)) & 0x3f;
-                    toReturn.append(PEM_ARRAY[pos]);
-                }
-                break;
-            case 6:
-                if (bytePos == bt.length - 1) {
-                    toReturn.append(PEM_ARRAY[((bt[bytePos] & 0x03) << 4) & 0x3f]);
-                } else {
-                    int pos = (((bt[bytePos] & 0x03) << 4) | ((bt[bytePos + 1] & 0xf0) >> 4)) & 0x3f;
-                    toReturn.append(PEM_ARRAY[pos]);
-                }
-                break;
-            default:
-                break;
+                case 0:
+                    toReturn.append(PEM_ARRAY[(bt[bytePos] & 0xfc) >> 2]);
+                    break;
+                case 2:
+                    toReturn.append(PEM_ARRAY[(bt[bytePos] & 0x3f)]);
+                    break;
+                case 4:
+                    if (bytePos == bt.length - 1) {
+                        toReturn.append(PEM_ARRAY[((bt[bytePos] & 0x0f) << 2) & 0x3f]);
+                    } else {
+                        int pos = (((bt[bytePos] & 0x0f) << 2) | ((bt[bytePos + 1] & 0xc0) >> 6)) & 0x3f;
+                        toReturn.append(PEM_ARRAY[pos]);
+                    }
+                    break;
+                case 6:
+                    if (bytePos == bt.length - 1) {
+                        toReturn.append(PEM_ARRAY[((bt[bytePos] & 0x03) << 4) & 0x3f]);
+                    } else {
+                        int pos = (((bt[bytePos] & 0x03) << 4) | ((bt[bytePos + 1] & 0xf0) >> 4)) & 0x3f;
+                        toReturn.append(PEM_ARRAY[pos]);
+                    }
+                    break;
+                default:
+                    break;
             }
             curPos += 6;
         }
@@ -126,7 +126,7 @@ public class BASE64Encoder {
     }
 
     private void decodeAtom(PushbackInputStream paramPushbackInputStream, OutputStream paramOutputStream, int paramInt)
-        throws IOException {
+            throws IOException {
         int i;
         int j = -1;
         int k = -1;
@@ -142,7 +142,7 @@ public class BASE64Encoder {
                 throw new RuntimeException();
             }
         } while ((i == 10) || (i == 13));
-        this.decode_buffer[0] = (byte)i;
+        this.decode_buffer[0] = (byte) i;
 
         i = readFully(paramPushbackInputStream, this.decode_buffer, 1, paramInt - 1);
         if (i == -1) {
@@ -156,38 +156,38 @@ public class BASE64Encoder {
             paramInt = 2;
         }
         switch (paramInt) {
-        case 4:
-            n = pem_convert_array[(this.decode_buffer[3] & 0xFF)];
-        case 3:
-            m = pem_convert_array[(this.decode_buffer[2] & 0xFF)];
-        case 2:
-            k = pem_convert_array[(this.decode_buffer[1] & 0xFF)];
-            j = pem_convert_array[(this.decode_buffer[0] & 0xFF)];
+            case 4:
+                n = pem_convert_array[(this.decode_buffer[3] & 0xFF)];
+            case 3:
+                m = pem_convert_array[(this.decode_buffer[2] & 0xFF)];
+            case 2:
+                k = pem_convert_array[(this.decode_buffer[1] & 0xFF)];
+                j = pem_convert_array[(this.decode_buffer[0] & 0xFF)];
         }
 
         switch (paramInt) {
-        case 2:
-            paramOutputStream.write((byte)(j << 2 & 0xFC | k >>> 4 & 0x3));
-            break;
-        case 3:
-            paramOutputStream.write((byte)(j << 2 & 0xFC | k >>> 4 & 0x3));
-            paramOutputStream.write((byte)(k << 4 & 0xF0 | m >>> 2 & 0xF));
-            break;
-        case 4:
-            paramOutputStream.write((byte)(j << 2 & 0xFC | k >>> 4 & 0x3));
-            paramOutputStream.write((byte)(k << 4 & 0xF0 | m >>> 2 & 0xF));
-            paramOutputStream.write((byte)(m << 6 & 0xC0 | n & 0x3F));
+            case 2:
+                paramOutputStream.write((byte) (j << 2 & 0xFC | k >>> 4 & 0x3));
+                break;
+            case 3:
+                paramOutputStream.write((byte) (j << 2 & 0xFC | k >>> 4 & 0x3));
+                paramOutputStream.write((byte) (k << 4 & 0xF0 | m >>> 2 & 0xF));
+                break;
+            case 4:
+                paramOutputStream.write((byte) (j << 2 & 0xFC | k >>> 4 & 0x3));
+                paramOutputStream.write((byte) (k << 4 & 0xF0 | m >>> 2 & 0xF));
+                paramOutputStream.write((byte) (m << 6 & 0xC0 | n & 0x3F));
         }
     }
 
     private int readFully(InputStream paramInputStream, byte[] paramArrayOfByte, int paramInt1, int paramInt2)
-        throws IOException {
+            throws IOException {
         for (int i = 0; i < paramInt2; i++) {
             int j = paramInputStream.read();
             if (j == -1) {
                 return i == 0 ? -1 : i;
             }
-            paramArrayOfByte[(i + paramInt1)] = (byte)j;
+            paramArrayOfByte[(i + paramInt1)] = (byte) j;
         }
         return paramInt2;
     }
@@ -197,6 +197,6 @@ public class BASE64Encoder {
             pem_convert_array[i] = -1;
         }
         for (int i = 0; i < PEM_ARRAY.length; i++)
-            pem_convert_array[PEM_ARRAY[i]] = (byte)i;
+            pem_convert_array[PEM_ARRAY[i]] = (byte) i;
     }
 }

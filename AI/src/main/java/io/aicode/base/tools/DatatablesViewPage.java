@@ -1,12 +1,15 @@
 package io.aicode.base.tools;
+
 import java.util.List;
 
 public class DatatablesViewPage<T> {
-  
+
     private List<T> aaData; //aaData 与datatales 加载的“dataSrc"对应
-    private int iTotalDisplayRecords;   
-    private int iTotalRecords;  
-    public DatatablesViewPage() {}
+    private int iTotalDisplayRecords;
+    private int iTotalRecords;
+
+    public DatatablesViewPage() {
+    }
 
     public List<T> getAaData() {
         return aaData;

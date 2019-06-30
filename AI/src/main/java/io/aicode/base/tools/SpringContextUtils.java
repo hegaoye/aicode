@@ -18,7 +18,7 @@ public class SpringContextUtils implements ApplicationContextAware {
     }
 
     public static ApplicationContext getContext() {
-        if(ctx == null) {
+        if (ctx == null) {
             logger.warn("SpringContextUtils通过Web容器获取ApplicationContext对象失败！即将通过XML配置文件来实例化容器！");
             ctx = new ClassPathXmlApplicationContext("framework/spring-core.xml");
         }
@@ -27,7 +27,7 @@ public class SpringContextUtils implements ApplicationContextAware {
     }
 
     public void setApplicationContext(ApplicationContext context) {
-        if(ctx != null) {
+        if (ctx != null) {
             logger.warn("ApplicationContext被覆盖！");
         }
 
@@ -50,7 +50,7 @@ public class SpringContextUtils implements ApplicationContextAware {
     }
 
     private static void assertCtxIsNull() {
-        if(ctx == null) {
+        if (ctx == null) {
             throw new IllegalStateException("SpringContextUtils的ApplicationContext为空，请检查问题！");
         }
     }

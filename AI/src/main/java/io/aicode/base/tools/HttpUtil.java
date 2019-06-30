@@ -34,192 +34,197 @@ import java.util.List;
 
 /**
  * HTTP工具类，获取用户真实IP等信息
+ *
  * @author CCW
- * 2017-03-31
+ *         2017-03-31
  */
 
 public class HttpUtil {
-	private final static Logger logger = LoggerFactory.getLogger(HttpUtil.class);
-	
-	/**
-	 * 获取用户真实IP
-	 *
-	 * 2017-03-31
-	 * @param request
-	 * @return IP
-	 */
-	public String getIpAddr(HttpServletRequest request) {
-		String ip = request.getHeader("x-forwarded-for");
-		if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-			ip = request.getHeader("Proxy-Client-IP");
-		}
-		if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-			ip = request.getHeader("WL-Proxy-Client-IP");
-		}
-		if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-			ip = request.getRemoteAddr();
-		}
-		return ip;
-	}
+    private final static Logger logger = LoggerFactory.getLogger(HttpUtil.class);
 
-	/**
-	 * 向指定 URL 发送POST方法的请求
-	 *
-	 * @param url   发送请求的 URL
-	 * @param param 请求参数，请求参数应该是 name1=value1&name2=value2 的形式。
-	 * @return 所代表远程资源的响应结果
-	 */
-	public static String sendPost(String url, String param) {
-		List formparams = params2Map(param);
-		CloseableHttpClient httpClient = HttpClients.createDefault();
-		HttpPost post = new HttpPost(url);
-		String result = "";         //post结果
-		RequestConfig config = RequestConfig.custom()
-				.setConnectionRequestTimeout(10000)     //设置连接请求超时
-				.setConnectTimeout(10000)               //设置连接超时
-				.setSocketTimeout(10000)                //设置请求超时
-				.build();
-		CloseableHttpResponse response = null;
-		try {
-			post.setEntity(new UrlEncodedFormEntity(formparams, "UTF-8"));
-			post.setConfig(config);
-			response = httpClient.execute(post);
-			HttpEntity entity = response.getEntity();
-			result = EntityUtils.toString(entity, "UTF-8");
-			EntityUtils.consume(entity);
-		} catch (ClientProtocolException e) {
-			logger.error("post 请求异常 catch：ClientProtocolException = " + e);
-		} catch (IOException e) {
-			logger.error("post 请求异常 catch：IOException = " + e);
-		} finally {
-			closeResponse(response);
-		}
-		return result;
-	}
+    /**
+     * 获取用户真实IP
+     * <p>
+     * 2017-03-31
+     *
+     * @param request
+     * @return IP
+     */
+    public String getIpAddr(HttpServletRequest request) {
+        String ip = request.getHeader("x-forwarded-for");
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("Proxy-Client-IP");
+        }
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("WL-Proxy-Client-IP");
+        }
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getRemoteAddr();
+        }
+        return ip;
+    }
 
-	/**
-	 * 向指定 URL 发送 GET 方法的请求
-	 * @param url 发送请求的 URL
-	 * @return 所代表远程资源的响应结果
-	 */
-	public static String sendGet(String url) {
-		CloseableHttpClient httpClient = HttpClients.createDefault();
-		HttpGet get = new HttpGet(url);
-		String result = "";         //post结果
-		RequestConfig config = RequestConfig.custom()   //自定义请求参数
-				.setConnectionRequestTimeout(10000)     //设置连接请求超时
-				.setConnectTimeout(10000)               //设置连接超时
-				.setSocketTimeout(10000)                //设置请求超时
-				.build();
-		CloseableHttpResponse response = null;
-		try {
-			get.setConfig(config);
-			response = httpClient.execute(get);
-			HttpEntity entity = response.getEntity();
-			result = EntityUtils.toString(entity, "UTF-8").trim();
-			EntityUtils.consume(entity);
-		} catch (ClientProtocolException e) {
-			logger.error("get 请求异常 catch：ClientProtocolException = " + e);
-		} catch (IOException e) {
-			logger.error("get 请求异常 catch：IOException = " + e);
-		} finally {
-			closeResponse(response);
-		}
-		return result;
-	}
-	
-	
-	/**
-	 * POST请求
-	 *
-	 * 2017-03-31
-	 * @param url 请求路径
-	 * @param param 请求参数
-	 * @return json格式字符串
-	 */
-	public static String doPost(String url, String param) {
-		PrintWriter out = null;
-		BufferedReader in = null;
-		String result = "";
-		try {
-			URL realUrl = new URL(url);
-			// 打开和URL之间的连接
-			URLConnection conn = realUrl.openConnection();
-			// 设置通用的请求属性
-			conn.setRequestProperty("accept", "*/*");
-			conn.setRequestProperty("connection", "Keep-Alive");
-			conn.setRequestProperty("user-agent",
-					"Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1;SV1)");
-			// 发送POST请求必须设置如下两行
-			conn.setDoOutput(true);
-			conn.setDoInput(true);
-			// 获取URLConnection对象对应的输出流
-			out = new PrintWriter(conn.getOutputStream());
-			// 发送请求参数
-			out.print(param);
-			// flush输出流的缓冲
-			out.flush();
-			// 定义BufferedReader输入流来读取URL的响应
-			in = new BufferedReader(
-					new InputStreamReader(conn.getInputStream()));
-			String line;
-			while ((line = in.readLine()) != null) {
-				result += line;
-			}
-		} catch (Exception e) {
-			System.out.println("发送 POST 请求出现异常！" + e);
-			e.printStackTrace();
-		}
-		// 使用finally块来关闭输出流、输入流
-		finally {
-			try {
-				if (out != null) {
-					out.close();
-				}
-				if (in != null) {
-					in.close();
-				}
-			} catch (IOException ex) {
-				ex.printStackTrace();
-			}
-		}
-		 return result;
-	}
+    /**
+     * 向指定 URL 发送POST方法的请求
+     *
+     * @param url   发送请求的 URL
+     * @param param 请求参数，请求参数应该是 name1=value1&name2=value2 的形式。
+     * @return 所代表远程资源的响应结果
+     */
+    public static String sendPost(String url, String param) {
+        List formparams = params2Map(param);
+        CloseableHttpClient httpClient = HttpClients.createDefault();
+        HttpPost post = new HttpPost(url);
+        String result = "";         //post结果
+        RequestConfig config = RequestConfig.custom()
+                .setConnectionRequestTimeout(10000)     //设置连接请求超时
+                .setConnectTimeout(10000)               //设置连接超时
+                .setSocketTimeout(10000)                //设置请求超时
+                .build();
+        CloseableHttpResponse response = null;
+        try {
+            post.setEntity(new UrlEncodedFormEntity(formparams, "UTF-8"));
+            post.setConfig(config);
+            response = httpClient.execute(post);
+            HttpEntity entity = response.getEntity();
+            result = EntityUtils.toString(entity, "UTF-8");
+            EntityUtils.consume(entity);
+        } catch (ClientProtocolException e) {
+            logger.error("post 请求异常 catch：ClientProtocolException = " + e);
+        } catch (IOException e) {
+            logger.error("post 请求异常 catch：IOException = " + e);
+        } finally {
+            closeResponse(response);
+        }
+        return result;
+    }
 
-	/**
-	 * &符号隔开的请求参数字符串，转Map
-	 *
-	 * @param param
-	 * @return
-	 */
-	private static List params2Map(String param) {
-		List formparams = new ArrayList();
-		String[] paramAry = param.split("&");
-		for (int i = 0; i < paramAry.length; i++) {
-			String str = paramAry[i];
-			String key = str.substring(0, str.indexOf("="));
-			String value = str.substring(str.indexOf("=") + 1, str.length());
-			formparams.add(new BasicNameValuePair(key, value));
-		}
-		return formparams;
-	}
+    /**
+     * 向指定 URL 发送 GET 方法的请求
+     *
+     * @param url 发送请求的 URL
+     * @return 所代表远程资源的响应结果
+     */
+    public static String sendGet(String url) {
+        CloseableHttpClient httpClient = HttpClients.createDefault();
+        HttpGet get = new HttpGet(url);
+        String result = "";         //post结果
+        RequestConfig config = RequestConfig.custom()   //自定义请求参数
+                .setConnectionRequestTimeout(10000)     //设置连接请求超时
+                .setConnectTimeout(10000)               //设置连接超时
+                .setSocketTimeout(10000)                //设置请求超时
+                .build();
+        CloseableHttpResponse response = null;
+        try {
+            get.setConfig(config);
+            response = httpClient.execute(get);
+            HttpEntity entity = response.getEntity();
+            result = EntityUtils.toString(entity, "UTF-8").trim();
+            EntityUtils.consume(entity);
+        } catch (ClientProtocolException e) {
+            logger.error("get 请求异常 catch：ClientProtocolException = " + e);
+        } catch (IOException e) {
+            logger.error("get 请求异常 catch：IOException = " + e);
+        } finally {
+            closeResponse(response);
+        }
+        return result;
+    }
 
-	/**
-	 * 关闭 http响应实例
-	 * @param response
-	 */
-	public static void closeResponse(CloseableHttpResponse response) {
-		try {
-			if (response != null) {
-				response.close();
-			}
-		} catch (IOException e) {
-			logger.error("关闭 http响应 finally catch：IOException = " + e);
-		}
-	}
+
+    /**
+     * POST请求
+     * <p>
+     * 2017-03-31
+     *
+     * @param url   请求路径
+     * @param param 请求参数
+     * @return json格式字符串
+     */
+    public static String doPost(String url, String param) {
+        PrintWriter out = null;
+        BufferedReader in = null;
+        String result = "";
+        try {
+            URL realUrl = new URL(url);
+            // 打开和URL之间的连接
+            URLConnection conn = realUrl.openConnection();
+            // 设置通用的请求属性
+            conn.setRequestProperty("accept", "*/*");
+            conn.setRequestProperty("connection", "Keep-Alive");
+            conn.setRequestProperty("user-agent",
+                    "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1;SV1)");
+            // 发送POST请求必须设置如下两行
+            conn.setDoOutput(true);
+            conn.setDoInput(true);
+            // 获取URLConnection对象对应的输出流
+            out = new PrintWriter(conn.getOutputStream());
+            // 发送请求参数
+            out.print(param);
+            // flush输出流的缓冲
+            out.flush();
+            // 定义BufferedReader输入流来读取URL的响应
+            in = new BufferedReader(
+                    new InputStreamReader(conn.getInputStream()));
+            String line;
+            while ((line = in.readLine()) != null) {
+                result += line;
+            }
+        } catch (Exception e) {
+            System.out.println("发送 POST 请求出现异常！" + e);
+            e.printStackTrace();
+        }
+        // 使用finally块来关闭输出流、输入流
+        finally {
+            try {
+                if (out != null) {
+                    out.close();
+                }
+                if (in != null) {
+                    in.close();
+                }
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+        return result;
+    }
+
+    /**
+     * &符号隔开的请求参数字符串，转Map
+     *
+     * @param param
+     * @return
+     */
+    private static List params2Map(String param) {
+        List formparams = new ArrayList();
+        String[] paramAry = param.split("&");
+        for (int i = 0; i < paramAry.length; i++) {
+            String str = paramAry[i];
+            String key = str.substring(0, str.indexOf("="));
+            String value = str.substring(str.indexOf("=") + 1, str.length());
+            formparams.add(new BasicNameValuePair(key, value));
+        }
+        return formparams;
+    }
+
+    /**
+     * 关闭 http响应实例
+     *
+     * @param response
+     */
+    public static void closeResponse(CloseableHttpResponse response) {
+        try {
+            if (response != null) {
+                response.close();
+            }
+        } catch (IOException e) {
+            logger.error("关闭 http响应 finally catch：IOException = " + e);
+        }
+    }
 
 	/*public static String okget(String url) {
-		OkHttpClient client = new OkHttpClient();
+        OkHttpClient client = new OkHttpClient();
 		Request request = new Request.Builder()
 				.url(uri)
 				.get()

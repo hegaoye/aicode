@@ -174,12 +174,12 @@ public class LocalSession extends AbstractMap<String, Object> implements Seriali
     }
 
     /**
+     * @return : void
      * @Enclosing_Method : invalidate
      * @Written by        : lixin
      * @Creation Date     : 2012-7-20 下午02:47:26
      * @version : v1.00
      * @Description : 注销session
-     * @return             : void
      */
     public void invalidate() {
         if (map == null) {
@@ -192,12 +192,12 @@ public class LocalSession extends AbstractMap<String, Object> implements Seriali
     }
 
     /**
+     * @return : Set<Entry<String,Object>>
      * @Enclosing_Method : entrySet
      * @Written by        : lixin
      * @Creation Date     : 2012-7-20 下午03:33:52
      * @version : v1.00
      * @Description : 转化为Set
-     * @return             : Set<Entry<String,Object>>
      */
     public Set<Entry<String, Object>> entrySet() {
         return map.entrySet();

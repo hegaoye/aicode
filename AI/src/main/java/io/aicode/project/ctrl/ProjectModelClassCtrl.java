@@ -5,26 +5,23 @@
 package io.aicode.project.ctrl;
 
 import com.alibaba.fastjson.JSON;
+import io.aicode.base.BaseCtrl;
 import io.aicode.base.core.BeanRet;
 import io.aicode.base.core.entity.Page;
 import io.aicode.base.tools.StringTools;
-import io.aicode.base.tools.redis.RedisUtils;
 import io.aicode.project.entity.ProjectModelClass;
 import io.aicode.project.service.ProjectModelClassSV;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.data.redis.core.RedisTemplate;
-import springfox.documentation.annotations.ApiIgnore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 import javax.annotation.Resource;
-
-import io.aicode.base.BaseCtrl;
 
 
 /**
@@ -38,10 +35,6 @@ import io.aicode.base.BaseCtrl;
 public class ProjectModelClassCtrl extends BaseCtrl {
     private final static Logger logger = LoggerFactory.getLogger(ProjectModelClassCtrl.class);
 
-    @Resource
-    protected RedisTemplate<String, Object> redisTemplate;
-    @Resource
-    protected RedisUtils redisUtils;
 
     @Resource
     private ProjectModelClassSV projectModelClassSV;

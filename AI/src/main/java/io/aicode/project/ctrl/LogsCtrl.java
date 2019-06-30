@@ -1,7 +1,7 @@
 package io.aicode.project.ctrl;
 
 import io.aicode.base.BaseCtrl;
-import io.aicode.base.core.BeanRet ;
+import io.aicode.base.core.BeanRet;
 import io.aicode.base.exceptions.BaseException;
 import io.aicode.project.service.LogsSV;
 import io.aicode.setting.service.SettingSV;
@@ -22,7 +22,6 @@ import java.util.Date;
 
 /**
  * 项目管理控制器
-
  *
  * @author lixin
  */
@@ -67,7 +66,7 @@ public class LogsCtrl extends BaseCtrl {
     @ResponseBody
     public BeanRet saveLogs(String logs, String path) {
         Boolean result = logsSV.saveLogs(logs, path);
-        if(result) {
+        if (result) {
             return BeanRet.create(true, "成功");
         } else {
             return BeanRet.create(false, "失败");

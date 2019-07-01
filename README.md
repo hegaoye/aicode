@@ -101,8 +101,8 @@ docker search aicode
 #拉取aicode的镜像 hegaoye/aicode:1.0-beta
 docker pull hegaoye/aicode:1.0-beta
 
-#启动容器
-docker run --name aicode -p 8080:8080 --restart always -d hegaoye/aicode:1.0-beta
+#启动容器,注意 host,username,passowrd 要进行修改成自己的mysql主机
+docker run -e host=192.168.1.220:3306 -e username=root -e password=aicode -p 8080:8080 --name aicode --restart always -d  hegaoye/aicode:1.0-beta
 
 #查看日志
 docker logs --tail 1000 -f aicode

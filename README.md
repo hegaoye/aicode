@@ -41,12 +41,12 @@ ai-code 与其他开源的完整项目不同点在于技术整合框架的抽象
 
 # 使用方法
 ### 连接数据库：
--首先要做的就是建立``aicode``的数据库，建议使用``mysql``,脚本请用最新的版本日期，你可以在项目根目录下``sql/aicodexxxxx.sql``中找到合适的
-sql脚本,比如创建数据库名为``aicode``,数据库的ip为``192.168.1.220``,账户密码为``username=root,password=xxxxx``;
+-首先要做的就是建立``ai_code``的数据库，建议使用``mysql``,脚本请用最新的版本日期，你可以在项目根目录下``sql/aicodexxxxx.sql``中找到合适的
+sql脚本,比如创建数据库名为``ai_code``,数据库的ip为``192.168.1.220``,账户密码为``username=root,password=xxxxx``;
 
 -找到项目下 ``AI/src/main/resources/ai_jdbc.properties`` 文件将数据库链接修改成刚才初始化的数据库``ip``
 ```
-jdbc.url=jdbc:mysql://192.168.1.220:3306/aicode?useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=round&allowMultiQueries=true
+jdbc.url=jdbc:mysql://192.168.1.220:3306/ai_code?useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=round&allowMultiQueries=true
 jdbc.username=root
 jdbc.password=xxxxx
 ```

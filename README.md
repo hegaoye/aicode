@@ -94,6 +94,8 @@ swagger界面如下，我只用了一个简单的表来演示，你的要有多�
 ### docker 启动方式(推荐)
 docker 依赖dockerhub 镜像（意思是你的网络要支持访问哦，大家明白哈，搞不定的加群），大家可以通过docker的常规命令``pull`` ``run`` 即可，注意：docker镜像
 中不包含数据库，数据库脚本请从项目中下载进行初始化，数据库名称请使用``ai_code``命名，以下docker命令操作
+dockerhub 详细操作说明 https://hub.docker.com/r/hegaoye/aicode
+
 ```
 #搜索查看aicode的镜像是否存在
 docker search aicode

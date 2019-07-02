@@ -219,7 +219,7 @@ public class SqlFactory {
             return
                     sql.matches("(?s).*\\sin\\s*\\([:#\\$&]\\{?" + paramName + "\\}?[$#}]?\\).*") // match in (:username) ,not in (#username#)
                             || sql.matches("(?s).*[#$]" + paramName + "\\[]\\.?\\w*[#$].*") //match #user[]# $user[]$ #user[].age# for ibatis
-                            || sql.matches("(?s).*[#$]\\{" + paramName + "\\[[$\\{\\}\\w]+]\\}*.*"); //match #{user[index]}# ${user[${index}]}  for mybatis
+                            || sql.matches("(?s).*[#$]\\{" + paramName + "\\[[$\\{\\}\\w]+]\\}*.*"); //match #{user[index]}# ${user[${index}]}  for mapper
         }
 
         private Column findColumnByParamName(ParsedSql parsedSql, Sql sql, String paramName) throws Exception {

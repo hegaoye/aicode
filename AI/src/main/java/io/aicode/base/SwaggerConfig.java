@@ -18,7 +18,6 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
  * @version 2017年5月27日 上午9:50:59
  */
 @Configuration
-@EnableWebMvc
 @EnableSwagger2
 public class SwaggerConfig {
 

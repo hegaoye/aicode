@@ -1,118 +1,12 @@
-apply plugin: 'org.akhikhl.gretty'
-apply plugin: 'war'
+apply plugin: 'java'
+apply plugin: 'org.springframework.boot'
+
 dependencies {
-    compile rootProject.ext.dependencies["aopalliance"]
-    compile rootProject.ext.dependencies["cglib"]
-    compile rootProject.ext.dependencies["cglib-nodep"]
-
-    //------------通用工具 begin-----------------
-    compile rootProject.ext.dependencies["slf4j-api"]
-    compile rootProject.ext.dependencies["logback-core"]
-    compile rootProject.ext.dependencies["logback-classic"]
-    compile rootProject.ext.dependencies["logback-ext-spring"]
-    compile rootProject.ext.dependencies["commons-lang"]
-    compile rootProject.ext.dependencies["commons-beanutils"]
-    compile rootProject.ext.dependencies["commons-collections"]
-    compile rootProject.ext.dependencies["commons-httpclient"]
-    compile rootProject.ext.dependencies["commons-codec"]
-    compile rootProject.ext.dependencies["commons-discovery"]
-    compile rootProject.ext.dependencies["commons-logging"]
-    compile rootProject.ext.dependencies["commons-logging-api"]
-    compile rootProject.ext.dependencies["commons-fileupload"]
-    compile rootProject.ext.dependencies["commons-dbcp"]
-    compile rootProject.ext.dependencies["commons-pool"]
-    compile rootProject.ext.dependencies["commons-io"]
-    compile rootProject.ext.dependencies["dom4j"]
-    compile rootProject.ext.dependencies["druid"]
-    compile rootProject.ext.dependencies["ezmorph"]
-    compile rootProject.ext.dependencies["fastjson"]
-    compile rootProject.ext.dependencies["guava"]
-    compile rootProject.ext.dependencies["jcaptcha"]
-    //------------通用工具 begin-----------------
-
-    //-----------mybatis begin---------------
-    compile rootProject.ext.dependencies["druid"]
-    compile rootProject.ext.dependencies["mybatis"]
-    compile rootProject.ext.dependencies["mybatis-spring"]
-    compile rootProject.ext.dependencies["mysql-connector"]
-    compile rootProject.ext.dependencies["mybatis-paginator"]
-    //-----------mybatis end---------------
-
-    //-----------junit begin------------------
-    compile rootProject.ext.dependencies["hamcrest-core"]
-    compile rootProject.ext.dependencies["junit"]
-    //-----------junit end------------------
-
-    compile rootProject.ext.dependencies["jackson-core"]
-    compile rootProject.ext.dependencies["jackson-core-asl"]
-    compile rootProject.ext.dependencies["jackson-databind"]
-    compile rootProject.ext.dependencies["jackson-annotations"]
-    compile rootProject.ext.dependencies["jackson-jaxrs-base"]
-    compile rootProject.ext.dependencies["jackson-jaxrs-json-provider"]
-    compile rootProject.ext.dependencies["jackson-module-jaxb-annotations"]
-    compile rootProject.ext.dependencies["jackson-mapper-asl"]
-    compile rootProject.ext.dependencies["javassist"]
-    compile rootProject.ext.dependencies["javax.persistence"]
-    compile rootProject.ext.dependencies["javax.transaction"]
-    compile rootProject.ext.dependencies["jdom"]
-    compile rootProject.ext.dependencies["jline"]
-    compile rootProject.ext.dependencies["jtds"]
-    compile rootProject.ext.dependencies["jxl"]
-
-    //--------------jstl begin-----------------
-    compile rootProject.ext.dependencies["jstl"]
-    compile rootProject.ext.dependencies["standard"]
-    //--------------jstl end-----------------
-
-    //------------spring begin----------------
-    compile rootProject.ext.dependencies["aspectjweaver"]
-    compile rootProject.ext.dependencies["spring-aop"]
-    compile rootProject.ext.dependencies["spring-aspects"]
-    compile rootProject.ext.dependencies["spring-beans"]
-    compile rootProject.ext.dependencies["spring-context"]
-    compile rootProject.ext.dependencies["spring-context-support"]
-    compile rootProject.ext.dependencies["spring-core"]
-    compile rootProject.ext.dependencies["spring-expression"]
-    compile rootProject.ext.dependencies["spring-instrument"]
-    compile rootProject.ext.dependencies["spring-instrument-tomcat"]
-    compile rootProject.ext.dependencies["spring-jdbc"]
-    compile rootProject.ext.dependencies["spring-jms"]
-    compile rootProject.ext.dependencies["spring-orm"]
-    compile rootProject.ext.dependencies["spring-oxm"]
-    compile rootProject.ext.dependencies["spring-test"]
-    compile rootProject.ext.dependencies["spring-tx"]
-    compile rootProject.ext.dependencies["spring-web"]
-    compile rootProject.ext.dependencies["spring-webmvc"]
-    compile rootProject.ext.dependencies["spring-webmvc-portlet"]
-    compile rootProject.ext.dependencies["spring-websocket"]
-    compile rootProject.ext.dependencies["spring-messaging"]
-    //------------spring end----------------
-
-
-    compile rootProject.ext.dependencies["testng"]
-
-    // ----------jwt Nimbus JOSE+JWT begin----------
-    compile rootProject.ext.dependencies["java-jwt"]
-    //----------jwt Nimbus JOSE+JWT end------------
-
-    //------------swagger start-------------------
-    compile rootProject.ext.dependencies["swagger2"]
-    compile rootProject.ext.dependencies["swagger-ui"]
-    //------------swagger end-------------------
-
-    // ------------jgit start-------------------
-    compile rootProject.ext.dependencies["jgit"]
-    //------------jgit end-------------------
-
-    // ------------zip4j  操作zip begin start-------------------
-    compile rootProject.ext.dependencies["zip4j"]
-    //------------zip4j  操作zip begin end-------------------
-
-    compile rootProject.ext.dependencies["purejavacomm"]
-    compile rootProject.ext.dependencies["gson"]
-    compile rootProject.ext.dependencies["pty4j"]
-    compile rootProject.ext.dependencies["lombok"]
-
+    compile('org.springframework.boot:spring-boot-starter-web')
+//    compile('org.springframework.boot:spring-boot-starter-security')
+    compile('com.alibaba:druid-spring-boot-starter:1.1.10')
     compile fileTree(dir: '../libs', include: ['*.jar'])
-
+    testCompile('org.springframework.boot:spring-boot-starter-test')
 }
+
+

@@ -6,7 +6,6 @@ import io.aicode.base.JwtToken;
 import io.aicode.base.tools.Constants;
 import io.aicode.base.core.BeanRet;
 import io.aicode.base.exceptions.BaseException;
-import io.aicode.base.interceptor.WSClientManager;
 import io.aicode.base.tools.Md5;
 import io.aicode.project.entity.Account;
 import io.aicode.project.service.AccountSV;
@@ -44,8 +43,6 @@ public class LoginCtrl extends BaseCtrl {
     @Resource
     private AccountSV accountSV;
 
-    @Resource
-    private WSClientManager wsClientManager;
 
     @Resource
     private SShSV sShSV;

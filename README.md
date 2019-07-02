@@ -28,7 +28,7 @@ sql脚本中板焊了模板，会在你``构建项目``时自动拉取到本地�
 ai-code 与其他开源的完整项目不同点在于技术整合框架的抽象，mvc的模型抽象，我们有这样的场景，有新的业务需求，用同样的技术框架，通常做法可能就是找一个项目然后删删改改提取
 出来一个较为干净的框架，然后把新的业务模型，实体类，接口等等重新声明，创建在此基础上再做很多CRUD的编码，有时候我们很反感重复这些，但是又不得不做，通常做这些毫无意义又无聊
 同意请举手，于是乎有没有办法做一个工具出来让新的业务模型设计好后拿到``sql``脚本 通过工具可以选择各种不同的技术框架组合，就像``spring boot``一样整合技术在一起，但是又
-可以自动把``mybatis mapper,dao/dto,service,ctrl,ui``等等通用功能自动开发好呢？把常用的工具，加密算法等等通用的自动集成进去呢？比如``swagger,gradle,maven``等等
+可以自动把``mapper mapper.mapper,dao/dto,service,ctrl,ui``等等通用功能自动开发好呢？把常用的工具，加密算法等等通用的自动集成进去呢？比如``swagger,gradle,maven``等等
 答案是肯定的``ai-code``就是这个思路，整合有给你定制的可能，业务随意变化，只要拿到sql脚本一切就是动动手指，点击生成，再也不用搞来搞去那些重复的不能再重复的无聊工作了。
 这就是ai-code的基本思路和思想；
 
@@ -135,7 +135,7 @@ uml信息可以自己打开vpp文件查看详细，仅仅放两张用于参考
 Ctrl模板类
 ![Image text](https://gitee.com/helixin/AI-Code/raw/dev/images/tmp1.png)
 
-mybatis sql 模板注意观察有关联关系哦
+mapper sql 模板注意观察有关联关系哦
 ![Image text](https://gitee.com/helixin/AI-Code/raw/dev/images/tm2.png)
 
 前端模板抽离样貌
@@ -145,7 +145,7 @@ mybatis sql 模板注意观察有关联关系哦
 
 ### 项目技术点
 - spring mvc
-- mybatis
+- mapper
 - freemarker
 - websocket
 - java reflection

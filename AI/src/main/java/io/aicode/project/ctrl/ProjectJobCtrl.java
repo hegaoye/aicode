@@ -2,12 +2,12 @@ package io.aicode.project.ctrl;
 
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Maps;
-import io.aicode.base.interceptor.WSClientManager;
 import io.aicode.base.BaseCtrl;
 import io.aicode.base.core.BeanRet;
 import io.aicode.base.tools.Page;
 import io.aicode.base.exceptions.BaseException;
 import io.aicode.base.tools.StringTools;
+import io.aicode.base.websocket.WSClientManager;
 import io.aicode.project.entity.ProjectJob;
 import io.aicode.project.service.ProjectJobSV;
 import io.aicode.project.service.ProjectSV;
@@ -216,7 +216,7 @@ public class ProjectJobCtrl extends BaseCtrl {
         try {
             Assert.hasText(code, BaseException.BaseExceptionEnum.Empty_Param.toString());
 //            ProjectJob projectJob = projectJobSV.execute(code); TODO 测试新日志暂时注释
-            WebSocketSession webSocketSession = wsClientManager.get(request.getRemoteHost());
+            WebSocketSession webSocketSession = null;// wsClientManager.get(request.getRemoteHost());
             if (webSocketSession != null) {
                 //检查数据库初始化
 //                projectSV.execute(code);

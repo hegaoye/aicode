@@ -1,6 +1,6 @@
 # AI Code
 技术交流 qq 群：839360512
-
+项目支持``docker``启动方式，``war``启动方式，轻松快速上手，
 项目已经经历了10多个项目，其中包含融资项目，模板几经修改和整合，很实用，新的功能按部就班添加中，期待大家的反馈和使用感受
 一个基于freemarker为核心的代码生成框架，本项目目前支持sql进行反向生成java的代码，代码生成的程度取决于用的模板，目前整合的模板中
 有如下：
@@ -90,6 +90,29 @@ swagger界面如下，我只用了一个简单的表来演示，你的要有多�
 来编码，所谓武功至高境界就是``无招胜有招`` 就是这个意思，让代码服务你更久才有时间学习更多的技术和知识，让今天的一行代码在未来体现出更大价
 值才是我们要思考和做的，期待大家的分享和模板的壮大，目前正在整理``rabbitmq, kafka, rocketmq``的分布式，微服务框架模板整合，后面将会
 更好玩哦，模板链接再次推荐可以参考：https://gitee.com/helixin/aicode_template，祝你和你的团队编程愉快，coding让世界更美好。
+
+### docker 启动方式(推荐)
+docker 依赖dockerhub 镜像（意思是你的网络要支持访问哦，大家明白哈，搞不定的加群），大家可以通过docker的常规命令``pull`` ``run`` 即可，注意：docker镜像
+中不包含数据库，数据库脚本请从项目中下载进行初始化，数据库名称请使用``ai_code``命名，以下docker命令操作
+dockerhub 详细操作说明 https://hub.docker.com/r/hegaoye/aicode
+
+```
+#搜索查看aicode的镜像是否存在
+docker search aicode
+
+#拉取aicode的镜像 hegaoye/aicode:1.0-beta
+docker pull hegaoye/aicode:1.0-beta
+
+#启动容器,注意 host,username,passowrd 要进行修改成自己的mysql主机
+docker run -e host=192.168.1.220:3306 -e username=root -e password=aicode -p 8080:8080 --name aicode --restart always -d  hegaoye/aicode:1.0-beta
+
+#查看日志
+docker logs --tail 1000 -f aicode
+
+#重启，关闭，启动容器命令
+docker restart|stop|start aicode
+```
+
 
 ### 编写模板说明：
 模板语法采用freemarker编写，定义了一个实体类可以在项目``io.aicode.base.core.TemplateData`` 下找到此类，大致的内置变量可以如下图

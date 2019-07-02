@@ -18,12 +18,12 @@ import java.util.concurrent.ConcurrentHashMap;
 public class WSClientManager {
     //线程安全map
     private static Map<String, Session> sessionMap = new ConcurrentHashMap<>();
-
+    private static String token = "aicode";
     //静态变量，用来记录当前在线连接数。
     private static int onlineCount = 0;
 
-    public static void put(String token, Session session) {
-        Session ss = get(token);
+    public static void put(Session session) {
+        Session ss = get();
         if (ss == null) {
             sessionMap.put(token, session);
             addOnlineCount();           //在线数加1
@@ -31,13 +31,13 @@ public class WSClientManager {
         }
     }
 
-    public static void remove(String token) {
+    public static void remove() {
         sessionMap.remove(token);
         subOnlineCount();           //在线数减1
         log.info("有一连接关闭！当前在线人数为" + getOnlineCount());
     }
 
-    public static Session get(String token) {
+    public static Session get() {
         if (sessionMap.containsKey(token)) {
             return sessionMap.get(token);
         }
@@ -47,12 +47,12 @@ public class WSClientManager {
     /**
      * 实现服务器主动推送
      */
-    public static void sendMessage(String token, String message) {
-        Session session = get(token);
+    public static void sendMessage(String message) {
+        Session session = get();
         if (session != null) {
             if (session.isOpen()) {
                 try {
-                    session.getBasicRemote().sendText(message);
+                    session.getBasicRemote().sendText("# " + message);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -66,8 +66,8 @@ public class WSClientManager {
         }
     }
 
-    public static void sendShellMsg(String token, String username, String host, String path, String msg) {
-        sendMessage(token, username + "@" + host + ":" + path + "# " + msg);
+    public static void sendShellMsg(String username, String host, String path, String msg) {
+        sendMessage(username + "@" + host + ":" + path + "# " + msg);
     }
 
     public static synchronized int getOnlineCount() {

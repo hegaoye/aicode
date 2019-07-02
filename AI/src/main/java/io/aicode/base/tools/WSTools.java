@@ -2,8 +2,8 @@ package io.aicode.base.tools;
 
 import lombok.extern.java.Log;
 import org.springframework.web.socket.TextMessage;
-import org.springframework.web.socket.WebSocketSession;
 
+import javax.websocket.Session;
 import java.io.IOException;
 
 /**
@@ -11,34 +11,34 @@ import java.io.IOException;
  */
 @Log
 public class WSTools {
-    private WebSocketSession webSocketSession;
+    private Session webSocketSession;
 
-    public WSTools(WebSocketSession webSocketSession) {
+    public WSTools(Session webSocketSession) {
         this.webSocketSession = webSocketSession;
     }
 
-    public void send(String msg) {
-        try {
-            if (this.webSocketSession.isOpen()) {
-                this.webSocketSession.sendMessage(new TextMessage("# " + msg));
-            } else {
-                log.warning("WebSocket 连接已经关闭");
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-
-    public void send(String username, String host, String path, String msg) {
-        try {
-            if (this.webSocketSession.isOpen()) {
-                this.webSocketSession.sendMessage(new TextMessage(username + "@" + host + ":" + path + "# " + msg));
-            } else {
-                log.warning("WebSocket 连接已经关闭");
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+//    public void send(String msg) {
+//        try {
+//            if (this.webSocketSession.isOpen()) {
+//                this.webSocketSession.send(new TextMessage("# " + msg));
+//            } else {
+//                log.warning("WebSocket 连接已经关闭");
+//            }
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//    }
+//
+//
+//    public void send(String username, String host, String path, String msg) {
+//        try {
+//            if (this.webSocketSession.isOpen()) {
+//                this.webSocketSession.sendMessage(new TextMessage(username + "@" + host + ":" + path + "# " + msg));
+//            } else {
+//                log.warning("WebSocket 连接已经关闭");
+//            }
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//    }
 }

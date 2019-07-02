@@ -24,6 +24,7 @@ import springfox.documentation.annotations.ApiIgnore;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.websocket.Session;
 import java.util.Map;
 
 
@@ -215,13 +216,10 @@ public class ProjectJobCtrl extends BaseCtrl {
     public BeanRet execute(String code, HttpServletRequest request) {
         try {
             Assert.hasText(code, BaseException.BaseExceptionEnum.Empty_Param.toString());
-//            ProjectJob projectJob = projectJobSV.execute(code); TODO 测试新日志暂时注释
-            WebSocketSession webSocketSession = null;// wsClientManager.get(request.getRemoteHost());
+            Session webSocketSession = wsClientManager.get();
             if (webSocketSession != null) {
-                //检查数据库初始化
-//                projectSV.execute(code);
                 //生成代码
-                ProjectJob projectJob = projectJobSV.execute(code, webSocketSession);
+                ProjectJob projectJob = projectJobSV.execute(code);
                 return BeanRet.create(true, "执行任务成功", projectJob);
             }
             return BeanRet.create();

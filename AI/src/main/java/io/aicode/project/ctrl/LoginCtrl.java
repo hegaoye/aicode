@@ -9,7 +9,6 @@ import io.aicode.base.exceptions.BaseException;
 import io.aicode.base.tools.Md5;
 import io.aicode.project.entity.Account;
 import io.aicode.project.service.AccountSV;
-import io.aicode.project.service.SShSV;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -43,9 +42,6 @@ public class LoginCtrl extends BaseCtrl {
     @Resource
     private AccountSV accountSV;
 
-
-    @Resource
-    private SShSV sShSV;
 
     /**
      * 登陆

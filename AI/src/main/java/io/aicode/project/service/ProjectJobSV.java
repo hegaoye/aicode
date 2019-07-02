@@ -7,7 +7,8 @@ package io.aicode.project.service;
 
 import io.aicode.base.BaseMybatisSV;
 import io.aicode.project.entity.ProjectJob;
-import org.springframework.web.socket.WebSocketSession;
+
+import javax.websocket.Session;
 
 public interface ProjectJobSV extends BaseMybatisSV<ProjectJob, Long> {
 
@@ -25,18 +26,11 @@ public interface ProjectJobSV extends BaseMybatisSV<ProjectJob, Long> {
      */
     void delete(String code);
 
-    /**
-     * 执行任务
-     *
-     * @param code 任务编码
-     */
-    ProjectJob execute(String code);
 
     /**
      * 执行任务
      *
      * @param code             任务编码
-     * @param webSocketSession 对象
      */
-    ProjectJob execute(String code, WebSocketSession webSocketSession);
+    ProjectJob execute(String code);
 }

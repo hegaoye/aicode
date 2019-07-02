@@ -43,13 +43,9 @@ mybatis:
 
 logging:
    level:
-      io:
+     io:
        aicode: debug
 
    path: /var/log/tomcat/
-#     org:
-#      springframework: debug
-#      spring:
-#        springboot:
-#               dao: debug
+
 

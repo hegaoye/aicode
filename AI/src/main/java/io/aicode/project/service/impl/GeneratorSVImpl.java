@@ -338,10 +338,10 @@ public class GeneratorSVImpl implements GenerateSV {
         String projectPath = new HandleFuncs().getCurrentClassPath() + settingWorkspace.getV() + "/" + project.getEnglishName();
         projectPath = projectPath.replace("//", "/");
         //1.检测项目工作工作空间是否存在
+        FileUtil.delFolder(projectPath);
         File file = new File(projectPath);
         if (!file.exists()) {
-//            file.mkdirs();
-            FileUtil.delFolder(projectPath);
+            file.mkdirs();
             WSClientManager.sendMessage("删除已存在[" + project.getEnglishName() + "]项目");
         }
 

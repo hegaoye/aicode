@@ -89,7 +89,8 @@ swagger界面如下，我只用了一个简单的表来演示，你的要有多�
 如果你体验了高效的代码生成和抽象思维把规律的重复的代码进行模板化后可以服务你未来更久的时间，那时候就体验到，编程除了用coding还可以用设计
 来编码，所谓武功至高境界就是``无招胜有招`` 就是这个意思，让代码服务你更久才有时间学习更多的技术和知识，让今天的一行代码在未来体现出更大价
 值才是我们要思考和做的，期待大家的分享和模板的壮大，目前正在整理``rabbitmq, kafka, rocketmq``的分布式，微服务框架模板整合，后面将会
-更好玩哦，模板链接再次推荐可以参考：https://gitee.com/helixin/aicode_template，祝你和你的团队编程愉快，coding让世界更美好。
+更好玩哦，模板链接再次推荐可以参考：https://gitee.com/helixin/aicode_template
+祝你和你的团队编程愉快，coding让世界更美好。
 
 ### docker 启动方式(推荐)
 docker 依赖dockerhub 镜像（意思是你的网络要支持访问哦，大家明白哈，搞不定的加群），大家可以通过docker的常规命令``pull`` ``run`` 即可，注意：docker镜像
@@ -206,18 +207,11 @@ alter table `order` comment '订单';
 
 去处后即可合法使用，一定要保障sql可以正常执行再用来跑代码，否则会失败
 
-### 下阶段
-1.增加docker 用法支持和梳理，让使用只需简单的命令即可搞定
-
-2.发布第一版正式版本，供大家下载使用
-
-3.建立ai-code 官网用于管理和交流
-
-4.增加使用培训的视频
-
 # 子项目
 前端参考地址 https://gitee.com/helixin/ai-code-frontend
 
 设计文档地址 https://gitee.com/helixin/AI-Code-Doc
 
 模板仓库地址 https://gitee.com/helixin/aicode_template
+
+docker教程 https://hub.docker.com/r/hegaoye/aicode

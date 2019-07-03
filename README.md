@@ -1,6 +1,6 @@
 # AI Code
 技术交流 qq 群：839360512
-
+项目支持``docker``启动方式，``war``启动方式，轻松快速上手，
 项目已经经历了10多个项目，其中包含融资项目，模板几经修改和整合，很实用，新的功能按部就班添加中，期待大家的反馈和使用感受
 一个基于freemarker为核心的代码生成框架，本项目目前支持sql进行反向生成java的代码，代码生成的程度取决于用的模板，目前整合的模板中
 有如下：
@@ -41,19 +41,19 @@ ai-code 与其他开源的完整项目不同点在于技术整合框架的抽象
 
 # 使用方法
 ### 连接数据库：
--首先要做的就是建立``aicode``的数据库，建议使用``mysql``,脚本请用最新的版本日期，你可以在项目根目录下``sql/aicodexxxxx.sql``中找到合适的
-sql脚本,比如创建数据库名为``aicode``,数据库的ip为``192.168.1.220``,账户密码为``username=root,password=xxxxx``;
+-首先要做的就是建立``ai_code``的数据库(推荐数据库格式：编码为utf8mb4  排序为 utf8mb4_general_ci)，建议使用``mysql``,脚本请用最新的版本日期，你可以在项目根目录下``sql/aicodexxxxx.sql``中找到合适的
+sql脚本,比如创建数据库名为``ai_code``,数据库的ip为``192.168.1.220``,账户密码为``username=root,password=xxxxx``;
 
--找到项目下 ``AI/src/main/resources/ai_jdbc.properties`` 文件将数据库链接修改成刚才初始化的数据库``ip``
+-找到项目下 ``AI/src/main/resources/jdbc.properties`` 文件将数据库链接修改成刚才初始化的数据库``ip``
 ```
-jdbc.url=jdbc:mysql://192.168.1.220:3306/aicode?useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=round&allowMultiQueries=true
+jdbc.url=jdbc:mysql://192.168.1.220:3306/ai_code?useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=round&allowMultiQueries=true
 jdbc.username=root
 jdbc.password=xxxxx
 ```
 
 修改完毕后可以直接启动,启动默认为``8080``端口
 浏览器中打开输入：``http://127.0.0.1:8080/index.html``
-默认账户:``lixin  888888``尝试登录，你可以在数据库中修改次账户数据表明为``account``
+默认账户:``admin  888888``尝试登录，你可以在数据库中修改次账户数据表明为``account``
 ![Image text](https://gitee.com/helixin/AI-Code/raw/dev/images/index.png)
 
 参考已有项目的效果
@@ -89,7 +89,31 @@ swagger界面如下，我只用了一个简单的表来演示，你的要有多�
 如果你体验了高效的代码生成和抽象思维把规律的重复的代码进行模板化后可以服务你未来更久的时间，那时候就体验到，编程除了用coding还可以用设计
 来编码，所谓武功至高境界就是``无招胜有招`` 就是这个意思，让代码服务你更久才有时间学习更多的技术和知识，让今天的一行代码在未来体现出更大价
 值才是我们要思考和做的，期待大家的分享和模板的壮大，目前正在整理``rabbitmq, kafka, rocketmq``的分布式，微服务框架模板整合，后面将会
-更好玩哦，模板链接再次推荐可以参考：https://gitee.com/helixin/aicode_template，祝你和你的团队编程愉快，coding让世界更美好。
+更好玩哦，模板链接再次推荐可以参考：https://gitee.com/helixin/aicode_template
+祝你和你的团队编程愉快，coding让世界更美好。
+
+### docker 启动方式(推荐)
+docker 依赖dockerhub 镜像（意思是你的网络要支持访问哦，大家明白哈，搞不定的加群），大家可以通过docker的常规命令``pull`` ``run`` 即可，注意：docker镜像
+中不包含数据库，数据库脚本请从项目中下载进行初始化，数据库名称请使用``ai_code``命名，以下docker命令操作
+dockerhub 详细操作说明 https://hub.docker.com/r/hegaoye/aicode
+
+```
+#搜索查看aicode的镜像是否存在
+docker search aicode
+
+#拉取aicode的镜像 hegaoye/aicode:1.0-beta
+docker pull hegaoye/aicode:1.0-beta
+
+#启动容器,注意 host,username,passowrd 要进行修改成自己的mysql主机
+docker run -e host=192.168.1.220:3306 -e username=root -e password=aicode -p 8080:8080 --name aicode --restart always -d  hegaoye/aicode:1.0-beta
+
+#查看日志
+docker logs --tail 1000 -f aicode
+
+#重启，关闭，启动容器命令
+docker restart|stop|start aicode
+```
+
 
 ### 编写模板说明：
 模板语法采用freemarker编写，定义了一个实体类可以在项目``io.aicode.base.core.TemplateData`` 下找到此类，大致的内置变量可以如下图
@@ -183,18 +207,11 @@ alter table `order` comment '订单';
 
 去处后即可合法使用，一定要保障sql可以正常执行再用来跑代码，否则会失败
 
-### 下阶段
-1.增加docker 用法支持和梳理，让使用只需简单的命令即可搞定
-
-2.发布第一版正式版本，供大家下载使用
-
-3.建立ai-code 官网用于管理和交流
-
-4.增加使用培训的视频
-
 # 子项目
 前端参考地址 https://gitee.com/helixin/ai-code-frontend
 
 设计文档地址 https://gitee.com/helixin/AI-Code-Doc
 
 模板仓库地址 https://gitee.com/helixin/aicode_template
+
+docker教程 https://hub.docker.com/r/hegaoye/aicode

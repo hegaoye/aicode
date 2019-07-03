@@ -252,6 +252,7 @@ public class GeneratorSVImpl implements GenerateSV {
             logger.debug(JSON.toJSONString(frameworks));
             if (frameworks.getGitHome() != null) {
                 String project_template_Path = template_Path + frameworks.getGitHome().substring(frameworks.getGitHome().lastIndexOf("/") + 1).replace(".git", "");
+                //TODO 已经存在的进行清理
                 WSClientManager.sendMessage("已连接到模板仓库，开始克隆已选技术[" + frameworks.getName() + "]的模板");
                 logsSV.saveLogs("已连接到模板仓库，开始克隆已选技术[" + frameworks.getName() + "]的模板", logsPath);
                 if (YNEnum.Y == YNEnum.getYN(frameworks.getIsPublic())) {
@@ -338,10 +339,10 @@ public class GeneratorSVImpl implements GenerateSV {
         String projectPath = new HandleFuncs().getCurrentClassPath() + settingWorkspace.getV() + "/" + project.getEnglishName();
         projectPath = projectPath.replace("//", "/");
         //1.检测项目工作工作空间是否存在
-        FileUtil.delFolder(projectPath);
         File file = new File(projectPath);
         if (!file.exists()) {
-            file.mkdirs();
+//            file.mkdirs();
+            FileUtil.delFolder(projectPath);
             WSClientManager.sendMessage("删除已存在[" + project.getEnglishName() + "]项目");
         }
 
@@ -351,11 +352,15 @@ public class GeneratorSVImpl implements GenerateSV {
         ProjectRepositoryAccount projectRepositoryAccount = projectRepositoryAccountDAO.load(map);
         if (projectRepositoryAccount != null) {
             if (ProjectRepositoryTypeEnum.GIT == ProjectRepositoryTypeEnum.getEnum(projectRepositoryAccount.getType())) {
-                WSClientManager.sendMessage("初始化设定git项目");
-                GitTools.cloneGit(projectRepositoryAccount.getHome(), projectPath, projectRepositoryAccount.getAccount(), projectRepositoryAccount.getPassword());
-                WSClientManager.sendMessage("初始化设定git项目完成");
+                if (projectRepositoryAccount.getHome().startsWith("git://") && projectRepositoryAccount.getHome().endsWith(".git")) {
+                    WSClientManager.sendMessage("初始化设定git项目");
+                    GitTools.cloneGit(projectRepositoryAccount.getHome(), projectPath, projectRepositoryAccount.getAccount(), projectRepositoryAccount.getPassword());
+                    WSClientManager.sendMessage("初始化设定git项目完成");
+                } else {
+                    WSClientManager.sendMessage("git 仓库地址不合法无法检出指定项目，请在生成后手动下载源码包！");
+                }
             } else if (ProjectRepositoryTypeEnum.SVN == ProjectRepositoryTypeEnum.getEnum(projectRepositoryAccount.getType())) {
-                //TODO SVN 仓库工具类
+                //TODO SVN 仓库工具类9
             }
         }
 

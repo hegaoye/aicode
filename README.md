@@ -41,10 +41,10 @@ ai-code 与其他开源的完整项目不同点在于技术整合框架的抽象
 
 # 使用方法
 ### 连接数据库：
--首先要做的就是建立``ai_code``的数据库，建议使用``mysql``,脚本请用最新的版本日期，你可以在项目根目录下``sql/aicodexxxxx.sql``中找到合适的
+-首先要做的就是建立``ai_code``的数据库(推荐数据库格式：编码为utf8mb4  排序为 utf8mb4_general_ci)，建议使用``mysql``,脚本请用最新的版本日期，你可以在项目根目录下``sql/aicodexxxxx.sql``中找到合适的
 sql脚本,比如创建数据库名为``ai_code``,数据库的ip为``192.168.1.220``,账户密码为``username=root,password=xxxxx``;
 
--找到项目下 ``AI/src/main/resources/ai_jdbc.properties`` 文件将数据库链接修改成刚才初始化的数据库``ip``
+-找到项目下 ``AI/src/main/resources/jdbc.properties`` 文件将数据库链接修改成刚才初始化的数据库``ip``
 ```
 jdbc.url=jdbc:mysql://192.168.1.220:3306/ai_code?useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=round&allowMultiQueries=true
 jdbc.username=root
@@ -53,7 +53,7 @@ jdbc.password=xxxxx
 
 修改完毕后可以直接启动,启动默认为``8080``端口
 浏览器中打开输入：``http://127.0.0.1:8080/index.html``
-默认账户:``lixin  888888``尝试登录，你可以在数据库中修改次账户数据表明为``account``
+默认账户:``admin  888888``尝试登录，你可以在数据库中修改次账户数据表明为``account``
 ![Image text](https://gitee.com/helixin/AI-Code/raw/dev/images/index.png)
 
 参考已有项目的效果

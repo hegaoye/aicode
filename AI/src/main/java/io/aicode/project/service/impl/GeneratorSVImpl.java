@@ -284,7 +284,7 @@ public class GeneratorSVImpl implements GenerateSV {
                     if (file.getAbsoluteFile().toString().contains("\\.git\\") || file.getAbsoluteFile().toString().contains("README.md")) {
                         continue;
                     }
-                    String path = ("/" + file.getAbsoluteFile().toString()).replace("\\", "/").replace(template_Path, "");
+                    String path = ("/" + file.getAbsoluteFile().toString()).replace("\\", "/").replace(template_Path.replace("//", "/"), "");
                     path = "/" + path;
                     path = path.replace("//", "/");
                     FrameworksTemplate frameworksTemplate = new FrameworksTemplate();

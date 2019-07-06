@@ -97,6 +97,8 @@ docker 依赖dockerhub 镜像（意思是你的网络要支持访问哦，大家
 中不包含数据库，数据库脚本请从项目中下载进行初始化，数据库名称请使用``ai_code``命名，以下docker命令操作
 dockerhub 详细操作说明 https://hub.docker.com/r/hegaoye/aicode
 
+直接使用下面的命令即可搞定，数据库与程序自动``link``在一起，方便简单
+
 ```
 #检出数据库
 docker pull hegaoye/mysql:1.0-beta

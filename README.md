@@ -121,7 +121,6 @@ docker logs --tail 1000 -f aicode
 docker restart|stop|start aicode
 ```
 
-
 ### 编写模板说明：
 模板语法采用freemarker编写，定义了一个实体类可以在项目``io.aicode.base.core.TemplateData`` 下找到此类，大致的内置变量可以如下图
 

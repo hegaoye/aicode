@@ -8,8 +8,6 @@ package io.aicode.project.service;
 import io.aicode.base.BaseMybatisSV;
 import io.aicode.project.entity.ProjectJob;
 
-import javax.websocket.Session;
-
 public interface ProjectJobSV extends BaseMybatisSV<ProjectJob, Long> {
 
     /**

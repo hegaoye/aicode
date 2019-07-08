@@ -1,7 +1,7 @@
 package io.aicode.base;
 
-import io.aicode.base.tools.Page;
 import io.aicode.base.exceptions.BaseException;
+import io.aicode.base.tools.Page;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.Serializable;

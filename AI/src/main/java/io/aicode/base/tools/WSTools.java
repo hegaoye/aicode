@@ -1,10 +1,8 @@
 package io.aicode.base.tools;
 
 import lombok.extern.java.Log;
-import org.springframework.web.socket.TextMessage;
 
 import javax.websocket.Session;
-import java.io.IOException;
 
 /**
  * Created by lixin on 2018/10/12.

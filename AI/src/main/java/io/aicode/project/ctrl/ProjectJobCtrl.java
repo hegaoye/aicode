@@ -4,8 +4,8 @@ import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Maps;
 import io.aicode.base.BaseCtrl;
 import io.aicode.base.core.BeanRet;
-import io.aicode.base.tools.Page;
 import io.aicode.base.exceptions.BaseException;
+import io.aicode.base.tools.Page;
 import io.aicode.base.tools.StringTools;
 import io.aicode.base.websocket.WSClientManager;
 import io.aicode.project.entity.ProjectJob;
@@ -19,7 +19,6 @@ import org.apache.commons.collections.map.HashedMap;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.socket.WebSocketSession;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.annotation.Resource;

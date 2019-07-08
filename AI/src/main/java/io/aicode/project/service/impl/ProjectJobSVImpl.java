@@ -13,7 +13,6 @@ import io.aicode.base.exceptions.BaseException;
 import io.aicode.base.exceptions.ProjectJobException;
 import io.aicode.base.tools.Executors;
 import io.aicode.base.tools.StringTools;
-import io.aicode.base.tools.WSTools;
 import io.aicode.project.dao.ProjectJobDAO;
 import io.aicode.project.dao.ProjectJobLogsDAO;
 import io.aicode.project.entity.ProjectJob;
@@ -24,7 +23,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import javax.websocket.Session;
 import java.util.Date;
 import java.util.Map;
 

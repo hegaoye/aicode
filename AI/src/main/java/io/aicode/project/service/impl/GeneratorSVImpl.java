@@ -226,7 +226,7 @@ public class GeneratorSVImpl implements GenerateSV {
     private void cleanTemplates(List<ProjectFramwork> projectFramworkList) {
         frameworksTemplateDAO.deleteAll();
         Setting setting = settingDAO.loadByKey(Setting.Key.Template_Path.name());
-        String template_Path = new HandleFuncs().getCurrentClassPath() + setting.getV();//获得默认仓库地址
+        String template_Path = this.convertPath(setting.getV(), "", true);//获得默认仓库地址
 
         for (ProjectFramwork projectFramwork : projectFramworkList) {
             Frameworks frameworks = projectFramwork.getFrameworks();
@@ -569,7 +569,7 @@ public class GeneratorSVImpl implements GenerateSV {
             logger.error(e.getMessage());
         }
         ZipTools.zip(destination, projectWorkspacePath);
-        project.setDownloadUrl(this.convertPath(repositoryPathSetting.getV(), project.getEnglishName() + ".zip", false));
+        project.setDownloadUrl(this.convertPath(repositoryPathSetting.getV().replace("/static", ""), project.getEnglishName() + ".zip", false));
         projectDAO.update(project);
     }
 

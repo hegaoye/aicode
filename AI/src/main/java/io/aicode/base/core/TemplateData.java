@@ -65,7 +65,6 @@ public class TemplateData implements Serializable {
     private List<MapFieldColumn> columns = new ArrayList<>();  //列对象  集合
     private List<MapFieldColumn> pkColumns = new ArrayList<>();//主键数据信息
     private List<MapFieldColumn> notPkColumns = new ArrayList<>();  //非主键数据信息
-    //    private List<MapFieldColumn> fields = new ArrayList<>();  //类属性  集合
     private List<Field> fields = new ArrayList<>();//所有类下面的属性集合信息
     private List<MapFieldColumn> pkFields = new ArrayList<>();  //主键数据信息
     private List<MapFieldColumn> notPkFields = new ArrayList<>();  //非主键主键数据信息
@@ -101,25 +100,11 @@ public class TemplateData implements Serializable {
         this.className = classTable.getClassName();
         this.classNameLower = StringHelper.toJavaVariableName(classTable.getClassName());
         this.dashedCaseName = StringTools.humpToLine(classNameLower);
-        for (MapFieldColumn mapFieldColumn : pkColumns) {
-            if (mapFieldColumn.getField().equalsIgnoreCase(classTable.getClassName())) {
-                this.classNameLower = StringHelper.toJavaVariableName(classTable.getClassName()) + "Obj";
-                break;
-            }
-        }
-        for (MapFieldColumn mapFieldColumn : notPkColumns) {
-            if (mapFieldColumn.getField().equalsIgnoreCase(classTable.getClassName())) {
-                this.classNameLower = StringHelper.toJavaVariableName(classTable.getClassName()) + "Obj";
-                break;
-            }
-        }
 
-        for (MapFieldColumn mapFieldColumn : tableColumns) {
-            if (mapFieldColumn.getField().equalsIgnoreCase(classTable.getClassName())) {
-                this.classNameLower = StringHelper.toJavaVariableName(classTable.getClassName()) + "Obj";
-                break;
-            }
-        }
+        this.fixColumns(pkColumns, classTable);
+        this.fixColumns(notPkColumns, classTable);
+        this.fixColumns(tableColumns, classTable);
+
         this.notes = classTable.getNotes();
         this.classes = classes;
 
@@ -127,35 +112,7 @@ public class TemplateData implements Serializable {
         this.pkColumns = pkColumns;
         this.notPkColumns = notPkColumns;
 
-//        this.fields = columns;
-        if (columns != null && !columns.isEmpty()) {
-            if (this.fields == null) {
-                this.fields = new ArrayList<>();
-            }
-            for (MapFieldColumn mapFieldColumn : columns) {
-                String json = JSON.toJSONString(mapFieldColumn);
-                Field field = JSON.parseObject(json, Field.class);
-                if (mapFieldColumn.getDisplayAttribute() != null) {
-                    field.setIsRequired(mapFieldColumn.getDisplayAttribute().getIsRequired());
-                    field.setIsInsert(mapFieldColumn.getDisplayAttribute().getIsInsert());
-                    field.setIsDeleteCondition(mapFieldColumn.getDisplayAttribute().getIsDeleteCondition());
-                    field.setIsAllowUpdate(mapFieldColumn.getDisplayAttribute().getIsAllowUpdate());
-                    field.setIsListPageDisplay(mapFieldColumn.getDisplayAttribute().getIsListPageDisplay());
-                    field.setIsDetailPageDisplay(mapFieldColumn.getDisplayAttribute().getIsDetailPageDisplay());
-                    field.setIsQueryRequired(mapFieldColumn.getDisplayAttribute().getIsQueryRequired());
-                    field.setIsLineNew(mapFieldColumn.getDisplayAttribute().getIsLineNew());
-                    field.setMatchType(mapFieldColumn.getDisplayAttribute().getMatchType());
-                    field.setDisplayType(mapFieldColumn.getDisplayAttribute().getDisplayType());
-                    field.setDisplayCss(mapFieldColumn.getDisplayAttribute().getDisplayCss());
-                    field.setDisplayName(mapFieldColumn.getDisplayAttribute().getDisplayName());
-                    field.setDisplayNo(mapFieldColumn.getDisplayAttribute().getDisplayNo());
-                    field.setFieldValidationMode(mapFieldColumn.getDisplayAttribute().getFieldValidationMode());
-                    field.setValidateText(mapFieldColumn.getDisplayAttribute().getValidateText());
-                }
-                this.fields.add(field);
-            }
 
-        }
         this.pkFields = pkColumns;
         this.notPkFields = notPkColumns;
         this.tableFields = tableColumns;
@@ -164,6 +121,7 @@ public class TemplateData implements Serializable {
         } else {
             this.model = classTable.getTableName();
         }
+        //前端用于属性显示的转换
         this.modelClasses = modelClasses;
         this.modelDatas = modelDatas;
         this.oneToOneList = oneToOneList;
@@ -174,6 +132,8 @@ public class TemplateData implements Serializable {
                 this.isRelation = true;
             }
         }
+
+        this.fields(columns);
     }
 
 
@@ -196,6 +156,30 @@ public class TemplateData implements Serializable {
             this.model = classTable.getTableName();
         }
 
+        this.fields(columns);
+    }
+
+    /**
+     * 纠正不合法的列命名进行自动转化
+     *
+     * @param fieldColumns 列集合
+     * @param classTable   类模型映射
+     */
+    private void fixColumns(List<MapFieldColumn> fieldColumns, MapClassTable classTable) {
+        for (MapFieldColumn mapFieldColumn : fieldColumns) {
+            if (mapFieldColumn.getField().equalsIgnoreCase(classTable.getClassName())) {
+                this.classNameLower = "_" + StringHelper.toJavaVariableName(classTable.getClassName());
+                break;
+            }
+        }
+    }
+
+    /**
+     * 封装显示属性到属性上
+     *
+     * @param columns
+     */
+    private void fields(List<MapFieldColumn> columns) {
         if (columns != null && !columns.isEmpty()) {
             if (this.fields == null) {
                 this.fields = new ArrayList<>();
@@ -203,23 +187,57 @@ public class TemplateData implements Serializable {
             for (MapFieldColumn mapFieldColumn : columns) {
                 String json = JSON.toJSONString(mapFieldColumn);
                 Field field = JSON.parseObject(json, Field.class);
-                field.setIsRequired(mapFieldColumn.getDisplayAttribute().getIsRequired());
-                field.setIsInsert(mapFieldColumn.getDisplayAttribute().getIsInsert());
-                field.setIsDeleteCondition(mapFieldColumn.getDisplayAttribute().getIsDeleteCondition());
-                field.setIsAllowUpdate(mapFieldColumn.getDisplayAttribute().getIsAllowUpdate());
-                field.setIsListPageDisplay(mapFieldColumn.getDisplayAttribute().getIsListPageDisplay());
-                field.setIsDetailPageDisplay(mapFieldColumn.getDisplayAttribute().getIsDetailPageDisplay());
-                field.setIsQueryRequired(mapFieldColumn.getDisplayAttribute().getIsQueryRequired());
-                field.setIsLineNew(mapFieldColumn.getDisplayAttribute().getIsLineNew());
-                field.setMatchType(mapFieldColumn.getDisplayAttribute().getMatchType());
-                field.setDisplayType(mapFieldColumn.getDisplayAttribute().getDisplayType());
-                field.setDisplayCss(mapFieldColumn.getDisplayAttribute().getDisplayCss());
-                field.setDisplayName(mapFieldColumn.getDisplayAttribute().getDisplayName());
-                field.setDisplayNo(mapFieldColumn.getDisplayAttribute().getDisplayNo());
-                field.setFieldValidationMode(mapFieldColumn.getDisplayAttribute().getFieldValidationMode());
-                field.setValidateText(mapFieldColumn.getDisplayAttribute().getValidateText());
+                DisplayAttribute displayAttribute = mapFieldColumn.getDisplayAttribute();
+                if (displayAttribute != null) {
+                    if (displayAttribute.getIsRequired() != null) {
+                        field.setIsRequired(displayAttribute.getIsRequired());
+                    }
+                    if (displayAttribute.getIsInsert() != null) {
+                        field.setIsInsert(displayAttribute.getIsInsert());
+                    }
+                    if (displayAttribute.getIsDeleteCondition() != null) {
+                        field.setIsDeleteCondition(displayAttribute.getIsDeleteCondition());
+                    }
+                    if (displayAttribute.getIsAllowUpdate() != null) {
+                        field.setIsAllowUpdate(displayAttribute.getIsAllowUpdate());
+                    }
+                    if (displayAttribute.getIsListPageDisplay() != null) {
+                        field.setIsListPageDisplay(displayAttribute.getIsListPageDisplay());
+                    }
+                    if (displayAttribute.getIsDetailPageDisplay() != null) {
+                        field.setIsDetailPageDisplay(displayAttribute.getIsDetailPageDisplay());
+                    }
+                    if (displayAttribute.getIsQueryRequired() != null) {
+                        field.setIsQueryRequired(displayAttribute.getIsQueryRequired());
+                    }
+                    if (displayAttribute.getIsLineNew() != null) {
+                        field.setIsLineNew(displayAttribute.getIsLineNew());
+                    }
+                    if (displayAttribute.getMatchType() != null) {
+                        field.setMatchType(displayAttribute.getMatchType());
+                    }
+                    if (displayAttribute.getDisplayType() != null) {
+                        field.setDisplayType(displayAttribute.getDisplayType());
+                    }
+                    if (displayAttribute.getDisplayCss() != null) {
+                        field.setDisplayCss(displayAttribute.getDisplayCss());
+                    }
+                    if (displayAttribute.getDisplayName() != null) {
+                        field.setDisplayName(displayAttribute.getDisplayName());
+                    }
+                    if (displayAttribute.getDisplayNo() != null) {
+                        field.setDisplayNo(displayAttribute.getDisplayNo());
+                    }
+                    if (displayAttribute.getFieldValidationMode() != null) {
+                        field.setFieldValidationMode(displayAttribute.getFieldValidationMode());
+                    }
+                    if (displayAttribute.getValidateText() != null) {
+                        field.setValidateText(displayAttribute.getValidateText());
+                    }
+                }
                 this.fields.add(field);
             }
         }
+
     }
 }

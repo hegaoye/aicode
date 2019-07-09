@@ -240,7 +240,8 @@ public class GeneratorSVImpl implements GenerateSV {
     //准备框架模板
     private void readyframeworksTemplateList(List<ProjectFramwork> projectFramworkList, String logsPath) {
         Setting setting = settingDAO.loadByKey(Setting.Key.Template_Path.name());
-        String template_Path = new HandleFuncs().getCurrentClassPath() + setting.getV();//获得默认仓库地址
+        //获得默认仓库地址
+        String template_Path = this.convertPath("/", setting.getV(), true);
         //拼接项目框架字符串，用于判断
         String projectFramworkKeyWords = "";
         for (ProjectFramwork projectFramwork : projectFramworkList) {
@@ -252,7 +253,7 @@ public class GeneratorSVImpl implements GenerateSV {
             logger.debug(JSON.toJSONString(frameworks));
             if (frameworks.getGitHome() != null) {
                 String project_template_Path = template_Path + frameworks.getGitHome().substring(frameworks.getGitHome().lastIndexOf("/") + 1).replace(".git", "");
-                //TODO 已经存在的进行清理
+                //TODO 已经存在的进行清理 需要开发
                 WSClientManager.sendMessage("已连接到模板仓库，开始克隆已选技术[" + frameworks.getName() + "]的模板");
                 logsSV.saveLogs("已连接到模板仓库，开始克隆已选技术[" + frameworks.getName() + "]的模板", logsPath);
                 if (YNEnum.Y == YNEnum.getYN(frameworks.getIsPublic())) {
@@ -284,9 +285,7 @@ public class GeneratorSVImpl implements GenerateSV {
                     if (file.getAbsoluteFile().toString().contains("\\.git\\") || file.getAbsoluteFile().toString().contains("README.md")) {
                         continue;
                     }
-                    String path = ("/" + file.getAbsoluteFile().toString()).replace("\\", "/").replace(template_Path.replace("//", "/"), "");
-                    path = "/" + path;
-                    path = path.replace("//", "/");
+                    String path = this.convertPath("/", file.getAbsoluteFile().toString(), false).replace((template_Path + "/").replace("//", ""), "");
                     FrameworksTemplate frameworksTemplate = new FrameworksTemplate();
                     frameworksTemplate.setCode(String.valueOf(uidGenerator.getUID()));
                     frameworksTemplate.setPath(path);
@@ -336,12 +335,10 @@ public class GeneratorSVImpl implements GenerateSV {
     private String buildProject(Project project) {
         Setting settingWorkspace = settingDAO.loadByKey(Setting.Key.Workspace.name());
         WSClientManager.sendMessage("创建项目[" + project.getEnglishName() + "]");
-        String projectPath = new HandleFuncs().getCurrentClassPath() + settingWorkspace.getV() + "/" + project.getEnglishName();
-        projectPath = projectPath.replace("//", "/");
+        String projectPath = this.convertPath(settingWorkspace.getV(), project.getEnglishName(), true);
         //1.检测项目工作工作空间是否存在
         File file = new File(projectPath);
         if (!file.exists()) {
-//            file.mkdirs();
             FileUtil.delFolder(projectPath);
             WSClientManager.sendMessage("删除已存在[" + project.getEnglishName() + "]项目");
         }
@@ -550,16 +547,20 @@ public class GeneratorSVImpl implements GenerateSV {
      */
     private void zipProject(Project project) {
         Setting settingWorkspace = settingDAO.loadByKey(Setting.Key.Workspace.name());
-        String projectWorkspacePath = new HandleFuncs().getCurrentClassPath() + settingWorkspace.getV() + "/" + project.getEnglishName();
-        projectWorkspacePath = projectWorkspacePath.replace("//", "/");
+        String projectWorkspacePath = this.convertPath(settingWorkspace.getV(), project.getEnglishName(), true);
 
-        Setting Repository_Path = settingDAO.loadByKey(Setting.Key.Repository_Path.name());
-        String projectPath = new HandleFuncs().getCurrentClassPath() + Repository_Path.getV() + "/" + project.getEnglishName();
-        String destination = projectPath;
+        Setting repositoryPathSetting = settingDAO.loadByKey(Setting.Key.Repository_Path.name());
+        String destination = this.convertPath(repositoryPathSetting.getV(), project.getEnglishName(), true);
+
 
         //压缩文件
         try {
-            File zipFile = new File(destination);
+            File repositoryFile = new File(new HandleFuncs().getCurrentClassPath() + repositoryPathSetting.getV());
+            if (!repositoryFile.exists()) {
+                repositoryFile.mkdirs();
+            }
+
+            File zipFile = new File(destination + ".zip");
             if (zipFile.exists()) {
                 zipFile.delete();
             }
@@ -568,8 +569,26 @@ public class GeneratorSVImpl implements GenerateSV {
             logger.error(e.getMessage());
         }
         ZipTools.zip(destination, projectWorkspacePath);
-        project.setDownloadUrl((Repository_Path.getV() + "/" + project.getEnglishName() + ".zip").replace("//", "/"));
+        project.setDownloadUrl(this.convertPath(repositoryPathSetting.getV(), project.getEnglishName() + ".zip", false));
         projectDAO.update(project);
+    }
+
+    /**
+     * 替换路径拼装中导致的 多余slash
+     *
+     * @param path     路径
+     * @param filename 文件名
+     * @return 绝对路径
+     */
+    private String convertPath(String path, String filename, boolean isAbsolute) {
+        String absolutePath = "";
+        if (isAbsolute) {
+            absolutePath = new HandleFuncs().getCurrentClassPath() + "/" + path + "/" + filename;
+        } else {
+            absolutePath = path + "/" + filename;
+        }
+        absolutePath = absolutePath.replace("////", "/").replace("///", "/").replace("//", "/").replace("\\\\\\", "/").replace("\\\\", "/").replace("\\", "/");
+        return absolutePath;
     }
 
     /**
@@ -579,7 +598,7 @@ public class GeneratorSVImpl implements GenerateSV {
      * @param targetPath 目标路径
      * @return 目标路径绝对路径
      */
-    public String findPath(String root, String targetPath) {
+    private String findPath(String root, String targetPath) {
         File templateFile = new File(root);
         File[] files = templateFile.listFiles();
         String path = null;

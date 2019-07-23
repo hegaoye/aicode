@@ -1,7 +1,7 @@
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 CREATE DATABASE IF NOT EXISTS ai_code DEFAULT CHARSET utf8mb4 COLLATE utf8mb4_general_ci;
-
+USE ai_code;
 -- ----------------------------
 -- Table structure for account
 -- ----------------------------

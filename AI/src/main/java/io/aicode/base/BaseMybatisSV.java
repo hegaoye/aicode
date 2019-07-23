@@ -20,7 +20,7 @@ public interface BaseMybatisSV<E, PK extends Serializable> {
      * @param entity 实体
      * @throws BaseException
      */
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = false)
     void save(E entity) throws BaseException;
 
 
@@ -30,7 +30,7 @@ public interface BaseMybatisSV<E, PK extends Serializable> {
      * @param entity 实体
      * @throws BaseException
      */
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = false)
     void update(E entity) throws BaseException;
 
 
@@ -100,7 +100,7 @@ public interface BaseMybatisSV<E, PK extends Serializable> {
      * @param entity 实体
      * @throws BaseException
      */
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = false)
     void saveOrUpdate(E entity) throws BaseException;
 
 
@@ -110,7 +110,7 @@ public interface BaseMybatisSV<E, PK extends Serializable> {
      * @param id 对象id
      * @throws BaseException
      */
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = false)
     void deleteById(PK id) throws BaseException;
 
     /**
@@ -119,7 +119,7 @@ public interface BaseMybatisSV<E, PK extends Serializable> {
      * @author 立坤 更新于2017.07.21
      * @remark 批量删除信息
      */
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = false)
     void deleteByIds(List<Long> ids) throws BaseException;
 
     /**

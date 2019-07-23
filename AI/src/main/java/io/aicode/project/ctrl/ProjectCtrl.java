@@ -116,6 +116,7 @@ public class ProjectCtrl extends BaseCtrl {
         String workspace = settingSV.load(Setting.Key.Workspace);
 
         filePath = new HandleFuncs().getCurrentClassPath() + workspace + filePath;
+        logger.info(filePath);
 
         File file = new File(filePath);
         if (file.isDirectory()) {
@@ -125,6 +126,7 @@ public class ProjectCtrl extends BaseCtrl {
 
         if (file.isFile() && !filePath.contains(".jar")) {
             String fileStr = FileUtils.readFileToString(new File(filePath), "UTF-8");
+            logger.info(fileStr);
             return BeanRet.create(true, "查询一个详情信息", fileStr);
         }
         return BeanRet.create(true, "", filePath.replaceAll("/\\w*\\.jar", ""));

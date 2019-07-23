@@ -23,14 +23,16 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.io.FileUtils;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.annotation.Resource;
-import java.io.File;
-import java.io.IOException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
 import java.util.List;
 import java.util.Map;
 
@@ -268,6 +270,28 @@ public class ProjectCtrl extends BaseCtrl {
         projectSV.execute(code);
         return BeanRet.create(true, "执行脚本成功");
     }
+
+    @GetMapping("/download")
+    public void downloadFile(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        String fileName = "test2019.zip";// 设置文件名，根据业务需要替换成要下载的文件名
+        if (fileName != null) {
+            ClassPathResource resource = new ClassPathResource("repository/" + fileName);
+            response.setContentType("application/force-download");// 设置强制下载不打开
+            fileName = new String(fileName.getBytes("UTF-8"), "iso-8859-1");
+            response.addHeader("Content-Disposition", "attachment;fileName=" + fileName);// 设置文件名
+            byte[] buffer = new byte[1024];
+            try (InputStream inputStream = resource.getInputStream();
+                 BufferedInputStream bis = new BufferedInputStream(inputStream)) {
+                OutputStream os = response.getOutputStream();
+                int i = bis.read(buffer);
+                while (i != -1) {
+                    os.write(buffer, 0, i);
+                    i = bis.read(buffer);
+                }
+            }
+        }
+    }
+
 
     /**
      * 进入首页

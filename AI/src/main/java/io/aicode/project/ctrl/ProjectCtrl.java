@@ -109,7 +109,10 @@ public class ProjectCtrl extends BaseCtrl {
     public BeanRet scanPath(String code, String filePath) throws IOException {
         Assert.hasText(filePath, BaseException.BaseExceptionEnum.Empty_Param.toString());
         logger.info(filePath);
-
+        //自动过滤ace冗余路路径的问题
+        if (filePath.contains("ace/")) {
+            filePath = filePath.replace("ace/", "/").replace("//", "/");
+        }
         Map<String, Object> map = new HashedMap();
         map.put("code", code);
         Project project = projectSV.load(map);

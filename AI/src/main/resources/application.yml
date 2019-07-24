@@ -50,6 +50,7 @@ logging:
      io:
        aicode: debug
 
+
    path: /var/log/tomcat/
 
 

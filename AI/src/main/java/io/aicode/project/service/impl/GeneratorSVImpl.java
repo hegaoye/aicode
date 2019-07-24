@@ -80,7 +80,6 @@ public class GeneratorSVImpl implements GenerateSV {
         String path = logsSV.createLogFiles(projectCode, projectJob.getCreateTime());
 
         try {
-
             //1.创建项目
             String log = "Start By AI-Code @Copyright <a href='http://www.aicode.io' target='_blank'>AI-Code</a>";
             WSClientManager.sendMessage(log);
@@ -550,12 +549,12 @@ public class GeneratorSVImpl implements GenerateSV {
         String projectWorkspacePath = this.convertPath(settingWorkspace.getV(), project.getEnglishName(), true);
 
         Setting repositoryPathSetting = settingDAO.loadByKey(Setting.Key.Repository_Path.name());
-        String destination = this.convertPath(repositoryPathSetting.getV(), project.getEnglishName(), true);
+        String destination = repositoryPathSetting.getV() + "/" + project.getEnglishName();
 
 
         //压缩文件
         try {
-            File repositoryFile = new File(new HandleFuncs().getCurrentClassPath() + repositoryPathSetting.getV());
+            File repositoryFile = new File(repositoryPathSetting.getV());
             if (!repositoryFile.exists()) {
                 repositoryFile.mkdirs();
             }
@@ -569,7 +568,7 @@ public class GeneratorSVImpl implements GenerateSV {
             logger.error(e.getMessage());
         }
         ZipTools.zip(destination, projectWorkspacePath);
-        project.setDownloadUrl(this.convertPath(repositoryPathSetting.getV().replace("/static", ""), project.getEnglishName() + ".zip", false));
+        project.setDownloadUrl("/project/download/" + project.getEnglishName());
         projectDAO.update(project);
     }
 

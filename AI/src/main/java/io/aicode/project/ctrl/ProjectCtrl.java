@@ -9,7 +9,6 @@ import io.aicode.base.enums.YNEnum;
 import io.aicode.base.exceptions.BaseException;
 import io.aicode.base.tools.Constants;
 import io.aicode.base.tools.FileUtil;
-import io.aicode.base.tools.HandleFuncs;
 import io.aicode.base.tools.Page;
 import io.aicode.display.facade.DisplayAttributeSV;
 import io.aicode.project.entity.Project;
@@ -116,7 +115,7 @@ public class ProjectCtrl extends BaseCtrl {
         Project project = projectSV.load(map);
         String workspace = settingSV.load(Setting.Key.Workspace);
 
-        filePath = new HandleFuncs().getCurrentClassPath() + workspace + filePath;
+        filePath = workspace + filePath;
         logger.info(filePath);
 
         File file = new File(filePath);
@@ -282,13 +281,12 @@ public class ProjectCtrl extends BaseCtrl {
         String fileName = proejctName + ".zip";// 设置文件名，根据业务需要替换成要下载的文件名
         if (fileName != null) {
             String repositoryPath = settingSV.load(Setting.Key.Repository_Path, String.class);
-//            ClassPathResource resource = new ClassPathResource("repository/" + fileName);
             response.setContentType("application/force-download");// 设置强制下载不打开
             fileName = new String(fileName.getBytes("UTF-8"), "iso-8859-1");
             response.addHeader("Content-Disposition", "attachment;fileName=" + fileName);// 设置文件名
             byte[] buffer = new byte[1024];
             FileInputStream fileInputStream = new FileInputStream(new File(repositoryPath + fileName));
-            try (InputStream inputStream = fileInputStream;//resource.getInputStream();
+            try (InputStream inputStream = fileInputStream;
                  BufferedInputStream bis = new BufferedInputStream(inputStream)) {
                 OutputStream os = response.getOutputStream();
                 int i = bis.read(buffer);

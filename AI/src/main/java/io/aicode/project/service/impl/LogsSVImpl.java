@@ -77,7 +77,7 @@ public class LogsSVImpl implements LogsSV {
             //2.用户名+项目名生成唯一的文件夹
             String fileName = accountName + "_" + name + "_logs";
             String workspace = settingSV.load(Setting.Key.Workspace);
-            String path = new HandleFuncs().getCurrentClassPath() + workspace + fileName;
+            String path = workspace + fileName;
             FileUtil.createDir(path, null);
             //3.根据时间戳生成文件
             String dateStr = DateTools.dateToNum14(date);
@@ -168,7 +168,7 @@ public class LogsSVImpl implements LogsSV {
                 filePath = name + "/" + date + SuffixTypeEnum.Log.val;
             }
             String workspace = settingSV.load(Setting.Key.Workspace);
-            String path = new HandleFuncs().getCurrentClassPath() + workspace;
+            String path = workspace;
             if (StringTools.isNotEmpty(filePath)) {
                 path = path + filePath;
             }

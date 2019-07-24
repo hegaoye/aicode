@@ -9,7 +9,10 @@ import io.aicode.base.core.ModelData;
 import io.aicode.base.core.StringHelper;
 import io.aicode.base.core.TemplateData;
 import io.aicode.base.enums.YNEnum;
-import io.aicode.base.tools.*;
+import io.aicode.base.tools.FileUtil;
+import io.aicode.base.tools.GitTools;
+import io.aicode.base.tools.StringTools;
+import io.aicode.base.tools.ZipTools;
 import io.aicode.base.websocket.WSClientManager;
 import io.aicode.display.entity.DisplayAttribute;
 import io.aicode.project.dao.*;
@@ -119,7 +122,7 @@ public class GeneratorSVImpl implements GenerateSV {
             logsSV.saveLogs(log, path);
             logsSV.saveLogs("开始 下载技术模板", path);
             logsSV.saveLogs(log, path);
-            this.readyframeworksTemplateList(projectFramworkList, path);
+            this.prepareframeworksTemplateList(projectFramworkList, path);
             WSClientManager.sendMessage(log);
             WSClientManager.sendMessage("结束 下载技术模板成功");
             WSClientManager.sendMessage(log);
@@ -237,7 +240,7 @@ public class GeneratorSVImpl implements GenerateSV {
     }
 
     //准备框架模板
-    private void readyframeworksTemplateList(List<ProjectFramwork> projectFramworkList, String logsPath) {
+    private void prepareframeworksTemplateList(List<ProjectFramwork> projectFramworkList, String logsPath) {
         Setting setting = settingDAO.loadByKey(Setting.Key.Template_Path.name());
         //获得默认仓库地址
         String template_Path = this.convertPath("/", setting.getV(), true);
@@ -284,7 +287,8 @@ public class GeneratorSVImpl implements GenerateSV {
                     if (file.getAbsoluteFile().toString().contains("\\.git\\") || file.getAbsoluteFile().toString().contains("README.md")) {
                         continue;
                     }
-                    String path = this.convertPath("/", file.getAbsoluteFile().toString(), false).replace((template_Path + "/").replace("//", ""), "");
+                    String path = this.convertPath("/", file.getAbsoluteFile().toString(), false).replace("//", "");
+                    path = path.substring(path.indexOf(template_Path) + template_Path.length());
                     FrameworksTemplate frameworksTemplate = new FrameworksTemplate();
                     frameworksTemplate.setCode(String.valueOf(uidGenerator.getUID()));
                     frameworksTemplate.setPath(path);
@@ -503,9 +507,9 @@ public class GeneratorSVImpl implements GenerateSV {
                 .replace("${module}", project.getEnglishName())
                 .replace("${model}", templateData.getModel());
 
-        String templatePath = new HandleFuncs().getCurrentClassPath()
-                + "/" + settingTemplatePath.getV()
+        String templatePath = "/" + settingTemplatePath.getV()
                 + "/" + frameworksTemplate.getPath();
+        templatePath = templatePath.replace("//", "/").replace("///", "/");
         logger.debug("模板路径：" + templatePath);
         if (targetFilePath.contains("angular")) {
             logger.debug("目标文件路径" + targetFilePath);
@@ -582,7 +586,7 @@ public class GeneratorSVImpl implements GenerateSV {
     private String convertPath(String path, String filename, boolean isAbsolute) {
         String absolutePath = "";
         if (isAbsolute) {
-            absolutePath = new HandleFuncs().getCurrentClassPath() + "/" + path + "/" + filename;
+            absolutePath = "/" + path + "/" + filename;
         } else {
             absolutePath = path + "/" + filename;
         }

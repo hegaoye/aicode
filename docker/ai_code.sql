@@ -337,9 +337,9 @@ CREATE TABLE `setting`  (
 -- ----------------------------
 INSERT INTO `setting` VALUES (1, 'DefaultDatabase', 'ai_code', '默认链接数据库');
 INSERT INTO `setting` VALUES (2, 'Gradle_Directory_Structure', '[\"src/main/java\",\"src/main/resources/framework\"]', 'gradle目录结构');
-INSERT INTO `setting` VALUES (3, 'Workspace', '/static/workspace/', '工作目录');
+INSERT INTO `setting` VALUES (3, 'Workspace', '/home/workspace/', '工作目录');
 INSERT INTO `setting` VALUES (4, 'Package_entity', 'po', '实体目录命名');
-INSERT INTO `setting` VALUES (5, 'Template_Path', '/static/templates/', '模板默认路径');
+INSERT INTO `setting` VALUES (5, 'Template_Path', '/home/templates/', '模板默认路径');
 INSERT INTO `setting` VALUES (6, 'Repository_Path', '/home/repository/', 'zip仓库');
 INSERT INTO `setting` VALUES (7, 'GitHome_Default', 'https://gitee.com/helixin/aicode_template.git', '默认系统模板仓库路径');
 INSERT INTO `setting` VALUES (8, 'SandBox_Path', '/sandbox/', '沙箱环境目录');

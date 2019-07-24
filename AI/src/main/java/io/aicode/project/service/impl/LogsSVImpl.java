@@ -109,7 +109,7 @@ public class LogsSVImpl implements LogsSV {
             throw new BaseException(BaseException.BaseExceptionEnum.Empty_Param);
         }
         String workspace = settingSV.load(Setting.Key.Workspace);
-        path = new HandleFuncs().getCurrentClassPath() + workspace + path;
+        path = workspace + path;
         FileOutputStream fop;
         File file;
         try {

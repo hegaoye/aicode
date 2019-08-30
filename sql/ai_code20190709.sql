@@ -80,17 +80,21 @@ CREATE TABLE `frameworks`  (
 -- ----------------------------
 -- Records of frameworks
 -- ----------------------------
-INSERT INTO `frameworks` VALUES (5, '123456', 'ssm-redis-swagger-lombok', 'ssm+redis+swagger+lombok', 'https://gitee.com/helixin/aicode_template.git', 'hegaoye@qq.com', '', 'Y');
-INSERT INTO `frameworks` VALUES (6, '456789', 'ssm-dubbo-redis-swagger-lombok-disconf-sentry', '此项目整合了ssm+dubbo+redis+swagger+lombok几大框架便于实现分布式，采用gradle管理构建项目，lombok使用请安装ide的插件并进行设置即可完成javabean的简化', 'https://gitee.com/helixin/aicode_template.git', 'hegaoye@qq.com', NULL, 'N');
-INSERT INTO `frameworks` VALUES (7, '74108520', 'ssh+redis+swagger+lombok', 'ssh+redis+swagger+lombok', 'https://gitee.com/helixin/aicode_template.git', 'hegaoye@qq.com', NULL, NULL);
-INSERT INTO `frameworks` VALUES (8, '888888', 'spring-cloud-redis-lombok-sentry', '此框架整合了spring-cloud、redis、lombok，swagger等最新版本，可以方便的实现单项目开发，分布式开发的需求；需要注意的是需要对spring boot有所了解将有助于使用此套框架，框架自己包含了工具包，配置好了分层，需要修改数据库连接地址以及一些自己内网的信息接口生成后直接运行使用，免测试。', 'https://gitee.com/helixin/aicode_template.git', 'hegaoye@qq.com', NULL, 'Y');
-INSERT INTO `frameworks` VALUES (9, '999999', 'ssm-redis-swagger-lombok-pitop', 'ssm+redis+swagger+lombok', 'https://gitee.com/helixin/aicode_template.git', 'hegaoye@qq.com', '', 'Y');
-INSERT INTO `frameworks` VALUES (10, '10101010', 'springboot-redis-swagger-lombok', 'springboot+redis+swagger+lombok', 'https://gitee.com/helixin/aicode_template.git', 'hegaoye@qq.com', NULL, 'Y');
-INSERT INTO `frameworks` VALUES (25, '1081629222214967296', 'angular-template', 'angular-template', 'https://gitee.com/helixin/aicode_template.git', 'hegaoye@qq.com', '', 'Y');
-INSERT INTO `frameworks` VALUES (26, '1081629222214967297', 'springboot-redis-swagger-lombok-frontend', 'springboot-redis-swagger-lombok-frontend', 'https://gitee.com/helixin/aicode_template.git', 'hegaoye@qq.com', '', 'Y');
-INSERT INTO `frameworks` VALUES (27, '1261424610586877952', 'angular-template-i18n', 'angular国际化模板', 'https://gitee.com/helixin/aicode_template.git', 'hegaoye@qq.com', '888888', 'Y');
-INSERT INTO `frameworks` VALUES (28, '1593730370629427200', 'springcloud2.1.5-redis-swagger-lombok-provider', '此框架以springcloud Greenwich.RELEASE，springboot 2.1.5.RELEASE 版本为基础进行整合，整合 springcloud的各个组件eureka,feign 实现分布式微服务', 'https://gitee.com/helixin/aicode_template.git', 'hegaoye@qq.com', '888888', 'Y');
-INSERT INTO `frameworks` VALUES (28, '1593730370629427201', 'springcloud2.1.5-provider-config', '此框架以springcloud Greenwich.RELEASE，springboot 2.1.5.RELEASE 版本为基础进行整合，整合 springcloud的各个组件eureka,feign,config 实现分布式微服务', 'https://gitee.com/helixin/aicode_template.git', 'hegaoye@qq.com', '888888', 'Y');
+INSERT INTO `frameworks` VALUES (1, '123456', 'ssm-redis-swagger-lombok', 'ssm+redis+swagger+lombok', 'https://gitee.com/helixin/aicode_template.git', 'hegaoye@qq.com', '', 'Y');
+INSERT INTO `frameworks` VALUES (2, '456789', 'ssm-dubbo-redis-swagger-lombok-disconf-sentry', '此项目整合了ssm+dubbo+redis+swagger+lombok几大框架便于实现分布式，采用gradle管理构建项目，lombok使用请安装ide的插件并进行设置即可完成javabean的简化', 'https://gitee.com/helixin/aicode_template.git', 'hegaoye@qq.com', NULL, 'N');
+INSERT INTO `frameworks` VALUES (3, '74108520', 'ssh+redis+swagger+lombok', 'ssh+redis+swagger+lombok', 'https://gitee.com/helixin/aicode_template.git', 'hegaoye@qq.com', NULL, NULL);
+INSERT INTO `frameworks` VALUES (4, '888888', 'spring-cloud-redis-lombok-sentry', '此框架整合了spring-cloud、redis、lombok，swagger等最新版本，可以方便的实现单项目开发，分布式开发的需求；需要注意的是需要对spring boot有所了解将有助于使用此套框架，框架自己包含了工具包，配置好了分层，需要修改数据库连接地址以及一些自己内网的信息接口生成后直接运行使用，免测试。', 'https://gitee.com/helixin/aicode_template.git', 'hegaoye@qq.com', NULL, 'Y');
+INSERT INTO `frameworks` VALUES (5, '999999', 'ssm-redis-swagger-lombok-pitop', 'ssm+redis+swagger+lombok', 'https://gitee.com/helixin/aicode_template.git', 'hegaoye@qq.com', '', 'Y');
+INSERT INTO `frameworks` VALUES (6, '10101010', 'springboot-redis-swagger-lombok', 'springboot+redis+swagger+lombok', 'https://gitee.com/helixin/aicode_template.git', 'hegaoye@qq.com', NULL, 'Y');
+INSERT INTO `frameworks` VALUES (7, '1081629222214967296', 'angular-template', 'angular 框架自动与后端接口对接，请配合使用以frontend结尾的后端框架生成使用', 'https://gitee.com/helixin/aicode_template.git', 'hegaoye@qq.com', '', 'Y');
+INSERT INTO `frameworks` VALUES (8, '1081629222214967297', 'springboot-redis-swagger-lombok-frontend', 'springboot-redis-swagger-lombok-frontend', 'https://gitee.com/helixin/aicode_template.git', 'hegaoye@qq.com', '', 'Y');
+INSERT INTO `frameworks` VALUES (9, '1261424610586877952', 'angular-template-i18n', 'angular国际化模板', 'https://gitee.com/helixin/aicode_template.git', 'hegaoye@qq.com', '888888', 'Y');
+INSERT INTO `frameworks` VALUES (10, '1593730370629427200', 'springcloud2.1.5-redis-swagger-lombok-provider', '此框架以springcloud Greenwich.RELEASE，springboot 2.1.5.RELEASE 版本为基础进行整合，整合 springcloud的各个组件eureka,feign 实现分布式微服务', 'https://gitee.com/helixin/aicode_template.git', 'hegaoye@qq.com', '888888', 'Y');
+INSERT INTO `frameworks` VALUES (11, '1593730370629427201', 'springcloud2.1.5-provider-config', '此框架以springcloud Greenwich.RELEASE，springboot 2.1.5.RELEASE 版本为基础进行整合，整合 springcloud的各个组件eureka,feign,config 实现分布式微服务', 'https://gitee.com/helixin/aicode_template.git', 'hegaoye@qq.com', '888888', 'Y');
+INSERT INTO `frameworks` VALUES (12, '1593730370629427202', 'springboot-redis-swagger-lombok-aoplog-jwt', 'Spring cloud + Mybatis + Redis + Swagger + Lombok 基础框架组合 + 自定义 AOP 日志 + JWT 登录验证', 'https://gitee.com/helixin/aicode_template.git', 'hegaoye@qq.com', '888888', 'Y');
+INSERT INTO `frameworks` VALUES (13, '1593730370629427203', 'ssh-redis-swagger-lombok', '整合springmvc,spring,hibernate,swagger,redis,lombok等多种框架', 'https://gitee.com/helixin/aicode_template.git', 'hegaoye@qq.com', '888888', 'Y');
+INSERT INTO `frameworks` VALUES (14, '1593730370629427204', 'angular-template-rzhkj', 'angular 框架自动与后端接口对接，请配合使用以frontend结尾的后端框架生成使用', 'https://gitee.com/helixin/aicode_template.git', 'hegaoye@qq.com', '888888', 'Y');
+INSERT INTO `frameworks` VALUES (15, '1593730370629427205', 'springboot-redis-swagger-lombok-rzhkj', 'rzhkj springboot 版本框架整合了redis,swagger,lombok等', 'https://gitee.com/helixin/aicode_template.git', 'hegaoye@qq.com', '888888', 'Y');
 
 -- ----------------------------
 -- Table structure for frameworks_template

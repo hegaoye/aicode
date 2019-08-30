@@ -89,6 +89,8 @@ INSERT INTO `frameworks` VALUES (10, '10101010', 'springboot-redis-swagger-lombo
 INSERT INTO `frameworks` VALUES (25, '1081629222214967296', 'angular-template', 'angular-template', 'https://gitee.com/helixin/aicode_template.git', 'hegaoye@qq.com', '', 'Y');
 INSERT INTO `frameworks` VALUES (26, '1081629222214967297', 'springboot-redis-swagger-lombok-frontend', 'springboot-redis-swagger-lombok-frontend', 'https://gitee.com/helixin/aicode_template.git', 'hegaoye@qq.com', '', 'Y');
 INSERT INTO `frameworks` VALUES (27, '1261424610586877952', 'angular-template-i18n', 'angular国际化模板', 'https://gitee.com/helixin/aicode_template.git', 'hegaoye@qq.com', '888888', 'Y');
+INSERT INTO `frameworks` VALUES (28, '1593730370629427200', 'springcloud2.1.5-redis-swagger-lombok-provider', '此框架以springcloud Greenwich.RELEASE，springboot 2.1.5.RELEASE 版本为基础进行整合，整合 springcloud的各个组件eureka,feign 实现分布式微服务', 'https://gitee.com/helixin/aicode_template.git', 'hegaoye@qq.com', '888888', 'Y');
+INSERT INTO `frameworks` VALUES (28, '1593730370629427201', 'springcloud2.1.5-provider-config', '此框架以springcloud Greenwich.RELEASE，springboot 2.1.5.RELEASE 版本为基础进行整合，整合 springcloud的各个组件eureka,feign,config 实现分布式微服务', 'https://gitee.com/helixin/aicode_template.git', 'hegaoye@qq.com', '888888', 'Y');
 
 -- ----------------------------
 -- Table structure for frameworks_template

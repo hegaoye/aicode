@@ -140,6 +140,7 @@ public class DatabaseDataTypesUtils {
         _preferredJavaTypeForSqlType.put("char", "java.lang.String");
         _preferredJavaTypeForSqlType.put("text", "java.lang.String");
         _preferredJavaTypeForSqlType.put("varchar", "java.lang.String");
+        _preferredJavaTypeForSqlType.put("enum", "java.lang.String");
         // according to resultset.gif, we should use java.io.Reader, but String is more convenient for EJB
 
         _preferredJavaTypeForSqlType.put("longvarchar", "java.lang.String");

@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mapper.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<mapper namespace="MapFieldColumn">
+
+    <resultMap id="rs_base" type="MapFieldColumn">
+        <result property="id" column="id"/>
+        <result property="mapClassTableCode" column="mapClassTableCode"/>
+        <result property="code" column="code"/>
+        <result property="column" column="column"/>
+        <result property="field" column="field"/>
+        <result property="sqlType" column="sqlType"/>
+        <result property="fieldType" column="fieldType"/>
+        <result property="notes" column="notes"/>
+        <result property="defaultValue" column="defaultValue"/>
+        <result property="isPrimaryKey" column="isPrimaryKey"/>
+        <result property="isDate" column="isDate"/>
+        <result property="isState" column="isState"/>
+    </resultMap>
+
+    <!--查询表信息关联信息-->
+    <resultMap id="rs_base_all" type="MapFieldColumn" extends="rs_base">
+        <collection property="displayAttribute" column="{mapFieldColumnCode=code}" select="DisplayAttribute.load"/>
+    </resultMap>
+
+    <!-- 用于select查询公用抽取的列 -->
+    <sql id="MapFieldColumn.columns">
+		id,mapClassTableCode,code,`column`,field,sqlType,fieldType,notes,defaultValue,isPrimaryKey,isDate,isState
+	</sql>
+
+    <insert id="MapFieldColumn.insert" useGeneratedKeys="true" keyProperty="id" parameterType="MapFieldColumn">
+        INSERT INTO `map_field_column` (
+        id ,
+        mapClassTableCode ,
+        code ,
+        `column` ,
+        field ,
+        sqlType ,
+        fieldType ,
+        notes ,
+        defaultValue ,
+        isPrimaryKey ,
+        isDate ,
+        isState
+        ) VALUES (
+        #{id} ,
+        #{mapClassTableCode} ,
+        #{code} ,
+        #{column} ,
+        #{field} ,
+        #{sqlType} ,
+        #{fieldType} ,
+        #{notes} ,
+        #{defaultValue} ,
+        #{isPrimaryKey} ,
+        #{isDate} ,
+        #{isState}
+        )
+        <selectKey keyProperty="id" resultType="long">
+            select LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+
+    <update id="MapFieldColumn.update" parameterType="MapFieldColumn">
+        UPDATE `map_field_column`
+        <trim prefix="set" suffixOverrides=",">
+            <if test="mapClassTableCode!=null and mapClassTableCode!=''">
+                mapClassTableCode = #{mapClassTableCode} ,
+            </if>
+            <if test="code!=null and code!=''">
+                code = #{code} ,
+            </if>
+            <if test="column!=null and column!=''">
+                `column` = #{column} ,
+            </if>
+            <if test="field!=null and field!=''">
+                field = #{field} ,
+            </if>
+            <if test="sqlType!=null and sqlType!=''">
+                sqlType = #{sqlType} ,
+            </if>
+            <if test="fieldType!=null and fieldType!=''">
+                fieldType = #{fieldType} ,
+            </if>
+            <if test="notes!=null and notes!=''">
+                notes = #{notes} ,
+            </if>
+            <if test="defaultValue!=null and defaultValue!=''">
+                defaultValue = #{defaultValue} ,
+            </if>
+            <if test="isPrimaryKey!=null and isPrimaryKey!=''">
+                isPrimaryKey = #{isPrimaryKey} ,
+            </if>
+            <if test="isDate!=null and isDate!=''">
+                isDate = #{isDate} ,
+            </if>
+            <if test="isState!=null and isState!=''">
+                isState = #{isState}
+            </if>
+        </trim>
+        WHERE
+        id = #{id}
+    </update>
+
+    <delete id="MapFieldColumn.delete">
+        DELETE FROM `map_field_column`
+        <include refid="MapFieldColumn.where"/>
+    </delete>
+
+    <select id="MapFieldColumn.load" resultMap="rs_base_all">
+        SELECT
+        <include refid="MapFieldColumn.columns"/>
+        FROM `map_field_column`
+        <include refid="MapFieldColumn.where"/>
+    </select>
+
+    <sql id="MapFieldColumn.where">
+        <where>
+            <if test="id!=null and id!=''">
+                AND id = #{id}
+            </if>
+            <if test="mapClassTableCode!=null and mapClassTableCode!=''">
+                AND mapClassTableCode = #{mapClassTableCode}
+            </if>
+            <if test="code!=null and code!=''">
+                AND code = #{code}
+            </if>
+            <if test="column!=null and column!=''">
+                AND `column` = #{column}
+            </if>
+            <if test="field!=null and field!=''">
+                AND field = #{field}
+            </if>
+            <if test="sqlType!=null and sqlType!=''">
+                AND sqlType = #{sqlType}
+            </if>
+            <if test="fieldType!=null and fieldType!=''">
+                AND fieldType = #{fieldType}
+            </if>
+            <if test="notes!=null and notes!=''">
+                AND notes = #{notes}
+            </if>
+            <if test="defaultValue!=null and defaultValue!=''">
+                AND defaultValue = #{defaultValue}
+            </if>
+            <if test="isPrimaryKey!=null and isPrimaryKey!=''">
+                AND isPrimaryKey = #{isPrimaryKey}
+            </if>
+            <if test="isDate!=null and isDate!=''">
+                AND isDate = #{isDate}
+            </if>
+            <if test="isState!=null and isState!=''">
+                AND isState = #{isState}
+            </if>
+        </where>
+    </sql>
+
+
+    <select id="MapFieldColumn.count" resultType="long">
+        SELECT count(*) FROM `map_field_column`
+        <include refid="MapFieldColumn.where"/>
+    </select>
+
+
+    <select id="MapFieldColumn.query" resultMap="rs_base_all">
+        SELECT
+        <include refid="MapFieldColumn.columns"/>
+        FROM `map_field_column`
+        <include refid="MapFieldColumn.where"/>
+
+        <if test="sortColumns!=null and sortColumns!=''">
+            ORDER BY ${sortColumns}
+        </if>
+    </select>
+
+    <!--根据映射编码查询表的所有字段信息-->
+    <select id="MapFieldColumn.listFields" resultMap="rs_base">
+        SELECT
+        <include refid="MapFieldColumn.columns"/>
+        FROM `map_field_column`
+        WHERE mapClassTableCode = #{mapClassTableCode}
+    </select>
+
+
+</mapper>
+

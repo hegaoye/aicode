@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mapper.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<mapper namespace="Module">
+
+    <resultMap id="rs_base" type="Module">
+        <result property="id" column="id"/>
+        <result property="code" column="code"/>
+        <result property="name" column="name"/>
+        <result property="description" column="description"/>
+    </resultMap>
+
+    <!--查询表信息关联信息-->
+    <resultMap id="rs_base_all" type="Module" extends="rs_base">
+        <collection property="moduleFileList" column="{moduleCode=code}" select="ModuleFile.query"/>
+    </resultMap>
+
+    <!-- 用于select查询公用抽取的列 -->
+    <sql id="Module.columns">
+		id,code,name,description
+	</sql>
+
+    <insert id="Module.insert" useGeneratedKeys="true" keyProperty="id" parameterType="Module">
+        INSERT INTO `Module` (
+        id ,
+        code ,
+        name ,
+        description
+        ) VALUES (
+        #{id} ,
+        #{code} ,
+        #{name} ,
+        #{description}
+        )
+        <selectKey keyProperty="id" resultType="long">
+            select LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+
+    <update id="Module.update" parameterType="Module">
+        UPDATE `Module`
+        <trim prefix="set" suffixOverrides=",">
+            <if test="name!=null and name!=''">
+                name = #{name} ,
+            </if>
+            <if test="description!=null and description!=''">
+                description = #{description} ,
+            </if>
+        </trim>
+        WHERE
+        code = #{code}
+    </update>
+
+    <delete id="Module.delete">
+        DELETE FROM `Module`
+        <include refid="Module.where"/>
+    </delete>
+
+    <select id="Module.load" resultMap="rs_base_all">
+        SELECT
+        <include refid="Module.columns"/>
+        FROM `Module`
+        <include refid="Module.where"/>
+    </select>
+
+    <sql id="Module.where">
+        <where>
+            <if test="id!=null and id!=''">
+                AND id = #{id}
+            </if>
+            <if test="code!=null and code!=''">
+                AND code = #{code}
+            </if>
+            <if test="name!=null and name!=''">
+                AND name = #{name}
+            </if>
+
+            <if test="description!=null and description!=''">
+                AND description = #{description}
+            </if>
+        </where>
+    </sql>
+
+
+    <select id="Module.count" resultType="long">
+        SELECT count(*) FROM `Module`
+        <include refid="Module.where"/>
+    </select>
+
+
+    <select id="Module.query" resultMap="rs_base_all">
+        SELECT
+        <include refid="Module.columns"/>
+        FROM `Module`
+        <include refid="Module.where"/>
+
+        <if test="sortColumns!=null and sortColumns!=''">
+            ORDER BY ${sortColumns}
+        </if>
+    </select>
+
+
+</mapper>
+

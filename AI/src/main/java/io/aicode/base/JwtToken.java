@@ -30,15 +30,13 @@ import java.util.concurrent.TimeUnit;
 public class JwtToken {
     protected final static Logger logger = LoggerFactory.getLogger(JwtToken.class);
 
-    private static long expireMinutes = 60L;//60分钟
-    private static String secret = "ZhengZhouRenZhongHeKeJi315@aicode.com";
+    private static long expireMinutes = 120L;//60分钟
+    private static String secret = "hegaoye@qq.com/hegaoye@gmail.com/www.hegaoye.com";
 
     public static void main(String[] args) {
         String token = createToken("client_id", "c5f04615-7739-4267-877c-bedd9ab7fed3");
         boolean flag = verifier(token);
         System.out.println(flag);
-
-
     }
 
 

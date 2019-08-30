@@ -221,3 +221,8 @@ alter table `order` comment '订单';
 模板仓库地址 https://gitee.com/helixin/aicode_template
 
 docker教程 https://hub.docker.com/r/hegaoye/aicode
+
+# 尝鲜演示地址
+http://www.hegaoye.com
+admin
+888888

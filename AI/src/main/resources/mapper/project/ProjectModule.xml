@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mapper.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<mapper namespace="ProjectModule">
+
+	<resultMap id="rs_base" type="ProjectModule">
+        <result property="id" column="id"/>
+        <result property="projectCode" column="projectCode"/>
+        <result property="moduleCode" column="moduleCode"/>
+	</resultMap>
+
+
+	<!--查询表信息关联信息-->
+	<resultMap id="rs_base_all" type="ProjectModule" extends="rs_base">
+		<association property="module" column="{code=moduleCode}" select="Module.load"/>
+	</resultMap>
+
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="ProjectModule.columns">
+		id,projectCode,moduleCode
+	</sql>
+
+	<insert id="ProjectModule.insert" useGeneratedKeys="true" keyProperty="id" parameterType="ProjectModule">
+        INSERT INTO `project_module` (
+        	id ,
+        	projectCode ,
+        	moduleCode 
+        ) VALUES (
+        	#{id} ,
+        	#{projectCode} ,
+        	#{moduleCode} 
+        )
+		<selectKey keyProperty="id" resultType="long">
+			select LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+
+	<update id="ProjectModule.update" parameterType="ProjectModule">
+        UPDATE `project_module`
+		<trim prefix="set" suffixOverrides=",">
+			<if test="projectCode!=null and projectCode!=''">
+	        projectCode = #{projectCode} ,
+		    </if>
+			<if test="moduleCode!=null and moduleCode!=''">
+	        moduleCode = #{moduleCode} 
+		    </if>
+		</trim>
+        WHERE
+	        id = #{id} 
+	</update>
+
+    <delete id="ProjectModule.delete">
+        DELETE FROM `project_module`
+		<include refid="ProjectModule.where"/>
+    </delete>
+
+    <select id="ProjectModule.load" resultMap="rs_base_all">
+		SELECT <include refid="ProjectModule.columns" />
+		    FROM `project_module`
+		<include refid="ProjectModule.where"/>
+	</select>
+
+	<sql id="ProjectModule.where">
+		<where>
+			<if test="id!=null and id!=''">
+				AND id = #{id}
+			</if>
+			<if test="projectCode!=null and projectCode!=''">
+				AND projectCode = #{projectCode}
+			</if>
+			<if test="moduleCode!=null and moduleCode!=''">
+				AND moduleCode = #{moduleCode}
+			</if>
+		</where>
+	</sql>
+
+
+
+    <select id="ProjectModule.count" resultType="long">
+        SELECT count(*) FROM `project_module`
+		<include refid="ProjectModule.where"/>
+    </select>
+
+
+    <select id="ProjectModule.query" resultMap="rs_base_all">
+    	SELECT <include refid="ProjectModule.columns" />
+	    FROM `project_module`
+		<include refid="ProjectModule.where"/>
+
+		<if test="sortColumns!=null and sortColumns!=''">
+			ORDER BY ${sortColumns}
+		</if>
+    </select>
+
+
+</mapper>
+

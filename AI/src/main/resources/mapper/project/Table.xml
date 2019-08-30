@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mapper.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<mapper namespace="Table">
+
+    <resultMap id="rs_base" type="Table">
+        <result property="tableName" column="table_name"/>
+        <result property="tableComment" column="table_comment"/>
+    </resultMap>
+
+    <resultMap id="database" type="Table">
+        <result property="catalogName" column="catalog_name"/>
+        <result property="schemaName" column="schema_name"/>
+        <result property="defaultCahracterSetName" column="default_cahracter_set_name"/>
+        <result property="defaultCollationName" column="default_collation_name"/>
+    </resultMap>
+
+    <!--查询指定数据库下指定表的信息-->
+    <select id="Table.load" resultMap="rs_base">
+        SELECT table_name,table_comment
+        FROM `information_schema.tables`
+        where table_schema=#{database}
+         AND table_name=#{tableName}
+        and table_type='base table'
+    </select>
+
+    <!--统计数据库下有多少个表-->
+    <select id="Table.count" resultType="long">
+        select count(1)
+		from information_schema.tables
+		where table_schema=#{database} and table_type='base table'
+    </select>
+
+    <!--查询数据库下所有表信息-->
+    <select id="Table.query" resultMap="rs_base">
+		select table_name,table_comment
+		from information_schema.tables
+		where table_schema=#{database} and table_type='base table'
+    </select>
+
+</mapper>
+

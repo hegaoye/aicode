@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mapper.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<mapper namespace="ProjectRepositoryAccount">
+
+	<resultMap id="rs_base" type="ProjectRepositoryAccount">
+        <result property="id" column="id"/>
+        <result property="code" column="code"/>
+        <result property="projectCode" column="projectCode"/>
+        <result property="account" column="account"/>
+        <result property="password" column="password"/>
+        <result property="home" column="home"/>
+        <result property="description" column="description"/>
+        <result property="state" column="state"/>
+        <result property="type" column="type"/>
+	</resultMap>
+
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="ProjectRepositoryAccount.columns">
+		id,code,projectCode,account,password,home,description,state,type
+	</sql>
+
+	<insert id="ProjectRepositoryAccount.insert" useGeneratedKeys="true" keyProperty="id" parameterType="ProjectRepositoryAccount">
+        INSERT INTO `project_repository_account` (
+        	id ,
+        	code ,
+        	projectCode ,
+        	account ,
+        	password ,
+        	home ,
+        	description ,
+        	state ,
+        	type 
+        ) VALUES (
+        	#{id} ,
+        	#{code} ,
+        	#{projectCode} ,
+        	#{account} ,
+        	#{password} ,
+        	#{home} ,
+        	#{description} ,
+        	#{state} ,
+        	#{type} 
+        )
+		<selectKey keyProperty="id" resultType="long">
+			select LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+
+	<update id="ProjectRepositoryAccount.update" parameterType="ProjectRepositoryAccount">
+        UPDATE `project_repository_account`
+		<trim prefix="set" suffixOverrides=",">
+			<if test="projectCode!=null and projectCode!=''">
+	        projectCode = #{projectCode} ,
+		    </if>
+			<if test="account!=null and account!=''">
+	        account = #{account} ,
+		    </if>
+			<if test="password!=null and password!=''">
+	        password = #{password} ,
+		    </if>
+			<if test="home!=null and home!=''">
+	        home = #{home} ,
+		    </if>
+			<if test="description!=null and description!=''">
+	        description = #{description} ,
+		    </if>
+			<if test="state!=null and state!=''">
+	        state = #{state} ,
+		    </if>
+			<if test="type!=null and type!=''">
+	        type = #{type} 
+		    </if>
+		</trim>
+        WHERE
+	        code = #{code}
+	</update>
+
+    <delete id="ProjectRepositoryAccount.delete">
+        DELETE FROM `project_repository_account`
+		<include refid="ProjectRepositoryAccount.where"/>
+    </delete>
+
+    <select id="ProjectRepositoryAccount.load" resultMap="rs_base">
+		SELECT <include refid="ProjectRepositoryAccount.columns" />
+		    FROM `project_repository_account`
+		<include refid="ProjectRepositoryAccount.where"/>
+	</select>
+
+	<sql id="ProjectRepositoryAccount.where">
+		<where>
+			<if test="id!=null and id!=''">
+				AND id = #{id}
+			</if>
+			<if test="code!=null and code!=''">
+				AND code = #{code}
+			</if>
+			<if test="projectCode!=null and projectCode!=''">
+				AND projectCode = #{projectCode}
+			</if>
+			<if test="account!=null and account!=''">
+				AND account = #{account}
+			</if>
+			<if test="password!=null and password!=''">
+				AND password = #{password}
+			</if>
+			<if test="home!=null and home!=''">
+				AND home = #{home}
+			</if>
+			<if test="description!=null and description!=''">
+				AND description = #{description}
+			</if>
+			<if test="state!=null and state!=''">
+				AND state = #{state}
+			</if>
+			<if test="type!=null and type!=''">
+				AND type = #{type}
+			</if>
+		</where>
+	</sql>
+
+
+
+    <select id="ProjectRepositoryAccount.count" resultType="long">
+        SELECT count(*) FROM `project_repository_account`
+		<include refid="ProjectRepositoryAccount.where"/>
+    </select>
+
+
+    <select id="ProjectRepositoryAccount.query" resultMap="rs_base">
+    	SELECT <include refid="ProjectRepositoryAccount.columns" />
+	    FROM `project_repository_account`
+		<include refid="ProjectRepositoryAccount.where"/>
+
+		<if test="sortColumns!=null and sortColumns!=''">
+			ORDER BY ${sortColumns}
+		</if>
+    </select>
+
+
+</mapper>
+

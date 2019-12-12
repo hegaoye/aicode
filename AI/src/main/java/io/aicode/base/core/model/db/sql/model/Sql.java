@@ -19,7 +19,7 @@ import java.util.List;
  * <pre>
  * hibernate: :username,
  * ibatis2: #username#,$usename$,
- * mybatis(or ibatis3): #{username},${username}
+ * mapper(or ibatis3): #{username},${username}
  * </pre>
  * SQL对象创建示例：
  * <pre>

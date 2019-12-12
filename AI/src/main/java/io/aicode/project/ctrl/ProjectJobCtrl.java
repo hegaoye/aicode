@@ -2,12 +2,12 @@ package io.aicode.project.ctrl;
 
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Maps;
-import io.aicode.base.interceptor.WSClientManager;
 import io.aicode.base.BaseCtrl;
 import io.aicode.base.core.BeanRet;
-import io.aicode.base.tools.Page;
 import io.aicode.base.exceptions.BaseException;
+import io.aicode.base.tools.Page;
 import io.aicode.base.tools.StringTools;
+import io.aicode.base.websocket.WSClientManager;
 import io.aicode.project.entity.ProjectJob;
 import io.aicode.project.service.ProjectJobSV;
 import io.aicode.project.service.ProjectSV;
@@ -19,11 +19,11 @@ import org.apache.commons.collections.map.HashedMap;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.socket.WebSocketSession;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.websocket.Session;
 import java.util.Map;
 
 
@@ -215,13 +215,10 @@ public class ProjectJobCtrl extends BaseCtrl {
     public BeanRet execute(String code, HttpServletRequest request) {
         try {
             Assert.hasText(code, BaseException.BaseExceptionEnum.Empty_Param.toString());
-//            ProjectJob projectJob = projectJobSV.execute(code); TODO 测试新日志暂时注释
-            WebSocketSession webSocketSession = wsClientManager.get(request.getRemoteHost());
+            Session webSocketSession = wsClientManager.get();
             if (webSocketSession != null) {
-                //检查数据库初始化
-//                projectSV.execute(code);
                 //生成代码
-                ProjectJob projectJob = projectJobSV.execute(code, webSocketSession);
+                ProjectJob projectJob = projectJobSV.execute(code);
                 return BeanRet.create(true, "执行任务成功", projectJob);
             }
             return BeanRet.create();

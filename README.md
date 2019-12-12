@@ -97,15 +97,22 @@ docker 依赖dockerhub 镜像（意思是你的网络要支持访问哦，大家
 中不包含数据库，数据库脚本请从项目中下载进行初始化，数据库名称请使用``ai_code``命名，以下docker命令操作
 dockerhub 详细操作说明 https://hub.docker.com/r/hegaoye/aicode
 
+直接使用下面的命令即可搞定，数据库与程序自动``link``在一起，方便简单
+
 ```
+#检出数据库
+docker pull hegaoye/mysql:1.0-beta
+#启动数据库 设置 --hostname=aicode-db 用于link方式连接
+docker run -p  3306:3306 -e MYSQL_ROOT_PASSWORD=aicode --hostname=aicode-db  --name aicode-db  --restart always -d hegaoye/mysql:1.0-beta  --lower_case_table_names=1
+
 #搜索查看aicode的镜像是否存在
 docker search aicode
 
 #拉取aicode的镜像 hegaoye/aicode:1.0-beta
 docker pull hegaoye/aicode:1.0-beta
 
-#启动容器,注意 host,username,passowrd 要进行修改成自己的mysql主机
-docker run -e host=192.168.1.220:3306 -e username=root -e password=aicode -p 8080:8080 --name aicode --restart always -d  hegaoye/aicode:1.0-beta
+#启动容器,注意 host,username,passowrd 要进行修改成自己的mysql主机 使用link 连接aicode-db
+docker run --link aicode-db:aicode-db -e host=aicode-db:3306 -e username=root -e password=aicode -p 8080:8080 --name aicode --restart always -d  hegaoye/aicode:1.0-beta
 
 #查看日志
 docker logs --tail 1000 -f aicode
@@ -113,7 +120,6 @@ docker logs --tail 1000 -f aicode
 #重启，关闭，启动容器命令
 docker restart|stop|start aicode
 ```
-
 
 ### 编写模板说明：
 模板语法采用freemarker编写，定义了一个实体类可以在项目``io.aicode.base.core.TemplateData`` 下找到此类，大致的内置变量可以如下图
@@ -215,3 +221,8 @@ alter table `order` comment '订单';
 模板仓库地址 https://gitee.com/helixin/aicode_template
 
 docker教程 https://hub.docker.com/r/hegaoye/aicode
+
+# 尝鲜演示地址
+http://www.hegaoye.com
+admin
+888888

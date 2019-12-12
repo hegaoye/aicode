@@ -9,7 +9,11 @@ import io.aicode.base.core.ModelData;
 import io.aicode.base.core.StringHelper;
 import io.aicode.base.core.TemplateData;
 import io.aicode.base.enums.YNEnum;
-import io.aicode.base.tools.*;
+import io.aicode.base.tools.FileUtil;
+import io.aicode.base.tools.GitTools;
+import io.aicode.base.tools.StringTools;
+import io.aicode.base.tools.ZipTools;
+import io.aicode.base.websocket.WSClientManager;
 import io.aicode.display.entity.DisplayAttribute;
 import io.aicode.project.dao.*;
 import io.aicode.project.entity.*;
@@ -73,24 +77,23 @@ public class GeneratorSVImpl implements GenerateSV {
      *
      * @param projectCode 项目编码
      * @param projectJob  项目job
-     * @param webSocket   socket连接
      */
     @Override
-    public void aiCode(String projectCode, ProjectJob projectJob, WSTools webSocket) {
+    public void aiCode(String projectCode, ProjectJob projectJob) {
         String path = logsSV.createLogFiles(projectCode, projectJob.getCreateTime());
-        try {
 
+        try {
             //1.创建项目
             String log = "Start By AI-Code @Copyright <a href='http://www.aicode.io' target='_blank'>AI-Code</a>";
-            webSocket.send(log);
+            WSClientManager.sendMessage(log);
             logsSV.saveLogs(log, path);
             Map<String, Object> map = Maps.newHashMap();
             map.put("code", projectCode);
             Project project = projectDAO.load(map);
-            String projectPath = this.buildProject(project, webSocket);
+            String projectPath = this.buildProject(project);
             projectDAO.update(projectCode, project.getBuildNumber() != null ? project.getBuildNumber() + 1 : 1);
             log = "已初始化项目 【 " + project.getName() + " ( " + project.getEnglishName() + " )】 工作空间";
-            webSocket.send(log);
+            WSClientManager.sendMessage(log);
             logsSV.saveLogs(log, path);
             projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), log));
             logger.info("创建工作空间库完成");
@@ -99,39 +102,39 @@ public class GeneratorSVImpl implements GenerateSV {
 
             //2.获取类信息
             log = "转化数据库结构与类模型...";
-            webSocket.send(log);
+            WSClientManager.sendMessage(log);
             logsSV.saveLogs(log, path);
             List<ProjectMap> projectMapList = project.getProjectMapList();
             List<MapClassTable> mapClassTableList = new ArrayList<>();
             projectMapList.forEach(projectMap -> {
                 mapClassTableList.add(projectMap.getMapClassTable());
             });
-            webSocket.send("转化数据库结构与类模型成功！");
+            WSClientManager.sendMessage("转化数据库结构与类模型成功！");
             logsSV.saveLogs("转化数据库结构与类模型成功！", path);
 
             //3.获取模板信息
             List<ProjectFramwork> projectFramworkList = project.getProjectFramworkList();
             //从git中检出技术模板库
             log = ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>";
-            webSocket.send(log);
-            webSocket.send("开始 下载技术模板");
-            webSocket.send(log);
+            WSClientManager.sendMessage(log);
+            WSClientManager.sendMessage("开始 下载技术模板");
+            WSClientManager.sendMessage(log);
             logsSV.saveLogs(log, path);
             logsSV.saveLogs("开始 下载技术模板", path);
             logsSV.saveLogs(log, path);
-            this.readyframeworksTemplateList(projectFramworkList, webSocket, path);
-            webSocket.send(log);
-            webSocket.send("结束 下载技术模板成功");
-            webSocket.send(log);
+            this.prepareframeworksTemplateList(projectFramworkList, path);
+            WSClientManager.sendMessage(log);
+            WSClientManager.sendMessage("结束 下载技术模板成功");
+            WSClientManager.sendMessage(log);
             logsSV.saveLogs(log, path);
             logsSV.saveLogs("结束 下载技术模板成功", path);
             logsSV.saveLogs(log, path);
 
             //4.生成源码
-            webSocket.send("开始生成源码...");
+            WSClientManager.sendMessage("开始生成源码...");
             logsSV.saveLogs("开始生成源码...", path);
             projectFramworkList.forEach(projectFramwork -> {
-                webSocket.send("已获取项目 【" + projectFramwork.getFrameworks().getName() + "】 的模板");
+                WSClientManager.sendMessage("已获取项目 【" + projectFramwork.getFrameworks().getName() + "】 的模板");
                 logsSV.saveLogs("已获取项目 【" + projectFramwork.getFrameworks().getName() + "】 的模板", path);
                 Map<String, Object> param = new HashMap<>();
                 param.put("frameworkCode", projectFramwork.getFrameworks().getCode());
@@ -139,9 +142,9 @@ public class GeneratorSVImpl implements GenerateSV {
                 List<FrameworksTemplate> frameworksTemplateList = frameworksTemplateDAO.query(param);
                 frameworksTemplateList.forEach(frameworksTemplate -> {
                     projectMapList.forEach(projectMap -> {
-                        this.generator(projectPath, project, frameworks, projectMap.getMapClassTable(), frameworksTemplate, mapClassTableList, webSocket);
+                        this.generator(projectPath, project, frameworks, projectMap.getMapClassTable(), frameworksTemplate, mapClassTableList);
                     });
-                    webSocket.send("[生成] 模板 " + frameworksTemplate.getPath() + " 的源码");
+                    WSClientManager.sendMessage("[生成] 模板 " + frameworksTemplate.getPath() + " 的源码");
                     logsSV.saveLogs("[生成] 模板 " + frameworksTemplate.getPath() + " 的源码", path);
                 });
             });
@@ -152,10 +155,10 @@ public class GeneratorSVImpl implements GenerateSV {
 
             //生成sql脚本到项目下
             String sql = this.generateTsql(projectPath, project.getEnglishName(), projectCode);
-            webSocket.send("分布式唯一算法sql " + sql);
+            WSClientManager.sendMessage("分布式唯一算法sql " + sql);
             logsSV.saveLogs("分布式唯一算法sql " + sql, path);
             String sqllog = "【已经生成】 " + project.getEnglishName() + "Sql 脚本文件并追加系统配置";
-            webSocket.send(sqllog);
+            WSClientManager.sendMessage(sqllog);
             logsSV.saveLogs(sqllog, path);
             projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), sqllog));
 
@@ -167,12 +170,12 @@ public class GeneratorSVImpl implements GenerateSV {
             ProjectRepositoryAccount projectRepositoryAccount = projectRepositoryAccountDAO.load(map);
             if (projectRepositoryAccount != null) {
                 String gitLog = "获取代码仓库信息: " + projectRepositoryAccount.getAccount();
-                webSocket.send(gitLog);
+                WSClientManager.sendMessage(gitLog);
                 logsSV.saveLogs(gitLog, path);
                 projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), gitLog));
                 GitTools.commitAndPush(new File(projectPath), projectRepositoryAccount.getAccount(), projectRepositoryAccount.getPassword(), "AI-Code 为您构建代码，享受智慧生活");
                 gitLog = "代码已经提交到 ⇛⇛⇛ <a style='text-decoration:underline;' href='" + projectRepositoryAccount.getHome() + "' target='_blank'>[" + projectRepositoryAccount.getHome() + "] </a>仓库";
-                webSocket.send(gitLog);
+                WSClientManager.sendMessage(gitLog);
                 logsSV.saveLogs(gitLog, path);
                 projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), gitLog));
             }
@@ -180,7 +183,7 @@ public class GeneratorSVImpl implements GenerateSV {
             //7.创建压缩文件
             this.zipProject(project);
             String endLog = "代码已打包ZIP, ⇛⇛⇛  <a style='text-decoration:underline;' href='" + project.getDownloadUrl() + "' target='_blank'>[点击下载" + project.getEnglishName() + ".zip]</a>";
-            webSocket.send(endLog);
+            WSClientManager.sendMessage(endLog);
             logsSV.saveLogs(endLog, path);
             //记录日志
             projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), endLog));
@@ -189,7 +192,7 @@ public class GeneratorSVImpl implements GenerateSV {
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e.getMessage());
-            webSocket.send(e.getMessage());
+            WSClientManager.sendMessage(e.getMessage());
             logsSV.saveLogs(e.getMessage(), path);
             projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), "ERROR : " + e.getMessage()));
             projectJob.setState(ProjectJob.State.Error.name());
@@ -202,21 +205,21 @@ public class GeneratorSVImpl implements GenerateSV {
                 ProjectJobLogs projectJobLogs = new ProjectJobLogs();
                 projectJobLogs.setCode(projectJob.getCode());
                 projectJobLogs.setLog("Finished: SUCCESS");
-                webSocket.send("Finished: SUCCESS");
+                WSClientManager.sendMessage("Finished: SUCCESS");
                 logsSV.saveLogs("Finished: SUCCESS", path);
                 projectJobLogsDAO.insert(projectJobLogs);
             } else {
                 ProjectJobLogs projectJobLogs = new ProjectJobLogs();
                 projectJobLogs.setCode(projectJob.getCode());
                 projectJobLogs.setLog("Finished: ERROR");
-                webSocket.send("Finished: ERROR");
+                WSClientManager.sendMessage("Finished: ERROR");
                 logsSV.saveLogs("Finished: ERROR", path);
                 projectJobLogsDAO.insert(projectJobLogs);
             }
             ProjectJobLogs projectJobLogs = new ProjectJobLogs();
             projectJobLogs.setCode(projectJob.getCode());
             projectJobLogs.setLog("End");
-            webSocket.send("End");
+            WSClientManager.sendMessage("End");
             projectJobLogsDAO.insert(projectJobLogs);
         }
     }
@@ -225,7 +228,7 @@ public class GeneratorSVImpl implements GenerateSV {
     private void cleanTemplates(List<ProjectFramwork> projectFramworkList) {
         frameworksTemplateDAO.deleteAll();
         Setting setting = settingDAO.loadByKey(Setting.Key.Template_Path.name());
-        String template_Path = new HandleFuncs().getCurrentClassPath() + setting.getV();//获得默认仓库地址
+        String template_Path = this.convertPath(setting.getV(), "", true);//获得默认仓库地址
 
         for (ProjectFramwork projectFramwork : projectFramworkList) {
             Frameworks frameworks = projectFramwork.getFrameworks();
@@ -237,9 +240,10 @@ public class GeneratorSVImpl implements GenerateSV {
     }
 
     //准备框架模板
-    private void readyframeworksTemplateList(List<ProjectFramwork> projectFramworkList, WSTools webSocket, String logsPath) {
+    private void prepareframeworksTemplateList(List<ProjectFramwork> projectFramworkList, String logsPath) {
         Setting setting = settingDAO.loadByKey(Setting.Key.Template_Path.name());
-        String template_Path = new HandleFuncs().getCurrentClassPath() + setting.getV();//获得默认仓库地址
+        //获得默认仓库地址
+        String template_Path = this.convertPath("/", setting.getV(), true);
         //拼接项目框架字符串，用于判断
         String projectFramworkKeyWords = "";
         for (ProjectFramwork projectFramwork : projectFramworkList) {
@@ -251,7 +255,8 @@ public class GeneratorSVImpl implements GenerateSV {
             logger.debug(JSON.toJSONString(frameworks));
             if (frameworks.getGitHome() != null) {
                 String project_template_Path = template_Path + frameworks.getGitHome().substring(frameworks.getGitHome().lastIndexOf("/") + 1).replace(".git", "");
-                webSocket.send("已连接到模板仓库，开始克隆已选技术[" + frameworks.getName() + "]的模板");
+                //TODO 已经存在的进行清理 需要开发
+                WSClientManager.sendMessage("已连接到模板仓库，开始克隆已选技术[" + frameworks.getName() + "]的模板");
                 logsSV.saveLogs("已连接到模板仓库，开始克隆已选技术[" + frameworks.getName() + "]的模板", logsPath);
                 if (YNEnum.Y == YNEnum.getYN(frameworks.getIsPublic())) {
                     GitTools.cloneGit(frameworks.getGitHome(), project_template_Path);
@@ -282,18 +287,17 @@ public class GeneratorSVImpl implements GenerateSV {
                     if (file.getAbsoluteFile().toString().contains("\\.git\\") || file.getAbsoluteFile().toString().contains("README.md")) {
                         continue;
                     }
-                    String path = ("/" + file.getAbsoluteFile().toString()).replace("\\", "/").replace(template_Path.replace("//", "/"), "");
-                    path = "/" + path;
-                    path = path.replace("//", "/");
+                    String path = this.convertPath("/", file.getAbsoluteFile().toString(), false).replace("//", "");
+                    path = path.substring(path.indexOf(template_Path) + template_Path.length());
                     FrameworksTemplate frameworksTemplate = new FrameworksTemplate();
                     frameworksTemplate.setCode(String.valueOf(uidGenerator.getUID()));
                     frameworksTemplate.setPath(path);
                     frameworksTemplate.setFrameworkCode(frameworks.getCode());
                     frameworksTemplateDAO.insert(frameworksTemplate);
-                    webSocket.send("[模板] " + frameworksTemplate.getPath().substring(frameworksTemplate.getPath().lastIndexOf("/") + 1));
+                    WSClientManager.sendMessage("[模板] " + frameworksTemplate.getPath().substring(frameworksTemplate.getPath().lastIndexOf("/") + 1));
                     logsSV.saveLogs("[模板] " + frameworksTemplate.getPath().substring(frameworksTemplate.getPath().lastIndexOf("/") + 1), logsPath);
                 }
-                webSocket.send("模板克隆成功！");
+                WSClientManager.sendMessage("模板克隆成功！");
                 logsSV.saveLogs("模板克隆成功！", logsPath);
             }
         }
@@ -331,17 +335,15 @@ public class GeneratorSVImpl implements GenerateSV {
      *
      * @param project
      */
-    private String buildProject(Project project, WSTools webSocket) {
+    private String buildProject(Project project) {
         Setting settingWorkspace = settingDAO.loadByKey(Setting.Key.Workspace.name());
-        webSocket.send("创建项目[" + project.getEnglishName() + "]");
-        String projectPath = new HandleFuncs().getCurrentClassPath() + settingWorkspace.getV() + "/" + project.getEnglishName();
-        projectPath = projectPath.replace("//", "/");
+        WSClientManager.sendMessage("创建项目[" + project.getEnglishName() + "]");
+        String projectPath = this.convertPath(settingWorkspace.getV(), project.getEnglishName(), true);
         //1.检测项目工作工作空间是否存在
         File file = new File(projectPath);
         if (!file.exists()) {
-//            file.mkdirs();
             FileUtil.delFolder(projectPath);
-            webSocket.send("删除已存在[" + project.getEnglishName() + "]项目");
+            WSClientManager.sendMessage("删除已存在[" + project.getEnglishName() + "]项目");
         }
 
         //3.代码仓库检出
@@ -350,24 +352,28 @@ public class GeneratorSVImpl implements GenerateSV {
         ProjectRepositoryAccount projectRepositoryAccount = projectRepositoryAccountDAO.load(map);
         if (projectRepositoryAccount != null) {
             if (ProjectRepositoryTypeEnum.GIT == ProjectRepositoryTypeEnum.getEnum(projectRepositoryAccount.getType())) {
-                webSocket.send("初始化设定git项目");
-                GitTools.cloneGit(projectRepositoryAccount.getHome(), projectPath, projectRepositoryAccount.getAccount(), projectRepositoryAccount.getPassword());
-                webSocket.send("初始化设定git项目完成");
+                if (projectRepositoryAccount.getHome().startsWith("git://") && projectRepositoryAccount.getHome().endsWith(".git")) {
+                    WSClientManager.sendMessage("初始化设定git项目");
+                    GitTools.cloneGit(projectRepositoryAccount.getHome(), projectPath, projectRepositoryAccount.getAccount(), projectRepositoryAccount.getPassword());
+                    WSClientManager.sendMessage("初始化设定git项目完成");
+                } else {
+                    WSClientManager.sendMessage("git 仓库地址不合法无法检出指定项目，请在生成后手动下载源码包！");
+                }
             } else if (ProjectRepositoryTypeEnum.SVN == ProjectRepositoryTypeEnum.getEnum(projectRepositoryAccount.getType())) {
-                //TODO SVN 仓库工具类
+                //TODO SVN 仓库工具类9
             }
         }
 
         if (file.exists()) {
             List<ProjectFramwork> frameworksList = project.getProjectFramworkList();
-            webSocket.send("判断是否是选择多技术项目....");
+            WSClientManager.sendMessage("判断是否是选择多技术项目....");
             if (frameworksList.size() > 1) {
-                webSocket.send("多技术框架项目，将生成多个框架源码....");
+                WSClientManager.sendMessage("多技术框架项目，将生成多个框架源码....");
                 for (ProjectFramwork projectFramwork : frameworksList) {
                     File frameworkFile = new File(projectPath + "/" + projectFramwork.getFrameworks().getName());
                     if (!frameworkFile.exists()) {
                         frameworkFile.mkdir();
-                        webSocket.send("创建" + projectFramwork.getFrameworks().getName() + "文件夹成功!");
+                        WSClientManager.sendMessage("创建" + projectFramwork.getFrameworks().getName() + "文件夹成功!");
                     }
                 }
             }
@@ -384,7 +390,7 @@ public class GeneratorSVImpl implements GenerateSV {
      * @param mapClassTable      映射对象
      * @param frameworksTemplate 框架模板对象
      */
-    private void generator(String projectPath, Project project, Frameworks frameworks, MapClassTable mapClassTable, FrameworksTemplate frameworksTemplate, List<MapClassTable> mapClassTableList, WSTools webSocket) {
+    private void generator(String projectPath, Project project, Frameworks frameworks, MapClassTable mapClassTable, FrameworksTemplate frameworksTemplate, List<MapClassTable> mapClassTableList) {
         List<MapFieldColumn> mapFieldColumnPks = new ArrayList<>();
         List<MapFieldColumn> mapFieldColumnNotPks = new ArrayList<>();
         List<MapFieldColumn> mapFieldColumnList = new ArrayList<>();
@@ -501,9 +507,9 @@ public class GeneratorSVImpl implements GenerateSV {
                 .replace("${module}", project.getEnglishName())
                 .replace("${model}", templateData.getModel());
 
-        String templatePath = new HandleFuncs().getCurrentClassPath()
-                + "/" + settingTemplatePath.getV()
+        String templatePath = "/" + settingTemplatePath.getV()
                 + "/" + frameworksTemplate.getPath();
+        templatePath = templatePath.replace("//", "/").replace("///", "/");
         logger.debug("模板路径：" + templatePath);
         if (targetFilePath.contains("angular")) {
             logger.debug("目标文件路径" + targetFilePath);
@@ -517,17 +523,17 @@ public class GeneratorSVImpl implements GenerateSV {
                         FreemarkerHelper.generate(templateData, targetFilePath, templatePath);
                     } catch (IOException e) {
                         e.printStackTrace();
-                        webSocket.send(e.getMessage());
+                        WSClientManager.sendMessage(e.getMessage());
                     } catch (TemplateException e) {
                         e.printStackTrace();
-                        webSocket.send(e.getMessage());
+                        WSClientManager.sendMessage(e.getMessage());
                     }
                 } else {
                     try {
                         FileUtils.copyFileToDirectory(new File(templatePath), new File(targetFilePath.substring(0, targetFilePath.lastIndexOf("/"))));
                     } catch (IOException e) {
                         e.printStackTrace();
-                        webSocket.send(e.getMessage());
+                        WSClientManager.sendMessage(e.getMessage());
                     }
                 }
             } else {
@@ -544,16 +550,20 @@ public class GeneratorSVImpl implements GenerateSV {
      */
     private void zipProject(Project project) {
         Setting settingWorkspace = settingDAO.loadByKey(Setting.Key.Workspace.name());
-        String projectWorkspacePath = new HandleFuncs().getCurrentClassPath() + settingWorkspace.getV() + "/" + project.getEnglishName();
-        projectWorkspacePath = projectWorkspacePath.replace("//", "/");
+        String projectWorkspacePath = this.convertPath(settingWorkspace.getV(), project.getEnglishName(), true);
 
-        Setting Repository_Path = settingDAO.loadByKey(Setting.Key.Repository_Path.name());
-        String projectPath = new HandleFuncs().getCurrentClassPath() + Repository_Path.getV() + "/" + project.getEnglishName();
-        String destination = projectPath;
+        Setting repositoryPathSetting = settingDAO.loadByKey(Setting.Key.Repository_Path.name());
+        String destination = repositoryPathSetting.getV() + "/" + project.getEnglishName();
+
 
         //压缩文件
         try {
-            File zipFile = new File(destination);
+            File repositoryFile = new File(repositoryPathSetting.getV());
+            if (!repositoryFile.exists()) {
+                repositoryFile.mkdirs();
+            }
+
+            File zipFile = new File(destination + ".zip");
             if (zipFile.exists()) {
                 zipFile.delete();
             }
@@ -562,8 +572,26 @@ public class GeneratorSVImpl implements GenerateSV {
             logger.error(e.getMessage());
         }
         ZipTools.zip(destination, projectWorkspacePath);
-        project.setDownloadUrl((Repository_Path.getV() + "/" + project.getEnglishName() + ".zip").replace("//", "/"));
+        project.setDownloadUrl("/project/download/" + project.getEnglishName());
         projectDAO.update(project);
+    }
+
+    /**
+     * 替换路径拼装中导致的 多余slash
+     *
+     * @param path     路径
+     * @param filename 文件名
+     * @return 绝对路径
+     */
+    private String convertPath(String path, String filename, boolean isAbsolute) {
+        String absolutePath = "";
+        if (isAbsolute) {
+            absolutePath = "/" + path + "/" + filename;
+        } else {
+            absolutePath = path + "/" + filename;
+        }
+        absolutePath = absolutePath.replace("////", "/").replace("///", "/").replace("//", "/").replace("\\\\\\", "/").replace("\\\\", "/").replace("\\", "/");
+        return absolutePath;
     }
 
     /**
@@ -573,7 +601,7 @@ public class GeneratorSVImpl implements GenerateSV {
      * @param targetPath 目标路径
      * @return 目标路径绝对路径
      */
-    public String findPath(String root, String targetPath) {
+    private String findPath(String root, String targetPath) {
         File templateFile = new File(root);
         File[] files = templateFile.listFiles();
         String path = null;

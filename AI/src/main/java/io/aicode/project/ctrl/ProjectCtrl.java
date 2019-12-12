@@ -4,13 +4,12 @@ import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Maps;
 import io.aicode.base.BaseCtrl;
 import io.aicode.base.JwtToken;
-import io.aicode.base.tools.Constants;
 import io.aicode.base.core.BeanRet;
-import io.aicode.base.tools.Page;
 import io.aicode.base.enums.YNEnum;
 import io.aicode.base.exceptions.BaseException;
+import io.aicode.base.tools.Constants;
 import io.aicode.base.tools.FileUtil;
-import io.aicode.base.tools.HandleFuncs;
+import io.aicode.base.tools.Page;
 import io.aicode.display.facade.DisplayAttributeSV;
 import io.aicode.project.entity.Project;
 import io.aicode.project.service.MapRelationshipSV;
@@ -23,14 +22,15 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.annotation.Resource;
-import java.io.File;
-import java.io.IOException;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
 import java.util.List;
 import java.util.Map;
 
@@ -109,13 +109,17 @@ public class ProjectCtrl extends BaseCtrl {
     public BeanRet scanPath(String code, String filePath) throws IOException {
         Assert.hasText(filePath, BaseException.BaseExceptionEnum.Empty_Param.toString());
         logger.info(filePath);
-
+        //自动过滤ace冗余路路径的问题
+        if (filePath.contains("ace/")) {
+            filePath = filePath.replace("ace/", "/").replace("//", "/");
+        }
         Map<String, Object> map = new HashedMap();
         map.put("code", code);
         Project project = projectSV.load(map);
         String workspace = settingSV.load(Setting.Key.Workspace);
 
-        filePath = new HandleFuncs().getCurrentClassPath() + workspace + filePath;
+        filePath = workspace + filePath;
+        logger.info(filePath);
 
         File file = new File(filePath);
         if (file.isDirectory()) {
@@ -125,6 +129,7 @@ public class ProjectCtrl extends BaseCtrl {
 
         if (file.isFile() && !filePath.contains(".jar")) {
             String fileStr = FileUtils.readFileToString(new File(filePath), "UTF-8");
+            logger.info(fileStr);
             return BeanRet.create(true, "查询一个详情信息", fileStr);
         }
         return BeanRet.create(true, "", filePath.replaceAll("/\\w*\\.jar", ""));
@@ -266,6 +271,36 @@ public class ProjectCtrl extends BaseCtrl {
         projectSV.execute(code);
         return BeanRet.create(true, "执行脚本成功");
     }
+
+    @GetMapping("/download/{proejctName}")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "proejctName", value = "项目名", required = true, paramType = "path")
+    })
+    public void downloadFile(@PathVariable("proejctName") String proejctName, HttpServletResponse response) throws Exception {
+        if (StringUtils.isBlank(proejctName)) {
+            return;
+        }
+
+        String fileName = proejctName + ".zip";// 设置文件名，根据业务需要替换成要下载的文件名
+        if (fileName != null) {
+            String repositoryPath = settingSV.load(Setting.Key.Repository_Path, String.class);
+            response.setContentType("application/force-download");// 设置强制下载不打开
+            fileName = new String(fileName.getBytes("UTF-8"), "iso-8859-1");
+            response.addHeader("Content-Disposition", "attachment;fileName=" + fileName);// 设置文件名
+            byte[] buffer = new byte[1024];
+            FileInputStream fileInputStream = new FileInputStream(new File(repositoryPath + fileName));
+            try (InputStream inputStream = fileInputStream;
+                 BufferedInputStream bis = new BufferedInputStream(inputStream)) {
+                OutputStream os = response.getOutputStream();
+                int i = bis.read(buffer);
+                while (i != -1) {
+                    os.write(buffer, 0, i);
+                    i = bis.read(buffer);
+                }
+            }
+        }
+    }
+
 
     /**
      * 进入首页

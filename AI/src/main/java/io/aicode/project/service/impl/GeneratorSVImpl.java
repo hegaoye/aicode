@@ -2,12 +2,14 @@ package io.aicode.project.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.baidu.fsg.uid.UidGenerator;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import freemarker.template.TemplateException;
-import io.aicode.base.core.FreemarkerHelper;
+import io.aicode.base.core.template.Configuration;
 import io.aicode.base.core.ModelData;
 import io.aicode.base.core.StringHelper;
 import io.aicode.base.core.TemplateData;
+import io.aicode.base.core.template.TemplateHelper;
+import io.aicode.base.enums.TemplateEnum;
 import io.aicode.base.enums.YNEnum;
 import io.aicode.base.tools.FileUtil;
 import io.aicode.base.tools.GitTools;
@@ -25,6 +27,7 @@ import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
@@ -70,6 +73,11 @@ public class GeneratorSVImpl implements GenerateSV {
 
     @Resource
     private UidGenerator uidGenerator;
+
+    @Autowired
+    private TemplateHelper freemarkerHelper;
+    @Autowired
+    private TemplateHelper beetlHelper;
 
 
     /**
@@ -519,15 +527,15 @@ public class GeneratorSVImpl implements GenerateSV {
         if (YNEnum.getYN(project.getIsIncrement()) == YNEnum.N) {
             if (new File(templatePath).exists()) {
                 if (!templatePath.contains(".jar")) {
-                    try {
-                        FreemarkerHelper.generate(templateData, targetFilePath, templatePath);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        WSClientManager.sendMessage(e.getMessage());
-                    } catch (TemplateException e) {
-                        e.printStackTrace();
-                        WSClientManager.sendMessage(e.getMessage());
+                    //适配模板引擎
+                    TemplateEnum templateEnum = this.adapterTemplateEngine(projectPath);
+                    String msg = "";
+                    if (TemplateEnum.Freemarker == templateEnum) {
+                        msg = freemarkerHelper.generate(templateData, targetFilePath, templatePath);
+                    } else if (TemplateEnum.Beetl == templateEnum) {
+                        msg = beetlHelper.generate(templateData, targetFilePath, templatePath);
                     }
+                    WSClientManager.sendMessage(msg);
                 } else {
                     try {
                         FileUtils.copyFileToDirectory(new File(templatePath), new File(targetFilePath.substring(0, targetFilePath.lastIndexOf("/"))));
@@ -541,6 +549,36 @@ public class GeneratorSVImpl implements GenerateSV {
             }
         }
 
+    }
+
+    /**
+     * 适配 模板引擎
+     *
+     * @param projectPath 项目路径
+     * @return TemplateEnum
+     */
+    private TemplateEnum adapterTemplateEngine(String projectPath) {
+        try {
+            //定义文件名默认 aicode.json  ，以及可能的错误名字进行兼容
+            String[] fileName = {"aicode.json", "aicode", "ai-code.json", "ai-code"};
+            File aicodeFile = null;
+            List<String> list = Lists.newArrayList(fileName);
+            for (String name : list) {
+                aicodeFile = new File((projectPath + "/" + name).replace("//", "/"));
+                if (aicodeFile != null && aicodeFile.exists()) {
+                    break;
+                }
+            }
+
+            String json = FileUtils.readFileToString(aicodeFile);
+            Configuration configuration = JSON.parseObject(json, Configuration.class);
+            TemplateEnum templateEnum = TemplateEnum.getTemplate(configuration.getEngine());
+            return templateEnum;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        //默认 freemarker
+        return TemplateEnum.Freemarker;
     }
 
     /**

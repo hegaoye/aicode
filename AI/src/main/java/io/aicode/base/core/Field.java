@@ -87,6 +87,7 @@ public class Field implements Serializable {
     private boolean checkState;
     private boolean checkPk;
     private boolean checkDigit = false;
+    private String upper;
 
 
     public void toJava() {
@@ -149,6 +150,11 @@ public class Field implements Serializable {
 
     public boolean getIsLineNew() {
         return isLineNew.equals(YNEnum.Y.name()) ? true : false;
+    }
+
+    public String getUpper() {
+        this.upper = StringHelper.capitalize(field);
+        return this.upper;
     }
 
 }

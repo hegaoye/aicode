@@ -277,6 +277,16 @@ public class StringTools {
         return sb.toString();
     }
 
+    public static List<String> getByPattern(String str,String patternStr){
+        Pattern p = Pattern.compile(patternStr, Pattern.CASE_INSENSITIVE);
+        Matcher m = p.matcher(str);
+        List<String> list=new ArrayList<>();
+        while (m.find()) {
+            list.add(m.group());
+        }
+        return list;
+    }
+
     /**
      * 将字符串中的中文转化为拼音,其他不变
      *
@@ -500,6 +510,8 @@ public class StringTools {
     public static void main(String[] args) {
         System.out.println(humpToLine("GaoJieJie"));
         System.out.println(humpToLine("zaoJieJie"));
+        List<String> s=StringTools.getByPattern("状态： 启用Enable,停用 Disable, 正常 Normal","[\\u4e00-\\u9fa5]+\\s?\\w+");
+        System.out.println(s);
 
     }
 

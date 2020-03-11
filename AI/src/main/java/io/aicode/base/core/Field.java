@@ -25,35 +25,35 @@ public class Field implements Serializable {
     /**
      * 数据库字段:isRequired  属性显示:是否必填 Y,N
      */
-    private String isRequired;
+    private boolean isRequired;
     /**
      * 数据库字段:isInsert  属性显示:是否插入
      */
-    private String isInsert;
+    private boolean isInsert;
     /**
      * 数据库字段:isDeleteCondition  属性显示:是否是删除条件
      */
-    private String isDeleteCondition;
+    private boolean isDeleteCondition;
     /**
      * 数据库字段:isAllowUpdate  属性显示:是否允许修改 Y,N
      */
-    private String isAllowUpdate;
+    private boolean isAllowUpdate;
     /**
      * 数据库字段:isListPageDisplay  属性显示:是否分页列表显示 Y,N
      */
-    private String isListPageDisplay;
+    private boolean isListPageDisplay;
     /**
      * 数据库字段:isDetailPageDisplay  属性显示:是否详情页显示 Y,N
      */
-    private String isDetailPageDisplay;
+    private boolean isDetailPageDisplay;
     /**
      * 数据库字段:isQueryRequired  属性显示:是否是查询条件 Y,N
      */
-    private String isQueryRequired;
+    private boolean isQueryRequired;
     /**
      * 数据库字段:isLineNew  属性显示:是否换行
      */
-    private String isLineNew;
+    private boolean isLineNew;
     /**
      * 数据库字段:matchType  属性显示:匹配方式 =,!=,>=,<=,>,<,like,左like，右like,between,in
      */
@@ -89,7 +89,6 @@ public class Field implements Serializable {
     private boolean checkDigit = false;
     private String upper;
 
-
     public void toJava() {
         this.field = StringHelper.toJavaVariableName(this.column);
         if (this.field.equals("id")) {
@@ -98,7 +97,6 @@ public class Field implements Serializable {
             this.fieldType = DatabaseDataTypesUtils.getPreferredJavaType(this.sqlType);
         }
     }
-
 
     public boolean getCheckDate() {
         return isDate.equals(YNEnum.Y.name()) ? true : false;
@@ -118,38 +116,6 @@ public class Field implements Serializable {
             this.checkDigit = DatabaseDataTypesUtils.isFloatNumber(this.fieldType);
         }
         return checkDigit;
-    }
-
-    public boolean getIsRequired() {
-        return isRequired.equals(YNEnum.Y.name()) ? true : false;
-    }
-
-    public boolean getIsInsert() {
-        return isInsert.equals(YNEnum.Y.name()) ? true : false;
-    }
-
-    public boolean getIsDeleteCondition() {
-        return isDeleteCondition.equals(YNEnum.Y.name()) ? true : false;
-    }
-
-    public boolean getIsAllowUpdate() {
-        return isAllowUpdate.equals(YNEnum.Y.name()) ? true : false;
-    }
-
-    public boolean getIsListPageDisplay() {
-        return isListPageDisplay.equals(YNEnum.Y.name()) ? true : false;
-    }
-
-    public boolean getIsDetailPageDisplay() {
-        return isDetailPageDisplay.equals(YNEnum.Y.name()) ? true : false;
-    }
-
-    public boolean getIsQueryRequired() {
-        return isQueryRequired.equals(YNEnum.Y.name()) ? true : false;
-    }
-
-    public boolean getIsLineNew() {
-        return isLineNew.equals(YNEnum.Y.name()) ? true : false;
     }
 
     public String getUpper() {

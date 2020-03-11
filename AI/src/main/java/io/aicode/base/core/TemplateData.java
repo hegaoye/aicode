@@ -50,9 +50,11 @@ import java.util.List;
 @Data
 public class TemplateData implements Serializable {
     private String projectName; //项目英文名
+    private String projectname; //项目英文名
     private String model;   //模块中的模型 -> private String basePackage;.private String model;.service
     private String module; //模块 一个项目的模块化 不参与java的包定义只是项目管理分离办法
     private String basePackage;  //包名
+    private String basepackage;  //包名
     private MapClassTable table;  //表对象
     private MapClassTable clazz;  //类对象
     private String tableName;  //表名
@@ -91,7 +93,9 @@ public class TemplateData implements Serializable {
                         List<MapClassTable> modelClasses, List<ModelData> modelDatas, List<TemplateData> oneToOneList,
                         List<TemplateData> oneToManyList) {
         this.projectName = project.getEnglishName();
+        this.projectname = project.getEnglishName();
         this.basePackage = project.getBasePackage();
+        this.basepackage = project.getBasePackage();
         this.copyright = project.getCopyright();
         this.author = project.getAuthor();
 

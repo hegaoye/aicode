@@ -34,6 +34,16 @@ public class BeetlHelper implements TemplateHelper {
     @Override
     public String generate(TemplateData templateData, String targetFilePath, String templatePath) {
         try {
+            templatePath = templatePath.replace("//", "/").replace("\\", "/");
+//            templatePath = templatePath.substring(0, templatePath.lastIndexOf("/"));
+            targetFilePath = targetFilePath.replace("\\", "/").replace("//", "/");
+            String filePath = targetFilePath.substring(0, targetFilePath.lastIndexOf("/"));
+
+            File dirFile = new File(filePath);
+            if (!dirFile.exists()) {
+                dirFile.mkdirs();
+            }
+
             FileResourceLoader resourceLoader = new FileResourceLoader("/", "UTF-8");
             groupTemplate.setResourceLoader(resourceLoader);
             Template template = groupTemplate.getTemplate(templatePath);

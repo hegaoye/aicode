@@ -48,6 +48,7 @@ public class BeetlHelper implements TemplateHelper {
             groupTemplate.setResourceLoader(resourceLoader);
             Template template = groupTemplate.getTemplate(templatePath);
             Map<String, Object> dataMap = JSON.parseObject(JSON.toJSONString(templateData), Map.class);
+            dataMap.put("package", templateData.getBasePackage());
             template.binding(dataMap);
             Writer out = new OutputStreamWriter(new FileOutputStream(targetFilePath), Charset.forName("UTF-8"));
             template.renderTo(out);

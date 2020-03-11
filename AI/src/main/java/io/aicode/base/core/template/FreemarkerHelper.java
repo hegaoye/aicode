@@ -1,5 +1,6 @@
 package io.aicode.base.core.template;
 
+import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Maps;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -53,7 +54,9 @@ public class FreemarkerHelper implements TemplateHelper {
             configuration.setDirectoryForTemplateLoading(new File(templatePath));
             Template temp = configuration.getTemplate(templateFileName);
             out = new OutputStreamWriter(new FileOutputStream(targetFilePath), Charset.forName("UTF-8"));
-            temp.process(templateData, out);
+            Map<String, Object> param = JSON.parseObject(JSON.toJSONString(templateData), Map.class);
+            param.put("package", templateData.getBasePackage());
+            temp.process(param, out);
         } catch (IOException e) {
             e.printStackTrace();
             return e.getMessage();

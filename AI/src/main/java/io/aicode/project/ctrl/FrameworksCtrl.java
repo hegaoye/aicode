@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.annotation.Resource;
+import java.util.HashMap;
 import java.util.Map;
 
 
@@ -84,9 +85,8 @@ public class FrameworksCtrl extends BaseCtrl {
     public BeanRet list(@ApiIgnore Page<Frameworks> page) {
         try {
             Assert.notNull(page, BaseException.BaseExceptionEnum.Empty_Param.toString());
-
             page = frameworksSV.getList(page);
-            int count = frameworksSV.count(new HashedMap());
+            int count = frameworksSV.count(new HashMap<>());
             page.setTotalRow(count);
 
             logger.info(JSON.toJSONString(page));

@@ -76,9 +76,12 @@ public abstract class BaseMybatisSVImpl<E, PK extends Serializable> implements B
      * @throws BaseException
      */
 
+    @Override
     @Transactional(readOnly = true)
     public Page<E> getList(Page<E> page) throws BaseException {
-        if (page == null) throw new BaseException("page 为空对象！查询失败！");
+        if (page == null) {
+            throw new BaseException("page 为空对象！查询失败！");
+        }
         int i = getBaseMybatisDAO().count(page.getParams());
         page.setTotalRow(i);
         List<E> list = getBaseMybatisDAO().query(page.getParams(), page.genRowStart(), page.getPageSize());

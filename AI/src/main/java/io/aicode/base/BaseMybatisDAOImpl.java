@@ -31,6 +31,7 @@ public abstract class BaseMybatisDAOImpl<E, PK extends Serializable> extends Sql
     protected Class<?> entityType;
 
 
+    @Override
     @Autowired
     public void setSqlSessionTemplate(SqlSessionTemplate sqlSessionTemplate) {
         super.setSqlSessionTemplate(sqlSessionTemplate);
@@ -67,6 +68,7 @@ public abstract class BaseMybatisDAOImpl<E, PK extends Serializable> extends Sql
      * @param entity 实体
      * @return
      */
+    @Override
     public E insert(E entity) {
         logger.info("====> 保存 [void save(E entity)]");
         logger.info("====> " + ToStringBuilder.reflectionToString(entity, ToStringStyle.MULTI_LINE_STYLE));
@@ -81,6 +83,7 @@ public abstract class BaseMybatisDAOImpl<E, PK extends Serializable> extends Sql
      * @param entity 实体
      * @return
      */
+    @Override
     public E update(E entity) {
         logger.info("====> 更新 [E update(E entity)]");
         logger.info("====> " + ToStringBuilder.reflectionToString(entity, ToStringStyle.MULTI_LINE_STYLE));
@@ -94,6 +97,7 @@ public abstract class BaseMybatisDAOImpl<E, PK extends Serializable> extends Sql
      *
      * @param map 实体参数
      */
+    @Override
     public void update(Map<String, Object> map) {
         logger.info("====> 更新操作 [void update(Map<String, Object> map)]");
         logger.info("====> " + ToStringBuilder.reflectionToString(map, ToStringStyle.MULTI_LINE_STYLE));
@@ -106,14 +110,16 @@ public abstract class BaseMybatisDAOImpl<E, PK extends Serializable> extends Sql
      *
      * @param entity 实体
      */
+    @Override
     public void insertOrUpdate(E entity) {
         logger.info("====> 更新或保存 [void saveOrUpdate(E entity)]");
         logger.info("====> " + ToStringBuilder.reflectionToString(entity, ToStringStyle.MULTI_LINE_STYLE));
 
-        if (((BaseEntity) entity).getId() == null)
+        if (((BaseEntity) entity).getId() == null) {
             insert(entity);
-        else
+        } else {
             update(entity);
+        }
     }
 
     /**
@@ -122,6 +128,7 @@ public abstract class BaseMybatisDAOImpl<E, PK extends Serializable> extends Sql
      * @param entity 实体
      * @return
      */
+    @Override
     public E merage(E entity) {
         logger.info("====> 合并实体 [E merage(E entity)]");
         logger.info("====> " + ToStringBuilder.reflectionToString(entity, ToStringStyle.MULTI_LINE_STYLE));
@@ -144,6 +151,7 @@ public abstract class BaseMybatisDAOImpl<E, PK extends Serializable> extends Sql
      *
      * @param pk 主键id值
      */
+    @Override
     public void delete(PK pk) {
         logger.info("====> 删除数据 [void delete(PK pk)]");
         logger.info("====> " + pk);
@@ -164,6 +172,7 @@ public abstract class BaseMybatisDAOImpl<E, PK extends Serializable> extends Sql
      * @param entitySet 集合
      * @return
      */
+    @Override
     public int batchInsert(Collection<E> entitySet) {
         logger.info("====> 批量插入 [int batchInsert(Collection<E> entitySet)]");
         logger.info("====> " + ToStringBuilder.reflectionToString(entitySet, ToStringStyle.MULTI_LINE_STYLE));
@@ -193,6 +202,7 @@ public abstract class BaseMybatisDAOImpl<E, PK extends Serializable> extends Sql
      * @param entitySet
      * @return
      */
+    @Override
     public int batchUpdate(Collection<E> entitySet) {
         int x = 0;
 
@@ -219,6 +229,7 @@ public abstract class BaseMybatisDAOImpl<E, PK extends Serializable> extends Sql
      * @param listMap map参数的集合
      * @return
      */
+    @Override
     public int batchUpdate(String stmtId, Collection<Map<String, Object>> listMap) {
         int x = 0;
 
@@ -244,6 +255,7 @@ public abstract class BaseMybatisDAOImpl<E, PK extends Serializable> extends Sql
      * @param keySet
      * @return
      */
+    @Override
     public int batchDelete(Collection<PK> keySet) {
         logger.info("====> 批量删除 [int batchDelete(Collection<PK> keySet)");
         logger.info("====> " + ToStringBuilder.reflectionToString(keySet, ToStringStyle.MULTI_LINE_STYLE));
@@ -264,6 +276,7 @@ public abstract class BaseMybatisDAOImpl<E, PK extends Serializable> extends Sql
      * @param params Map类型的参数
      * @return
      */
+    @Override
     public List<E> query(Map<String, Object> params) {
         logger.info("====> 查询所有数据 [List<E> query(Map<String, Object> params)]");
         logger.info("====> " + ToStringBuilder.reflectionToString(params, ToStringStyle.MULTI_LINE_STYLE));
@@ -280,6 +293,7 @@ public abstract class BaseMybatisDAOImpl<E, PK extends Serializable> extends Sql
      * @param pk 主键id值
      * @return
      */
+    @Override
     public E load(PK pk) {
         logger.info("====> 根据id查询 [E load(PK pk)]");
         logger.info("====> " + pk);
@@ -298,12 +312,15 @@ public abstract class BaseMybatisDAOImpl<E, PK extends Serializable> extends Sql
      * @param params map参数
      * @return
      */
+    @Override
     public E load(Map<String, Object> params) {
         logger.info("====> 条件查询实体 [E load(Map<String, Object> params)]");
         logger.info("====> " + ToStringBuilder.reflectionToString(params, ToStringStyle.MULTI_LINE_STYLE));
 
         List<E> list = this.query(params, 0, 1);
-        if (list.size() == 0) return null;
+        if (list.size() == 0) {
+            return null;
+        }
 
         logger.info("<==== 条件查询实体 [E load(Map<String, Object> params)]");
         logger.info("<==== " + ToStringBuilder.reflectionToString(list, ToStringStyle.MULTI_LINE_STYLE));
@@ -316,6 +333,7 @@ public abstract class BaseMybatisDAOImpl<E, PK extends Serializable> extends Sql
      * @param params map 参数
      * @return
      */
+    @Override
     public int count(Map<String, Object> params) {
         return Integer.parseInt(getSqlSession().selectOne(this.sqlmapNamespace + "." + SQLID_COUNT, params) + "");
     }
@@ -329,6 +347,7 @@ public abstract class BaseMybatisDAOImpl<E, PK extends Serializable> extends Sql
      * @param rowSize  要查询记录数
      * @return
      */
+    @Override
     public List<E> query(Map<String, Object> params, int startRow, int rowSize) {
         logger.info("====> 分页查询 [Page<E> getList(Page<E> page)]");
         logger.info("====> " + ToStringBuilder.reflectionToString(params, ToStringStyle.MULTI_LINE_STYLE));
@@ -348,6 +367,7 @@ public abstract class BaseMybatisDAOImpl<E, PK extends Serializable> extends Sql
      * @param <T>
      * @return
      */
+    @Override
     public <T> List<T> query(String stmtId, Map<String, Object> params) {
         logger.info("====> 根据 stmtid 查询一个集合 [<T> List<T> query(String stmtId, Map<String, Object> params)]");
         logger.info("====> " + stmtId);
@@ -364,6 +384,7 @@ public abstract class BaseMybatisDAOImpl<E, PK extends Serializable> extends Sql
      * @param params Map类型的参数，如果没有查询条件约束，则传递null也可以
      * @return
      */
+    @Override
     public int count(String stmtId, Map<String, Object> params) {
         return Integer.parseInt(getSqlSession().selectOne(this.sqlmapNamespace + "." + stmtId, params) + "");
     }
@@ -378,6 +399,7 @@ public abstract class BaseMybatisDAOImpl<E, PK extends Serializable> extends Sql
      * @param <T>
      * @return
      */
+    @Override
     public <T> List<T> query(String stmtId, Map<String, Object> params, int startRow, int rowSize) {
         logger.info("====> 根据stmtid 进行分页查询 [<T> List<T> query(String stmtId, Map<String, Object> params, int startRow, int rowSize)]");
         logger.info("====> " + stmtId);
@@ -399,6 +421,7 @@ public abstract class BaseMybatisDAOImpl<E, PK extends Serializable> extends Sql
      * @return boolean
      * @throws BaseException
      */
+    @Override
     public boolean isUnique(E entity, String uniquePropertyNames) {
         logger.info("====> 判断是否唯一 [boolean isUnique(E entity, String uniquePropertyNames)]");
         logger.info("====> " + ToStringBuilder.reflectionToString(entity, ToStringStyle.MULTI_LINE_STYLE));

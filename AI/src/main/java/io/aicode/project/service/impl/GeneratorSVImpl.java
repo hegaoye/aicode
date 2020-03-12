@@ -526,6 +526,8 @@ public class GeneratorSVImpl implements GenerateSV {
         targetFilePath = targetFilePath + frameworksTemplatePath.replace(".ftl", "")
                 .replace("${basepackage}", project.getBasePackage().replace(".", "/"))
                 .replace("${basePackage}", project.getBasePackage().replace(".", "/"))
+                .replace("${package}", project.getBasePackage().replace(".", "/"))
+                .replace("${Package}", project.getBasePackage().replace(".", "/"))
                 .replace("${className}", mapClassTable.getClassName())
                 .replace("${classNameLower}", StringHelper.toJavaVariableName(mapClassTable.getClassName()))
                 .replace("${dashedCaseName}", StringTools.humpToLine(mapClassTable.getClassName()))

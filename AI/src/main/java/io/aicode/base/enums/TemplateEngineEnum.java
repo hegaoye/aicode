@@ -6,7 +6,10 @@ package io.aicode.base.enums;
  */
 public enum TemplateEngineEnum {
     Freemarker,
-    Beetl,;
+    Beetl,
+    ;
+
+
 
     public static TemplateEngineEnum getTemplate(String template) {
         for (TemplateEngineEnum templateEngineEnum : TemplateEngineEnum.values()) {

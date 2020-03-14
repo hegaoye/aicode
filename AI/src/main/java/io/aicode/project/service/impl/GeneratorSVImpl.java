@@ -559,12 +559,14 @@ public class GeneratorSVImpl implements GenerateSV {
                 if (!templatePath.contains(".jar")) {
                     //适配模板引擎
                     String msg = "";
-                    if (TemplateEngineEnum.Freemarker == templateEngineEnum) {
-                        msg = freemarkerHelper.generate(templateData, targetFilePath, templatePath);
-                    } else if (TemplateEngineEnum.Beetl == templateEngineEnum) {
-                        msg = beetlHelper.generate(templateData, targetFilePath, templatePath);
+                    if (null == adapterTemplateEngine(templatePath)) {
+                        if (TemplateEngineEnum.Freemarker == templateEngineEnum) {
+                            msg = freemarkerHelper.generate(templateData, targetFilePath, templatePath);
+                        } else if (TemplateEngineEnum.Beetl == templateEngineEnum) {
+                            msg = beetlHelper.generate(templateData, targetFilePath, templatePath);
+                        }
+                        WSClientManager.sendMessage(msg);
                     }
-                    WSClientManager.sendMessage(msg);
                 } else {
                     try {
                         FileUtils.copyFileToDirectory(new File(templatePath), new File(targetFilePath.substring(0, targetFilePath.lastIndexOf("/"))));
@@ -589,10 +591,10 @@ public class GeneratorSVImpl implements GenerateSV {
     private TemplateEngineEnum adapterTemplateEngine(String path) {
         try {
             //定义文件名默认 aicode.json  ，以及可能的错误名字进行兼容
-            String[] fileName = {"aicode.json", "aicode", "ai-code.json", "ai-code"};
             File aicodeFile = null;
-            List<String> list = Lists.newArrayList(fileName);
-            for (String name : list) {
+            String[] fileName = {"aicode.json", "aicode", "ai-code.json", "ai-code"};
+            List<String> fileNameList = Lists.newArrayList(fileName);
+            for (String name : fileNameList) {
                 if (path.endsWith(name)) {
                     aicodeFile = new File(path);
                     if (aicodeFile != null && aicodeFile.exists()) {

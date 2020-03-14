@@ -130,6 +130,7 @@ public class GeneratorSVImpl implements GenerateSV {
             logsSV.saveLogs(log, path);
             logsSV.saveLogs("开始 下载技术模板", path);
             logsSV.saveLogs(log, path);
+            WSClientManager.sendMessage("git 努力下载中.....");
 
             /**
              * 准备框架模板

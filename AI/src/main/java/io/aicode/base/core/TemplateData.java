@@ -1,12 +1,13 @@
 package io.aicode.base.core;
 
-import com.alibaba.fastjson.JSON;
+import io.aicode.base.enums.YNEnum;
 import io.aicode.base.tools.StringTools;
 import io.aicode.display.entity.DisplayAttribute;
 import io.aicode.project.entity.MapClassTable;
 import io.aicode.project.entity.MapFieldColumn;
 import io.aicode.project.entity.Project;
 import lombok.Data;
+import org.springframework.beans.BeanUtils;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -49,9 +50,11 @@ import java.util.List;
 @Data
 public class TemplateData implements Serializable {
     private String projectName; //项目英文名
+    private String projectname; //项目英文名
     private String model;   //模块中的模型 -> private String basePackage;.private String model;.service
     private String module; //模块 一个项目的模块化 不参与java的包定义只是项目管理分离办法
     private String basePackage;  //包名
+    private String basepackage;  //包名
     private MapClassTable table;  //表对象
     private MapClassTable clazz;  //类对象
     private String tableName;  //表名
@@ -90,7 +93,9 @@ public class TemplateData implements Serializable {
                         List<MapClassTable> modelClasses, List<ModelData> modelDatas, List<TemplateData> oneToOneList,
                         List<TemplateData> oneToManyList) {
         this.projectName = project.getEnglishName();
+        this.projectname = project.getEnglishName();
         this.basePackage = project.getBasePackage();
+        this.basepackage = project.getBasePackage();
         this.copyright = project.getCopyright();
         this.author = project.getAuthor();
 
@@ -185,33 +190,31 @@ public class TemplateData implements Serializable {
                 this.fields = new ArrayList<>();
             }
             for (MapFieldColumn mapFieldColumn : columns) {
-                String json = JSON.toJSONString(mapFieldColumn);
-                Field field = JSON.parseObject(json, Field.class);
+                Field field = new Field();
+                BeanUtils.copyProperties(mapFieldColumn, field);
                 DisplayAttribute displayAttribute = mapFieldColumn.getDisplayAttribute();
                 if (displayAttribute != null) {
                     if (displayAttribute.getIsRequired() != null) {
-                        field.setIsRequired(displayAttribute.getIsRequired());
+                        field.setQueryRequired(YNEnum.getYN(displayAttribute.getIsRequired()) == YNEnum.Y ? true : false);
                     }
                     if (displayAttribute.getIsInsert() != null) {
-                        field.setIsInsert(displayAttribute.getIsInsert());
+                        field.setInsert(YNEnum.getYN(displayAttribute.getIsInsert()) == YNEnum.Y ? true : false);
                     }
                     if (displayAttribute.getIsDeleteCondition() != null) {
-                        field.setIsDeleteCondition(displayAttribute.getIsDeleteCondition());
+                        field.setDeleteCondition(YNEnum.getYN(displayAttribute.getIsDeleteCondition()) == YNEnum.Y ? true : false);
                     }
                     if (displayAttribute.getIsAllowUpdate() != null) {
-                        field.setIsAllowUpdate(displayAttribute.getIsAllowUpdate());
+                        field.setAllowUpdate(YNEnum.getYN(displayAttribute.getIsAllowUpdate()) == YNEnum.Y ? true : false);
                     }
                     if (displayAttribute.getIsListPageDisplay() != null) {
-                        field.setIsListPageDisplay(displayAttribute.getIsListPageDisplay());
+                        field.setListPageDisplay(YNEnum.getYN(displayAttribute.getIsListPageDisplay()) == YNEnum.Y ? true : false);
                     }
                     if (displayAttribute.getIsDetailPageDisplay() != null) {
-                        field.setIsDetailPageDisplay(displayAttribute.getIsDetailPageDisplay());
+                        field.setDetailPageDisplay(YNEnum.getYN(displayAttribute.getIsDetailPageDisplay()) == YNEnum.Y ? true : false);
                     }
-                    if (displayAttribute.getIsQueryRequired() != null) {
-                        field.setIsQueryRequired(displayAttribute.getIsQueryRequired());
-                    }
+
                     if (displayAttribute.getIsLineNew() != null) {
-                        field.setIsLineNew(displayAttribute.getIsLineNew());
+                        field.setLineNew(YNEnum.getYN(displayAttribute.getIsLineNew()) == YNEnum.Y ? true : false);
                     }
                     if (displayAttribute.getMatchType() != null) {
                         field.setMatchType(displayAttribute.getMatchType());

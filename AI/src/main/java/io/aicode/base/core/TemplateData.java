@@ -63,6 +63,7 @@ public class TemplateData implements Serializable {
     private String notes;  //类注释
     private String copyright;  //项目版权
     private String author;  //作者
+    private boolean checkState;//是否有状态属性
 
     private List<MapClassTable> classes = new ArrayList<>();//类信息对象  集合
     private List<MapFieldColumn> columns = new ArrayList<>();  //列对象  集合
@@ -190,6 +191,9 @@ public class TemplateData implements Serializable {
                 this.fields = new ArrayList<>();
             }
             for (MapFieldColumn mapFieldColumn : columns) {
+                if (!this.checkState && mapFieldColumn.getIsState().equals(YNEnum.Y.name())) {
+                    this.checkState = true;
+                }
                 Field field = new Field();
                 BeanUtils.copyProperties(mapFieldColumn, field);
                 DisplayAttribute displayAttribute = mapFieldColumn.getDisplayAttribute();

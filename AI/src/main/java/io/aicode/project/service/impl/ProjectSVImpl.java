@@ -96,7 +96,7 @@ public class ProjectSVImpl extends BaseMybatisSVImpl<Project, Long> implements P
                 || StringUtils.isBlank(project.getDescription())
                 || StringUtils.isBlank(project.getLanguage())
                 || StringUtils.isBlank(project.getBasePackage())
-                ) {
+        ) {
             logger.error(BaseException.BaseExceptionEnum.Empty_Param.toString());
             throw new ProjectException(BaseException.BaseExceptionEnum.Empty_Param);
         }
@@ -350,7 +350,7 @@ public class ProjectSVImpl extends BaseMybatisSVImpl<Project, Long> implements P
                 mapFieldColumn.setDefaultValue(column.getColumnDefault());
                 mapFieldColumn.setIsPrimaryKey(DatabaseDataTypesUtils.isPrimaryKey(column.getColumnKey()) ? YNEnum.Y.name() : YNEnum.N.name());
                 mapFieldColumn.setIsDate(DatabaseDataTypesUtils.isDate(column.getDataType()) ? YNEnum.Y.name() : YNEnum.N.name());
-                mapFieldColumn.setIsState(DatabaseDataTypesUtils.isState(column.getDataType()) ? YNEnum.Y.name() : YNEnum.N.name());
+                mapFieldColumn.setIsState(DatabaseDataTypesUtils.isState(column.getColumnName()) ? YNEnum.Y.name() : YNEnum.N.name());
                 mapFieldColumn.toJava();
                 mapFieldColumns.add(mapFieldColumn);
             });

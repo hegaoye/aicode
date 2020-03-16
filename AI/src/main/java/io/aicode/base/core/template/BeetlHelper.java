@@ -55,6 +55,6 @@ public class BeetlHelper implements TemplateHelper {
             e.printStackTrace();
             return e.getMessage();
         }
-        return "success";
+        return "OK: " + templatePath;
     }
 }

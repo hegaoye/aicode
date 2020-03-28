@@ -15,7 +15,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * 映射模板的输出数据定义
@@ -150,7 +149,7 @@ public class TemplateData implements Serializable {
     /**
      * 类的枚举
      */
-    private List<MapState> stateList = new ArrayList<>();
+    private List<MapState> states = new ArrayList<>();
 
     /**
      * 是否有关联关系
@@ -345,12 +344,12 @@ public class TemplateData implements Serializable {
                     if (StringUtils.isNotBlank(mapFieldColumn.getNotes())) {
                         Map<String, Object> map = StringTools.getStateOrType(mapFieldColumn.getNotes());
                         for (Map.Entry<String, Object> entry : map.entrySet()) {
-                            mapState.setState(entry.getKey());
+                            mapState.setState(StringHelper.capitalize(entry.getKey()));
                             mapState.setValue(String.valueOf(entry.getValue()));
 
                         }
                     }
-                    this.stateList.add(mapState);
+                    this.states.add(mapState);
                 }
             }
         }

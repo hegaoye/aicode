@@ -40,6 +40,7 @@ public class MapFieldColumn extends BaseEntity implements java.io.Serializable {
     private boolean checkState;
     private boolean checkPk;
     private boolean checkDigit = false;
+    private String upper;
 
     private DisplayAttribute displayAttribute;
     private MapRelationship mapRelationship;
@@ -85,6 +86,11 @@ public class MapFieldColumn extends BaseEntity implements java.io.Serializable {
             this.checkDigit = DatabaseDataTypesUtils.isFloatNumber(this.fieldType);
         }
         return checkDigit;
+    }
+
+    public String getUpper() {
+        this.upper = StringHelper.capitalize(field);
+        return this.upper;
     }
 
 }

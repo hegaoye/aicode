@@ -2,12 +2,14 @@ package io.aicode.project.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.baidu.fsg.uid.UidGenerator;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import freemarker.template.TemplateException;
-import io.aicode.base.core.FreemarkerHelper;
 import io.aicode.base.core.ModelData;
 import io.aicode.base.core.StringHelper;
 import io.aicode.base.core.TemplateData;
+import io.aicode.base.core.template.Configuration;
+import io.aicode.base.core.template.TemplateHelper;
+import io.aicode.base.enums.TemplateEngineEnum;
 import io.aicode.base.enums.YNEnum;
 import io.aicode.base.tools.FileUtil;
 import io.aicode.base.tools.GitTools;
@@ -25,6 +27,7 @@ import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
@@ -70,6 +73,11 @@ public class GeneratorSVImpl implements GenerateSV {
 
     @Resource
     private UidGenerator uidGenerator;
+
+    @Autowired
+    private TemplateHelper freemarkerHelper;
+    @Autowired
+    private TemplateHelper beetlHelper;
 
 
     /**
@@ -122,7 +130,13 @@ public class GeneratorSVImpl implements GenerateSV {
             logsSV.saveLogs(log, path);
             logsSV.saveLogs("开始 下载技术模板", path);
             logsSV.saveLogs(log, path);
-            this.prepareframeworksTemplateList(projectFramworkList, path);
+            WSClientManager.sendMessage("git 努力下载中.....");
+
+            /**
+             * 准备框架模板
+             */
+            TemplateEngineEnum templateEngineEnum = this.prepareframeworksTemplateList(projectFramworkList, path);
+
             WSClientManager.sendMessage(log);
             WSClientManager.sendMessage("结束 下载技术模板成功");
             WSClientManager.sendMessage(log);
@@ -142,7 +156,7 @@ public class GeneratorSVImpl implements GenerateSV {
                 List<FrameworksTemplate> frameworksTemplateList = frameworksTemplateDAO.query(param);
                 frameworksTemplateList.forEach(frameworksTemplate -> {
                     projectMapList.forEach(projectMap -> {
-                        this.generator(projectPath, project, frameworks, projectMap.getMapClassTable(), frameworksTemplate, mapClassTableList);
+                        this.generator(projectPath, project, frameworks, projectMap.getMapClassTable(), frameworksTemplate, mapClassTableList, templateEngineEnum);
                     });
                     WSClientManager.sendMessage("[生成] 模板 " + frameworksTemplate.getPath() + " 的源码");
                     logsSV.saveLogs("[生成] 模板 " + frameworksTemplate.getPath() + " 的源码", path);
@@ -240,7 +254,7 @@ public class GeneratorSVImpl implements GenerateSV {
     }
 
     //准备框架模板
-    private void prepareframeworksTemplateList(List<ProjectFramwork> projectFramworkList, String logsPath) {
+    private TemplateEngineEnum prepareframeworksTemplateList(List<ProjectFramwork> projectFramworkList, String logsPath) {
         Setting setting = settingDAO.loadByKey(Setting.Key.Template_Path.name());
         //获得默认仓库地址
         String template_Path = this.convertPath("/", setting.getV(), true);
@@ -250,6 +264,7 @@ public class GeneratorSVImpl implements GenerateSV {
             projectFramworkKeyWords = projectFramworkKeyWords + projectFramwork.getFrameworks().getName() + "|";
         }
 
+        TemplateEngineEnum templateEngineEnum = null;
         for (ProjectFramwork projectFramwork : projectFramworkList) {
             Frameworks frameworks = projectFramwork.getFrameworks();
             logger.debug(JSON.toJSONString(frameworks));
@@ -264,7 +279,8 @@ public class GeneratorSVImpl implements GenerateSV {
                     GitTools.cloneGit(frameworks.getGitHome(), project_template_Path, frameworks.getAccount(), frameworks.getPassword());
                 }
 
-                String template_root_path = this.findPath(template_Path, frameworks.getName());
+                String template_root_path = this.findPath(project_template_Path, frameworks.getName());
+//                String template_root_path = this.findPath(template_Path, frameworks.getName());
 
                 //删除不相干的模板及目录文件
                 File templateFile = new File(template_root_path.replace(frameworks.getName(), ""));
@@ -288,6 +304,9 @@ public class GeneratorSVImpl implements GenerateSV {
                         continue;
                     }
                     String path = this.convertPath("/", file.getAbsoluteFile().toString(), false).replace("//", "");
+                    if (null == templateEngineEnum) {
+                        templateEngineEnum = this.adapterTemplateEngine(path);
+                    }
                     path = path.substring(path.indexOf(template_Path) + template_Path.length());
                     FrameworksTemplate frameworksTemplate = new FrameworksTemplate();
                     frameworksTemplate.setCode(String.valueOf(uidGenerator.getUID()));
@@ -301,6 +320,12 @@ public class GeneratorSVImpl implements GenerateSV {
                 logsSV.saveLogs("模板克隆成功！", logsPath);
             }
         }
+
+        if (null == templateEngineEnum) {
+            templateEngineEnum = TemplateEngineEnum.Freemarker;
+        }
+
+        return templateEngineEnum;
     }
 
 
@@ -389,8 +414,9 @@ public class GeneratorSVImpl implements GenerateSV {
      * @param project            项目对象
      * @param mapClassTable      映射对象
      * @param frameworksTemplate 框架模板对象
+     * @param templateEngineEnum
      */
-    private void generator(String projectPath, Project project, Frameworks frameworks, MapClassTable mapClassTable, FrameworksTemplate frameworksTemplate, List<MapClassTable> mapClassTableList) {
+    private void generator(String projectPath, Project project, Frameworks frameworks, MapClassTable mapClassTable, FrameworksTemplate frameworksTemplate, List<MapClassTable> mapClassTableList, TemplateEngineEnum templateEngineEnum) {
         List<MapFieldColumn> mapFieldColumnPks = new ArrayList<>();
         List<MapFieldColumn> mapFieldColumnNotPks = new ArrayList<>();
         List<MapFieldColumn> mapFieldColumnList = new ArrayList<>();
@@ -480,7 +506,7 @@ public class GeneratorSVImpl implements GenerateSV {
 
         //生成路径处理
         String frameworksTemplatePath = frameworksTemplate.getPath();
-        if (frameworksTemplatePath.contains("/${module}")) {
+        if (frameworksTemplatePath.contains("/${module}") || frameworksTemplatePath.contains("/$module$")) {
             frameworksTemplatePath = frameworksTemplatePath.substring(frameworksTemplatePath.indexOf("/$"));
         } else if (frameworksTemplatePath.contains(frameworks.getName())) {
             frameworksTemplatePath = frameworksTemplatePath.substring(frameworksTemplatePath.indexOf(frameworks.getName()) + frameworks.getName().length());
@@ -501,11 +527,24 @@ public class GeneratorSVImpl implements GenerateSV {
         targetFilePath = targetFilePath + frameworksTemplatePath.replace(".ftl", "")
                 .replace("${basepackage}", project.getBasePackage().replace(".", "/"))
                 .replace("${basePackage}", project.getBasePackage().replace(".", "/"))
+                .replace("${package}", project.getBasePackage().replace(".", "/"))
+                .replace("${Package}", project.getBasePackage().replace(".", "/"))
                 .replace("${className}", mapClassTable.getClassName())
                 .replace("${classNameLower}", StringHelper.toJavaVariableName(mapClassTable.getClassName()))
                 .replace("${dashedCaseName}", StringTools.humpToLine(mapClassTable.getClassName()))
                 .replace("${module}", project.getEnglishName())
-                .replace("${model}", templateData.getModel());
+                .replace("${model}", templateData.getModel())
+
+                .replace(".btl", "")
+                .replace("$basepackage$", project.getBasePackage().replace(".", "/"))
+                .replace("$basePackage$", project.getBasePackage().replace(".", "/"))
+                .replace("$package$", project.getBasePackage().replace(".", "/"))
+                .replace("$Package$", project.getBasePackage().replace(".", "/"))
+                .replace("$className$", mapClassTable.getClassName())
+                .replace("$classNameLower$", StringHelper.toJavaVariableName(mapClassTable.getClassName()))
+                .replace("$dashedCaseName$", StringTools.humpToLine(mapClassTable.getClassName()))
+                .replace("$module$", project.getEnglishName())
+                .replace("$model$", templateData.getModel());
 
         String templatePath = "/" + settingTemplatePath.getV()
                 + "/" + frameworksTemplate.getPath();
@@ -519,14 +558,15 @@ public class GeneratorSVImpl implements GenerateSV {
         if (YNEnum.getYN(project.getIsIncrement()) == YNEnum.N) {
             if (new File(templatePath).exists()) {
                 if (!templatePath.contains(".jar")) {
-                    try {
-                        FreemarkerHelper.generate(templateData, targetFilePath, templatePath);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        WSClientManager.sendMessage(e.getMessage());
-                    } catch (TemplateException e) {
-                        e.printStackTrace();
-                        WSClientManager.sendMessage(e.getMessage());
+                    //适配模板引擎
+                    String msg = "";
+                    if (null == adapterTemplateEngine(templatePath)) {
+                        if (TemplateEngineEnum.Freemarker == templateEngineEnum) {
+                            msg = freemarkerHelper.generate(templateData, targetFilePath, templatePath);
+                        } else if (TemplateEngineEnum.Beetl == templateEngineEnum) {
+                            msg = beetlHelper.generate(templateData, targetFilePath, templatePath);
+                        }
+                        WSClientManager.sendMessage(msg);
                     }
                 } else {
                     try {
@@ -541,6 +581,41 @@ public class GeneratorSVImpl implements GenerateSV {
             }
         }
 
+    }
+
+    /**
+     * 适配 模板引擎
+     *
+     * @param path 项目路径
+     * @return TemplateEngineEnum
+     */
+    private TemplateEngineEnum adapterTemplateEngine(String path) {
+        try {
+            //定义文件名默认 aicode.json  ，以及可能的错误名字进行兼容
+            File aicodeFile = null;
+            String[] fileName = {"aicode.json", "aicode", "ai-code.json", "ai-code"};
+            List<String> fileNameList = Lists.newArrayList(fileName);
+            for (String name : fileNameList) {
+                if (path.endsWith(name)) {
+                    aicodeFile = new File(path);
+                    if (aicodeFile != null && aicodeFile.exists()) {
+                        break;
+                    }
+                }
+            }
+            if (aicodeFile == null) {
+                return null;
+            }
+
+            String json = FileUtils.readFileToString(aicodeFile);
+            Configuration configuration = JSON.parseObject(json, Configuration.class);
+            TemplateEngineEnum templateEngineEnum = TemplateEngineEnum.getTemplate(configuration.getEngine());
+            return templateEngineEnum;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        //默认 freemarker
+        return TemplateEngineEnum.Freemarker;
     }
 
     /**

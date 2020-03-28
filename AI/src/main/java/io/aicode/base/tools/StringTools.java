@@ -51,21 +51,35 @@ public class StringTools {
      */
     public static boolean checkIdCard(String idCard) {
         //判断传参是否为空
-        if (!StringTools.isNotEmpty(idCard)) return false;
+        if (!StringTools.isNotEmpty(idCard)) {
+            return false;
+        }
         //判断传参的位数是否正确
-        if (idCard.length() != 15 && idCard.length() != 18) return false;
+        if (idCard.length() != 15 && idCard.length() != 18) {
+            return false;
+        }
         //检查身份证号字符串是否正确（只能是0-9，Xx）
-        if (!checkIdCardString(idCard)) return false;
+        if (!checkIdCardString(idCard)) {
+            return false;
+        }
         //如果idCard为15位，则先转换成18位身份证号
-        if (idCard.length() == 15) idCard = idCard15To18(idCard);
+        if (idCard.length() == 15) {
+            idCard = idCard15To18(idCard);
+        }
         //检查身份证的区域是否正确
-        if (!checkIdCardArea(idCard)) return false;
+        if (!checkIdCardArea(idCard)) {
+            return false;
+        }
         //检查身份证的生日是否正确
-        if (!checkIdCardBirthday(idCard)) return false;
+        if (!checkIdCardBirthday(idCard)) {
+            return false;
+        }
         //通过前17位数字及权重，获得第18位校验码
         int checkCode = getCheckCode18Bit(idCard);
         //比较正确的校验码与输入的第18位字符，且当非老身份证号码时
-        if (checkCodeMap.get(String.valueOf(checkCode)).indexOf(idCard.substring(17, 18)) < 0) return false;
+        if (checkCodeMap.get(String.valueOf(checkCode)).indexOf(idCard.substring(17, 18)) < 0) {
+            return false;
+        }
         return true;
     }
 
@@ -98,7 +112,9 @@ public class StringTools {
      * @return
      */
     private static boolean checkIdCardArea(String idCard) {
-        if (!StringTools.isNotEmpty(idCard) || idCard.length() != 18) return false;
+        if (!StringTools.isNotEmpty(idCard) || idCard.length() != 18) {
+            return false;
+        }
         String provinceid = idCard.substring(0, 2);
         boolean flag = false;
         for (String id : cityCode) {
@@ -118,7 +134,9 @@ public class StringTools {
      * @return
      */
     private static boolean checkIdCardBirthday(String idCard) {
-        if (!StringTools.isNotEmpty(idCard) || idCard.length() != 18) return false;
+        if (!StringTools.isNotEmpty(idCard) || idCard.length() != 18) {
+            return false;
+        }
         int idCardYear = Integer.parseInt(idCard.substring(6, 10)); //获得身份证的年
         int idCardMonth = Integer.parseInt(idCard.substring(10, 12));//获得身份证的月
         int idCardDay = Integer.parseInt(idCard.substring(12, 14));//获得身份证的日
@@ -126,15 +144,21 @@ public class StringTools {
         calendar.setTime(new Date());
         int nowYear = calendar.get(Calendar.YEAR);
         //检查日期是否超出范围
-        if (idCardYear > nowYear || idCardYear < 1900) return false;
+        if (idCardYear > nowYear || idCardYear < 1900) {
+            return false;
+        }
         //检查日期是否超出范围
-        if (idCardMonth < 1 || idCardMonth > 12) return false;
+        if (idCardMonth < 1 || idCardMonth > 12) {
+            return false;
+        }
         calendar.set(Calendar.YEAR, idCardYear);
         calendar.set(Calendar.MONTH, idCardMonth - 1);
         //获取身份证号月份最大天数  
         int lastDay = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
         //检查日期是否超出范围
-        if (idCardDay < 1 || idCardDay > lastDay) return false;
+        if (idCardDay < 1 || idCardDay > lastDay) {
+            return false;
+        }
         return true;
     }
 
@@ -275,6 +299,16 @@ public class StringTools {
         }
         m.appendTail(sb);
         return sb.toString();
+    }
+
+    public static List<String> getByPattern(String str, String patternStr) {
+        Pattern p = Pattern.compile(patternStr, Pattern.CASE_INSENSITIVE);
+        Matcher m = p.matcher(str);
+        List<String> list = new ArrayList<>();
+        while (m.find()) {
+            list.add(m.group());
+        }
+        return list;
     }
 
     /**
@@ -500,6 +534,8 @@ public class StringTools {
     public static void main(String[] args) {
         System.out.println(humpToLine("GaoJieJie"));
         System.out.println(humpToLine("zaoJieJie"));
+        List<String> s = StringTools.getByPattern("状态： 启用Enable,停用 Disable, 正常 Normal", "[\\u4e00-\\u9fa5]+\\s?\\w+");
+        System.out.println(s);
 
     }
 

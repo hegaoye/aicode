@@ -57,7 +57,7 @@ public class DatabaseDataTypesUtils {
         return false;
     }
 
-    public static boolean isState(String javaType) {
+    public static boolean isStateOrType(String javaType) {
         if (javaType.contains("state") || javaType.contains("State")) {
             return true;
         }

@@ -34,7 +34,7 @@ public class MapFieldColumn extends BaseEntity implements java.io.Serializable {
     private String defaultValue;//数据库字段:defaultValue  属性显示:字段默认值
     private String isPrimaryKey;//数据库字段:isPrimaryKey  属性显示:是否是主键
     private String isDate;//数据库字段:isDate  属性显示:是否是时间类型
-    private String isState;//数据库字段:isState  属性显示:是否是状态
+    private String isState;//数据库字段:isStateOrType  属性显示:是否是状态
 
     private boolean checkDate;
     private boolean checkState;

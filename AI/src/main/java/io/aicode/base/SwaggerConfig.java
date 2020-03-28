@@ -2,7 +2,6 @@ package io.aicode.base;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import springfox.documentation.annotations.ApiIgnore;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
@@ -18,7 +17,6 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
  * @version 2017年5月27日 上午9:50:59
  */
 @Configuration
-@EnableWebMvc
 @EnableSwagger2
 public class SwaggerConfig {
 

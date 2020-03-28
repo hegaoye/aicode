@@ -11,7 +11,6 @@ import io.aicode.base.enums.SuffixTypeEnum;
 import io.aicode.base.exceptions.BaseException;
 import io.aicode.base.tools.DateTools;
 import io.aicode.base.tools.FileUtil;
-import io.aicode.base.tools.HandleFuncs;
 import io.aicode.base.tools.StringTools;
 import io.aicode.project.dao.AccountDAO;
 import io.aicode.project.dao.ProjectDAO;
@@ -77,7 +76,7 @@ public class LogsSVImpl implements LogsSV {
             //2.用户名+项目名生成唯一的文件夹
             String fileName = accountName + "_" + name + "_logs";
             String workspace = settingSV.load(Setting.Key.Workspace);
-            String path = new HandleFuncs().getCurrentClassPath() + workspace + fileName;
+            String path = workspace + fileName;
             FileUtil.createDir(path, null);
             //3.根据时间戳生成文件
             String dateStr = DateTools.dateToNum14(date);
@@ -109,7 +108,7 @@ public class LogsSVImpl implements LogsSV {
             throw new BaseException(BaseException.BaseExceptionEnum.Empty_Param);
         }
         String workspace = settingSV.load(Setting.Key.Workspace);
-        path = new HandleFuncs().getCurrentClassPath() + workspace + path;
+        path = workspace + path;
         FileOutputStream fop;
         File file;
         try {
@@ -168,7 +167,7 @@ public class LogsSVImpl implements LogsSV {
                 filePath = name + "/" + date + SuffixTypeEnum.Log.val;
             }
             String workspace = settingSV.load(Setting.Key.Workspace);
-            String path = new HandleFuncs().getCurrentClassPath() + workspace;
+            String path = workspace;
             if (StringTools.isNotEmpty(filePath)) {
                 path = path + filePath;
             }

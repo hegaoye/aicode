@@ -7,7 +7,6 @@ package io.aicode.project.entity;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import io.aicode.base.BaseEntity;
-import io.aicode.base.BaseEntity;
 import lombok.Data;
 
 /**

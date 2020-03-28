@@ -1,0 +1,274 @@
+/****************************************定义不同状态的空心按钮************************************************/
+
+/*主题色外发光按钮*/
+.thc-btn-w.ant-btn {
+  border-color: #E51C23;
+  background-color: #fff;
+  color: #E51C23;
+}
+
+.thc-btn-w.ant-btn:hover, .thc-btn-w.ant-btn:focus {
+  color: #E51C23;
+  border-color: #E51C23;
+  box-shadow: 0 0 10px #a0a0a0;
+}
+
+/*主题色外发光按钮 end*/
+
+/*主题色实心按钮 start*/
+.btn-thc.ant-btn {
+  border-color: #E51C23;
+  background-color: #E51C23;
+  color: #ffffff;
+}
+
+.btn-thc.ant-btn:hover, .btn-thc.ant-btn:focus, .btn-thc.ant-btn:active {
+  color: #ffffff;
+  background-color: #E51C23;
+  border-color: #E51C23;
+  box-shadow: 0 0 2px #ff1c23 inset;
+}
+
+/*主题色实心按钮 end*/
+
+/*danger红色按钮 start*/
+.btn-danger.ant-btn {
+  border-color: #f04134;
+  background-color: #f04134;
+  color: #fff;
+}
+
+.btn-danger.ant-btn:hover, .btn-danger.ant-btn:focus, .btn-danger.ant-btn:active {
+  color: #fff;
+  background-color: #f04134;
+  border-color: #f04134;
+  box-shadow: 0 0 2px #f0604e inset;
+}
+
+/*danger红色按钮 end*/
+
+/*实心绿色按钮 start*/
+.btn-green.ant-btn {
+  border-color: #37bc9b;
+  background-color: #37bc9b;
+  color: #fff;
+}
+
+.btn-green.ant-btn:hover, .btn-green.ant-btn:focus, .btn-green.ant-btn:active {
+  color: #fff;
+  background-color: #37bc9b;
+  border-color: #37bc9b;
+  box-shadow: 0 0 2px #50bc9e inset;
+}
+
+/*实心绿色按钮 end*/
+
+/*实心success按钮 start*/
+.btn-success.ant-btn {
+  border-color: #27c24c;
+  background-color: #27c24c;
+  color: #fff;
+}
+
+.btn-success.ant-btn:hover, .btn-success.ant-btn:focus, .btn-success.ant-btn:active {
+  color: #fff;
+  background-color: #27c24c;
+  border-color: #27c24c;
+  box-shadow: 0 0 2px #53c257 inset;
+}
+
+/*实心success按钮 end*/
+
+/*实心橙色按钮 start*/
+.btn-warning.ant-btn {
+  border-color: #ff902b;
+  background-color: #ff902b;
+  color: #fff;
+}
+
+.btn-warning.ant-btn:hover, .btn-warning.ant-btn:focus, .btn-warning.ant-btn:active {
+  color: #fff;
+  background-color: #ff902b;
+  border-color: #ff902b;
+  box-shadow: 0 0 2px #ffa340 inset;
+}
+
+/*实心橙色按钮 end*/
+
+/*实心蓝色按钮 start*/
+.btn-purple.ant-btn {
+  border-color: #7265e6;
+  background-color: #7265e6;
+  color: #fff;
+}
+
+.btn-purple.ant-btn:hover, .btn-purple.ant-btn:focus, .btn-purple.ant-btn:active {
+  color: #fff;
+  background-color: #7265e6;
+  border-color: #7265e6;
+  box-shadow: 0 0 2px #836fba inset;
+}
+
+/*实心蓝色按钮 end*/
+
+/*实心蓝色按钮 start*/
+.btn-blue.ant-btn {
+  border-color: #108ee9;
+  background-color: #108ee9;
+  color: #fff;
+}
+
+.btn-blue.ant-btn:hover, .btn-blue.ant-btn:focus, .btn-blue.ant-btn:active {
+  color: #fff;
+  background-color: #108ee9;
+  border-color: #108ee9;
+  box-shadow: 0 0 2px #49b0e9 inset;
+}
+
+/*实心蓝色按钮 end*/
+
+
+
+/*主题色空心按钮 start*/
+.btn-thc-o.ant-btn {
+  border-color: #E51C23;
+  background-color: #fff;
+  color: #E51C23;
+}
+
+.btn-thc-o.ant-btn:hover, .btn-thc-o.ant-btn:focus, .btn-thc-o.ant-btn:active {
+  color: #E51C23;
+  background-color: #fff;
+  border-color: #E51C23;
+  box-shadow: 0 0 2px #ff1c23 inset;
+}
+
+
+/*danger红色按钮 start*/
+.btn-danger-o.ant-btn {
+  border-color: #f04134;
+  background-color: #fff;
+  color: #f04134;
+}
+
+.btn-danger-o.ant-btn:hover, .btn-danger-o.ant-btn:focus, .btn-danger-o.ant-btn:active {
+  color: #f04134;
+  background-color: #fff;
+  border-color: #f04134;
+  box-shadow: 0 0 2px #f0604e inset;
+}
+
+/*空心绿色按钮 start*/
+.btn-green-o.ant-btn {
+  border-color: #37bc9b;
+  background-color: #fff;
+  color: #37bc9b;
+}
+
+.btn-green-o.ant-btn:hover, .btn-green-o.ant-btn:focus, .btn-green-o.ant-btn:active {
+  color: #37bc9b;
+  background-color: #fff;
+  border-color: #37bc9b;
+  box-shadow: 0 0 2px #50bc9e inset;
+}
+
+/*空心绿色按钮 end*/
+
+/*空心success按钮 start*/
+.btn-success-o.ant-btn {
+  border-color: #27c24c;
+  background-color: #fff;
+  color: #27c24c;
+}
+
+.btn-success-o.ant-btn:hover, .btn-success-o.ant-btn:focus, .btn-success-o.ant-btn:active {
+  color: #27c24c;
+  background-color: #fff;
+  border-color: #27c24c;
+  box-shadow: 0 0 2px #53c257 inset;
+}
+
+/*空心success按钮 end*/
+
+/*空心橙色按钮 start*/
+.btn-warning-o.ant-btn {
+  border-color: #ff902b;
+  background-color: #fff;
+  color: #ff902b;
+}
+
+.btn-warning-o.ant-btn:hover, .btn-warning-o.ant-btn:focus, .btn-warning-o.ant-btn:active {
+  color: #ff902b;
+  background-color: #fff;
+  border-color: #ff902b;
+  box-shadow: 0 0 2px #ffa340 inset;
+}
+
+/*空心橙色按钮 end*/
+
+/*空心蓝色按钮 start*/
+.btn-purple-o.ant-btn {
+  border-color: #7265e6;
+  background-color: #fff;
+  color: #7265e6;
+}
+
+.btn-purple-o.ant-btn:hover, .btn-purple-o.ant-btn:focus, .btn-purple-o.ant-btn:active {
+  color: #7265e6;
+  background-color: #fff;
+  border-color: #7265e6;
+  box-shadow: 0 0 2px #836fba inset;
+}
+
+/*空心蓝色按钮 end*/
+
+/*空心蓝色按钮 start*/
+.btn-blue-o.ant-btn {
+  border-color: #108ee9;
+  background-color: #fff;
+  color: #108ee9;
+}
+
+.btn-blue-o.ant-btn:hover, .btn-blue-o.ant-btn:focus, .btn-blue-o.ant-btn:active {
+  color: #108ee9;
+  background-color: #fff;
+  border-color: #108ee9;
+  box-shadow: 0 0 2px #49b0e9 inset;
+}
+
+/*空心蓝色按钮 end*/
+
+/*主题色按钮，点击状态的水波颜色*/
+.btn-thc.ant-btn-clicked:after {
+  border: 0 solid #E51C23;
+}
+
+/*danger按钮，点击状态的水波颜色*/
+.btn-danger.ant-btn-clicked:after {
+  border: 0 solid #f04134;
+}
+
+/*绿色按钮，点击状态的水波颜色*/
+.btn-green.ant-btn-clicked:after {
+  border: 0 solid #37bc9b;
+}
+
+/*success按钮，点击状态的水波颜色*/
+.btn-success.ant-btn-clicked:after {
+  border: 0 solid #27c24c;
+}
+
+/*橙色按钮，点击状态的水波颜色*/
+.btn-warning.ant-btn-clicked:after {
+  border: 0 solid #F57C00;
+}
+
+/*紫色按钮，点击状态的水波颜色*/
+.btn-purple.ant-btn-clicked:after {
+  border: 0 solid #7265e6;
+}
+
+/*蓝色按钮，点击状态的水波颜色*/
+.btn-blue.ant-btn-clicked:after {
+  border: 0 solid #108ee9;
+}

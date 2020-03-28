@@ -1,6 +1,5 @@
 package io.aicode.project.service;
 
-import io.aicode.base.tools.WSTools;
 import io.aicode.project.entity.ProjectJob;
 
 /**
@@ -11,9 +10,8 @@ public interface GenerateSV {
     /**
      * 根据项目码创建项目代码
      *
-     * @param projectCode      项目编码
-     * @param projectJob       项目job
-     * @param webSocketSession socket连接
+     * @param projectCode 项目编码
+     * @param projectJob  项目job
      */
-    void aiCode(String projectCode, ProjectJob projectJob, WSTools webSocketSession);
+    void aiCode(String projectCode, ProjectJob projectJob);
 }

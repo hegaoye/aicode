@@ -14,6 +14,7 @@ import io.aicode.base.core.BeanRet;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
@@ -26,6 +27,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Enumeration;
 
+
+@Component
 public class ContextInterceptor extends HandlerInterceptorAdapter {
     private final static Logger logger = LoggerFactory.getLogger(ContextInterceptor.class);
 

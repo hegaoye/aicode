@@ -7,6 +7,7 @@
  */
 package io.aicode.base.tools;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang.StringUtils;
 
@@ -17,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 public class FileUtil {
 
     /**
@@ -423,16 +425,16 @@ public class FileUtil {
         File folder = new File(filePath);
         //文件夹路径不存在
         if (!folder.exists() && !folder.isDirectory()) {
-            System.out.println("文件夹路径不存在，创建路径:" + filePath);
+            log.info("文件夹路径不存在，创建路径:" + filePath);
             folder.mkdirs();
         } else {
-            System.out.println("文件夹路径存在:" + filePath);
+            log.info("文件夹路径存在:" + filePath);
         }
         // 如果文件不存在就创建
         if (!"null".equals(fileName) && !StringUtils.isEmpty(fileName)) {
             File file = new File(filePath + "/" + fileName);
             if (!file.exists()) {
-                System.out.println("文件不存在，创建文件:" + filePath + "/" + fileName);
+                log.info("文件不存在，创建文件:" + filePath + "/" + fileName);
                 try {
                     file.createNewFile();
                 } catch (IOException e) {
@@ -448,7 +450,7 @@ public class FileUtil {
         File file = new File("C:\\workspaces\\AI-Code\\AI\\src\\main\\webapp\\templates");
         File[] list1 = file.listFiles();
         for (File file1 : list1) {
-            System.out.println(file1.getName());
+            log.info(file1.getName());
         }
 
         GitTools.cloneGit("https://gitee.com/helixin/aicode_template.git", "C:\\workspaces\\AI-Code\\AI\\build\\libs\\exploded\\AI.war\\templates\\aicode_template");
@@ -459,14 +461,14 @@ public class FileUtil {
         for (int i = 0; i < list.size(); i++) {
             String path = list.get(i).getAbsoluteFile().toString().replace("C:\\workspaces\\AI-Code\\AI\\src\\main\\webapp\\templates", "").replace("\\", "/");
             String sql = "INSERT into frameworks_template(code,frameworkCode,path) values('" + (888888 + i) + "','888888','" + path + "');";
-            System.out.println(sql);
+            log.info(sql);
         }
 
 //        List<Map<String, String>> mapList = sanDirFiles("C:\\workspaces\\AI-Code\\AI\\src\\main\\webapp\\templates\\spring-cloud-redis-lombok-sentry", "announce");
-//        System.out.println(JSON.toJSONString(mapList));
+//        log.info(JSON.toJSONString(mapList));
 //        try {
 //            String fileStr = FileUtils.readFileToString(new File("C:\\workspaces\\AI-Code\\AI\\build\\libs\\exploded\\AI.war\\workspace\\announce\\cycle\\src\\main\\java\\com\\cycle\\admin\\ctrl\\AdminCtrl.java"));
-//            System.out.println(fileStr);
+//            log.info(fileStr);
 //        } catch (IOException e) {
 //            e.printStackTrace();
 //        }

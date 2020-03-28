@@ -2,8 +2,8 @@ package io.aicode.base;
 
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Maps;
-import io.aicode.base.tools.Ignore;
 import io.aicode.base.exceptions.BaseException;
+import io.aicode.base.tools.Ignore;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;

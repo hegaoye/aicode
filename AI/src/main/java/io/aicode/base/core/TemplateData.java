@@ -5,13 +5,17 @@ import io.aicode.base.tools.StringTools;
 import io.aicode.display.entity.DisplayAttribute;
 import io.aicode.project.entity.MapClassTable;
 import io.aicode.project.entity.MapFieldColumn;
+import io.aicode.project.entity.MapState;
 import io.aicode.project.entity.Project;
 import lombok.Data;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * 映射模板的输出数据定义
@@ -49,40 +53,135 @@ import java.util.List;
  */
 @Data
 public class TemplateData implements Serializable {
-    private String projectName; //项目英文名
-    private String projectname; //项目英文名
-    private String model;   //模块中的模型 -> private String basePackage;.private String model;.service
-    private String module; //模块 一个项目的模块化 不参与java的包定义只是项目管理分离办法
-    private String basePackage;  //包名
-    private String basepackage;  //包名
-    private MapClassTable table;  //表对象
-    private MapClassTable clazz;  //类对象
-    private String tableName;  //表名
-    private String className;  //类名
-    private String classNameLower;  //类名小写
-    private String notes;  //类注释
-    private String copyright;  //项目版权
-    private String author;  //作者
+    /**
+     * 项目英文名
+     */
+    private String projectName;
+    /**
+     * 项目英文名
+     */
+    private String projectname;
+    /**
+     * 模块中的模型
+     */
+    private String model;
+    /**
+     * 模块 一个项目的模块化 不参与java的包定义只是项目管理分离办法
+     */
+    private String module;
+    /**
+     * 包名
+     */
+    private String basePackage;
+    private String basepackage;
+    /**
+     * 表对象
+     */
+    private MapClassTable table;
+    /**
+     * 类对象
+     */
+    private MapClassTable clazz;
+    /**
+     * 表名
+     */
+    private String tableName;
+    /**
+     * 类名
+     */
+    private String className;
+    /**
+     * 类名小写
+     */
+    private String classNameLower;
+    /**
+     * 类注释
+     */
+    private String notes;
+    /**
+     * 项目版权
+     */
+    private String copyright;
+    /**
+     * 作者
+     */
+    private String author;
 
-    private List<MapClassTable> classes = new ArrayList<>();//类信息对象  集合
-    private List<MapFieldColumn> columns = new ArrayList<>();  //列对象  集合
-    private List<MapFieldColumn> pkColumns = new ArrayList<>();//主键数据信息
-    private List<MapFieldColumn> notPkColumns = new ArrayList<>();  //非主键数据信息
-    private List<Field> fields = new ArrayList<>();//所有类下面的属性集合信息
-    private List<MapFieldColumn> pkFields = new ArrayList<>();  //主键数据信息
-    private List<MapFieldColumn> notPkFields = new ArrayList<>();  //非主键主键数据信息
-    private List<MapClassTable> modelClasses = new ArrayList<>();//各个模块下的所有类集合信息
-    private List<TemplateData> oneToOneList = new ArrayList<>();//1对1集合
-    private List<TemplateData> oneToManyList = new ArrayList<>();//1对多集合
-    private boolean isRelation;//是否有关联关系
-    private String mainField;//主表关联属性
-    private String joinField;//从表关联属性
+    /**
+     * 类信息对象  集合
+     */
+    private List<MapClassTable> classes = new ArrayList<>();
+    /**
+     * 列对象  集合
+     */
+    private List<MapFieldColumn> columns = new ArrayList<>();
+    /**
+     * 主键数据信息
+     */
+    private List<MapFieldColumn> pkColumns = new ArrayList<>();
+    /**
+     * 非主键数据信息
+     */
+    private List<MapFieldColumn> notPkColumns = new ArrayList<>();
+    /**
+     * 所有类下面的属性集合信息
+     */
+    private List<Field> fields = new ArrayList<>();
+    /**
+     * 主键数据信息
+     */
+    private List<MapFieldColumn> pkFields = new ArrayList<>();
+    /**
+     * 非主键主键数据信息
+     */
+    private List<MapFieldColumn> notPkFields = new ArrayList<>();
+    /**
+     * 各个模块下的所有类集合信息
+     */
+    private List<MapClassTable> modelClasses = new ArrayList<>();
+    /**
+     * 1对1集合
+     */
+    private List<TemplateData> oneToOneList = new ArrayList<>();
+    /**
+     * 1对多集合
+     */
+    private List<TemplateData> oneToManyList = new ArrayList<>();
+    /**
+     * 类的枚举
+     */
+    private List<MapState> stateList = new ArrayList<>();
+
+    /**
+     * 是否有关联关系
+     */
+    private boolean isRelation;
+    /**
+     * 主表关联属性
+     */
+    private String mainField;
+    /**
+     * 从表关联属性
+     */
+    private String joinField;
 
     //**********前端生成代码使用：start***********
-    private List<DisplayAttribute> displayAttributes = new ArrayList<>();//所有类下面的属性集合信息
-    private List<MapFieldColumn> tableFields = new ArrayList<>();  //前端页面显示
-    private List<ModelData> modelDatas = new ArrayList<>();//模型与实体类的关系
-    private String dashedCaseName;//破折号命名 或叫烤串命名 适用于 前端angular ,react, vue
+    /**
+     * 所有类下面的属性集合信息
+     */
+    private List<DisplayAttribute> displayAttributes = new ArrayList<>();
+    /**
+     * 前端页面显示
+     */
+    private List<MapFieldColumn> tableFields = new ArrayList<>();
+    /**
+     * 模型与实体类的关系
+     */
+    private List<ModelData> modelDatas = new ArrayList<>();
+    /**
+     * 破折号命名 或叫烤串命名 适用于 前端angular ,react, vue
+     */
+    private String dashedCaseName;
 
     //**********前端生成代码使用：end***********
 
@@ -239,6 +338,20 @@ public class TemplateData implements Serializable {
                     }
                 }
                 this.fields.add(field);
+
+                //转化状态
+                if (YNEnum.Y == YNEnum.getYN(mapFieldColumn.getIsDate())) {
+                    MapState mapState = new MapState();
+                    if (StringUtils.isNotBlank(mapFieldColumn.getNotes())) {
+                        Map<String, Object> map = StringTools.getStateOrType(mapFieldColumn.getNotes());
+                        for (Map.Entry<String, Object> entry : map.entrySet()) {
+                            mapState.setState(entry.getKey());
+                            mapState.setValue(String.valueOf(entry.getValue()));
+
+                        }
+                    }
+                    this.stateList.add(mapState);
+                }
             }
         }
 

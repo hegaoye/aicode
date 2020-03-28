@@ -353,6 +353,11 @@ public class ProjectSVImpl extends BaseMybatisSVImpl<Project, Long> implements P
                 mapFieldColumn.setIsPrimaryKey(DatabaseDataTypesUtils.isPrimaryKey(column.getColumnKey()) ? YNEnum.Y.name() : YNEnum.N.name());
                 mapFieldColumn.setIsDate(DatabaseDataTypesUtils.isDate(column.getDataType()) ? YNEnum.Y.name() : YNEnum.N.name());
                 mapFieldColumn.setIsState(DatabaseDataTypesUtils.isStateOrType(column.getDataType()) ? YNEnum.Y.name() : YNEnum.N.name());
+                if (YNEnum.N == YNEnum.getYN(mapFieldColumn.getIsState())) {
+                    Map<String, Object> objectMap = StringTools.getStateOrType(column.getColumnComment());
+                    YNEnum ynEnum = null != objectMap && !objectMap.isEmpty() ? YNEnum.Y : YNEnum.N;
+                    mapFieldColumn.setIsState(ynEnum.name());
+                }
                 mapFieldColumn.toJava();
                 mapFieldColumns.add(mapFieldColumn);
             });

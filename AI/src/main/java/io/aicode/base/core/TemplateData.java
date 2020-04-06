@@ -340,16 +340,15 @@ public class TemplateData implements Serializable {
 
                 //转化状态
                 if (YNEnum.Y == YNEnum.getYN(mapFieldColumn.getIsState())) {
-                    MapState mapState = new MapState();
                     if (StringUtils.isNotBlank(mapFieldColumn.getNotes())) {
                         Map<String, Object> map = StringTools.getStateOrType(mapFieldColumn.getNotes());
                         for (Map.Entry<String, Object> entry : map.entrySet()) {
+                            MapState mapState = new MapState();
                             mapState.setState(StringHelper.capitalize(entry.getKey()));
                             mapState.setValue(String.valueOf(entry.getValue()));
-
+                            this.states.add(mapState);
                         }
                     }
-                    this.states.add(mapState);
                 }
             }
         }

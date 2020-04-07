@@ -16,10 +16,10 @@ import lombok.Data;
  * @since 1.0
  */
 @Data
-public class MapState implements java.io.Serializable {
+public class MapStatus implements java.io.Serializable {
 
-    private String state;
-    private String value;
+    private String name;
+    private String desc;
 
 }
 

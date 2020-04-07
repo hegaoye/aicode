@@ -5,7 +5,7 @@ import io.aicode.base.tools.StringTools;
 import io.aicode.display.entity.DisplayAttribute;
 import io.aicode.project.entity.MapClassTable;
 import io.aicode.project.entity.MapFieldColumn;
-import io.aicode.project.entity.MapState;
+import io.aicode.project.entity.MapStatus;
 import io.aicode.project.entity.Project;
 import lombok.Data;
 import org.apache.commons.lang.StringUtils;
@@ -149,7 +149,7 @@ public class TemplateData implements Serializable {
     /**
      * 类的枚举
      */
-    private List<MapState> states = new ArrayList<>();
+    private List<MapStatus> states = new ArrayList<>();
 
     /**
      * 是否有关联关系
@@ -349,10 +349,10 @@ public class TemplateData implements Serializable {
                         Map<String, Object> map = StringTools.getStateOrType(mapFieldColumn.getNotes());
                         if (!map.isEmpty()) {
                             for (Map.Entry<String, Object> entry : map.entrySet()) {
-                                MapState mapState = new MapState();
-                                mapState.setState(StringHelper.capitalize(entry.getKey()));
-                                mapState.setValue(String.valueOf(entry.getValue()));
-                                this.states.add(mapState);
+                                MapStatus mapStatus = new MapStatus();
+                                mapStatus.setName(StringHelper.capitalize(entry.getKey()));
+                                mapStatus.setDesc(String.valueOf(entry.getValue()));
+                                this.states.add(mapStatus);
                             }
                         }
                     }

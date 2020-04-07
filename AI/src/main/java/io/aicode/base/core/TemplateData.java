@@ -287,6 +287,9 @@ public class TemplateData implements Serializable {
             if (this.fields == null) {
                 this.fields = new ArrayList<>();
             }
+            if (this.states == null) {
+                this.states = new ArrayList<>();
+            }
             for (MapFieldColumn mapFieldColumn : columns) {
                 Field field = new Field();
                 BeanUtils.copyProperties(mapFieldColumn, field);
@@ -342,11 +345,13 @@ public class TemplateData implements Serializable {
                 if (YNEnum.Y == YNEnum.getYN(mapFieldColumn.getIsState())) {
                     if (StringUtils.isNotBlank(mapFieldColumn.getNotes())) {
                         Map<String, Object> map = StringTools.getStateOrType(mapFieldColumn.getNotes());
-                        for (Map.Entry<String, Object> entry : map.entrySet()) {
-                            MapState mapState = new MapState();
-                            mapState.setState(StringHelper.capitalize(entry.getKey()));
-                            mapState.setValue(String.valueOf(entry.getValue()));
-                            this.states.add(mapState);
+                        if (!map.isEmpty()) {
+                            for (Map.Entry<String, Object> entry : map.entrySet()) {
+                                MapState mapState = new MapState();
+                                mapState.setState(StringHelper.capitalize(entry.getKey()));
+                                mapState.setValue(String.valueOf(entry.getValue()));
+                                this.states.add(mapState);
+                            }
                         }
                     }
                 }

@@ -2,6 +2,7 @@ package io.aicode.base.core.template;
 
 import com.alibaba.fastjson.JSON;
 import io.aicode.base.core.TemplateData;
+import io.aicode.project.entity.MapState;
 import lombok.extern.slf4j.Slf4j;
 import org.beetl.core.GroupTemplate;
 import org.beetl.core.Template;
@@ -11,6 +12,8 @@ import org.springframework.stereotype.Service;
 
 import java.io.*;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -57,4 +60,5 @@ public class BeetlHelper implements TemplateHelper {
         }
         return "success";
     }
+
 }

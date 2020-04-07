@@ -184,6 +184,8 @@ public class TemplateData implements Serializable {
 
     //**********前端生成代码使用：end***********
 
+    public TemplateData() {
+    }
 
     //TODO {定义模板变量}
     public TemplateData(Project project, MapClassTable classTable, List<MapClassTable> classes, List<MapFieldColumn> columns,

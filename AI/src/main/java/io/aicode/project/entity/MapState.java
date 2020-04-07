@@ -5,7 +5,6 @@
 
 package io.aicode.project.entity;
 
-import io.aicode.base.BaseEntity;
 import lombok.Data;
 
 
@@ -17,7 +16,7 @@ import lombok.Data;
  * @since 1.0
  */
 @Data
-public class MapState extends BaseEntity implements java.io.Serializable {
+public class MapState implements java.io.Serializable {
 
     private String state;
     private String value;

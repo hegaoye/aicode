@@ -149,7 +149,7 @@ public class TemplateData implements Serializable {
     /**
      * 类的枚举
      */
-    private List<MapStatus> statusList = new ArrayList<>();
+    private List<MapStatus> states = new ArrayList<>();
 
     /**
      * 是否有关联关系
@@ -289,8 +289,8 @@ public class TemplateData implements Serializable {
             if (this.fields == null) {
                 this.fields = new ArrayList<>();
             }
-            if (this.statusList == null) {
-                this.statusList = new ArrayList<>();
+            if (this.states == null) {
+                this.states = new ArrayList<>();
             }
             for (MapFieldColumn mapFieldColumn : columns) {
                 Field field = new Field();
@@ -352,7 +352,7 @@ public class TemplateData implements Serializable {
                                 MapStatus mapStatus = new MapStatus();
                                 mapStatus.setName(StringHelper.capitalize(entry.getKey()));
                                 mapStatus.setValue(String.valueOf(entry.getValue()));
-                                this.statusList.add(mapStatus);
+                                this.states.add(mapStatus);
                             }
                         }
                     }

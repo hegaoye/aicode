@@ -566,7 +566,7 @@ public class GeneratorSVImpl implements GenerateSV {
                         } else if (TemplateEngineEnum.Beetl == templateEngineEnum) {
                             msg = beetlHelper.generate(templateData, targetFilePath, templatePath);
                         }
-                        WSClientManager.sendMessage(msg);
+//                        WSClientManager.sendMessage(msg);
                     }
                 } else {
                     try {

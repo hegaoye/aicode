@@ -351,7 +351,7 @@ public class TemplateData implements Serializable {
                             for (Map.Entry<String, Object> entry : map.entrySet()) {
                                 MapStatus mapStatus = new MapStatus();
                                 mapStatus.setName(StringHelper.capitalize(entry.getKey()));
-                                mapStatus.setDesc(String.valueOf(entry.getValue()));
+                                mapStatus.setValue(String.valueOf(entry.getValue()));
                                 this.statusList.add(mapStatus);
                             }
                         }

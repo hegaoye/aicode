@@ -19,7 +19,7 @@ import lombok.Data;
 public class MapStatus implements java.io.Serializable {
 
     private String name;
-    private String desc;
+    private String value;
 
 }
 

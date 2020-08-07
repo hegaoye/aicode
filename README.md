@@ -128,6 +128,108 @@ docker logs --tail 1000 -f aicode
 docker restart|stop|start aicode
 ```
 
+### K8S 配置参考
+```
+###创建db####
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+        - name: mysql
+          image: hegaoye/mysql:1.0-beta
+          ports:
+            - containerPort: 3306
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: "888888" # 数据库的密码，修改为自己的
+          args: ["--lower_case_table_names=1"]
+      #注意 以下配置为发布在master主机上否则无法启动，如果有node节点可以删除此配置
+      tolerations:
+        - key: node-role.kubernetes.io/master
+          operator: Exists
+          effect: NoSchedule
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql
+spec:
+  ports:
+    - port: 3306
+      targetPort: 3306
+      nodePort: 30306
+  type: NodePort
+  selector:
+    app: mysql
+
+
+###创建aicode####
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aicode
+  labels:
+    app: aicode
+spec:
+  selector:
+    matchLabels:
+      app: aicode
+  template:
+    metadata:
+      labels:
+        app: aicode
+    spec:
+      containers:
+        - name: aicode
+          image: hegaoye/aicode:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: host
+              value: "mysql:3306" #对应db的service 名和开放的端口号 默认是3306
+            - name: username
+              value: "root"
+            - name: password
+              value: "888888"  # 数据库的密码 对应db中设置的
+      #注意 以下配置为发布在master主机上否则无法启动，如果有node节点可以删除此配置
+      tolerations:
+        - key: node-role.kubernetes.io/master
+          operator: Exists
+          effect: NoSchedule
+
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: aicode-svc
+spec:
+  ports:
+    - port: 8001
+      targetPort: 8080
+      nodePort: 30880
+  type: NodePort
+  selector:
+    app: aicode
+
+
+```
+
+
 ### 编写模板说明：
 模板语法采用freemarker编写，定义了一个实体类可以在项目``io.aicode.base.core.TemplateData`` 下找到此类，大致的内置变量可以如下图
 

@@ -2,9 +2,9 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: aicode
+  name: aicode-demo
   labels:
-    app: aicode
+    app: aicode-demo
 spec:
   replicas: 1
   selector:

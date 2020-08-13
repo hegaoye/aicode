@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
         - name: aicode-demo
-          image: $REGISTRY/$DOCKERHUB_NAMESPACE/$APP_NAME:SNAPSHOT-$BRANCH_NAME-$BUILD_NUMBER
+          image: $REGISTRY/$DOCKERHUB_NAMESPACE/$APP_NAME:SNAPSHOT-$BUILD_NUMBER
           ports:
             - containerPort: 8080
           env:

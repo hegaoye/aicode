@@ -31,6 +31,7 @@ pipeline {
             steps {
                 container ('maven') {
                     sh 'mvn clean'
+                    sh 'mvn install'
                 }
             }
         }

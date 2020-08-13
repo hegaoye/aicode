@@ -24,7 +24,7 @@ spec:
             - name: username
               value: "root"
             - name: password
-              value: "888888"  # 数据库的密码 对应db中设置的
+              value: "mysqladmin"  # 数据库的密码 对应db中设置的
 
 ---
 

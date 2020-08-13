@@ -34,27 +34,27 @@
     </build>
 
     <!--<repositories>-->
-        <!--&lt;!&ndash;<repository>&ndash;&gt;-->
-            <!--&lt;!&ndash;<id>public</id>&ndash;&gt;-->
-            <!--&lt;!&ndash;<name>aliyun nexus</name>&ndash;&gt;-->
-            <!--&lt;!&ndash;<url>http://maven.aliyun.com/nexus/content/groups/public/</url>&ndash;&gt;-->
-            <!--&lt;!&ndash;<releases>&ndash;&gt;-->
-                <!--&lt;!&ndash;<enabled>true</enabled>&ndash;&gt;-->
-            <!--&lt;!&ndash;</releases>&ndash;&gt;-->
-        <!--&lt;!&ndash;</repository>&ndash;&gt;-->
+    <!--<repository>-->
+    <!--<id>public</id>-->
+    <!--<name>aliyun nexus</name>-->
+    <!--<url>http://maven.aliyun.com/nexus/content/groups/public/</url>-->
+    <!--<releases>-->
+    <!--<enabled>true</enabled>-->
+    <!--</releases>-->
+    <!--</repository>-->
     <!--</repositories>-->
 
-    <!--<pluginRepositories>-->
-        <!--&lt;!&ndash;<pluginRepository>&ndash;&gt;-->
-            <!--&lt;!&ndash;<id>public</id>&ndash;&gt;-->
-            <!--&lt;!&ndash;<name>aliyun nexus</name>&ndash;&gt;-->
-            <!--&lt;!&ndash;<url>http://maven.aliyun.com/nexus/content/groups/public/</url>&ndash;&gt;-->
-            <!--&lt;!&ndash;<releases>&ndash;&gt;-->
-                <!--&lt;!&ndash;<enabled>true</enabled>&ndash;&gt;-->
-            <!--&lt;!&ndash;</releases>&ndash;&gt;-->
-            <!--&lt;!&ndash;<snapshots>&ndash;&gt;-->
-                <!--&lt;!&ndash;<enabled>false</enabled>&ndash;&gt;-->
-            <!--&lt;!&ndash;</snapshots>&ndash;&gt;-->
-        <!--&lt;!&ndash;</pluginRepository>&ndash;&gt;-->
-    <!--</pluginRepositories>-->
+    <pluginRepositories>
+        <pluginRepository>
+            <id>public</id>
+            <name>aliyun nexus</name>
+            <url>http://maven.aliyun.com/nexus/content/groups/public/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </pluginRepository>
+    </pluginRepositories>
 </project>

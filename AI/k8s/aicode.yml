@@ -21,7 +21,7 @@ spec:
       containers:
         - name: aicode-demo
 #          image: $REGISTRY/$DOCKERHUB_NAMESPACE/$APP_NAME:SNAPSHOT-$BUILD_NUMBER
-          image: image: hegaoye/aicode:latest
+          image: hegaoye/aicode:latest
           ports:
             - containerPort: 8080
           env:

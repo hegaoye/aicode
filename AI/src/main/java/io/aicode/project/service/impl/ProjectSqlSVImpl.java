@@ -18,7 +18,6 @@ import io.aicode.project.entity.Project;
 import io.aicode.project.entity.ProjectSql;
 import io.aicode.project.entity.ProjectSqlStateEnum;
 import io.aicode.project.service.ProjectSqlSV;
-import org.springframework.data.annotation.ReadOnlyProperty;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

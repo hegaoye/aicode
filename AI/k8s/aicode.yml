@@ -1,4 +1,3 @@
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -31,26 +30,3 @@ spec:
               value: "root"
             - name: password
               value: "mysqladmin"
-
----
-
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    app: aicode-demo
-    component: ks-aicode-dev
-  name: aicode-demo-svc
-  namespace: aicode-dev
-spec:
-  ports:
-    - name: http
-      protocol: TCP
-      port: 8080
-      targetPort: 8080
-      nodePort: 30888
-  type: NodePort
-  selector:
-    app: aicode-demo
-    component: ks-aicode-dev
-    tier: backend

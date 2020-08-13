@@ -36,7 +36,20 @@ pipeline {
             }
         }
 
-
+        stage('质量扫描') {
+          steps {
+            container ('maven') {
+              withCredentials([string(credentialsId: "$SONAR_CREDENTIAL_ID", variable: 'SONAR_TOKEN')]) {
+                withSonarQubeEnv('sonar') {
+                 sh "mvn sonar:sonar -o -gs `pwd`/AI/settings.xml -Dsonar.branch=$BRANCH_NAME -Dsonar.login=$SONAR_TOKEN"
+                }
+              }
+              timeout(time: 1, unit: 'HOURS') {
+                waitForQualityGate abortPipeline: true
+              }
+            }
+          }
+        }
 
         stage ('打包镜像') {
             steps {

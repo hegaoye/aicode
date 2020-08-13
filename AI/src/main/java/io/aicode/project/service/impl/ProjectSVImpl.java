@@ -335,8 +335,10 @@ public class ProjectSVImpl extends BaseMybatisSVImpl<Project, Long> implements P
 
             MapClassTable mapClassTable = new MapClassTable(String.valueOf(uidGenerator.getUID()), table.getTableName(), table.getTableComment());
             mapClassTable.toJava();
-            projectMapDAO.insert(new ProjectMap(project.getCode(), mapClassTable.getCode()));//保存项目与表的关系
-            mapClassTableDAO.insert(mapClassTable);//保存项目表信息
+            //保存项目与表的关系
+            projectMapDAO.insert(new ProjectMap(project.getCode(), mapClassTable.getCode()));
+            //保存项目表信息
+            mapClassTableDAO.insert(mapClassTable);
 
 
             List<MapFieldColumn> mapFieldColumns = new ArrayList<>();
@@ -350,11 +352,17 @@ public class ProjectSVImpl extends BaseMybatisSVImpl<Project, Long> implements P
                 mapFieldColumn.setDefaultValue(column.getColumnDefault());
                 mapFieldColumn.setIsPrimaryKey(DatabaseDataTypesUtils.isPrimaryKey(column.getColumnKey()) ? YNEnum.Y.name() : YNEnum.N.name());
                 mapFieldColumn.setIsDate(DatabaseDataTypesUtils.isDate(column.getDataType()) ? YNEnum.Y.name() : YNEnum.N.name());
-                mapFieldColumn.setIsState(DatabaseDataTypesUtils.isState(column.getColumnName()) ? YNEnum.Y.name() : YNEnum.N.name());
+                mapFieldColumn.setIsState(DatabaseDataTypesUtils.isStateOrType(column.getDataType()) ? YNEnum.Y.name() : YNEnum.N.name());
+                if (YNEnum.N == YNEnum.getYN(mapFieldColumn.getIsState())) {
+                    Map<String, Object> objectMap = StringTools.getStateOrType(column.getColumnComment());
+                    YNEnum ynEnum = null != objectMap && !objectMap.isEmpty() ? YNEnum.Y : YNEnum.N;
+                    mapFieldColumn.setIsState(ynEnum.name());
+                }
                 mapFieldColumn.toJava();
                 mapFieldColumns.add(mapFieldColumn);
             });
-            mapFieldColumnDAO.batchInsert(mapFieldColumns);//保存表的列信息
+            //保存表的列信息
+            mapFieldColumnDAO.batchInsert(mapFieldColumns);
         });
 
         project.setIsParseTable(YNEnum.Y.name());

@@ -248,7 +248,7 @@ public class GeneratorSVImpl implements GenerateSV {
             Frameworks frameworks = projectFramwork.getFrameworks();
             if (frameworks.getGitHome() != null) {
                 String project_template_Path = template_Path + frameworks.getGitHome().substring(frameworks.getGitHome().lastIndexOf("/") + 1).replace(".git", "");
-                FileUtil.delFolder(project_template_Path);
+                FileUtils.deleteQuietly(new File(project_template_Path));
             }
         }
     }
@@ -566,7 +566,7 @@ public class GeneratorSVImpl implements GenerateSV {
                         } else if (TemplateEngineEnum.Beetl == templateEngineEnum) {
                             msg = beetlHelper.generate(templateData, targetFilePath, templatePath);
                         }
-                        WSClientManager.sendMessage(msg);
+//                        WSClientManager.sendMessage(msg);
                     }
                 } else {
                     try {

@@ -21,7 +21,7 @@ spec:
             - containerPort: 8080
           env:
             - name: host
-              value: "mysql:3306" #对应db的service 名和开放的端口号 默认是3306
+              value: "mysql.aicode:3306" #对应db的service 名和开放的端口号 默认是3306
             - name: username
               value: "root"
             - name: password

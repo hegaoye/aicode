@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: aicode-demo
+  namespace: aicode-demo-dev
   labels:
     app: aicode-demo
 spec:
@@ -31,7 +32,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  labels:
+    app: aicode-demo
   name: aicode-demo-svc
+  namespace: aicode-demo-dev
 spec:
   ports:
     - port: 8080
@@ -40,3 +44,10 @@ spec:
   type: NodePort
   selector:
     app: aicode-demo
+
+---
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: aicode-demo-dev

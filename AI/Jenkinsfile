@@ -5,17 +5,29 @@ pipeline {
     }
 
   }
+
+  environment {
+      DOCKER_CREDENTIAL_ID = 'harbor-id'
+      GITHUB_CREDENTIAL_ID = 'github-id'
+      KUBECONFIG_CREDENTIAL_ID = 'kubeconfig-id'
+      REGISTRY = 'hub.subo.tw'
+      DOCKERHUB_NAMESPACE = 'ruoyi'
+      GITHUB_ACCOUNT = 'hegaoye@qq.com'
+      APP_NAME = 'aicode'
+  }
+
+
   stages {
-    stage('拉取代码') {
+    stage('拉取源代码') {
       steps {
         git(url: 'https://github.com/hegaoye/ai-code.git', credentialsId: 'github-id', branch: 'feature/create-docker', changelog: true, poll: false)
       }
     }
-    stage('测试') {
+    stage('单元测试') {
       steps {
         container('maven') {
-          sh 'mvn clean'
-          sh 'mvn install'
+          sh '''mvn clean install
+'''
         }
 
       }
@@ -25,7 +37,8 @@ pipeline {
         container('maven') {
           sh 'mvn clean package'
           sh 'docker build -f AI/Dockerfile -t $REGISTRY/$DOCKERHUB_NAMESPACE/$APP_NAME:SNAPSHOT-$BUILD_NUMBER .'
-          withCredentials([usernamePassword(credentialsId : 'dockerhub-id' ,passwordVariable : 'DOCKER_PASSWORD' ,usernameVariable : 'DOCKER_USERNAME' ,)]) {
+
+          withCredentials([usernamePassword(credentialsId : 'harbor-id' ,passwordVariable : 'DOCKER_PASSWORD' ,usernameVariable : 'DOCKER_PASSWORD' ,)]) {
             sh 'echo "$DOCKER_PASSWORD" | docker login $REGISTRY -u "$DOCKER_USERNAME" --password-stdin'
             sh 'docker push $REGISTRY/$DOCKERHUB_NAMESPACE/$APP_NAME:SNAPSHOT-$BUILD_NUMBER'
           }
@@ -42,7 +55,7 @@ pipeline {
     stage('部署至 Dev 环境') {
       steps {
         input(message: '@admin  ', submitter: 'admin')
-        kubernetesDeploy(enableConfigSubstitution: true, deleteResource: false, kubeconfigId: 'kubeconfig-id', configs: 'AI/k8s/**')
+        kubernetesDeploy(enableConfigSubstitution: true, deleteResource: false, kubeconfigId: 'kubeconfig-id', configs: 'AI/aicode.yml')
       }
     }
   }

@@ -61,26 +61,26 @@ jdbc.password=xxxxx
 修改完毕后可以直接启动,启动默认为``8080``端口
 浏览器中打开输入：``http://127.0.0.1:8080/index.html``
 默认账户:``admin  888888``尝试登录，你可以在数据库中修改次账户数据表明为``account``
-![Image text](https://gitee.com/helixin/AI-Code/raw/dev/images/index.png)
+![Image text](https://gitee.com/helixin/aicode/raw/dev/images/index.png)
 
 参考已有项目的效果
-![Image text](https://gitee.com/helixin/AI-Code/raw/dev/images/aicode_index.png)
+![Image text](https://gitee.com/helixin/aicode/raw/dev/images/aicode_index.png)
 
 ### 模板仓库添加
 在你登陆后你可以添加自己的模板仓库
 
-![Image text](https://gitee.com/helixin/AI-Code/raw/dev/images/aicode_templates.png)
+![Image text](https://gitee.com/helixin/aicode/raw/dev/images/aicode_templates.png)
 
 ### 创建项目
 有了模板之后可以创业见一个项目，然后按照``下一步``的指引操作下去即可完成操作
 (此处为gif动画需要你登录账户才能看，osc的限制)
-![image text](https://gitee.com/helixin/AI-Code/raw/dev/images/show.gif)
+![image text](https://gitee.com/helixin/aicode/raw/dev/images/show.gif)
 
 ### 构建项目
 构建很简单，点击即可自动完成对项目的生成，下载模板，生成代码，提交到git仓库，这个地方的日志输出是websocket，存储文档log可以反复查看
 十分方便
 (此处为gif动画需要你登录账户才能看，osc的限制)
-![Image text](https://gitee.com/helixin/AI-Code/raw/dev/images/build.gif)
+![Image text](https://gitee.com/helixin/aicode/raw/dev/images/build.gif)
 
 之后点击``构建项目`` 按钮就开始进行想的自动构建了
 
@@ -88,10 +88,10 @@ jdbc.password=xxxxx
 当你生成项目代码后你可以在你的``git svn``仓库中找到源码，也可以直接下载源码自行导入到开发工具中，然后运行，这里需要注意的是配置文件和
 数据库的连接一定要修改，否则默认的将无法使用，一下为测试演示的界面图供参考
 代码界面和运行启动项目 我用的是Idea 最好用的java开发工具，没有之一，开发用就用最好的工具，不将就
-![Image text](https://gitee.com/helixin/AI-Code/raw/dev/images/running.png)
+![Image text](https://gitee.com/helixin/aicode/raw/dev/images/running.png)
 
 swagger界面如下，我只用了一个简单的表来演示，你的要有多复杂就有多复杂均可以实现
-![Image text](https://gitee.com/helixin/AI-Code/raw/dev/images/swagger.png)
+![Image text](https://gitee.com/helixin/aicode/raw/dev/images/swagger.png)
 
 如果你体验了高效的代码生成和抽象思维把规律的重复的代码进行模板化后可以服务你未来更久的时间，那时候就体验到，编程除了用coding还可以用设计
 来编码，所谓武功至高境界就是``无招胜有招`` 就是这个意思，让代码服务你更久才有时间学习更多的技术和知识，让今天的一行代码在未来体现出更大价
@@ -229,32 +229,70 @@ spec:
 
 ```
 
+### 本地部署 nginx配置
+```
+upstream api{
+   ip_hash;
+   server 192.168.0.215:8080;
+}
 
+server {
+        listen       80;
+        server_name  hegaoye.com www.hegaoye.com;
+        gzip on;
+        gzip_min_length  5k;
+        gzip_buffers     4 16k;
+        gzip_http_version 1.0;
+        gzip_comp_level 3;
+        gzip_types     image/jpeg image/gif image/png image/ico text/plain application/x-javascript text/css text/javascript application/apk  application/json;
+        gzip_vary on;
+        gzip_disable "MSIE [1-6].";
+        charset utf-8;
+        add_header Access-Control-Allow-Origin *;
+        add_header Access-Control-Allow-Methods 'GET,POST';
+        add_header Access-Control-Allow-Headers 'DNT,X-Mx-ReqToken,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Authorization';        
+        
+       location / {
+           proxy_pass   http://api;
+           proxy_set_header Host $host;
+           proxy_set_header X-Real-IP $remote_addr;
+           proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+              
+           proxy_http_version 1.1;
+           proxy_set_header Upgrade $http_upgrade;
+           proxy_set_header Connection "Upgrade";
+           proxy_connect_timeout 4s;
+           proxy_read_timeout 12h;
+           proxy_send_timeout 12s;
+       }
+}
+
+```
 ### 编写模板说明：
 模板语法采用freemarker编写，定义了一个实体类可以在项目``io.aicode.base.core.TemplateData`` 下找到此类，大致的内置变量可以如下图
 
-![Image text](https://gitee.com/helixin/AI-Code/raw/dev/images/aicode_help.png)
+![Image text](https://gitee.com/helixin/aicode/raw/dev/images/aicode_help.png)
 
 如果你需要编写自己的模板按照这里面的规则即可完成编写，如果需要参考已有模板请看顶部的连接分享你可以根据自己的需求修改一个出来然后也分享出来让大家
 享受你的技术带来的便捷。
 ### UML参考
 uml信息可以自己打开vpp文件查看详细，仅仅放两张用于参考
-![Image text](https://gitee.com/helixin/AI-Code/raw/dev/images/models.jpg)
+![Image text](https://gitee.com/helixin/aicode/raw/dev/images/models.jpg)
 
-![Image text](https://gitee.com/helixin/AI-Code/raw/dev/images/active.jpg)
+![Image text](https://gitee.com/helixin/aicode/raw/dev/images/active.jpg)
 
 ### 模板长啥样？
 模块化模板样貌
-![Image text](https://gitee.com/helixin/AI-Code/raw/dev/images/tmp4.png)
+![Image text](https://gitee.com/helixin/aicode/raw/dev/images/tmp4.png)
 
 Ctrl模板类
-![Image text](https://gitee.com/helixin/AI-Code/raw/dev/images/tmp1.png)
+![Image text](https://gitee.com/helixin/aicode/raw/dev/images/tmp1.png)
 
 mybatis sql 模板注意观察有关联关系哦
-![Image text](https://gitee.com/helixin/AI-Code/raw/dev/images/tm2.png)
+![Image text](https://gitee.com/helixin/aicode/raw/dev/images/tm2.png)
 
 前端模板抽离样貌
-![Image text](https://gitee.com/helixin/AI-Code/raw/dev/images/tmp3.png)
+![Image text](https://gitee.com/helixin/aicode/raw/dev/images/tmp3.png)
 
 
 

@@ -3,6 +3,9 @@
  */
 package com.aicode.map.entity;
 
+import com.aicode.display.vo.DisplayAttributeVO;
+import com.aicode.map.vo.MapRelationshipVO;
+import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 import lombok.experimental.Accessors;
@@ -79,5 +82,10 @@ public class MapFieldColumn implements java.io.Serializable {
      */
     @ApiModelProperty(value = "是否是状态")
     private java.lang.String isState;
+
+    @TableField(exist = false)
+    private DisplayAttributeVO displayAttribute;
+    @TableField(exist = false)
+    private MapRelationshipVO mapRelationship;
 
 }

@@ -18,7 +18,7 @@ public final class R implements Serializable {
     /**
      * 失败 false  传递 异常枚举对象
      */
-    public static R failed(String code, String msg) {
+    public static R failed(String msg) {
         return new R(false, msg, null);
     }
 

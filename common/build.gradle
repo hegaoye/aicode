@@ -1,0 +1,30 @@
+apply plugin: 'java'
+apply plugin: 'idea'
+
+sourceCompatibility = 1.8
+[compileJava, compileTestJava, javadoc]*.options*.encoding = 'UTF-8'
+
+repositories {
+    maven { url 'https://plugins.gradle.org/m2/' }
+    maven { url 'https://repo.spring.io/milestone' }
+    maven { url 'http://maven.jahia.org/maven2' }
+    mavenCentral()
+    jcenter()
+}
+
+
+dependencies {
+    implementation 'com.baomidou:mybatis-plus-generator:3.1.2'
+    implementation 'com.baomidou:mybatis-plus-boot-starter:3.1.2'
+
+    implementation 'cn.hutool:hutool-all:5.1.5'
+    implementation 'com.alibaba:fastjson:1.2.66'
+    implementation 'com.baomidou:mybatis-plus-generator:3.1.2'
+
+    implementation "org.springframework.boot:spring-boot-starter-data-redis:2.2.6.RELEASE"
+    implementation "redis.clients:jedis:3.0.1"
+    compileOnly 'org.projectlombok:lombok:1.18.12'
+    annotationProcessor 'org.projectlombok:lombok:1.18.12'
+
+    implementation project(path: ":core")
+}

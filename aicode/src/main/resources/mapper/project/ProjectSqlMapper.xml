@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aicode.project.dao.mapper.ProjectSqlMapper">
+    <resultMap id="rs_base" type="com.aicode.project.entity.ProjectSql">
+        <result property="id" column="id"/>
+        <result property="projectCode" column="projectCode"/>
+        <result property="code" column="code"/>
+        <result property="tsql" column="tsql"/>
+        <result property="state" column="state"/>
+    </resultMap>
+
+
+    <sql id="columns">
+    id,projectCode,code,tsql,state
+    </sql>
+
+    <sql id="where">
+        <where>
+            <if test="id!=null and id!=''">
+                AND id = #{id}
+            </if>
+            <if test="projectCode!=null and projectCode!=''">
+                AND projectCode = #{projectCode}
+            </if>
+            <if test="codes!=null and codes!=''">
+                AND code in
+                <foreach collection="codes" index="index" item="stateIn" open="(" separator="," close=")">
+                    #{stateIn}
+                </foreach>
+            </if>
+            <if test="tsqls!=null and tsqls!=''">
+                AND tsql in
+                <foreach collection="tsqls" index="index" item="stateIn" open="(" separator="," close=")">
+                    #{stateIn}
+                </foreach>
+            </if>
+            <if test="state!=null and state!=''">
+                AND state = #{state}
+            </if>
+        </where>
+    </sql>
+
+</mapper>

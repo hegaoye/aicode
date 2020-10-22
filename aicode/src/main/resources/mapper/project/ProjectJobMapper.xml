@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aicode.project.dao.mapper.ProjectJobMapper">
+    <resultMap id="rs_base" type="com.aicode.project.entity.ProjectJob">
+        <result property="id" column="id"/>
+        <result property="projectCode" column="projectCode"/>
+        <result property="code" column="code"/>
+        <result property="number" column="number"/>
+        <result property="state" column="state"/>
+        <result property="createTime" column="createTime"/>
+    </resultMap>
+
+
+    <sql id="columns">
+    id,projectCode,code,number,state,createTime
+    </sql>
+
+    <sql id="where">
+        <where>
+            <if test="id!=null and id!=''">
+                AND id = #{id}
+            </if>
+            <if test="projectCode!=null and projectCode!=''">
+                AND projectCode = #{projectCode}
+            </if>
+            <if test="code!=null and code!=''">
+                AND code = #{code}
+            </if>
+            <if test="number!=null and number!=''">
+                AND number = #{number}
+            </if>
+            <if test="state!=null and state!=''">
+                AND state = #{state}
+            </if>
+            <if test="createTimeBegin!=null">
+                AND createTime >= #{createTimeBegin}
+            </if>
+            <if test="createTimeEnd!=null">
+                AND createTime &lt;= #{createTimeEnd}
+            </if>
+        </where>
+    </sql>
+
+</mapper>

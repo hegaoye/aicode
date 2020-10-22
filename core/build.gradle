@@ -1,0 +1,63 @@
+apply plugin: 'java'
+apply plugin: 'idea'
+
+sourceCompatibility = 1.8
+[compileJava, compileTestJava, javadoc]*.options*.encoding = 'UTF-8'
+
+repositories {
+    maven { url "https://plugins.gradle.org/m2/" }
+    maven { url "https://repo.spring.io/milestone" }
+    maven { url "http://maven.jahia.org/maven2" }
+    maven { url "http://oss.jfrog.org/artifactory/oss-snapshot-local/" }
+
+    mavenCentral()
+    jcenter()
+}
+
+dependencies {
+    //-----------jwt Nimbus JOSE+JWT  start--------------
+    implementation 'com.auth0:java-jwt:3.2.0'
+    //-----------jwt Nimbus JOSE+JWT  end--------------
+
+    //----------- commons  start--------------
+    implementation 'org.apache.commons:commons-lang3:3.4'
+    implementation 'commons-beanutils:commons-beanutils:1.9.2'
+    implementation 'commons-codec:commons-codec:1.6'
+    implementation 'commons-collections:commons-collections:3.2.1'
+    implementation 'commons-dbcp:commons-dbcp:1.2.2'
+    implementation 'commons-discovery:commons-discovery:0.2'
+    implementation 'commons-fileupload:commons-fileupload:1.2.1'
+    implementation 'commons-httpclient:commons-httpclient:3.0.1'
+    implementation 'commons-io:commons-io:2.4'
+    implementation 'commons-lang:commons-lang:2.5'
+    implementation 'commons-logging:commons-logging:1.2'
+    implementation 'commons-logging:commons-logging-api:1.1'
+    implementation 'commons-pool:commons-pool:1.6'
+    implementation 'org.apache.commons:commons-pool2:2.4.2'
+    implementation 'commons-net:commons-net:3.6'
+    //-----------commons   end--------------
+
+    // -----------okhttp start--------------
+    implementation 'com.squareup.okhttp3:okhttp:4.0.0'
+    implementation 'com.squareup.okhttp3:logging-interceptor:4.0.0'
+    //-----------okhttp end--------------
+
+    //-----------swagger2 start--------------
+    implementation 'io.springfox:springfox-swagger2:2.9.2'
+    implementation 'com.github.xiaoymin:swagger-bootstrap-ui:1.9.4'
+//    implementation 'io.springfox:springfox-swagger-ui:2.9.2'
+    //-----------swagger2 end--------------
+
+    compileOnly 'org.projectlombok:lombok:1.18.12'
+    annotationProcessor 'org.projectlombok:lombok:1.18.12'
+    implementation 'com.alibaba:fastjson:1.2.66'
+
+    //-----------redis start--------------
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis:2.2.6.RELEASE'
+    implementation 'redis.clients:jedis:3.0.1'
+    //-----------redis end--------------
+
+    implementation 'cn.hutool:hutool-all:5.1.5'
+
+}
+

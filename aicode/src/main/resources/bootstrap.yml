@@ -1,0 +1,234 @@
+spring:
+  application:
+    name: newaicode-api
+  cloud:
+
+    #注册中心配置
+    nacos:
+      discovery:
+        server-addr: ${REGISTER_HOST:192.168.0.250}:${REGISTER_PORT:8848}
+        group: DEFAULT_GROUP
+        namespace: 4fd50f88-83d5-49c3-9f4e-304d17b2a356
+      config:
+        server-addr: ${REGISTER_HOST:192.168.0.250}:${REGISTER_PORT:8848}
+        group: DEFAULT_GROUP
+        name: draw-lottery-cache
+        file-extension: yml
+        namespace: 4fd50f88-83d5-49c3-9f4e-304d17b2a356
+
+    #消息队列 配置
+    stream:
+      bindings:
+        buildFrameworksTemplateOutput:
+          content-type: application/json
+          destination: FrameworksTemplate_To
+        buildProjectJobLogsOutput:
+          content-type: application/json
+          destination: ProjectJobLogs_To
+        buildDisplayAttributeOutput:
+          content-type: application/json
+          destination: DisplayAttribute_To
+        buildProjectModuleOutput:
+          content-type: application/json
+          destination: ProjectModule_To
+        buildModuleFileOutput:
+          content-type: application/json
+          destination: ModuleFile_To
+        buildMapFieldColumnOutput:
+          content-type: application/json
+          destination: MapFieldColumn_To
+        buildProjectModelOutput:
+          content-type: application/json
+          destination: ProjectModel_To
+        buildAccountOutput:
+          content-type: application/json
+          destination: Account_To
+        buildProjectModelClassOutput:
+          content-type: application/json
+          destination: ProjectModelClass_To
+        buildProjectOutput:
+          content-type: application/json
+          destination: Project_To
+        buildMapClassTableOutput:
+          content-type: application/json
+          destination: MapClassTable_To
+        buildProjectJobOutput:
+          content-type: application/json
+          destination: ProjectJob_To
+        buildModuleOutput:
+          content-type: application/json
+          destination: Module_To
+        buildProjectRepositoryAccountOutput:
+          content-type: application/json
+          destination: ProjectRepositoryAccount_To
+        buildFrameworksOutput:
+          content-type: application/json
+          destination: Frameworks_To
+        buildProjectMapOutput:
+          content-type: application/json
+          destination: ProjectMap_To
+        buildMapRelationshipOutput:
+          content-type: application/json
+          destination: MapRelationship_To
+        buildProjectFramworkOutput:
+          content-type: application/json
+          destination: ProjectFramwork_To
+        buildProjectCodeCatalogOutput:
+          content-type: application/json
+          destination: ProjectCodeCatalog_To
+        buildProjectSqlOutput:
+          content-type: application/json
+          destination: ProjectSql_To
+        buildSettingOutput:
+          content-type: application/json
+          destination: Setting_To
+        buildFrameworksTemplateInput:
+          content-type: application/json
+          destination: FrameworksTemplate_To
+          group: FrameworksTemplate_group
+        buildProjectJobLogsInput:
+          content-type: application/json
+          destination: ProjectJobLogs_To
+          group: ProjectJobLogs_group
+        buildDisplayAttributeInput:
+          content-type: application/json
+          destination: DisplayAttribute_To
+          group: DisplayAttribute_group
+        buildProjectModuleInput:
+          content-type: application/json
+          destination: ProjectModule_To
+          group: ProjectModule_group
+        buildModuleFileInput:
+          content-type: application/json
+          destination: ModuleFile_To
+          group: ModuleFile_group
+        buildMapFieldColumnInput:
+          content-type: application/json
+          destination: MapFieldColumn_To
+          group: MapFieldColumn_group
+        buildProjectModelInput:
+          content-type: application/json
+          destination: ProjectModel_To
+          group: ProjectModel_group
+        buildAccountInput:
+          content-type: application/json
+          destination: Account_To
+          group: Account_group
+        buildProjectModelClassInput:
+          content-type: application/json
+          destination: ProjectModelClass_To
+          group: ProjectModelClass_group
+        buildProjectInput:
+          content-type: application/json
+          destination: Project_To
+          group: Project_group
+        buildMapClassTableInput:
+          content-type: application/json
+          destination: MapClassTable_To
+          group: MapClassTable_group
+        buildProjectJobInput:
+          content-type: application/json
+          destination: ProjectJob_To
+          group: ProjectJob_group
+        buildModuleInput:
+          content-type: application/json
+          destination: Module_To
+          group: Module_group
+        buildProjectRepositoryAccountInput:
+          content-type: application/json
+          destination: ProjectRepositoryAccount_To
+          group: ProjectRepositoryAccount_group
+        buildFrameworksInput:
+          content-type: application/json
+          destination: Frameworks_To
+          group: Frameworks_group
+        buildProjectMapInput:
+          content-type: application/json
+          destination: ProjectMap_To
+          group: ProjectMap_group
+        buildMapRelationshipInput:
+          content-type: application/json
+          destination: MapRelationship_To
+          group: MapRelationship_group
+        buildProjectFramworkInput:
+          content-type: application/json
+          destination: ProjectFramwork_To
+          group: ProjectFramwork_group
+        buildProjectCodeCatalogInput:
+          content-type: application/json
+          destination: ProjectCodeCatalog_To
+          group: ProjectCodeCatalog_group
+        buildProjectSqlInput:
+          content-type: application/json
+          destination: ProjectSql_To
+          group: ProjectSql_group
+        buildSettingInput:
+          content-type: application/json
+          destination: Setting_To
+          group: Setting_group
+
+      rocketmq:
+        bindings:
+          buildFrameworksTemplateOutput:
+            producer:
+              group: FrameworksTemplate_group
+          buildProjectJobLogsOutput:
+            producer:
+              group: ProjectJobLogs_group
+          buildDisplayAttributeOutput:
+            producer:
+              group: DisplayAttribute_group
+          buildProjectModuleOutput:
+            producer:
+              group: ProjectModule_group
+          buildModuleFileOutput:
+            producer:
+              group: ModuleFile_group
+          buildMapFieldColumnOutput:
+            producer:
+              group: MapFieldColumn_group
+          buildProjectModelOutput:
+            producer:
+              group: ProjectModel_group
+          buildAccountOutput:
+            producer:
+              group: Account_group
+          buildProjectModelClassOutput:
+            producer:
+              group: ProjectModelClass_group
+          buildProjectOutput:
+            producer:
+              group: Project_group
+          buildMapClassTableOutput:
+            producer:
+              group: MapClassTable_group
+          buildProjectJobOutput:
+            producer:
+              group: ProjectJob_group
+          buildModuleOutput:
+            producer:
+              group: Module_group
+          buildProjectRepositoryAccountOutput:
+            producer:
+              group: ProjectRepositoryAccount_group
+          buildFrameworksOutput:
+            producer:
+              group: Frameworks_group
+          buildProjectMapOutput:
+            producer:
+              group: ProjectMap_group
+          buildMapRelationshipOutput:
+            producer:
+              group: MapRelationship_group
+          buildProjectFramworkOutput:
+            producer:
+              group: ProjectFramwork_group
+          buildProjectCodeCatalogOutput:
+            producer:
+              group: ProjectCodeCatalog_group
+          buildProjectSqlOutput:
+            producer:
+              group: ProjectSql_group
+          buildSettingOutput:
+            producer:
+              group: Setting_group

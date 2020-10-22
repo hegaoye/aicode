@@ -1,0 +1,109 @@
+buildscript {
+    ext {
+        springBootVersion = '2.2.6.RELEASE'
+    }
+    repositories {
+        maven { url "https://plugins.gradle.org/m2/" }
+        maven { url "https://repo.spring.io/milestone" }
+        maven { url "http://repo.spring.io/release" }
+        maven { url "http://repo.spring.io/snapshot" }
+        maven { url "http://maven.jahia.org/maven2" }
+        maven { url "http://oss.jfrog.org/artifactory/oss-snapshot-local/" }
+
+        mavenCentral()
+        jcenter()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'idea'
+//apply plugin: 'spring-boot'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+
+sourceCompatibility = 1.8
+[compileJava, compileTestJava, javadoc]*.options*.encoding = 'UTF-8'
+
+repositories {
+    maven { url "https://plugins.gradle.org/m2/" }
+    maven { url "https://repo.spring.io/milestone" }
+    maven { url "http://repo.spring.io/release" }
+    maven { url "http://repo.spring.io/snapshot" }
+    maven { url "http://maven.jahia.org/maven2" }
+    maven { url "http://oss.jfrog.org/artifactory/oss-snapshot-local/" }
+
+    mavenCentral()
+    jcenter()
+}
+
+ext {
+    set('springCloudVersion', 'Hoxton.SR2')
+    set('springCloudAlibabaVersion', '2.2.0.RELEASE')
+
+}
+dependencies {
+
+    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign:2.2.2.RELEASE'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+    implementation 'com.alibaba.cloud:spring-cloud-starter-alibaba-nacos-discovery:2.2.0.RELEASE'
+    implementation 'com.alibaba.cloud:spring-cloud-starter-alibaba-nacos-config:2.2.0.RELEASE'
+    implementation 'com.alibaba.cloud:spring-cloud-starter-alibaba-sentinel'
+    implementation 'com.alibaba.boot:nacos-config-spring-boot-starter:0.2.4'
+
+    //----------- ignite start--------------
+    implementation 'org.apache.ignite:ignite-core:2.7.0'
+    implementation 'org.apache.ignite:ignite-spring:2.7.0'
+    implementation 'org.apache.ignite:ignite-indexing:2.7.0'
+    //----------- ignite end--------------
+
+    //----------- rocketmq start--------------
+    implementation 'com.alibaba.cloud:spring-cloud-stream-binder-rocketmq:2.2.0.RELEASE'
+    //----------- rocketmq end--------------
+
+    //----------- mybatis mysql druid start--------------
+    implementation 'mysql:mysql-connector-java:8.0.15'
+    implementation 'com.alibaba:druid:1.1.19'
+    implementation 'com.alibaba:druid-spring-boot-starter:1.1.10'
+    implementation 'com.baomidou:mybatis-plus-generator:3.1.2'
+    implementation 'com.baomidou:mybatis-plus-boot-starter:3.1.2'
+    //-----------mybatis mysql druid end--------------
+
+    //-----------redis start--------------
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis:2.2.6.RELEASE'
+    implementation 'redis.clients:jedis:3.0.1'
+    //-----------redis end--------------
+
+
+    //-----------swagger2 start--------------
+    implementation 'io.springfox:springfox-swagger2:2.9.2'
+    implementation 'com.github.xiaoymin:swagger-bootstrap-ui:1.9.4'
+    //-----------swagger2 end--------------
+
+    compileOnly 'org.projectlombok:lombok:1.18.12'
+    annotationProcessor 'org.projectlombok:lombok:1.18.12'
+
+    implementation 'com.alibaba:fastjson:1.2.59'
+    implementation 'com.github.ben-manes.caffeine:caffeine:2.8.1'
+    implementation 'com.github.pagehelper:pagehelper:5.1.11'
+
+    implementation project(path: ':core')
+    implementation project(path: ':common')
+    implementation project(path: ':facade')
+
+    implementation fileTree(dir: 'libs', include: ['uid-generator-1.0.0-SNAPSHOT.jar'])
+//    implementation 'org.springframework.boot:spring-boot-devtools'
+    testImplementation('org.springframework.boot:spring-boot-starter-test')
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+        mavenBom "com.alibaba.cloud:spring-cloud-alibaba-dependencies:${springCloudAlibabaVersion}"
+
+    }
+}

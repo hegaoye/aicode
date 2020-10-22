@@ -1,0 +1,27 @@
+apply plugin: 'java'
+apply plugin: 'idea'
+
+sourceCompatibility = 1.8
+[compileJava, compileTestJava, javadoc]*.options*.encoding = "UTF-8"
+
+repositories {
+    maven { url "https://plugins.gradle.org/m2/" }
+    maven { url "https://repo.spring.io/milestone" }
+    maven { url "http://maven.jahia.org/maven2" }
+    mavenCentral()
+    jcenter()
+}
+
+dependencies {
+    implementation 'io.springfox:springfox-swagger2:2.9.2'
+
+    //----------- rocketmq start--------------
+    implementation 'com.alibaba.cloud:spring-cloud-stream-binder-rocketmq:2.2.0.RELEASE'
+    //----------- rocketmq end--------------
+    
+    implementation project(path: ":core")
+    implementation project(path: ":common")
+    implementation 'com.baomidou:mybatis-plus-generator:3.3.1'
+    compileOnly 'org.projectlombok:lombok:1.18.12'
+    annotationProcessor 'org.projectlombok:lombok:1.18.12'
+}

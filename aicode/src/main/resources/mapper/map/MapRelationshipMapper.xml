@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aicode.map.dao.mapper.MapRelationshipMapper">
+    <resultMap id="rs_base" type="com.aicode.map.entity.MapRelationship">
+        <result property="id" column="id"/>
+        <result property="code" column="code"/>
+        <result property="mapClassTableCode" column="mapClassTableCode"/>
+        <result property="associateCode" column="associateCode"/>
+        <result property="isOneToOne" column="isOneToOne"/>
+        <result property="isOneToMany" column="isOneToMany"/>
+        <result property="mainField" column="mainField"/>
+        <result property="joinField" column="joinField"/>
+    </resultMap>
+
+
+    <sql id="columns">
+    id,code,mapClassTableCode,associateCode,isOneToOne,isOneToMany,mainField,joinField
+    </sql>
+
+    <sql id="where">
+        <where>
+            <if test="id!=null and id!=''">
+                AND id = #{id}
+            </if>
+            <if test="code!=null and code!=''">
+                AND code = #{code}
+            </if>
+            <if test="mapClassTableCode!=null and mapClassTableCode!=''">
+                AND mapClassTableCode = #{mapClassTableCode}
+            </if>
+            <if test="associateCode!=null and associateCode!=''">
+                AND associateCode = #{associateCode}
+            </if>
+            <if test="isOneToOnes!=null and isOneToOnes!=''">
+                AND isOneToOne in
+                <foreach collection="isOneToOnes" index="index" item="stateIn" open="(" separator="," close=")">
+                    #{stateIn}
+                </foreach>
+            </if>
+            <if test="isOneToManys!=null and isOneToManys!=''">
+                AND isOneToMany in
+                <foreach collection="isOneToManys" index="index" item="stateIn" open="(" separator="," close=")">
+                    #{stateIn}
+                </foreach>
+            </if>
+            <if test="mainField!=null and mainField!=''">
+                AND mainField = #{mainField}
+            </if>
+            <if test="joinField!=null and joinField!=''">
+                AND joinField = #{joinField}
+            </if>
+        </where>
+    </sql>
+
+</mapper>

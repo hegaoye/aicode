@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aicode.map.dao.mapper.MapFieldColumnMapper">
+    <resultMap id="rs_base" type="com.aicode.map.entity.MapFieldColumn">
+        <result property="id" column="id"/>
+        <result property="mapClassTableCode" column="mapClassTableCode"/>
+        <result property="code" column="code"/>
+        <result property="column" column="column"/>
+        <result property="field" column="field"/>
+        <result property="sqlType" column="sqlType"/>
+        <result property="fieldType" column="fieldType"/>
+        <result property="notes" column="notes"/>
+        <result property="defaultValue" column="defaultValue"/>
+        <result property="isPrimaryKey" column="isPrimaryKey"/>
+        <result property="isDate" column="isDate"/>
+        <result property="isState" column="isState"/>
+    </resultMap>
+
+
+    <sql id="columns">
+    id,mapClassTableCode,code,column,field,sqlType,fieldType,notes,defaultValue,isPrimaryKey,isDate,isState
+    </sql>
+
+    <sql id="where">
+        <where>
+            <if test="id!=null and id!=''">
+                AND id = #{id}
+            </if>
+            <if test="mapClassTableCode!=null and mapClassTableCode!=''">
+                AND mapClassTableCode = #{mapClassTableCode}
+            </if>
+            <if test="code!=null and code!=''">
+                AND code = #{code}
+            </if>
+            <if test="column!=null and column!=''">
+                AND column = #{column}
+            </if>
+            <if test="field!=null and field!=''">
+                AND field = #{field}
+            </if>
+            <if test="sqlType!=null and sqlType!=''">
+                AND sqlType = #{sqlType}
+            </if>
+            <if test="fieldType!=null and fieldType!=''">
+                AND fieldType = #{fieldType}
+            </if>
+            <if test="notes!=null and notes!=''">
+                AND notes = #{notes}
+            </if>
+            <if test="defaultValue!=null and defaultValue!=''">
+                AND defaultValue = #{defaultValue}
+            </if>
+            <if test="isPrimaryKey!=null and isPrimaryKey!=''">
+                AND isPrimaryKey = #{isPrimaryKey}
+            </if>
+            <if test="isDate!=null and isDate!=''">
+                AND isDate = #{isDate}
+            </if>
+            <if test="isState!=null and isState!=''">
+                AND isState = #{isState}
+            </if>
+        </where>
+    </sql>
+
+</mapper>

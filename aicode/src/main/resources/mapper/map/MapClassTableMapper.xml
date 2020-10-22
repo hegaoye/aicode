@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aicode.map.dao.mapper.MapClassTableMapper">
+    <resultMap id="rs_base" type="com.aicode.map.entity.MapClassTable">
+        <result property="id" column="id"/>
+        <result property="code" column="code"/>
+        <result property="tableName" column="tableName"/>
+        <result property="className" column="className"/>
+        <result property="notes" column="notes"/>
+    </resultMap>
+
+
+    <sql id="columns">
+    id,code,tableName,className,notes
+    </sql>
+
+    <sql id="where">
+        <where>
+            <if test="id!=null and id!=''">
+                AND id = #{id}
+            </if>
+            <if test="code!=null and code!=''">
+                AND code = #{code}
+            </if>
+            <if test="tableName!=null and tableName!=''">
+                AND tableName = #{tableName}
+            </if>
+            <if test="className!=null and className!=''">
+                AND className = #{className}
+            </if>
+            <if test="notes!=null and notes!=''">
+                AND notes = #{notes}
+            </if>
+        </where>
+    </sql>
+
+</mapper>

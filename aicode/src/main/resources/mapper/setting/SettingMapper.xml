@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aicode.setting.dao.mapper.SettingMapper">
+    <resultMap id="rs_base" type="com.aicode.setting.entity.Setting">
+        <result property="id" column="id"/>
+        <result property="k" column="k"/>
+        <result property="v" column="v"/>
+        <result property="description" column="description"/>
+    </resultMap>
+
+
+    <sql id="columns">
+    id,k,v,description
+    </sql>
+
+    <sql id="where">
+        <where>
+            <if test="id!=null and id!=''">
+                AND id = #{id}
+            </if>
+            <if test="k!=null and k!=''">
+                AND k = #{k}
+            </if>
+            <if test="v!=null and v!=''">
+                AND v = #{v}
+            </if>
+            <if test="description!=null and description!=''">
+                AND description = #{description}
+            </if>
+        </where>
+    </sql>
+
+</mapper>

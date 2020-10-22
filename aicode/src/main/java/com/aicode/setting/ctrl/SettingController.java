@@ -3,21 +3,19 @@
  */
 package com.aicode.setting.ctrl;
 
+import com.aicode.core.entity.R;
+import com.aicode.core.exceptions.BaseException;
 import com.aicode.setting.entity.Setting;
 import com.aicode.setting.service.SettingService;
-import com.aicode.setting.vo.SettingPageVO;
 import com.aicode.setting.vo.SettingSaveVO;
 import com.aicode.setting.vo.SettingVO;
-import com.aicode.core.entity.Page;
-import com.aicode.core.entity.PageVO;
-import com.aicode.core.entity.R;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import io.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
@@ -45,7 +43,7 @@ public class SettingController {
     @ApiOperation(value = "创建Setting", notes = "创建Setting")
     @PostMapping("/build")
     public SettingSaveVO build(@ApiParam(name = "创建Setting", value = "传入json格式", required = true)
-                                   @RequestBody SettingSaveVO settingSaveVO) {
+                               @RequestBody SettingSaveVO settingSaveVO) {
         if (null == settingSaveVO) {
             return null;
         }
@@ -61,6 +59,22 @@ public class SettingController {
     }
 
 
+    /**
+     * 加载一个系统中的参数设置
+     *
+     * @return BeanRet
+     */
+    @ApiOperation(value = "加载一个系统中的参数设置", notes = "加载一个系统中的参数设置")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "k", value = "键", required = true, paramType = "query")
+    })
+    @GetMapping("/load")
+    public R load(String k) {
+        Assert.hasText(k, BaseException.BaseExceptionEnum.Empty_Param.toString());
+        Setting setting = settingService.getOne(new LambdaQueryWrapper<Setting>()
+                .eq(Setting::getK, k));
+        return R.success(setting.getV());
+    }
 
     /**
      * 查询设置信息集合
@@ -68,23 +82,10 @@ public class SettingController {
      * @return 分页对象
      */
     @ApiOperation(value = "查询Setting信息集合", notes = "查询Setting信息集合")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "curPage", value = "当前页", required = true, paramType = "query"),
-            @ApiImplicitParam(name = "pageSize", value = "分页大小", required = true, paramType = "query"),
-    })
     @GetMapping(value = "/list")
-    public PageVO<SettingVO> list(@ApiIgnore SettingPageVO settingVO, Integer curPage, Integer pageSize) {
-        Page<Setting> page = new Page<>(pageSize, curPage);
-        QueryWrapper<Setting> queryWrapper = new QueryWrapper<>();
-        int total = settingService.count(queryWrapper);
-        PageVO<SettingVO> settingVOPageVO = new PageVO<>();
-        if (total > 0) {
-            List<Setting> settingList = settingService.list(queryWrapper, page.genRowStart(), page.getPageSize());
-            settingVOPageVO.setTotalRow(total);
-            settingVOPageVO.setRecords(JSON.parseArray(JSON.toJSONString(settingList),SettingVO.class));
-            log.debug(JSON.toJSONString(page));
-        }
-        return settingVOPageVO;
+    public R list() {
+        List<Setting> settingList = settingService.list();
+        return R.success(settingList);
     }
 
 
@@ -94,14 +95,18 @@ public class SettingController {
      * @return R
      */
     @ApiOperation(value = "修改Setting", notes = "修改Setting")
-    @PutMapping("/modify")
-    public boolean modify(@ApiParam(name = "修改Setting", value = "传入json格式", required = true)
-                          @RequestBody SettingVO settingVO) {
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "k", value = "键", required = true, paramType = "query"),
+            @ApiImplicitParam(name = "v", value = "值", required = true, paramType = "query"),
+            @ApiImplicitParam(name = "description", value = "说明", paramType = "query")
+    })
+    @RequestMapping(value = "/modify", method = {RequestMethod.PUT, RequestMethod.POST})
+    public R modify(@ApiIgnore SettingVO settingVO) {
         Setting newSetting = new Setting();
         BeanUtils.copyProperties(settingVO, newSetting);
-        boolean isUpdated = settingService.update(newSetting, new LambdaQueryWrapper<Setting>()
-                .eq(Setting::getId, settingVO.getId()));
-        return isUpdated;
+        settingService.update(newSetting, new LambdaQueryWrapper<Setting>()
+                .eq(Setting::getK, settingVO.getK()));
+        return R.success();
     }
 
 

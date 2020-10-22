@@ -40,4 +40,6 @@ public class Setting implements java.io.Serializable {
     @ApiModelProperty(value = "说明")
     private java.lang.String description;
 
+
+
 }

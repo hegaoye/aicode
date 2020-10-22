@@ -3,7 +3,12 @@
  */
 package com.aicode.frameworks.service;
 
+import com.aicode.core.enums.YNEnum;
+import com.aicode.setting.dao.SettingDAO;
+import com.aicode.setting.entity.Setting;
+import com.aicode.setting.entity.SettingKey;
 import com.baidu.fsg.uid.UidGenerator;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.aicode.frameworks.dao.FrameworksDAO;
@@ -13,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.List;
 import java.util.Date;
 
@@ -30,11 +36,21 @@ public class FrameworksServiceImpl extends ServiceImpl<FrameworksMapper, Framewo
     private FrameworksDAO frameworksDAO;
 
     @Autowired
+    private SettingDAO settingDAO;
+
+    @Autowired
     private UidGenerator uidGenerator;
 
     @Override
     public boolean save(Frameworks entity) {
-//        entity.setId(String.valueOf(uidGenerator.getUID()));
+        entity.setCode(String.valueOf(uidGenerator.getUID()));
+        if (entity.getGitHome() == null) {//默认走系统设置
+            Setting setting = settingDAO.selectOne(new LambdaQueryWrapper<Setting>()
+                    .eq(Setting::getK, SettingKey.GitHome_Default.name()));
+            entity.setGitHome(setting.getV());
+            entity.setIsPublic(YNEnum.Y.name());
+        }
+
         return super.save(entity);
     }
 

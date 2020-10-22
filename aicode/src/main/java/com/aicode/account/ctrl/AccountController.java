@@ -11,6 +11,10 @@ import com.aicode.account.vo.AccountVO;
 import com.aicode.core.entity.Page;
 import com.aicode.core.entity.PageVO;
 import com.aicode.core.entity.R;
+import com.aicode.core.enums.Constants;
+import com.aicode.core.exceptions.BaseException;
+import com.aicode.core.tools.JwtToken;
+import com.aicode.core.tools.security.Md5;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -18,6 +22,7 @@ import io.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
@@ -29,12 +34,12 @@ import java.util.List;
  * @author hegaoye
  */
 @RestController
-@RequestMapping("/_account")
+@RequestMapping("/account")
 @Slf4j
 @Api(value = "账户控制器", tags = "账户控制器")
 public class AccountController {
     @Autowired
-    private AccountService _accountService;
+    private AccountService accountService;
 
 
     /**
@@ -45,14 +50,14 @@ public class AccountController {
     @ApiOperation(value = "创建Account", notes = "创建Account")
     @PostMapping("/build")
     public AccountSaveVO build(@ApiParam(name = "创建Account", value = "传入json格式", required = true)
-                                   @RequestBody AccountSaveVO _accountSaveVO) {
+                               @RequestBody AccountSaveVO _accountSaveVO) {
         if (null == _accountSaveVO) {
             return null;
         }
         Account newAccount = new Account();
         BeanUtils.copyProperties(_accountSaveVO, newAccount);
 
-        _accountService.save(newAccount);
+        accountService.save(newAccount);
 
         _accountSaveVO = new AccountSaveVO();
         BeanUtils.copyProperties(newAccount, _accountSaveVO);
@@ -73,7 +78,7 @@ public class AccountController {
         if (code == null) {
             return null;
         }
-        Account _account = _accountService.getOne(new LambdaQueryWrapper<Account>()
+        Account _account = accountService.getOne(new LambdaQueryWrapper<Account>()
                 .eq(Account::getCode, code));
         AccountVO _accountVO = new AccountVO();
         BeanUtils.copyProperties(_account, _accountVO);
@@ -95,12 +100,12 @@ public class AccountController {
     public PageVO<AccountVO> list(@ApiIgnore AccountPageVO _accountVO, Integer curPage, Integer pageSize) {
         Page<Account> page = new Page<>(pageSize, curPage);
         QueryWrapper<Account> queryWrapper = new QueryWrapper<>();
-        int total = _accountService.count(queryWrapper);
+        int total = accountService.count(queryWrapper);
         PageVO<AccountVO> _accountVOPageVO = new PageVO<>();
         if (total > 0) {
-            List<Account> _accountList = _accountService.list(queryWrapper, page.genRowStart(), page.getPageSize());
+            List<Account> _accountList = accountService.list(queryWrapper, page.genRowStart(), page.getPageSize());
             _accountVOPageVO.setTotalRow(total);
-            _accountVOPageVO.setRecords(JSON.parseArray(JSON.toJSONString(_accountList),AccountVO.class));
+            _accountVOPageVO.setRecords(JSON.parseArray(JSON.toJSONString(_accountList), AccountVO.class));
             log.debug(JSON.toJSONString(page));
         }
         return _accountVOPageVO;
@@ -118,9 +123,31 @@ public class AccountController {
                           @RequestBody AccountVO _accountVO) {
         Account newAccount = new Account();
         BeanUtils.copyProperties(_accountVO, newAccount);
-        boolean isUpdated = _accountService.update(newAccount, new LambdaQueryWrapper<Account>()
+        boolean isUpdated = accountService.update(newAccount, new LambdaQueryWrapper<Account>()
                 .eq(Account::getId, _accountVO.getId()));
         return isUpdated;
+    }
+
+    /**
+     * 修改密码
+     *
+     * @return BeanRet
+     */
+    @ApiOperation(value = "修改密码", notes = "修改密码")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "password", value = "密码", required = true, paramType = "query")
+    })
+    @PutMapping("/modify/password")
+    @ResponseBody
+    public R modifyPassword(String password, String token) {
+        Assert.hasText(password, BaseException.BaseExceptionEnum.Empty_Param.toString());
+        String accountCode = JwtToken.getTokenValue(token, Constants.AccountCode.val.toString());
+        Account accountLoad = accountService.getOne(new LambdaQueryWrapper<Account>()
+                .eq(Account::getCode, accountCode));
+        accountLoad.setPassword(Md5.md5(password));
+        accountService.updateById(accountLoad);
+        return R.success();
+
     }
 
 
@@ -138,7 +165,7 @@ public class AccountController {
     public R delete(@ApiIgnore AccountVO _accountVO) {
         Account newAccount = new Account();
         BeanUtils.copyProperties(_accountVO, newAccount);
-        _accountService.remove(new LambdaQueryWrapper<Account>()
+        accountService.remove(new LambdaQueryWrapper<Account>()
                 .eq(Account::getId, _accountVO.getId()));
         return R.success("删除成功");
     }

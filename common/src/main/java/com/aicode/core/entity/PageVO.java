@@ -2,6 +2,7 @@ package com.aicode.core.entity;
 
 import com.aicode.core.base.BaseVO;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.List;
 
@@ -12,6 +13,7 @@ import java.util.List;
  * @author sys 11-12-16 下午4:56
  */
 @Data
+@EqualsAndHashCode(callSuper=true)
 public final class PageVO<VO> extends BaseVO implements java.io.Serializable {
     /**
      * 当前页，当传递到后台时候，就是要获取的页

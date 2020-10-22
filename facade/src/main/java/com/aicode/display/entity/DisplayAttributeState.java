@@ -10,10 +10,6 @@ package com.aicode.display.entity;
  */
 public enum DisplayAttributeState implements java.io.Serializable {
     Y("是否必填"),
-    Y("是否允许修改"),
-    Y("是否分页列表显示"),
-    Y("是否详情页显示"),
-    Y("是否是查询条件"),
     Like("右"),
     TimePicker("时间选择框"),
     MultiSelect("多项选择器"),
@@ -40,15 +36,11 @@ public enum DisplayAttributeState implements java.io.Serializable {
     DatePicker("日期选择框"),
     Password("密码"),
     Integer("整数"),
-    Email("邮件"),
     Positive_Integer("正整数"),
     Address("地址"),
     Telephone("电话"),
     Number("数值"),
-    IdCard("身份证"),
-    Website("网址"),
     Text("文本"),
-    Password("密码"),
     Css("显示"),
     ;
 

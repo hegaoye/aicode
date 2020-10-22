@@ -10,7 +10,6 @@ package com.aicode.map.entity;
  */
 public enum MapRelationshipState implements java.io.Serializable {
     Y("是否一对一"),
-    Y("是否一对多"),
     ;
 
     public String val;

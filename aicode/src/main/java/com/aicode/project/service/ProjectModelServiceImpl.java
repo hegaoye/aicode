@@ -34,7 +34,6 @@ public class ProjectModelServiceImpl extends ServiceImpl<ProjectModelMapper, Pro
 
     @Override
     public boolean save(ProjectModel entity) {
-//        entity.setId(String.valueOf(uidGenerator.getUID()));
         return super.save(entity);
     }
 

@@ -3,17 +3,16 @@
  */
 package com.aicode.project.ctrl;
 
+import com.aicode.core.entity.Page;
+import com.aicode.core.entity.R;
 import com.aicode.project.entity.ProjectModel;
 import com.aicode.project.service.ProjectModelService;
 import com.aicode.project.vo.ProjectModelPageVO;
-import com.aicode.project.vo.ProjectModelSaveVO;
 import com.aicode.project.vo.ProjectModelVO;
-import com.aicode.core.entity.Page;
-import com.aicode.core.entity.PageVO;
-import com.aicode.core.entity.R;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import io.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -36,6 +35,47 @@ public class ProjectModelController {
     @Autowired
     private ProjectModelService projectModelService;
 
+    /**
+     * 查询模块详情信息
+     *
+     * @param id
+     * @return BeanRet
+     */
+    @ApiOperation(value = "查询模块详情信息", notes = "查询模块详情信息")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "", paramType = "query")
+    })
+    @GetMapping(value = "/loadById/{id}")
+    public R loadById(@PathVariable Long id) {
+        if (id == null) {
+            return R.failed("");
+        }
+        ProjectModel projectModel = projectModelService.getById(id);
+        log.info(JSON.toJSONString(projectModel));
+        return R.success(projectModel);
+    }
+
+    /**
+     * 查询模块详情信息
+     *
+     * @param code 模块编码
+     * @return BeanRet
+     */
+    @ApiOperation(value = "查询模块详情信息", notes = "查询模块详情信息")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "code", value = "模块编码", paramType = "query")
+    })
+    @GetMapping(value = "/loadByCode/{code}")
+    public R loadByCode(@PathVariable String code) {
+        if (StringUtils.isNotEmpty(code)) {
+            return R.failed("");
+        }
+
+        ProjectModel projectModel = projectModelService.getOne(new LambdaQueryWrapper<ProjectModel>()
+                .eq(ProjectModel::getCode, code));
+        log.info(JSON.toJSONString(projectModel));
+        return R.success(projectModel);
+    }
 
     /**
      * 创建 模块
@@ -43,43 +83,22 @@ public class ProjectModelController {
      * @return R
      */
     @ApiOperation(value = "创建ProjectModel", notes = "创建ProjectModel")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "", paramType = "query", required = true),
+            @ApiImplicitParam(name = "code", value = "模块编码", paramType = "query", required = true),
+            @ApiImplicitParam(name = "preCode", value = "上级模块编码", paramType = "query", required = true),
+            @ApiImplicitParam(name = "name", value = "模块显示名称", paramType = "query", required = true),
+            @ApiImplicitParam(name = "route", value = "模块路由", paramType = "query", required = true),
+            @ApiImplicitParam(name = "css", value = "模块css样式", paramType = "query", required = true),
+            @ApiImplicitParam(name = "isMenu", value = "是否是菜单 Y,N", paramType = "query", required = true),
+            @ApiImplicitParam(name = "ico", value = "模块图标", paramType = "query", required = true)
+    })
     @PostMapping("/build")
-    public ProjectModelSaveVO build(@ApiParam(name = "创建ProjectModel", value = "传入json格式", required = true)
-                                   @RequestBody ProjectModelSaveVO projectModelSaveVO) {
-        if (null == projectModelSaveVO) {
-            return null;
-        }
-        ProjectModel newProjectModel = new ProjectModel();
-        BeanUtils.copyProperties(projectModelSaveVO, newProjectModel);
-
-        projectModelService.save(newProjectModel);
-
-        projectModelSaveVO = new ProjectModelSaveVO();
-        BeanUtils.copyProperties(newProjectModel, projectModelSaveVO);
-        log.debug(JSON.toJSONString(projectModelSaveVO));
-        return projectModelSaveVO;
+    public R build(@ApiIgnore ProjectModel projectModel) {
+        projectModelService.save(projectModel);
+        return R.success(projectModel);
     }
 
-
-    /**
-     * 根据条件code查询模块一个详情信息
-     *
-     * @param code 模块编码
-     * @return ProjectModelVO
-     */
-    @ApiOperation(value = "创建ProjectModel", notes = "创建ProjectModel")
-    @GetMapping("/load/code/{code}")
-    public ProjectModelVO loadByCode(@PathVariable java.lang.String code) {
-        if (code == null) {
-            return null;
-        }
-        ProjectModel projectModel = projectModelService.getOne(new LambdaQueryWrapper<ProjectModel>()
-                .eq(ProjectModel::getCode, code));
-        ProjectModelVO projectModelVO = new ProjectModelVO();
-        BeanUtils.copyProperties(projectModel, projectModelVO);
-        log.debug(JSON.toJSONString(projectModelVO));
-        return projectModelVO;
-    }
 
     /**
      * 查询模块信息集合
@@ -90,26 +109,47 @@ public class ProjectModelController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "curPage", value = "当前页", required = true, paramType = "query"),
             @ApiImplicitParam(name = "pageSize", value = "分页大小", required = true, paramType = "query"),
+            @ApiImplicitParam(name = "id", value = "", paramType = "query"),
+            @ApiImplicitParam(name = "code", value = "模块编码", paramType = "query"),
+            @ApiImplicitParam(name = "preCode", value = "上级模块编码", paramType = "query"),
+            @ApiImplicitParam(name = "name", value = "模块显示名称", paramType = "query"),
+            @ApiImplicitParam(name = "route", value = "模块路由", paramType = "query"),
+            @ApiImplicitParam(name = "css", value = "模块css样式", paramType = "query"),
+            @ApiImplicitParam(name = "isMenu", value = "是否是菜单 Y,N", paramType = "query"),
+            @ApiImplicitParam(name = "ico", value = "模块图标", paramType = "query")
     })
     @GetMapping(value = "/list")
-    public PageVO<ProjectModelVO> list(@ApiIgnore ProjectModelPageVO projectModelVO, Integer curPage, Integer pageSize) {
+    public R list(@ApiIgnore ProjectModelPageVO projectModelVO, Integer curPage, Integer pageSize) {
         Page<ProjectModel> page = new Page<>(pageSize, curPage);
         QueryWrapper<ProjectModel> queryWrapper = new QueryWrapper<>();
-        if (projectModelVO.getCss() != null) {
+        if (projectModelVO.getId() != null) {
+            queryWrapper.lambda().eq(ProjectModel::getId, projectModelVO.getId());
+        }
+        if (StringUtils.isNotEmpty(projectModelVO.getCode())) {
+            queryWrapper.lambda().eq(ProjectModel::getCode, projectModelVO.getCode());
+        }
+        if (StringUtils.isNotEmpty(projectModelVO.getPreCode())) {
+            queryWrapper.lambda().eq(ProjectModel::getPreCode, projectModelVO.getPreCode());
+        }
+        if (StringUtils.isNotEmpty(projectModelVO.getRoute())) {
+            queryWrapper.lambda().eq(ProjectModel::getRoute, projectModelVO.getRoute());
+        }
+        if (StringUtils.isNotEmpty(projectModelVO.getName())) {
+            queryWrapper.lambda().eq(ProjectModel::getName, projectModelVO.getName());
+        }
+        if (StringUtils.isNotEmpty(projectModelVO.getCss())) {
             queryWrapper.lambda().eq(ProjectModel::getCss, projectModelVO.getCss());
         }
-        if (projectModelVO.getIsMenu() != null) {
+        if (StringUtils.isNotEmpty(projectModelVO.getIsMenu())) {
             queryWrapper.lambda().eq(ProjectModel::getIsMenu, projectModelVO.getIsMenu());
         }
-        int total = projectModelService.count(queryWrapper);
-        PageVO<ProjectModelVO> projectModelVOPageVO = new PageVO<>();
-        if (total > 0) {
-            List<ProjectModel> projectModelList = projectModelService.list(queryWrapper, page.genRowStart(), page.getPageSize());
-            projectModelVOPageVO.setTotalRow(total);
-            projectModelVOPageVO.setRecords(JSON.parseArray(JSON.toJSONString(projectModelList),ProjectModelVO.class));
-            log.debug(JSON.toJSONString(page));
+        if (StringUtils.isNotEmpty(projectModelVO.getIco())) {
+            queryWrapper.lambda().eq(ProjectModel::getIco, projectModelVO.getIco());
         }
-        return projectModelVOPageVO;
+        List<ProjectModel> projectModelList = projectModelService.list(queryWrapper, page.genRowStart(), page.getPageSize());
+        page.setRecords(projectModelList);
+        log.debug(JSON.toJSONString(page));
+        return R.success(page);
     }
 
 
@@ -119,14 +159,28 @@ public class ProjectModelController {
      * @return R
      */
     @ApiOperation(value = "修改ProjectModel", notes = "修改ProjectModel")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "", paramType = "query"),
+            @ApiImplicitParam(name = "code", value = "模块编码", paramType = "query"),
+            @ApiImplicitParam(name = "preCode", value = "上级模块编码", paramType = "query"),
+            @ApiImplicitParam(name = "name", value = "模块显示名称", paramType = "query"),
+            @ApiImplicitParam(name = "route", value = "模块路由", paramType = "query"),
+            @ApiImplicitParam(name = "css", value = "模块css样式", paramType = "query"),
+            @ApiImplicitParam(name = "isMenu", value = "是否是菜单 Y,N", paramType = "query"),
+            @ApiImplicitParam(name = "ico", value = "模块图标", paramType = "query")
+    })
     @PutMapping("/modify")
-    public boolean modify(@ApiParam(name = "修改ProjectModel", value = "传入json格式", required = true)
-                          @RequestBody ProjectModelVO projectModelVO) {
-        ProjectModel newProjectModel = new ProjectModel();
-        BeanUtils.copyProperties(projectModelVO, newProjectModel);
-        boolean isUpdated = projectModelService.update(newProjectModel, new LambdaQueryWrapper<ProjectModel>()
-                .eq(ProjectModel::getId, projectModelVO.getId()));
-        return isUpdated;
+    public R modify(@ApiParam(name = "修改ProjectModel", value = "传入json格式", required = true)
+                    @RequestBody ProjectModel projectModel) {
+        LambdaQueryWrapper<ProjectModel> lambdaQueryWrapper = new LambdaQueryWrapper<ProjectModel>();
+        if (projectModel.getId() != null) {
+            lambdaQueryWrapper.eq(ProjectModel::getId, projectModel.getId());
+        }
+        if (StringUtils.isNotEmpty(projectModel.getCode())) {
+            lambdaQueryWrapper.eq(ProjectModel::getCode, projectModel.getCode());
+        }
+        projectModelService.update(projectModel, lambdaQueryWrapper);
+        return R.success();
     }
 
 
@@ -145,7 +199,7 @@ public class ProjectModelController {
         ProjectModel newProjectModel = new ProjectModel();
         BeanUtils.copyProperties(projectModelVO, newProjectModel);
         projectModelService.remove(new LambdaQueryWrapper<ProjectModel>()
-                .eq(ProjectModel::getId, projectModelVO.getId()));
+                .eq(ProjectModel::getCode, projectModelVO.getCode()));
         return R.success("删除成功");
     }
 

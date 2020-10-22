@@ -1,5 +1,5 @@
 /*
-* AI-Code 为您构建代码，享受智慧生活!
+ * AI-Code 为您构建代码，享受智慧生活!
  */
 package com.aicode.project.entity;
 
@@ -9,7 +9,9 @@ package com.aicode.project.entity;
  * @author hegaoye
  */
 public enum ProjectRepositoryAccountState implements java.io.Serializable {
-    ;
+    Enable("启用"),
+    Disenable("停用"),
+    Delete("删除");
 
     public String val;
 

@@ -3,18 +3,22 @@
  */
 package com.aicode.project.service;
 
-import com.baidu.fsg.uid.UidGenerator;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.aicode.core.exceptions.BaseException;
+import com.aicode.core.exceptions.ProjectRepositoryAccountException;
 import com.aicode.project.dao.ProjectRepositoryAccountDAO;
 import com.aicode.project.dao.mapper.ProjectRepositoryAccountMapper;
 import com.aicode.project.entity.ProjectRepositoryAccount;
+import com.aicode.project.entity.ProjectRepositoryAccountState;
+import com.aicode.project.entity.ProjectRepositoryTypeEnum;
+import com.alibaba.druid.util.StringUtils;
+import com.baidu.fsg.uid.UidGenerator;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Date;
 
 
 /**
@@ -33,9 +37,22 @@ public class ProjectRepositoryAccountServiceImpl extends ServiceImpl<ProjectRepo
     private UidGenerator uidGenerator;
 
     @Override
-    public boolean save(ProjectRepositoryAccount entity) {
-//        entity.setId(String.valueOf(uidGenerator.getUID()));
-        return super.save(entity);
+    public boolean save(ProjectRepositoryAccount projectRepositoryAccount) {
+        if (projectRepositoryAccount == null
+                || StringUtils.isEmpty(projectRepositoryAccount.getAccount())
+                || StringUtils.isEmpty(projectRepositoryAccount.getDescription())
+                || StringUtils.isEmpty(projectRepositoryAccount.getHome())
+                || StringUtils.isEmpty(projectRepositoryAccount.getPassword())
+                || StringUtils.isEmpty(projectRepositoryAccount.getType())) {
+            log.error(BaseException.BaseExceptionEnum.Empty_Param.toString());
+            throw new ProjectRepositoryAccountException(BaseException.BaseExceptionEnum.Empty_Param);
+        }
+
+        projectRepositoryAccount.setCode(String.valueOf(uidGenerator.getUID()));
+        projectRepositoryAccount.setState(ProjectRepositoryAccountState.Enable.name());
+        projectRepositoryAccount.setType(projectRepositoryAccount.getType().equalsIgnoreCase(ProjectRepositoryTypeEnum.GIT.name()) ? ProjectRepositoryTypeEnum.GIT.name() : ProjectRepositoryTypeEnum.SVN.name());
+
+        return super.save(projectRepositoryAccount);
     }
 
     /**

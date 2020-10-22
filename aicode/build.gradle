@@ -46,24 +46,8 @@ ext {
 }
 dependencies {
 
-    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign:2.2.2.RELEASE'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-
-    implementation 'com.alibaba.cloud:spring-cloud-starter-alibaba-nacos-discovery:2.2.0.RELEASE'
-    implementation 'com.alibaba.cloud:spring-cloud-starter-alibaba-nacos-config:2.2.0.RELEASE'
-    implementation 'com.alibaba.cloud:spring-cloud-starter-alibaba-sentinel'
-    implementation 'com.alibaba.boot:nacos-config-spring-boot-starter:0.2.4'
-
-    //----------- ignite start--------------
-    implementation 'org.apache.ignite:ignite-core:2.7.0'
-    implementation 'org.apache.ignite:ignite-spring:2.7.0'
-    implementation 'org.apache.ignite:ignite-indexing:2.7.0'
-    //----------- ignite end--------------
-
-    //----------- rocketmq start--------------
-    implementation 'com.alibaba.cloud:spring-cloud-stream-binder-rocketmq:2.2.0.RELEASE'
-    //----------- rocketmq end--------------
 
     //----------- mybatis mysql druid start--------------
     implementation 'mysql:mysql-connector-java:8.0.15'
@@ -72,12 +56,6 @@ dependencies {
     implementation 'com.baomidou:mybatis-plus-generator:3.1.2'
     implementation 'com.baomidou:mybatis-plus-boot-starter:3.1.2'
     //-----------mybatis mysql druid end--------------
-
-    //-----------redis start--------------
-    implementation 'org.springframework.boot:spring-boot-starter-data-redis:2.2.6.RELEASE'
-    implementation 'redis.clients:jedis:3.0.1'
-    //-----------redis end--------------
-
 
     //-----------swagger2 start--------------
     implementation 'io.springfox:springfox-swagger2:2.9.2'

@@ -10,9 +10,9 @@ spring:
   datasource:
     tidb:
       name: mysql-data
-      url: jdbc:mysql://{host}/{database}?useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=round&allowMultiQueries=true
-      username: {username}
-      password: {password}
+      url: jdbc:mysql://8.210.212.241:30306/ai_code?useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=round&allowMultiQueries=true
+      username: root
+      password: ty5tmRlj7aRRcsQ^Wi8
       driver-class-name: com.mysql.cj.jdbc.Driver
       type: com.alibaba.druid.pool.DruidDataSource # 使用druid数据源
       initialSize: 10 #初始化连接数量，最大最小连接数
@@ -33,9 +33,9 @@ spring:
       filters: stat #属性类型是字符串，通过别名的方式配置扩展插件，常用的插件有：监控统计用的filter:stat 日志用的filter:log4j 防御SQL注入的filter:wall
     uid:
       name: uid-data
-      url: jdbc:mysql://192.168.0.250:4000/sso?useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=round&allowMultiQueries=true
-      username: {username}
-      password: {password}
+      url: jdbc:mysql://8.210.212.241:30306/ai_code?useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=round&allowMultiQueries=true
+      username: root
+      password: ty5tmRlj7aRRcsQ^Wi8
       driver-class-name: com.mysql.cj.jdbc.Driver
       type: com.alibaba.druid.pool.DruidDataSource # 使用druid数据源
       initialSize: 10 #初始化连接数量，最大最小连接数
@@ -55,42 +55,6 @@ spring:
       connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
       filters: stat #属性类型是字符串，通过别名的方式配置扩展插件，常用的插件有：监控统计用的filter:stat 日志用的filter:log4j 防御SQL注入的filter:wall
 
-  redis:
-    host: 192.168.0.250
-    port: 6379
-    password:
-  cloud:
-    stream:
-      rocketmq:
-        binder:
-          name-server: 192.168.0.250:9876
-
-
-#feign:
-#  client:
-#    config:
-#      feignName:
-#        connectTimeout: 5000
-#        readTimeout: 5000
-
-
-hystrix:
-  command:
-    default:
-      execution:
-        timeout:
-          enabled: true
-        isolation:
-          thread:
-            timeoutInMilliseconds: 60000
-
-##Ribbon超时重试配置
-ribbon:
-  ConnectTimeout: 20000  #毫秒    连接超时时间
-  ReadTimeout: 20000     #毫秒      逻辑处理超时时间
-  OkToRetryOnAllOperations: true    # 是否对所有操作都进行重试
-  MaxAutoRetries: 2     # 对当前实例的最大重试次数(请求服务超时6s则会再请求一次)
-  MaxAutoRetriesNextServer: 1     # 切换实例的最大重试次数(如果还失败就切换下
 
 logging:
   level:
@@ -101,6 +65,5 @@ logging:
   config: classpath:logback.xml
 
 mybatis-plus:
-  #  mapper-locations: classpath:mapper/*/*.xml,classpath:/META-INF/mybatis/mapper/WORKER*.xml
   configuration:
     cache-enabled: true

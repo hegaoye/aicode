@@ -52,11 +52,6 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok:1.18.12'
     implementation 'com.alibaba:fastjson:1.2.66'
 
-    //-----------redis start--------------
-    implementation 'org.springframework.boot:spring-boot-starter-data-redis:2.2.6.RELEASE'
-    implementation 'redis.clients:jedis:3.0.1'
-    //-----------redis end--------------
-
     implementation 'cn.hutool:hutool-all:5.1.5'
 
 }

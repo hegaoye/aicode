@@ -22,7 +22,6 @@ dependencies {
     implementation 'com.baomidou:mybatis-plus-generator:3.1.2'
 
     implementation "org.springframework.boot:spring-boot-starter-data-redis:2.2.6.RELEASE"
-    implementation "redis.clients:jedis:3.0.1"
     compileOnly 'org.projectlombok:lombok:1.18.12'
     annotationProcessor 'org.projectlombok:lombok:1.18.12'
 

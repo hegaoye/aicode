@@ -10,9 +10,9 @@ spring:
       enabled: always #控制台的输出颜色控制
   datasource:
     name: mysql-data
-    url: jdbc:mysql://192.168.0.250:3306/ai_code?useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=round&allowMultiQueries=true
+    url: jdbc:mysql://8.210.212.241:30306/ai_code?useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=round&allowMultiQueries=true
     username: root
-    password: 888888
+    password: ty5tmRlj7aRRcsQ^Wi8
     driver-class-name: com.mysql.cj.jdbc.Driver
     type: com.alibaba.druid.pool.DruidDataSource # 使用druid数据源
     initialSize: 10 #初始化连接数量，最大最小连接数
@@ -52,7 +52,7 @@ logging:
 
 
 
-  path: /var/log/tomcat/
+path: /var/log/tomcat/
 
 
 

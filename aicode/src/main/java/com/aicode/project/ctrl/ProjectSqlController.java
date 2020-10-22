@@ -3,14 +3,13 @@
  */
 package com.aicode.project.ctrl;
 
+import com.aicode.core.entity.R;
+import com.aicode.core.exceptions.BaseException;
 import com.aicode.project.entity.ProjectSql;
 import com.aicode.project.service.ProjectSqlService;
 import com.aicode.project.vo.ProjectSqlPageVO;
 import com.aicode.project.vo.ProjectSqlSaveVO;
 import com.aicode.project.vo.ProjectSqlVO;
-import com.aicode.core.entity.Page;
-import com.aicode.core.entity.PageVO;
-import com.aicode.core.entity.R;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -18,18 +17,24 @@ import io.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
 
 /**
- * 项目sql脚本
+ * 项目sql管理控制器
+ * 1.查询一个详情信息
+ * 2.查询项目sql信息集合
+ * 3.创建项目sql
+ * 4.修改项目sql
+ * 5.删除项目sql
  *
  * @author hegaoye
  */
 @RestController
-@RequestMapping("/projectSql")
+@RequestMapping("/project/sql")
 @Slf4j
 @Api(value = "项目sql脚本控制器", tags = "项目sql脚本控制器")
 public class ProjectSqlController {
@@ -43,21 +48,36 @@ public class ProjectSqlController {
      * @return R
      */
     @ApiOperation(value = "创建ProjectSql", notes = "创建ProjectSql")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "projectCode", value = "项目编码", required = true, paramType = "query"),
+            @ApiImplicitParam(name = "tsql", value = "sql脚本", required = true, paramType = "query")
+    })
     @PostMapping("/build")
-    public ProjectSqlSaveVO build(@ApiParam(name = "创建ProjectSql", value = "传入json格式", required = true)
-                                   @RequestBody ProjectSqlSaveVO projectSqlSaveVO) {
-        if (null == projectSqlSaveVO) {
-            return null;
-        }
-        ProjectSql newProjectSql = new ProjectSql();
-        BeanUtils.copyProperties(projectSqlSaveVO, newProjectSql);
-
+    public R build(@ApiIgnore ProjectSql newProjectSql) {
         projectSqlService.save(newProjectSql);
+        return R.success(newProjectSql);
+    }
 
-        projectSqlSaveVO = new ProjectSqlSaveVO();
-        BeanUtils.copyProperties(newProjectSql, projectSqlSaveVO);
-        log.debug(JSON.toJSONString(projectSqlSaveVO));
-        return projectSqlSaveVO;
+
+    /**
+     * 查询一个详情信息
+     *
+     * @return BeanRet
+     */
+    @ApiOperation(value = "查询一个详情信息", notes = "查询一个详情信息")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "code", value = "sql编码", paramType = "query"),
+            @ApiImplicitParam(name = "projectCode", value = "项目编码", paramType = "query")
+    })
+    @GetMapping(value = "/load")
+    public R load(String code, String projectCode) {
+        Assert.hasText(code, BaseException.BaseExceptionEnum.Empty_Param.toString());
+        ProjectSql projectSql = projectSqlService.getOne(new LambdaQueryWrapper<ProjectSql>()
+                .eq(ProjectSql::getCode, code)
+                .eq(ProjectSql::getProjectCode, projectCode));
+        log.info(JSON.toJSONString(projectSql));
+        return R.success(projectSql);
+
     }
 
 
@@ -88,28 +108,17 @@ public class ProjectSqlController {
      */
     @ApiOperation(value = "查询ProjectSql信息集合", notes = "查询ProjectSql信息集合")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "curPage", value = "当前页", required = true, paramType = "query"),
-            @ApiImplicitParam(name = "pageSize", value = "分页大小", required = true, paramType = "query"),
+            @ApiImplicitParam(name = "projectCode", value = "项目编码", required = true, paramType = "query")
     })
     @GetMapping(value = "/list")
-    public PageVO<ProjectSqlVO> list(@ApiIgnore ProjectSqlPageVO projectSqlVO, Integer curPage, Integer pageSize) {
-        Page<ProjectSql> page = new Page<>(pageSize, curPage);
+    public R list(@ApiIgnore ProjectSqlPageVO projectSqlVO) {
         QueryWrapper<ProjectSql> queryWrapper = new QueryWrapper<>();
         if (projectSqlVO.getCode() != null) {
-            queryWrapper.lambda().eq(ProjectSql::getCode, projectSqlVO.getCode());
+            queryWrapper.lambda().eq(ProjectSql::getProjectCode, projectSqlVO.getProjectCode());
         }
-        if (projectSqlVO.getTsql() != null) {
-            queryWrapper.lambda().eq(ProjectSql::getTsql, projectSqlVO.getTsql());
-        }
-        int total = projectSqlService.count(queryWrapper);
-        PageVO<ProjectSqlVO> projectSqlVOPageVO = new PageVO<>();
-        if (total > 0) {
-            List<ProjectSql> projectSqlList = projectSqlService.list(queryWrapper, page.genRowStart(), page.getPageSize());
-            projectSqlVOPageVO.setTotalRow(total);
-            projectSqlVOPageVO.setRecords(JSON.parseArray(JSON.toJSONString(projectSqlList),ProjectSqlVO.class));
-            log.debug(JSON.toJSONString(page));
-        }
-        return projectSqlVOPageVO;
+
+        List<ProjectSql> projectSqlList = projectSqlService.list(queryWrapper);
+        return R.success(projectSqlList);
     }
 
 

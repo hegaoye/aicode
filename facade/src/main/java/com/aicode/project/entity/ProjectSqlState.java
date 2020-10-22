@@ -9,9 +9,9 @@ package com.aicode.project.entity;
  * @author hegaoye
  */
 public enum ProjectSqlState implements java.io.Serializable {
-    Tsql("编码"),
-    Sql("脚本"),
-    ;
+    Enable("启用"),
+    Disenable("停用"),
+    Delete("删除");
 
     public String val;
 

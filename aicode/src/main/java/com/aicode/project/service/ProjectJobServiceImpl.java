@@ -89,7 +89,7 @@ public class ProjectJobServiceImpl extends ServiceImpl<ProjectJobMapper, Project
         ProjectJob projectJob = new ProjectJob();
         projectJob.setCode(String.valueOf(uidGenerator.getUID()));
         projectJob.setProjectCode(projectCode);
-        projectJob.setState(ProjectJob.State.Executing.name());
+        projectJob.setState(ProjectJobState.Executing.name());
         projectJob.setNumber(1);
         projectJob.setCreateTime(new Date());
         projectJobDAO.insert(projectJob);

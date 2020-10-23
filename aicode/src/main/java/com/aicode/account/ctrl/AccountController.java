@@ -138,7 +138,7 @@ public class AccountController {
             @ApiImplicitParam(name = "password", value = "密码", required = true, paramType = "query")
     })
     @PutMapping("/modify/password")
-    @ResponseBody
+
     public R modifyPassword(String password, String token) {
         Assert.hasText(password, BaseException.BaseExceptionEnum.Empty_Param.toString());
         String accountCode = JwtToken.getTokenValue(token, Constants.AccountCode.val.toString());

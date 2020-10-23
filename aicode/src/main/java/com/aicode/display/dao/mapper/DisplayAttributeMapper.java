@@ -2,6 +2,7 @@ package com.aicode.display.dao.mapper;
 
 import com.aicode.display.entity.DisplayAttribute;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -13,4 +14,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface DisplayAttributeMapper extends BaseMapper<DisplayAttribute> {
 
+    int countByProjectCode(@Param("code") String code);
 }

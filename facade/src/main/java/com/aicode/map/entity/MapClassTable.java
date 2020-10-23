@@ -60,10 +60,6 @@ public class MapClassTable implements java.io.Serializable {
     @TableField(exist = false)
     private List<MapRelationship> mapRelationshipList;//类模型的关联关系
 
-
-    public MapClassTable() {
-    }
-
     public MapClassTable(String code, String name, String notes) {
         this.code = code;
         this.tableName = name;

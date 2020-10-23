@@ -50,7 +50,7 @@ public class ProjectModelClassController {
             @ApiImplicitParam(name = "id", value = "", paramType = "query")
     })
     @GetMapping(value = "/loadById/{id}")
-    @ResponseBody
+
     public R loadById(@PathVariable Long id) {
         if (id == null) {
             return R.failed("");
@@ -91,7 +91,7 @@ public class ProjectModelClassController {
             @ApiImplicitParam(name = "mapClassTableCode", value = "类编码", paramType = "query")
     })
     @GetMapping(value = "/loadByMapClassTableCode")
-    @ResponseBody
+
     public R loadByMapClassTableCode(@PathVariable String mapClassTableCode) {
         if (StringUtils.isEmpty(mapClassTableCode)) {
             return R.failed("");
@@ -114,7 +114,7 @@ public class ProjectModelClassController {
             @ApiImplicitParam(name = "projectModelCode", value = "模块编码", paramType = "query")
     })
     @GetMapping(value = "/loadByProjectModelCode")
-    @ResponseBody
+
     public R loadByProjectModelCode(@PathVariable String projectModelCode) {
         if (StringUtils.isEmpty(projectModelCode)) {
             return R.failed("");

@@ -6,6 +6,8 @@ import com.aicode.core.base.BaseDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 /**
  * MapFieldColumn DAO
  * 数据服务层
@@ -23,4 +25,7 @@ public class MapFieldColumnDAO extends BaseDAO<MapFieldColumnMapper, MapFieldCol
     private MapFieldColumnMapper mapFieldColumnMapper;
 
 
+    public void batchInsert(List<MapFieldColumn> mapFieldColumns) {
+        mapFieldColumnMapper.batchInsert(mapFieldColumns);
+    }
 }

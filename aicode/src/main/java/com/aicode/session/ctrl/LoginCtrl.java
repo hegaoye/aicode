@@ -50,7 +50,7 @@ public class LoginCtrl {
             @ApiImplicitParam(name = "password", value = "密码", required = true, paramType = "query")
     })
     @GetMapping(value = "/signin")
-    @ResponseBody
+
     public R signin(String account, String password, HttpServletResponse response) {
         try {
             Assert.hasText(account, BaseException.BaseExceptionEnum.Empty_Param.toString());
@@ -86,7 +86,7 @@ public class LoginCtrl {
             @ApiImplicitParam(name = "password", value = "密码", required = true, paramType = "query")
     })
     @PostMapping("/reg")
-    @ResponseBody
+
     public R reg(@ApiIgnore Account account) {
         Assert.hasText(account.getAccount(), BaseException.BaseExceptionEnum.Empty_Param.toString());
         Assert.hasText(account.getPassword(), BaseException.BaseExceptionEnum.Empty_Param.toString());

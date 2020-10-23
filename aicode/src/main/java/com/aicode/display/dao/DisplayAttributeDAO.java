@@ -23,4 +23,7 @@ public class DisplayAttributeDAO extends BaseDAO<DisplayAttributeMapper, Display
     private DisplayAttributeMapper displayAttributeMapper;
 
 
+    public int countByProjectCode(String code) {
+        return displayAttributeMapper.countByProjectCode(code);
+    }
 }

@@ -50,6 +50,11 @@ public class MapRelationshipServiceImpl extends ServiceImpl<MapRelationshipMappe
     public List<MapRelationship> list(QueryWrapper<MapRelationship> queryWrapper, int offset, int limit) {
         return mapRelationshipDAO.list(queryWrapper, offset, limit);
     }
+
+    @Override
+    public int countByProjectCode(String code) {
+        return mapRelationshipDAO.countByProjectCode(code);
+    }
 }
 
 

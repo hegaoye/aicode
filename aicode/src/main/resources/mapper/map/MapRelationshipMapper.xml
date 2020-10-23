@@ -12,6 +12,10 @@
         <result property="joinField" column="joinField"/>
     </resultMap>
 
+    <resultMap id="rs_base_all" type="com.aicode.map.entity.MapRelationship">
+        <association property="associateClass" column="{code=associateCode}"
+                     select="com.aicode.map.dao.mapper.MapClassTableMapper.selectByCode"/>
+    </resultMap>
 
     <sql id="columns">
     id,code,mapClassTableCode,associateCode,isOneToOne,isOneToMany,mainField,joinField
@@ -51,5 +55,11 @@
             </if>
         </where>
     </sql>
+
+    <select id="countByProjectCode" resultType="int">
+        SELECT count(mr.id)
+        FROM project_map pm,map_relationship mr
+        WHERE pm.mapClassTableCode = mr.mapClassTableCode AND pm.projectCode = #{projectCode}
+    </select>
 
 </mapper>

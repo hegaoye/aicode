@@ -64,7 +64,8 @@
             </if>
             <if test="isDetailPageDisplays!=null and isDetailPageDisplays!=''">
                 AND isDetailPageDisplay in
-                <foreach collection="isDetailPageDisplays" index="index" item="stateIn" open="(" separator="," close=")">
+                <foreach collection="isDetailPageDisplays" index="index" item="stateIn" open="(" separator=","
+                         close=")">
                     #{stateIn}
                 </foreach>
             </if>
@@ -97,7 +98,8 @@
             </if>
             <if test="fieldValidationModes!=null and fieldValidationModes!=''">
                 AND fieldValidationMode in
-                <foreach collection="fieldValidationModes" index="index" item="stateIn" open="(" separator="," close=")">
+                <foreach collection="fieldValidationModes" index="index" item="stateIn" open="(" separator=","
+                         close=")">
                     #{stateIn}
                 </foreach>
             </if>
@@ -112,5 +114,10 @@
             </if>
         </where>
     </sql>
+    <select id="countByProjectCode" resultType="java.lang.Integer">
+       SELECT count(mr.id)
+        FROM project_map pm, map_relationship mr
+        WHERE pm.mapClassTableCode = mr.mapClassTableCode AND pm.projectCode = #{code}
+    </select>
 
 </mapper>

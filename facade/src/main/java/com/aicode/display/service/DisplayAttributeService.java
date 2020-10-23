@@ -25,6 +25,8 @@ public interface DisplayAttributeService extends IService<DisplayAttribute> {
      * @return List<DisplayAttribute>
      */
     List<DisplayAttribute> list(QueryWrapper<DisplayAttribute> queryWrapper, int offset, int limit);
+
+    int countByProjectCode(String code);
 }
 
 

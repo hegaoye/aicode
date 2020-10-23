@@ -25,6 +25,18 @@ public interface ProjectService extends IService<Project> {
      * @return List<Project>
      */
     List<Project> list(QueryWrapper<Project> queryWrapper, int offset, int limit);
+
+    /**
+     * 删除项目
+     * 1.判断项目是否存在
+     * 2.删除数据
+     * 3.删除项目
+     *
+     * @param code 项目编码
+     */
+    void delete(String code);
+
+    void execute(String code);
 }
 
 

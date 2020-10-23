@@ -62,7 +62,7 @@ public class ProjectJobController {
             @ApiImplicitParam(name = "code", value = "任务编码", paramType = "query")
     })
     @GetMapping(value = "/load")
-    @ResponseBody
+
     public R load(String code) {
         Assert.hasText(code, BaseException.BaseExceptionEnum.Empty_Param.toString());
         ProjectJob projectJob = projectJobService.getOne(new LambdaQueryWrapper<ProjectJob>()
@@ -200,7 +200,7 @@ public class ProjectJobController {
             @ApiImplicitParam(name = "code", value = "任务编码", paramType = "query")
     })
     @GetMapping(value = "/execute")
-    @ResponseBody
+
     public R execute(String code, HttpServletRequest request) {
         try {
             Assert.hasText(code, BaseException.BaseExceptionEnum.Empty_Param.toString());

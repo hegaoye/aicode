@@ -23,4 +23,7 @@ public class MapRelationshipDAO extends BaseDAO<MapRelationshipMapper, MapRelati
     private MapRelationshipMapper mapRelationshipMapper;
 
 
+    public int countByProjectCode(String code) {
+        return mapRelationshipMapper.countByProjectCode(code);
+    }
 }

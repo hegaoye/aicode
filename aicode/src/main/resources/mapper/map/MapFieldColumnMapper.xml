@@ -18,7 +18,7 @@
 
 
     <sql id="columns">
-    id,mapClassTableCode,code,column,field,sqlType,fieldType,notes,defaultValue,isPrimaryKey,isDate,isState
+    id,mapClassTableCode,code,`column`,field,sqlType,fieldType,notes,defaultValue,isPrimaryKey,isDate,isState
     </sql>
 
     <sql id="where">
@@ -61,5 +61,28 @@
             </if>
         </where>
     </sql>
+
+    <insert id="batchInsert" parameterType="java.util.List">
+        insert into fast_money (
+        <include refid="columns"/>
+        )
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (
+            #{item.id},
+            #{item.mapClassTableCode},
+            #{item.code},
+            #{item.column},
+            #{item.field},
+            #{item.sqlType},
+            #{item.fieldType},
+            #{item.notes},
+            #{item.defaultValue},
+            #{item.isPrimaryKey},
+            #{item.isDate},
+            #{item.isState}
+            )
+        </foreach>
+    </insert>
 
 </mapper>

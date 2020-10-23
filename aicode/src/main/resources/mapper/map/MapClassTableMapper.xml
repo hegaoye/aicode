@@ -33,5 +33,11 @@
             </if>
         </where>
     </sql>
+    <select id="selectByCode" resultType="com.aicode.map.entity.MapClassTable">
+        select
+        <include refid="columns"/>
+        from map_class_table
+        where code=#{code}
+    </select>
 
 </mapper>

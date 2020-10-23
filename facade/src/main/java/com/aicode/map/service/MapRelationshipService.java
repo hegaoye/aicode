@@ -25,6 +25,8 @@ public interface MapRelationshipService extends IService<MapRelationship> {
      * @return List<MapRelationship>
      */
     List<MapRelationship> list(QueryWrapper<MapRelationship> queryWrapper, int offset, int limit);
+
+    int countByProjectCode(String code);
 }
 
 

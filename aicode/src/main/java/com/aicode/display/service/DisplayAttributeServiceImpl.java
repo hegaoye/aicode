@@ -50,6 +50,11 @@ public class DisplayAttributeServiceImpl extends ServiceImpl<DisplayAttributeMap
     public List<DisplayAttribute> list(QueryWrapper<DisplayAttribute> queryWrapper, int offset, int limit) {
         return displayAttributeDAO.list(queryWrapper, offset, limit);
     }
+
+    @Override
+    public int countByProjectCode(String code) {
+        return displayAttributeDAO.countByProjectCode(code);
+    }
 }
 
 

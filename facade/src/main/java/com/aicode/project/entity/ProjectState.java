@@ -9,7 +9,9 @@ package com.aicode.project.entity;
  * @author hegaoye
  */
 public enum ProjectState implements java.io.Serializable {
-    ;
+    Enable("启用"),
+    Disenable("停用"),
+    Delete("删除");
 
     public String val;
 

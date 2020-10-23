@@ -1,4 +1,4 @@
-package com.aicode.core.tools.core.template;
+package com.aicode.config.template;
 
 import lombok.Data;
 

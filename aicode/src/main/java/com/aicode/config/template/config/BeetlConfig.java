@@ -1,4 +1,4 @@
-package com.aicode.core.tools.core.template.config;
+package com.aicode.config.template.config;
 
 import org.beetl.core.Configuration;
 import org.beetl.core.GroupTemplate;

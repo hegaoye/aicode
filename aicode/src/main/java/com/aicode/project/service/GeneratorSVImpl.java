@@ -1,10 +1,7 @@
 package com.aicode.project.service;
 
-import com.aicode.base.core.ModelData;
-import com.aicode.base.core.StringHelper;
-import com.aicode.base.core.TemplateData;
-import com.aicode.base.core.template.Configuration;
-import com.aicode.base.core.template.TemplateHelper;
+import com.aicode.config.template.Configuration;
+import com.aicode.config.template.TemplateHelper;
 import com.aicode.config.websocket.WSClientManager;
 import com.aicode.core.enums.TemplateEngineEnum;
 import com.aicode.core.enums.YNEnum;
@@ -12,6 +9,7 @@ import com.aicode.core.tools.FileUtil;
 import com.aicode.core.tools.GitTools;
 import com.aicode.core.tools.StringTools;
 import com.aicode.core.tools.ZipTools;
+import com.aicode.core.tools.core.StringHelper;
 import com.aicode.display.entity.DisplayAttribute;
 import com.aicode.frameworks.dao.FrameworksTemplateDAO;
 import com.aicode.frameworks.entity.Frameworks;
@@ -28,10 +26,8 @@ import com.alibaba.fastjson.JSON;
 import com.baidu.fsg.uid.UidGenerator;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
@@ -45,10 +41,10 @@ import java.util.*;
  * 用于代码生成业务
  * Created by lixin on 2018/2/1.
  */
+@Slf4j
 @Component
 @Service
 public class GeneratorSVImpl implements GenerateSV {
-    protected final static Logger logger = LoggerFactory.getLogger(GeneratorSVImpl.class);
 
     @Resource
     private ProjectDAO projectDAO;
@@ -115,7 +111,7 @@ public class GeneratorSVImpl implements GenerateSV {
                     .code(projectJob.getCode())
                     .log(log)
                     .build());
-            logger.info("创建工作空间库完成");
+            GeneratorSVImpl.log.info("创建工作空间库完成");
             logsSV.saveLogs("创建工作空间库完成", path);
 
 
@@ -231,7 +227,7 @@ public class GeneratorSVImpl implements GenerateSV {
 
         } catch (Exception e) {
             e.printStackTrace();
-            logger.error(e.getMessage());
+            log.error(e.getMessage());
             WSClientManager.sendMessage(e.getMessage());
             logsSV.saveLogs(e.getMessage(), path);
             projectJobLogsDAO.insert(ProjectJobLogs.builder()
@@ -300,7 +296,7 @@ public class GeneratorSVImpl implements GenerateSV {
         TemplateEngineEnum templateEngineEnum = null;
         for (ProjectFramwork projectFramwork : projectFramworkList) {
             Frameworks frameworks = projectFramwork.getFrameworks();
-            logger.debug(JSON.toJSONString(frameworks));
+            log.debug(JSON.toJSONString(frameworks));
             if (frameworks.getGitHome() != null) {
                 String project_template_Path = template_Path + frameworks.getGitHome().substring(frameworks.getGitHome().lastIndexOf("/") + 1).replace(".git", "");
                 //TODO 已经存在的进行清理 需要开发
@@ -322,7 +318,7 @@ public class GeneratorSVImpl implements GenerateSV {
                     if (file.isDirectory()) {
                         if (!projectFramworkKeyWords.contains(file.getName())) {
                             if (file.isDirectory()) {
-                                logger.debug("del:" + file.getAbsolutePath());
+                                log.debug("del:" + file.getAbsolutePath());
                                 FileUtil.delFolder(file.getAbsolutePath());
                             } else {
                                 file.delete();
@@ -405,7 +401,7 @@ public class GeneratorSVImpl implements GenerateSV {
 
         //3.代码仓库检出
         ProjectRepositoryAccount projectRepositoryAccount = projectRepositoryAccountDAO.selectOne(new LambdaQueryWrapper<ProjectRepositoryAccount>()
-                .eq(ProjectRepositoryAccount::getProjectCode,project.getCode()));
+                .eq(ProjectRepositoryAccount::getProjectCode, project.getCode()));
         if (projectRepositoryAccount != null) {
             if (ProjectRepositoryTypeEnum.GIT == ProjectRepositoryTypeEnum.getEnum(projectRepositoryAccount.getType())) {
                 if (projectRepositoryAccount.getHome().startsWith("git://") && projectRepositoryAccount.getHome().endsWith(".git")) {
@@ -476,7 +472,7 @@ public class GeneratorSVImpl implements GenerateSV {
         //获取1对1,1对多关系集合
         mapClassTable.getMapRelationshipList().forEach(mapRelationship -> {
             List<MapFieldColumn> associateClassColumns = mapFieldColumnDAO.selectList(new LambdaQueryWrapper<MapFieldColumn>()
-                    .eq(MapFieldColumn::getMapClassTableCode,mapRelationship.getAssociateClass().getCode()));
+                    .eq(MapFieldColumn::getMapClassTableCode, mapRelationship.getAssociateClass().getCode()));
             if (YNEnum.getYN(mapRelationship.getIsOneToOne()) == YNEnum.Y) {
                 oneToOneList.add(new TemplateData(project, mapRelationship.getAssociateClass(), mapRelationship.getMainField(),
                         mapRelationship.getJoinField(), associateClassColumns));
@@ -485,7 +481,7 @@ public class GeneratorSVImpl implements GenerateSV {
                 oneToManyList.add(new TemplateData(project, mapRelationship.getAssociateClass(), mapRelationship.getMainField(),
                         mapRelationship.getJoinField(), associateClassColumns));
             }
-            logger.debug(JSON.toJSONString(mapRelationship.getAssociateClass().getMapFieldColumnList()));
+            log.debug(JSON.toJSONString(mapRelationship.getAssociateClass().getMapFieldColumnList()));
         });
 
         //各个模块下的所有类集合信息
@@ -511,7 +507,9 @@ public class GeneratorSVImpl implements GenerateSV {
         models.forEach(model -> {
             if (mapClassTableMap.containsKey(model)) {
                 List<MapClassTable> mapClassTables = mapClassTableMap.get(model);
-                modelDatas.add(new ModelData(model, mapClassTables));
+                modelDatas.add(ModelData.builder()
+                        .model(model)
+                        .classes(mapClassTables).build());
             }
         });
         HashSet hashSet = new HashSet(modelDatas);
@@ -581,9 +579,9 @@ public class GeneratorSVImpl implements GenerateSV {
         String templatePath = "/" + settingTemplatePath.getV()
                 + "/" + frameworksTemplate.getPath();
         templatePath = templatePath.replace("//", "/").replace("///", "/");
-        logger.debug("模板路径：" + templatePath);
+        log.debug("模板路径：" + templatePath);
         if (targetFilePath.contains("angular")) {
-            logger.debug("目标文件路径" + targetFilePath);
+            log.debug("目标文件路径" + targetFilePath);
         }
 
         //增量状态判断
@@ -609,7 +607,7 @@ public class GeneratorSVImpl implements GenerateSV {
                     }
                 }
             } else {
-                logger.error("文件不存在 ===> " + templatePath);
+                log.error("文件不存在 ===> " + templatePath);
             }
         }
 
@@ -659,7 +657,7 @@ public class GeneratorSVImpl implements GenerateSV {
         Setting settingWorkspace = settingDAO.selectOne(new LambdaQueryWrapper<Setting>().eq(Setting::getK, SettingKey.Workspace.name()));
         String projectWorkspacePath = this.convertPath(settingWorkspace.getV(), project.getEnglishName(), true);
 
-        Setting repositoryPathSetting = settingDAO.selectOne(new LambdaQueryWrapper<Setting>().eq(Setting::getK, (SettingKey.Repository_Path.name()));
+        Setting repositoryPathSetting = settingDAO.selectOne(new LambdaQueryWrapper<Setting>().eq(Setting::getK, (SettingKey.Repository_Path.name())));
         String destination = repositoryPathSetting.getV() + "/" + project.getEnglishName();
 
 
@@ -676,7 +674,7 @@ public class GeneratorSVImpl implements GenerateSV {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            logger.error(e.getMessage());
+            log.error(e.getMessage());
         }
         ZipTools.zip(destination, projectWorkspacePath);
         project.setDownloadUrl("/project/download/" + project.getEnglishName());

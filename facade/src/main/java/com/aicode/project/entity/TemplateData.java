@@ -1,14 +1,14 @@
-package com.aicode.core.tools.core;
+package com.aicode.project.entity;
 
-import io.aicode.base.enums.YNEnum;
-import io.aicode.base.tools.StringTools;
-import io.aicode.display.entity.DisplayAttribute;
-import io.aicode.project.entity.MapClassTable;
-import io.aicode.project.entity.MapFieldColumn;
-import io.aicode.project.entity.MapStatus;
-import io.aicode.project.entity.Project;
+import com.aicode.core.enums.YNEnum;
+import com.aicode.core.tools.StringTools;
+import com.aicode.core.tools.core.Field;
+import com.aicode.core.tools.core.StringHelper;
+import com.aicode.display.entity.DisplayAttribute;
+import com.aicode.map.entity.MapClassTable;
+import com.aicode.map.entity.MapFieldColumn;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import lombok.Data;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 
 import java.io.Serializable;

@@ -1,10 +1,11 @@
-package com.aicode.core.tools.core.template;
+package com.aicode.config.template;
 
+import com.aicode.project.entity.TemplateData;
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Maps;
 import freemarker.template.Template;
+import freemarker.template.Configuration;
 import freemarker.template.TemplateException;
-import io.aicode.base.core.TemplateData;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 

@@ -1,7 +1,7 @@
-package com.aicode.core.tools.core.template;
+package com.aicode.config.template;
 
+import com.aicode.project.entity.TemplateData;
 import com.alibaba.fastjson.JSON;
-import io.aicode.base.core.TemplateData;
 import lombok.extern.slf4j.Slf4j;
 import org.beetl.core.GroupTemplate;
 import org.beetl.core.Template;

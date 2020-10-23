@@ -3,6 +3,8 @@
  */
 package com.aicode.map.entity;
 
+import com.aicode.core.enums.YNEnum;
+import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 import lombok.experimental.Accessors;
@@ -59,5 +61,22 @@ public class MapRelationship implements java.io.Serializable {
      */
     @ApiModelProperty(value = "从表关联属性")
     private java.lang.String joinField;
+
+
+    @TableField(exist = false)
+    private MapClassTable associateClass;//被关联对象被查询
+
+    @TableField(exist = false)
+    private boolean oneToOne;
+    @TableField(exist = false)
+    private boolean oneToMany;
+
+    public boolean getOneToOne() {
+        return isOneToOne.equals(YNEnum.Y.name()) ? true : false;
+    }
+
+    public boolean getOneToMany() {
+        return isOneToMany.equals(YNEnum.Y.name()) ? true : false;
+    }
 
 }

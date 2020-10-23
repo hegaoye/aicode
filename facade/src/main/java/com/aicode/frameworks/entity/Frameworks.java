@@ -3,9 +3,13 @@
  */
 package com.aicode.frameworks.entity;
 
+import com.alibaba.fastjson.annotation.JSONField;
+import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 import lombok.experimental.Accessors;
+
+import java.util.List;
 
 /**
  * 框架技术池 的实体类
@@ -53,11 +57,16 @@ public class Frameworks implements java.io.Serializable {
      * 数据库字段:password  属性显示:
      */
     @ApiModelProperty(value = "")
+    @JSONField(serialize = false)
     private java.lang.String password;
     /**
      * 数据库字段:isPublic  属性显示:
      */
     @ApiModelProperty(value = "")
     private java.lang.String isPublic;
+
+    @TableField(exist = false)
+    private List<FrameworksTemplate> frameworksTemplateList;
+
 
 }

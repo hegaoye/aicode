@@ -3,9 +3,12 @@
  */
 package com.aicode.project.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 import lombok.experimental.Accessors;
+
+import java.util.List;
 
 /**
  * 项目信息 的实体类
@@ -129,5 +132,26 @@ public class Project implements java.io.Serializable {
      */
     @ApiModelProperty(value = "是否增量生成")
     private java.lang.String isIncrement;
+
+    @TableField(exist = false)
+    private List<ProjectFramwork> projectFramworkList;
+
+    @TableField(exist = false)
+    private List<ProjectMap> projectMapList;
+
+    @TableField(exist = false)
+    private List<ProjectJob> projectJobList;
+
+    @TableField(exist = false)
+    private List<ProjectModule> projectModuleList;
+
+    @TableField(exist = false)
+    private List<ProjectRepositoryAccount> projectRepositoryAccountList;
+
+    @TableField(exist = false)
+    private List<ProjectSql> projectSqlList;
+
+    @TableField(exist = false)
+    private String relationshipAndDisplay;
 
 }

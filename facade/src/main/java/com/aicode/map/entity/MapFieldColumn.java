@@ -3,6 +3,9 @@
  */
 package com.aicode.map.entity;
 
+import com.aicode.core.enums.YNEnum;
+import com.aicode.core.tools.core.StringHelper;
+import com.aicode.core.tools.core.typemapping.DatabaseDataTypesUtils;
 import com.aicode.display.entity.DisplayAttribute;
 import com.aicode.display.vo.DisplayAttributeVO;
 import com.aicode.map.vo.MapRelationshipVO;
@@ -90,4 +93,61 @@ public class MapFieldColumn implements java.io.Serializable {
     @TableField(exist = false)
     private MapRelationship mapRelationship;
 
+
+    @TableField(exist = false)
+    private boolean checkDate;
+    @TableField(exist = false)
+    private boolean checkState;
+    @TableField(exist = false)
+    private boolean checkPk;
+    @TableField(exist = false)
+    private boolean checkDigit = false;
+    @TableField(exist = false)
+    private String upper;
+
+
+    public MapFieldColumn(String mapClassTableCode, String code, String column, String sqlType, String notes, String defaultValue, String isPrimaryKey) {
+        this.mapClassTableCode = mapClassTableCode;
+        this.code = code;
+        this.column = column;
+        this.sqlType = sqlType;
+        this.notes = notes;
+        this.defaultValue = defaultValue;
+        this.isPrimaryKey = isPrimaryKey;
+    }
+
+    public void toJava() {
+        this.field = StringHelper.toJavaVariableName(this.column);
+        if (this.field.equals("id")) {
+            this.fieldType = "java.lang.Long";
+        } else {
+            this.fieldType = DatabaseDataTypesUtils.getPreferredJavaType(this.sqlType);
+        }
+    }
+
+
+    public boolean getCheckDate() {
+        return isDate.equals(YNEnum.Y.name()) ? true : false;
+    }
+
+    public boolean getCheckState() {
+        return isState.equals(YNEnum.Y.name()) ? true : false;
+    }
+
+    public boolean getCheckPk() {
+        return isPrimaryKey.equals(YNEnum.Y.name()) ? true : false;
+    }
+
+    public boolean getCheckDigit() {
+        this.checkDigit = DatabaseDataTypesUtils.isIntegerNumber(this.fieldType);
+        if (!this.checkDigit) {
+            this.checkDigit = DatabaseDataTypesUtils.isFloatNumber(this.fieldType);
+        }
+        return checkDigit;
+    }
+
+    public String getUpper() {
+        this.upper = StringHelper.capitalize(field);
+        return this.upper;
+    }
 }

@@ -3,6 +3,8 @@
  */
 package com.aicode.project.entity;
 
+import com.aicode.frameworks.entity.Frameworks;
+import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 import lombok.experimental.Accessors;
@@ -34,5 +36,8 @@ public class ProjectFramwork implements java.io.Serializable {
      */
     @ApiModelProperty(value = "项目编码")
     private java.lang.String projectCode;
+
+    @TableField(exist = false)
+    private Frameworks frameworks;
 
 }

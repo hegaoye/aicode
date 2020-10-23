@@ -3,9 +3,11 @@
  */
 package com.aicode.project.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 import lombok.experimental.Accessors;
+import com.aicode.module.entity.Module;
 
 /**
  * 项目选择模块 的实体类
@@ -13,9 +15,9 @@ import lombok.experimental.Accessors;
  * @author hegaoye
  */
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 public class ProjectModule implements java.io.Serializable {
@@ -34,5 +36,8 @@ public class ProjectModule implements java.io.Serializable {
      */
     @ApiModelProperty(value = "模块编码")
     private java.lang.String moduleCode;
+
+    @TableField(exist = false)
+    private Module module;
 
 }

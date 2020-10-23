@@ -3,6 +3,9 @@
  */
 package com.aicode.project.entity;
 
+import com.aicode.core.tools.HandleFuncs;
+import com.aicode.map.entity.MapClassTable;
+import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 import lombok.experimental.Accessors;
@@ -60,4 +63,13 @@ public class ProjectCodeCatalog implements java.io.Serializable {
     @ApiModelProperty(value = "绝对路径")
     private java.lang.String absolutePath;
 
+
+    @TableField(exist = false)
+    private MapClassTable mapClassTable;
+
+    public String basePackage(String workspace) {
+        return (new HandleFuncs().getCurrentClassPath() + "/"
+                + workspace + "/"
+                + absolutePath).replace("//", "/");
+    }
 }

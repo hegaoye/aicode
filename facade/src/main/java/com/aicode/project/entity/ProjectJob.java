@@ -3,9 +3,12 @@
  */
 package com.aicode.project.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 import lombok.experimental.Accessors;
+
+import java.util.List;
 
 /**
  * 任务 的实体类
@@ -50,4 +53,6 @@ public class ProjectJob implements java.io.Serializable {
     @ApiModelProperty(value = "执行任务时间")
     private java.util.Date createTime;
 
+    @TableField(exist = false)
+    private List<ProjectJobLogs> projectJobLogsList;
 }

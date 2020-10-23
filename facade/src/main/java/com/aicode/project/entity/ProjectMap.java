@@ -3,6 +3,8 @@
  */
 package com.aicode.project.entity;
 
+import com.aicode.map.entity.MapClassTable;
+import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 import lombok.experimental.Accessors;
@@ -34,5 +36,8 @@ public class ProjectMap implements java.io.Serializable {
      */
     @ApiModelProperty(value = "字段属性映射编码")
     private java.lang.String mapClassTableCode;
+
+    @TableField(exist = false)
+    private MapClassTable mapClassTable;
 
 }

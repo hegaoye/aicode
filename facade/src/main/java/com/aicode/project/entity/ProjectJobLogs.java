@@ -3,9 +3,12 @@
  */
 package com.aicode.project.entity;
 
+import com.aicode.core.tools.DateTools;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 import lombok.experimental.Accessors;
+
+import java.util.Date;
 
 /**
  * 任务日志 的实体类
@@ -35,4 +38,9 @@ public class ProjectJobLogs implements java.io.Serializable {
     @ApiModelProperty(value = "日志")
     private java.lang.String log;
 
+
+    public ProjectJobLogs(String code, String log) {
+        this.code = code;
+        this.log = "> ✔ " + DateTools.yyyyMMddHHmmssSSS(new Date()) + "&nbsp;&nbsp;" + log;
+    }
 }

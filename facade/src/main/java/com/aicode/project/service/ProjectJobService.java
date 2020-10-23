@@ -25,6 +25,13 @@ public interface ProjectJobService extends IService<ProjectJob> {
      * @return List<ProjectJob>
      */
     List<ProjectJob> list(QueryWrapper<ProjectJob> queryWrapper, int offset, int limit);
+
+    /**
+     * 执行任务
+     *
+     * @param projectCode 任务编码
+     */
+    ProjectJob execute(String projectCode);
 }
 
 

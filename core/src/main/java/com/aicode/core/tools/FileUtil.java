@@ -1,7 +1,24 @@
+/*
+ *
+ *                       http://www.aicode.io
+ *
+ *
+ *      本代码仅用于AI-Code.
+ */
 package com.aicode.core.tools;
 
-import java.io.*;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.map.HashedMap;
+import org.apache.commons.lang.StringUtils;
 
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+@Slf4j
 public class FileUtil {
 
     /**
@@ -164,6 +181,32 @@ public class FileUtil {
 
 
     /**
+     * 把字节数组保存为一个文件
+     */
+    public static File getFileFromBytes(byte[] b, String outputFile) {
+        BufferedOutputStream stream = null;
+        File file = null;
+        try {
+            file = new File(outputFile);
+            FileOutputStream fstream = new FileOutputStream(file);
+            stream = new BufferedOutputStream(fstream);
+            stream.write(b);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (stream != null) {
+                try {
+                    stream.close();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+            }
+        }
+        return file;
+    }
+
+
+    /**
      * @param sourceDir 　源目录
      * @param targetDir 　目标目录
      * @throws IOException
@@ -251,48 +294,184 @@ public class FileUtil {
     }
 
     /**
-     * InputStream转换为字符串
+     * 删除文件
+     *
+     * @param path
+     * @return
      */
-    public static String fileToString(InputStream inputStream) {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-        StringBuilder sb = new StringBuilder();
-        String line;
-        try {
-            while ((line = reader.readLine()) != null) {
-                sb.append(line);
+    public static boolean delFile(String path) {
+        boolean flag = false;
+        if (StringUtils.isNotBlank(path)) {
+            File temp = new File(path);
+            if (temp.exists() && temp.isFile()) {
+                temp.delete();
+                flag = true;
             }
-            inputStream.close();
-        } catch (IOException e) {
-            e.printStackTrace();
         }
-        return sb.toString();
+        return flag;
     }
 
     /**
-     * 创建文件
-     * @param path      文件路径
-     * @param format    文件格式
-     * @return
-     * @throws IOException
+     * 下载文件
+     *
+     * @param remoteFilePath 远端文件路径
+     * @param localFilePath  本地保存文件路径
      */
-    public static File creatFile(String path, String format) throws IOException {
-        path = path + "." + format;
-        File filename = new File(path);
-        if (!filename.exists()) {
-            filename.createNewFile();
+    public static void downloadFile(String remoteFilePath, String localFilePath) {
+        URL urlfile = null;
+        HttpURLConnection httpUrl = null;
+        BufferedInputStream bis = null;
+        BufferedOutputStream bos = null;
+        File f = new File(localFilePath);
+        try {
+            urlfile = new URL(remoteFilePath);
+            httpUrl = (HttpURLConnection) urlfile.openConnection();
+            httpUrl.connect();
+            bis = new BufferedInputStream(httpUrl.getInputStream());
+            bos = new BufferedOutputStream(new FileOutputStream(f));
+            int len = 2048;
+            byte[] b = new byte[len];
+            while ((len = bis.read(b)) != -1) {
+                bos.write(b, 0, len);
+            }
+            bos.flush();
+            bis.close();
+            httpUrl.disconnect();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                bis.close();
+                bos.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
-        return filename;
+    }
+
+    /**
+     * 获取指定目录下所有文件路径
+     *
+     * @param dirPath
+     */
+    public static List<File> getDirFiles(String dirPath) {
+        List<File> ret = new ArrayList<File>();
+        File file = new File(dirPath);
+        //获取目录下的所有文件或文件夹
+        File[] files = file.listFiles();
+        if (files == null) {
+            return null;
+        }
+        // 遍历目录下的所有文件
+        for (File f : files) {
+            if (f.isFile()) {
+                ret.add(f);
+            } else if (f.isDirectory()) {
+                ret.addAll(getDirFiles(f.getAbsolutePath()));
+            }
+        }
+        return ret;
+    }
+
+    /**
+     * 获取指定目录下所有文件路径
+     *
+     * @param dir
+     */
+    public static List<Map<String, String>> sanDirFiles(String dir, String subStr) {
+        List<Map<String, String>> fileList = new ArrayList<>();
+        File fileDir = new File(dir);
+        //获取目录下的所有文件或文件夹
+        File[] files = fileDir.listFiles();
+        if (files == null) {
+            return null;
+        }
+        for (File file : files) {
+            Map<String, String> map = new HashedMap();
+            if (file.isFile()) {
+                map.put("type", "File");
+                map.put("filePath", file.getPath().substring(file.getPath().indexOf(subStr)).replace("\\", "/").replace("//", "/"));
+            } else if (file.isDirectory()) {
+                map.put("type", "Directory");
+                map.put("filePath", file.getPath().substring(file.getPath().indexOf(subStr)).replace("\\", "/").replace("//", "/"));
+            }
+            fileList.add(map);
+        }
+        return fileList;
+    }
+
+    /**
+     * 获取文件路径
+     *
+     * @param dirPath 目录
+     * @return 路径集合
+     */
+    public static List<String> getDirFilesPath(String dirPath) {
+        List<File> list = getDirFiles(dirPath);
+        List<String> pathList = new ArrayList<>();
+        for (int i = 0; i < list.size(); i++) {
+            String path = list.get(i).getAbsoluteFile().toString().replace("\\", "/");
+            if (!path.contains(".git") && !path.contains("git")) {
+                if (new File(path).isFile()) {
+                    pathList.add(path);
+                }
+            }
+        }
+        return pathList;
+    }
+
+
+    public static void createDir(String filePath, String fileName) {
+        File folder = new File(filePath);
+        //文件夹路径不存在
+        if (!folder.exists() && !folder.isDirectory()) {
+            log.info("文件夹路径不存在，创建路径:" + filePath);
+            folder.mkdirs();
+        } else {
+            log.info("文件夹路径存在:" + filePath);
+        }
+        // 如果文件不存在就创建
+        if (!"null".equals(fileName) && !StringUtils.isEmpty(fileName)) {
+            File file = new File(filePath + "/" + fileName);
+            if (!file.exists()) {
+                log.info("文件不存在，创建文件:" + filePath + "/" + fileName);
+                try {
+                    file.createNewFile();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
 
     public static void main(String[] args) {
 
-        try {
-            creatFile("C:\\test", "xls");
-        } catch (IOException e) {
-            e.printStackTrace();
+        File file = new File("C:\\workspaces\\AI-Code\\AI\\src\\main\\webapp\\templates");
+        File[] list1 = file.listFiles();
+        for (File file1 : list1) {
+            log.info(file1.getName());
         }
 
+        GitTools.cloneGit("https://gitee.com/helixin/aicode_template.git", "C:\\workspaces\\AI-Code\\AI\\build\\libs\\exploded\\AI.war\\templates\\aicode_template");
+        GitTools.deleteGitRepository("C:\\workspaces\\AI-Code\\AI\\build\\libs\\exploded\\AI.war\\templates\\aicode_template\\.git");
+
+
+        List<File> list = getDirFiles("C:\\workspaces\\AI-Code\\AI\\src\\main\\webapp\\templates\\spring-cloud-redis-lombok-sentry");
+        for (int i = 0; i < list.size(); i++) {
+            String path = list.get(i).getAbsoluteFile().toString().replace("C:\\workspaces\\AI-Code\\AI\\src\\main\\webapp\\templates", "").replace("\\", "/");
+            String sql = "INSERT into frameworks_template(code,frameworkCode,path) values('" + (888888 + i) + "','888888','" + path + "');";
+            log.info(sql);
+        }
+
+//        List<Map<String, String>> mapList = sanDirFiles("C:\\workspaces\\AI-Code\\AI\\src\\main\\webapp\\templates\\spring-cloud-redis-lombok-sentry", "announce");
+//        log.info(JSON.toJSONString(mapList));
+//        try {
+//            String fileStr = FileUtils.readFileToString(new File("C:\\workspaces\\AI-Code\\AI\\build\\libs\\exploded\\AI.war\\workspace\\announce\\cycle\\src\\main\\java\\com\\cycle\\admin\\ctrl\\AdminCtrl.java"));
+//            log.info(fileStr);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
     }
 
 }

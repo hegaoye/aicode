@@ -3,14 +3,13 @@
  */
 package com.aicode.project.ctrl;
 
+import com.aicode.core.entity.Page;
+import com.aicode.core.entity.R;
 import com.aicode.project.entity.ProjectJobLogs;
 import com.aicode.project.service.ProjectJobLogsService;
 import com.aicode.project.vo.ProjectJobLogsPageVO;
 import com.aicode.project.vo.ProjectJobLogsSaveVO;
 import com.aicode.project.vo.ProjectJobLogsVO;
-import com.aicode.core.entity.Page;
-import com.aicode.core.entity.PageVO;
-import com.aicode.core.entity.R;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -45,7 +44,7 @@ public class ProjectJobLogsController {
     @ApiOperation(value = "创建ProjectJobLogs", notes = "创建ProjectJobLogs")
     @PostMapping("/build")
     public ProjectJobLogsSaveVO build(@ApiParam(name = "创建ProjectJobLogs", value = "传入json格式", required = true)
-                                   @RequestBody ProjectJobLogsSaveVO projectJobLogsSaveVO) {
+                                      @RequestBody ProjectJobLogsSaveVO projectJobLogsSaveVO) {
         if (null == projectJobLogsSaveVO) {
             return null;
         }
@@ -61,7 +60,6 @@ public class ProjectJobLogsController {
     }
 
 
-
     /**
      * 查询任务日志信息集合
      *
@@ -69,22 +67,25 @@ public class ProjectJobLogsController {
      */
     @ApiOperation(value = "查询ProjectJobLogs信息集合", notes = "查询ProjectJobLogs信息集合")
     @ApiImplicitParams({
+            @ApiImplicitParam(name = "code", value = "任务编码", paramType = "query"),
             @ApiImplicitParam(name = "curPage", value = "当前页", required = true, paramType = "query"),
-            @ApiImplicitParam(name = "pageSize", value = "分页大小", required = true, paramType = "query"),
+            @ApiImplicitParam(name = "pageSize", value = "分页大小", required = true, paramType = "query")
     })
     @GetMapping(value = "/list")
-    public PageVO<ProjectJobLogsVO> list(@ApiIgnore ProjectJobLogsPageVO projectJobLogsVO, Integer curPage, Integer pageSize) {
+    public R list(@ApiIgnore ProjectJobLogsPageVO projectJobLogsVO, Integer curPage, Integer pageSize) {
         Page<ProjectJobLogs> page = new Page<>(pageSize, curPage);
         QueryWrapper<ProjectJobLogs> queryWrapper = new QueryWrapper<>();
+        queryWrapper.lambda().eq(ProjectJobLogs::getCode, projectJobLogsVO.getCode());
+
         int total = projectJobLogsService.count(queryWrapper);
-        PageVO<ProjectJobLogsVO> projectJobLogsVOPageVO = new PageVO<>();
         if (total > 0) {
             List<ProjectJobLogs> projectJobLogsList = projectJobLogsService.list(queryWrapper, page.genRowStart(), page.getPageSize());
-            projectJobLogsVOPageVO.setTotalRow(total);
-            projectJobLogsVOPageVO.setRecords(JSON.parseArray(JSON.toJSONString(projectJobLogsList),ProjectJobLogsVO.class));
+            page.setTotalRow(total);
+            page.setRecords(projectJobLogsList);
             log.debug(JSON.toJSONString(page));
         }
-        return projectJobLogsVOPageVO;
+
+        return R.success(page);
     }
 
 

@@ -1,7 +1,6 @@
 package com.aicode.core.tools;
 
-
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang.StringUtils;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -107,10 +106,6 @@ public class DateTools {
 
         System.out.println(isBefore(DateTools.stringToDate("2017-09-01 00:00:00"), DateTools.stringToDate("2017-10-01 00:00:00")));
 
-        System.out.println(DateTools.format(DateTools.calculateByDate(new Date(), 1)));
-        System.out.println(DateTools.isBefore(DateTools.stringToDate("2018-1-02 00:00:00"), new Date()));
-
-
     }
 
 
@@ -118,9 +113,7 @@ public class DateTools {
      * 函数介绍：根据默认模式包日期对象转换成日期字符串 参数：date ,日期对象；parttern,日期字符格式 返回值：日期字符串
      */
     public static String format(Date date, String parttern) {
-        if (date == null) {
-            return null;
-        }
+        if (date == null) return null;
         DateFormat df = new SimpleDateFormat(parttern);
         return df.format(date);
     }
@@ -141,10 +134,20 @@ public class DateTools {
      * @return
      */
     public static String yyyyMMddHHmmss(Date date) {
-        if (date == null) {
-            return null;
-        }
+        if (date == null) return null;
         return format(date, "yyyy-MM-dd HH:mm:ss");
+    }
+
+    /**
+     * 格式化时间
+     * yyyy-MM-dd HH:mm:ss:SSS
+     *
+     * @param date yyyy-MM-dd HH:mm:ss:SSS
+     * @return
+     */
+    public static String yyyyMMddHHmmssSSS(Date date) {
+        if (date == null) return null;
+        return format(date, "yyyy-MM-dd HH:mm:ss:SSS");
     }
 
     /**
@@ -183,9 +186,7 @@ public class DateTools {
      */
     public static Date stringToDate(String strDate, String format)
             throws ParseException {
-        if (strDate == null) {
-            return null;
-        }
+        if (strDate == null) return null;
         DateFormat df = new SimpleDateFormat(format);
         return df.parse(strDate);
     }
@@ -203,9 +204,7 @@ public class DateTools {
      */
     public static Date stringToDate(String strDate, DateFormat format)
             throws ParseException {
-        if (strDate == null) {
-            return null;
-        }
+        if (strDate == null) return null;
         return format.parse(strDate);
     }
 
@@ -213,9 +212,7 @@ public class DateTools {
      * 函数介绍：根据日期字符串转换成日期对象 参数：strDate,日期字符串 返回值：date 对象
      */
     public static Date stringToDate(String strDate) {
-        if (strDate == null) {
-            return null;
-        }
+        if (strDate == null) return null;
         for (DateFormat df : ACCEPT_DATE_FORMATS) {
             try {
                 return df.parse(strDate);
@@ -227,6 +224,15 @@ public class DateTools {
         return null;
     }
 
+    /**
+     * 函数介绍：把页面上得到的日期字符转换成数据库需要数字 参数：datestr,日期字符串 返回值：数字字符
+     */
+    public static String StringToNum14(String datestr) {
+        if (datestr == null || StringUtils.isBlank(datestr.trim())) {
+            return null;
+        }
+        return format(stringToDate(datestr), "yyyyMMddHHmmss");
+    }
 
     /**
      * @param datestr 原时间串
@@ -247,6 +253,12 @@ public class DateTools {
         return format(stringToDate(datestr, format), "yyyyMMddHHmmss");
     }
 
+    public static String StringToNum8(String datestr) {
+        if (datestr == null || StringUtils.isBlank(datestr.trim())) {
+            return null;
+        }
+        return format(stringToDate(datestr), "yyyyMMdd");
+    }
 
     /**
      * @param datestr 原时间串
@@ -281,6 +293,31 @@ public class DateTools {
         return format(date, "yyyyMMdd");
     }
 
+    /**
+     * @param datestr 原时间串
+     * @param format  原时间串格式
+     * @return
+     * @throws ParseException
+     * @Enclosing_Method : StringToNum08
+     * @Written by : czq
+     * @Creation Date : Oct 27, 2010 2:52:20 PM
+     * @version : v1.00
+     * @Description : 将时间串转换成yyyyMMdd形式
+     */
+    public static String StringToNum08(String datestr, String format)
+            throws ParseException {
+        if (datestr == null || StringUtils.isBlank(datestr.trim())) {
+            return null;
+        }
+        return format(stringToDate(datestr, format), "yyyyMMdd");
+    }
+
+    public static String StringToNum06(String datestr) {
+        if (datestr == null || StringUtils.isBlank(datestr.trim())) {
+            return null;
+        }
+        return format(stringToDate(datestr), "yyyyMM");
+    }
 
     /**
      * @param datestr 原时间串
@@ -424,9 +461,7 @@ public class DateTools {
      * @return
      */
     public static String getDateFormatAfter(int day, String format) {
-        if (format == null) {
-            return null;
-        }
+        if (format == null) return null;
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DAY_OF_YEAR, +day);
         SimpleDateFormat sdf = new SimpleDateFormat(format);
@@ -484,9 +519,7 @@ public class DateTools {
      * @return
      */
     public static String getFormatPreMonth(Calendar day, int num, String format) {
-        if (format == null) {
-            return null;
-        }
+        if (format == null) return null;
         day.add(Calendar.MONTH, -num);
         SimpleDateFormat sdf = new SimpleDateFormat(format);
         String nowtime = sdf.format(day.getTime());
@@ -514,9 +547,7 @@ public class DateTools {
      * @return
      */
     public static String getOracleDate(Date date) {
-        if (date == null) {
-            return null;
-        }
+        if (date == null) return null;
         String updateTime = DateTools.format(date, "yyyy-MM-dd");
         return "to_date('" + updateTime + "','YYYY-MM-DD')";
     }
@@ -528,9 +559,7 @@ public class DateTools {
      * @return
      */
     public static String getOracleDateTime(Date date) {
-        if (date == null) {
-            return null;
-        }
+        if (date == null) return null;
         String updateTime = DateTools.format(date, "yyyy-MM-dd HH:mm:ss");
         return "to_date('" + updateTime + "','YYYY-MM-DD HH24:MI:SS')";
     }
@@ -540,9 +569,7 @@ public class DateTools {
      * @return 计算两个日期的天数差异
      */
     public static long getDifferDate(String data) {
-        if (data == null) {
-            return -1;
-        }
+        if (data == null) return -1;
         Date newdate = new Date();
         Date date1 = DateTools.stringToDate(data);
         long t1 = newdate.getTime();
@@ -558,9 +585,7 @@ public class DateTools {
      * @return
      */
     public static long getTimestmp(Date date) {
-        if (date == null) {
-            return -1;
-        }
+        if (date == null) return -1;
         return date.getTime();
     }
 
@@ -584,9 +609,7 @@ public class DateTools {
      * @throws ParseException
      */
     public static int daysBetween(Date smdate, Date bdate) throws ParseException {
-        if (smdate == null || bdate == null) {
-            return -1;
-        }
+        if (smdate == null || bdate == null) return -1;
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         smdate = sdf.parse(sdf.format(smdate));
         bdate = sdf.parse(sdf.format(bdate));
@@ -604,9 +627,7 @@ public class DateTools {
      * 字符串的日期格式的计算两个日期相差天数
      */
     public static int daysBetween(String smdate, String bdate) throws ParseException {
-        if (smdate == null || bdate == null) {
-            return -1;
-        }
+        if (smdate == null || bdate == null) return -1;
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         Calendar cal = Calendar.getInstance();
         cal.setTime(sdf.parse(smdate));
@@ -626,9 +647,7 @@ public class DateTools {
      * @return
      */
     public static long diffminutes(String smallDate, String bigDate) {
-        if (smallDate == null || bigDate == null) {
-            return -1;
-        }
+        if (smallDate == null || bigDate == null) return -1;
         Date begin = stringToDate(smallDate);
         Date end = stringToDate(bigDate);
         long between = (end.getTime() - begin.getTime()) / 1000;//除以1000是为了转换成秒
@@ -646,9 +665,7 @@ public class DateTools {
      * @return
      */
     public static Date getSomeOneDay(String dateToNum14, int date_num, int date_type) {
-        if (dateToNum14 == null) {
-            return null;
-        }
+        if (dateToNum14 == null) return null;
         Calendar c = Calendar.getInstance();
 
         Date config_time = DateTools.stringToDate(dateToNum14);
@@ -700,9 +717,7 @@ public class DateTools {
      * @return
      */
     public static Date getSomeOneDay(String dateToNum14, String timeStr) {
-        if (dateToNum14 == null || timeStr == null) {
-            return null;
-        }
+        if (dateToNum14 == null || timeStr == null) return null;
         int time = 0;
         int type = -1;
         if (timeStr.toLowerCase().contains("s")) {
@@ -737,9 +752,7 @@ public class DateTools {
      * @return
      */
     public static long getMilliseconds(String timeStr) {
-        if (timeStr == null) {
-            return -1;
-        }
+        if (timeStr == null) return -1;
         //计算预期时间
         Date someday = getSomeOneDay(DateTools.dateToNum14(new Date()), timeStr);
         //计算预期时间和当前时间的毫秒数差
@@ -800,9 +813,7 @@ public class DateTools {
      * @return
      */
     public static int monthBetween(String day1, String day2) {
-        if (day1 == null || day2 == null) {
-            return -1;
-        }
+        if (day1 == null || day2 == null) return -1;
         int differ = 0;
         try {
             Calendar c = Calendar.getInstance();
@@ -829,10 +840,8 @@ public class DateTools {
      * 计算今天和传入的月份差
      */
     public static int getDifferMonth(String day) {
-        if (day == null) {
-            return -1;
-        }
-        String currentDay = DateTools.stringToNum8(DateTools.dateToNum14(new Date()));
+        if (day == null) return -1;
+        String currentDay = DateTools.StringToNum8(DateTools.dateToNum14(new Date()));
         return DateTools.monthBetween(currentDay, day);
     }
 
@@ -844,9 +853,7 @@ public class DateTools {
      * @return
      */
     public static long secondsBetween(String d1, String d2) {
-        if (d1 == null || d2 == null) {
-            return -1;
-        }
+        if (d1 == null || d2 == null) return -1;
         long differ = 0;
         try {
             DateFormat df = new SimpleDateFormat("yyyyMMddHHmmss");
@@ -876,7 +883,7 @@ public class DateTools {
         //判断要计算的日期是否是周日，如果是则减一天计算周六的，否则会出问题，计算到下一周去了
         int dayWeek = cal.get(Calendar.DAY_OF_WEEK);//获得当前日期是一个星期的第几天
         if (1 == dayWeek) {
-            return 0L;
+            return 0l;
         }
         cal.setFirstDayOfWeek(Calendar.MONDAY);//设置一个星期的第一天，按中国的习惯一个星期的第一天是星期一
         int day = cal.get(Calendar.DAY_OF_WEEK);//获得当前日期是一个星期的第几天
@@ -896,9 +903,7 @@ public class DateTools {
      * @return
      */
     public static String getMondayByToday(String today) {
-        if (today == null) {
-            return null;
-        }
+        if (today == null) return null;
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss"); //设置时间格式
             Calendar cal = Calendar.getInstance();
@@ -934,9 +939,7 @@ public class DateTools {
      * @return
      */
     public static String getSundayByToday(String today) {
-        if (today == null) {
-            return null;
-        }
+        if (today == null) return null;
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss"); //设置时间格式
             Calendar cal = Calendar.getInstance();
@@ -972,9 +975,7 @@ public class DateTools {
      * @return
      */
     public static String getFirstDayOfMonth(String today) {
-        if (today == null) {
-            return null;
-        }
+        if (today == null) return null;
         try {
             int year = Integer.parseInt(today.substring(0, 4));
             int month = Integer.parseInt(today.substring(4, 6));
@@ -994,9 +995,7 @@ public class DateTools {
      * @return
      */
     public static String getLastDayOfMonth(String today) {
-        if (today == null) {
-            return null;
-        }
+        if (today == null) return null;
         try {
             int year = Integer.parseInt(today.substring(0, 4));
             int month = Integer.parseInt(today.substring(4, 6));
@@ -1016,13 +1015,11 @@ public class DateTools {
      * @param date1
      * @param date2
      * @return Integer
-     * .0
+     * @version 1.0.0
      * @2017-3-22 15:04:17
      */
     public static Integer isBefore(Date date1, Date date2) {
-        if (date1 == null || date2 == null) {
-            return null;
-        }
+        if (date1 == null || date2 == null) return null;
         Integer result = 0;
         try {
             if (date1.compareTo(date2) < 0) {//早
@@ -1040,7 +1037,7 @@ public class DateTools {
     /**
      * 获取当前年
      *
-     * .0
+     * @version 1.0.0
      * @2017-3-22 16:13:15
      */
     public static Integer getCurYear() {
@@ -1053,7 +1050,7 @@ public class DateTools {
     /**
      * 获取当前月
      *
-     * .0
+     * @version 1.0.0
      * @2017-3-22 16:13:20
      */
     public static Integer getCurMonth() {
@@ -1065,7 +1062,7 @@ public class DateTools {
     /**
      * 获取当前日期
      *
-     * .0
+     * @version 1.0.0
      * @2017-3-22 16:13:24
      */
     public static Integer getCurDate() {
@@ -1077,7 +1074,7 @@ public class DateTools {
     /**
      * 获取当前周几
      *
-     * .0
+     * @version 1.0.0
      * @2017-3-22 16:13:29
      */
     public static String getCurDay() {
@@ -1095,9 +1092,7 @@ public class DateTools {
      * @throws Exception
      */
     public static int getAge(Date birthDay) {
-        if (birthDay == null) {
-            return -1;
-        }
+        if (birthDay == null) return -1;
         Calendar cal = Calendar.getInstance();
         int age = 0;
         if (cal.before(birthDay)) {
@@ -1116,9 +1111,7 @@ public class DateTools {
 
         if (monthNow <= monthBirth) {
             if (monthNow == monthBirth) {
-                if (dayOfMonthNow < dayOfMonthBirth) {
-                    age--;
-                }
+                if (dayOfMonthNow < dayOfMonthBirth) age--;
             } else {
                 age--;
             }
@@ -1134,9 +1127,7 @@ public class DateTools {
      * @return
      */
     public static Date getBirthday(Integer age) {
-        if (age == null) {
-            return null;
-        }
+        if (age == null) return null;
         Calendar curCalendar = Calendar.getInstance();           //获取现在时间
         int curYear = curCalendar.get(Calendar.YEAR);//获取年份
         int curMonth = curCalendar.get(Calendar.MONTH);//获取月份
@@ -1165,30 +1156,17 @@ public class DateTools {
      * @return 计算后的日期(时间).
      */
     public static Date calculateByDate(Date d, int amount) {
-        if (d == null) {
-            return null;
-        }
+        if (d == null) return null;
         return calculate(d, GregorianCalendar.DATE, amount);
     }
 
     public static Date calculateByMinute(Date d, int amount) {
-        if (d == null) {
-            return null;
-        }
+        if (d == null) return null;
         return calculate(d, GregorianCalendar.MINUTE, amount);
     }
 
-    public static Date calculateByMonth(Date d, int amount) {
-        if (d == null) {
-            return null;
-        }
-        return calculate(d, GregorianCalendar.MONTH, amount);
-    }
-
     public static Date calculateByYear(Date d, int amount) {
-        if (d == null) {
-            return null;
-        }
+        if (d == null) return null;
         return calculate(d, GregorianCalendar.YEAR, amount);
     }
 
@@ -1213,9 +1191,8 @@ public class DateTools {
      * @return 计算后的日期(时间).
      */
     private static Date calculate(Date d, int field, int amount) {
-        if (d == null) {
+        if (d == null)
             return null;
-        }
         GregorianCalendar g = new GregorianCalendar();
         g.setTime(d);
         g.add(field, amount);
@@ -1230,12 +1207,10 @@ public class DateTools {
      * @return 日期转化后的字符串.
      */
     public static String date2String(String formater, Date aDate) {
-        if (formater == null || "".equals(formater)) {
+        if (formater == null || "".equals(formater))
             return null;
-        }
-        if (aDate == null) {
+        if (aDate == null)
             return null;
-        }
         return (new SimpleDateFormat(formater)).format(aDate);
     }
 
@@ -1246,9 +1221,7 @@ public class DateTools {
      * @return 日期转化后的字符串.
      */
     public static String date2String(String formater) {
-        if (formater == null) {
-            return null;
-        }
+        if (formater == null) return null;
         return date2String(formater, new Date());
     }
 
@@ -1260,7 +1233,7 @@ public class DateTools {
      */
     public static int dayOfWeek() {
         GregorianCalendar g = new GregorianCalendar();
-        int ret = g.get(Calendar.DAY_OF_WEEK);
+        int ret = g.get(java.util.Calendar.DAY_OF_WEEK);
         g = null;
         return ret;
     }
@@ -1279,7 +1252,7 @@ public class DateTools {
         for (int i = 0; i < ids.length; i++) {
             v.add(ids[i]);
         }
-        Collections.sort(v, String.CASE_INSENSITIVE_ORDER);
+        java.util.Collections.sort(v, String.CASE_INSENSITIVE_ORDER);
         v.copyInto(ids);
         v = null;
         return ids;
@@ -1292,9 +1265,7 @@ public class DateTools {
      * @return
      */
     public static String times(String timeStamp) {
-        if (timeStamp == null) {
-            return null;
-        }
+        if (timeStamp == null) return null;
         SimpleDateFormat sdr = new SimpleDateFormat("yyyy年MM月dd日HH时mm分ss秒");
         int i = Integer.parseInt(timeStamp);
         String times = sdr.format(new Date(i * 1000L));
@@ -1309,9 +1280,7 @@ public class DateTools {
      * @return
      */
     public static String times(String timeStamp, String pattern) {
-        if (timeStamp == null || pattern == null) {
-            return null;
-        }
+        if (timeStamp == null || pattern == null) return null;
         SimpleDateFormat sdr = new SimpleDateFormat(pattern);
         int i = Integer.parseInt(timeStamp);
         String times = sdr.format(new Date(i * 1000L));
@@ -1341,18 +1310,14 @@ public class DateTools {
      */
     public static String string2Timezone(String srcFormater,
                                          String srcDateTime, String dstFormater, String dstTimeZoneId) {
-        if (srcFormater == null || "".equals(srcFormater)) {
+        if (srcFormater == null || "".equals(srcFormater))
             return null;
-        }
-        if (srcDateTime == null || "".equals(srcDateTime)) {
+        if (srcDateTime == null || "".equals(srcDateTime))
             return null;
-        }
-        if (dstFormater == null || "".equals(dstFormater)) {
+        if (dstFormater == null || "".equals(dstFormater))
             return null;
-        }
-        if (dstTimeZoneId == null || "".equals(dstTimeZoneId)) {
+        if (dstTimeZoneId == null || "".equals(dstTimeZoneId))
             return null;
-        }
         SimpleDateFormat sdf = new SimpleDateFormat(srcFormater);
         try {
             int diffTime = getDiffTimeZoneRawOffset(dstTimeZoneId);
@@ -1373,7 +1338,7 @@ public class DateTools {
     /**
      * 获取系统当前默认时区与UTC的时间差.(单位:毫秒)
      *
-     * @return 系统当前默认时区与UTC的时间差.(单位 : 毫秒)
+     * @return 系统当前默认时区与UTC的时间差.(单位:毫秒)
      */
     private static int getDefaultTimeZoneRawOffset() {
         return TimeZone.getDefault().getRawOffset();
@@ -1383,12 +1348,10 @@ public class DateTools {
      * 获取指定时区与UTC的时间差.(单位:毫秒)
      *
      * @param timeZoneId 时区Id
-     * @return 指定时区与UTC的时间差.(单位 : 毫秒)
+     * @return 指定时区与UTC的时间差.(单位:毫秒)
      */
     private static int getTimeZoneRawOffset(String timeZoneId) {
-        if (timeZoneId == null) {
-            return -1;
-        }
+        if (timeZoneId == null) return -1;
         return TimeZone.getTimeZone(timeZoneId).getRawOffset();
     }
 
@@ -1396,12 +1359,10 @@ public class DateTools {
      * 获取系统当前默认时区与指定时区的时间差.(单位:毫秒)
      *
      * @param timeZoneId 时区Id
-     * @return 系统当前默认时区与指定时区的时间差.(单位 : 毫秒)
+     * @return 系统当前默认时区与指定时区的时间差.(单位:毫秒)
      */
     private static int getDiffTimeZoneRawOffset(String timeZoneId) {
-        if (timeZoneId == null) {
-            return -1;
-        }
+        if (timeZoneId == null) return -1;
         return TimeZone.getDefault().getRawOffset()
                 - TimeZone.getTimeZone(timeZoneId).getRawOffset();
     }
@@ -1438,9 +1399,7 @@ public class DateTools {
      * eg:utc2Local("2017-06-14 09:37:50.788+08:00", "yyyy-MM-dd HH:mm:ss.SSSXXX", "yyyy-MM-dd HH:mm:ss.SSS")
      */
     public static String utc2TimeZone(String utcTime, String timeZone, String patten) {
-        if (utcTime == null || timeZone == null || patten == null) {
-            return null;
-        }
+        if (utcTime == null || timeZone == null || patten == null) return null;
         SimpleDateFormat utcFormater = new SimpleDateFormat(patten);
         utcFormater.setTimeZone(TimeZone.getTimeZone("UTC"));//时区定义并进行时间获取
         Date gpsUTCDate = null;
@@ -1479,9 +1438,7 @@ public class DateTools {
      * @return UTC
      */
     public static Date toUtc(Date date) {
-        if (date == null) {
-            return null;
-        }
+        if (date == null) return null;
         String utcStr = date2Timezone(format(date, "yyyy-MM-dd HH:mm:ss"), "UTC");
         return stringToDate(utcStr);
     }
@@ -1493,9 +1450,7 @@ public class DateTools {
      * @return UTC yyyy-MM-dd'T'HH:mm'Z'
      */
     public static String toUtcFmt(Date date) {
-        if (date == null) {
-            return null;
-        }
+        if (date == null) return null;
         return format(date, "yyyy-MM-dd'T'HH:mm:ss'Z'");
     }
 
@@ -1507,9 +1462,7 @@ public class DateTools {
      * @return
      */
     public static Date utcToDate(String utcDate) {
-        if (utcDate == null) {
-            return null;
-        }
+        if (utcDate == null) return null;
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
         df.setTimeZone(TimeZone.getTimeZone("UTC"));
         try {
@@ -1530,9 +1483,7 @@ public class DateTools {
      */
     public static Date getTimeZoneDate(String dateStr, String timeZone) {
         try {
-            if (dateStr == null || timeZone == null) {
-                return null;
-            }
+            if (dateStr == null || timeZone == null) return null;
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             simpleDateFormat.setTimeZone(TimeZone.getTimeZone(timeZone));
             Date date = simpleDateFormat.parse(dateStr);
@@ -1551,9 +1502,7 @@ public class DateTools {
      * @return Date
      */
     public static Date toUtc(String dateStr, String timeZone) {
-        if (dateStr == null || timeZone == null) {
-            return null;
-        }
+        if (dateStr == null || timeZone == null) return null;
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         simpleDateFormat.setTimeZone(TimeZone.getTimeZone(timeZone));
         Date date1 = null;
@@ -1569,9 +1518,7 @@ public class DateTools {
     }
 
     public static Date toUtc(Date date, String timeZone) {
-        if (date == null || timeZone == null) {
-            return null;
-        }
+        if (date == null || timeZone == null) return null;
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         simpleDateFormat.setTimeZone(TimeZone.getTimeZone(timeZone));
         Date date1 = null;

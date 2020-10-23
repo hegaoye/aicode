@@ -47,6 +47,7 @@ ext {
 dependencies {
 
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
     //----------- mybatis mysql druid start--------------
@@ -68,6 +69,13 @@ dependencies {
     implementation 'com.alibaba:fastjson:1.2.59'
     implementation 'com.github.ben-manes.caffeine:caffeine:2.8.1'
     implementation 'com.github.pagehelper:pagehelper:5.1.11'
+
+    implementation 'commons-io:commons-io:2.4'
+    implementation 'org.apache.commons:commons-lang3:3.4'
+    implementation 'commons-fileupload:commons-fileupload:1.2.1'
+    implementation 'commons-collections:commons-collections:3.2.1'
+    implementation 'org.springframework.boot:spring-boot-starter-freemarker:2.1.2.RELEASE'
+    implementation 'com.ibeetl:beetl:3.0.19.RELEASE'
 
     implementation project(path: ':core')
     implementation project(path: ':common')

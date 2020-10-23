@@ -3,6 +3,7 @@
  */
 package com.aicode.map.entity;
 
+import com.aicode.display.entity.DisplayAttribute;
 import com.aicode.display.vo.DisplayAttributeVO;
 import com.aicode.map.vo.MapRelationshipVO;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -84,8 +85,9 @@ public class MapFieldColumn implements java.io.Serializable {
     private java.lang.String isState;
 
     @TableField(exist = false)
-    private DisplayAttributeVO displayAttribute;
+    private DisplayAttribute displayAttribute;
+
     @TableField(exist = false)
-    private MapRelationshipVO mapRelationship;
+    private MapRelationship mapRelationship;
 
 }

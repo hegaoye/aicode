@@ -33,7 +33,7 @@ public class ProjectJobPageVO extends BaseVO implements java.io.Serializable {
      * 数据库字段:number  属性显示:第多少次执行
      */
     @ApiModelProperty(value = "第多少次执行")
-    private java.lang.String number;
+    private int number;
     /**
      * 数据库字段:state  属性显示:任务状态: {创建:Create} , {执行中:Executing}, {完成:Completed} ,{失败:Error}, {警告:Waring}
      */

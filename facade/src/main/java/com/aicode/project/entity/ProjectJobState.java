@@ -9,7 +9,11 @@ package com.aicode.project.entity;
  * @author hegaoye
  */
 public enum ProjectJobState implements java.io.Serializable {
-    ;
+    Create("创建"),
+    Executing("执行中"),
+    Completed("完成"),
+    Error("失败"),
+    Waring("警告");
 
     public String val;
 

@@ -3,6 +3,8 @@
  */
 package com.aicode.project.ctrl;
 
+import com.aicode.config.websocket.WSClientManager;
+import com.aicode.core.exceptions.BaseException;
 import com.aicode.project.entity.ProjectJob;
 import com.aicode.project.service.ProjectJobService;
 import com.aicode.project.vo.ProjectJobPageVO;
@@ -14,17 +16,28 @@ import com.aicode.core.entity.R;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import io.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.websocket.Session;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 任务
+ * 1.查询任务详情信息
+ * 2.查询项目任务信息集合
+ * 3.创建任务
+ * 4.修改任务
+ * 5.删除任务
+ * 6.执行任务
  *
  * @author hegaoye
  */
@@ -35,7 +48,29 @@ import java.util.List;
 public class ProjectJobController {
     @Autowired
     private ProjectJobService projectJobService;
+    @Autowired
+    private WSClientManager wsClientManager;
 
+    /**
+     * 查询任务详情信息
+     *
+     * @param code 任务编码
+     * @return BeanRet
+     */
+    @ApiOperation(value = "查询任务详情信息", notes = "查询任务详情信息")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "code", value = "任务编码", paramType = "query")
+    })
+    @GetMapping(value = "/load")
+    @ResponseBody
+    public R load(String code) {
+        Assert.hasText(code, BaseException.BaseExceptionEnum.Empty_Param.toString());
+        ProjectJob projectJob = projectJobService.getOne(new LambdaQueryWrapper<ProjectJob>()
+                .eq(ProjectJob::getCode, code));
+        log.info(JSON.toJSONString(projectJob));
+        return R.success(projectJob);
+
+    }
 
     /**
      * 创建 任务
@@ -43,21 +78,23 @@ public class ProjectJobController {
      * @return R
      */
     @ApiOperation(value = "创建ProjectJob", notes = "创建ProjectJob")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "projectCode", value = "项目编码", required = true, paramType = "query"),
+            @ApiImplicitParam(name = "name", value = "任务名", required = true, paramType = "query"),
+            @ApiImplicitParam(name = "description", value = "任务描述", required = true, paramType = "query")
+    })
     @PostMapping("/build")
-    public ProjectJobSaveVO build(@ApiParam(name = "创建ProjectJob", value = "传入json格式", required = true)
-                                   @RequestBody ProjectJobSaveVO projectJobSaveVO) {
-        if (null == projectJobSaveVO) {
-            return null;
+    public R build(@ApiIgnore ProjectJob projectJob) {
+
+        ProjectJob projectJobLoad = projectJobService.getOne(new LambdaQueryWrapper<ProjectJob>()
+                .eq(ProjectJob::getProjectCode, projectJob.getProjectCode()));
+        if (null != projectJobLoad) {
+            return R.success(projectJobLoad);
         }
-        ProjectJob newProjectJob = new ProjectJob();
-        BeanUtils.copyProperties(projectJobSaveVO, newProjectJob);
+        projectJobService.save(projectJob);
 
-        projectJobService.save(newProjectJob);
-
-        projectJobSaveVO = new ProjectJobSaveVO();
-        BeanUtils.copyProperties(newProjectJob, projectJobSaveVO);
-        log.debug(JSON.toJSONString(projectJobSaveVO));
-        return projectJobSaveVO;
+        log.debug(JSON.toJSONString(projectJob));
+        return R.success(projectJob);
     }
 
 
@@ -88,30 +125,26 @@ public class ProjectJobController {
      */
     @ApiOperation(value = "查询ProjectJob信息集合", notes = "查询ProjectJob信息集合")
     @ApiImplicitParams({
+            @ApiImplicitParam(name = "code", value = "项目编码", paramType = "query"),
             @ApiImplicitParam(name = "curPage", value = "当前页", required = true, paramType = "query"),
-            @ApiImplicitParam(name = "pageSize", value = "分页大小", required = true, paramType = "query"),
-            @ApiImplicitParam(name = "createTimeBegin", value = "执行任务时间", paramType = "query"),
-            @ApiImplicitParam(name = "createTimeEnd", value = "执行任务时间", paramType = "query")
+            @ApiImplicitParam(name = "pageSize", value = "分页大小", required = true, paramType = "query")
     })
     @GetMapping(value = "/list")
-    public PageVO<ProjectJobVO> list(@ApiIgnore ProjectJobPageVO projectJobVO, Integer curPage, Integer pageSize) {
+    public R list(@ApiIgnore ProjectJobPageVO projectJobVO, Integer curPage, Integer pageSize) {
         Page<ProjectJob> page = new Page<>(pageSize, curPage);
         QueryWrapper<ProjectJob> queryWrapper = new QueryWrapper<>();
-        if (projectJobVO.getCreateTimeBegin() != null) {
-            queryWrapper.lambda().gt(ProjectJob::getCreateTime, projectJobVO.getCreateTimeBegin());
+        if (StringUtils.isNotEmpty(projectJobVO.getProjectCode())) {
+            queryWrapper.lambda().gt(ProjectJob::getProjectCode, projectJobVO.getProjectCode());
         }
-        if (projectJobVO.getCreateTimeEnd() != null) {
-            queryWrapper.lambda().lt(ProjectJob::getCreateTime, projectJobVO.getCreateTimeEnd());
-        }
+
         int total = projectJobService.count(queryWrapper);
-        PageVO<ProjectJobVO> projectJobVOPageVO = new PageVO<>();
         if (total > 0) {
             List<ProjectJob> projectJobList = projectJobService.list(queryWrapper, page.genRowStart(), page.getPageSize());
-            projectJobVOPageVO.setTotalRow(total);
-            projectJobVOPageVO.setRecords(JSON.parseArray(JSON.toJSONString(projectJobList),ProjectJobVO.class));
+            page.setTotalRow(total);
+            page.setRecords(projectJobList);
             log.debug(JSON.toJSONString(page));
         }
-        return projectJobVOPageVO;
+        return R.success(page);
     }
 
 
@@ -121,14 +154,20 @@ public class ProjectJobController {
      * @return R
      */
     @ApiOperation(value = "修改ProjectJob", notes = "修改ProjectJob")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "code", value = "项目编码", required = true, paramType = "query"),
+            @ApiImplicitParam(name = "name", value = "任务名", paramType = "query"),
+            @ApiImplicitParam(name = "state", value = "任务状态", paramType = "query"),
+            @ApiImplicitParam(name = "description", value = "任务描述", paramType = "query")
+    })
     @PutMapping("/modify")
-    public boolean modify(@ApiParam(name = "修改ProjectJob", value = "传入json格式", required = true)
-                          @RequestBody ProjectJobVO projectJobVO) {
-        ProjectJob newProjectJob = new ProjectJob();
-        BeanUtils.copyProperties(projectJobVO, newProjectJob);
-        boolean isUpdated = projectJobService.update(newProjectJob, new LambdaQueryWrapper<ProjectJob>()
-                .eq(ProjectJob::getId, projectJobVO.getId()));
-        return isUpdated;
+    public R modify(@ApiIgnore ProjectJob projectJob) {
+        if (StringUtils.isEmpty(projectJob.getState())) {
+            R.failed(BaseException.BaseExceptionEnum.Empty_Param);
+        }
+        projectJobService.update(projectJob, new LambdaQueryWrapper<ProjectJob>()
+                .eq(ProjectJob::getCode, projectJob.getCode()));
+        return R.success(projectJob);
     }
 
 
@@ -139,7 +178,6 @@ public class ProjectJobController {
      */
     @ApiOperation(value = "删除ProjectJob", notes = "删除ProjectJob")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "id", paramType = "query"),
             @ApiImplicitParam(name = "code", value = "任务编码", paramType = "query")
     })
     @DeleteMapping("/delete")
@@ -147,8 +185,36 @@ public class ProjectJobController {
         ProjectJob newProjectJob = new ProjectJob();
         BeanUtils.copyProperties(projectJobVO, newProjectJob);
         projectJobService.remove(new LambdaQueryWrapper<ProjectJob>()
-                .eq(ProjectJob::getId, projectJobVO.getId()));
+                .eq(ProjectJob::getCode, projectJobVO.getCode()));
         return R.success("删除成功");
     }
 
+    /**
+     * 构建任务
+     *
+     * @param code 项目编码
+     * @return BeanRet
+     */
+    @ApiOperation(value = "执行任务", notes = "执行任务")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "code", value = "任务编码", paramType = "query")
+    })
+    @GetMapping(value = "/execute")
+    @ResponseBody
+    public R execute(String code, HttpServletRequest request) {
+        try {
+            Assert.hasText(code, BaseException.BaseExceptionEnum.Empty_Param.toString());
+            Session webSocketSession = wsClientManager.get();
+            if (webSocketSession != null) {
+                //生成代码
+                ProjectJob projectJob = projectJobService.execute(code);
+                return R.success(projectJob);
+            }
+            return R.failed("");
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+            return R.failed("执行任务失败");
+        }
+    }
 }

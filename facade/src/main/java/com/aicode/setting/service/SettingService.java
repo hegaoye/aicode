@@ -4,6 +4,7 @@
 package com.aicode.setting.service;
 
 import com.aicode.setting.entity.Setting;
+import com.aicode.setting.entity.SettingKey;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -25,6 +26,14 @@ public interface SettingService extends IService<Setting> {
      * @return List<Setting>
      */
     List<Setting> list(QueryWrapper<Setting> queryWrapper, int offset, int limit);
+
+    /**
+     * 根据key 获得 value
+     *
+     * @param key Setting.Key
+     * @return T
+     */
+    <T> T load(SettingKey key, Class<T>... clazz);
 }
 
 

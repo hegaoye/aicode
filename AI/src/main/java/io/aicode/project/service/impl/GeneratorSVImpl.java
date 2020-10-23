@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.baidu.fsg.uid.UidGenerator;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import io.aicode.base.core.ModelData;
+import io.aicode.project.entity.ModelData;
 import io.aicode.base.core.StringHelper;
 import io.aicode.base.core.TemplateData;
 import io.aicode.base.core.template.Configuration;

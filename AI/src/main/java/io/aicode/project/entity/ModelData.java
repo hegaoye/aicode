@@ -1,6 +1,5 @@
-package io.aicode.base.core;
+package io.aicode.project.entity;
 
-import io.aicode.project.entity.MapClassTable;
 import lombok.Data;
 
 import java.util.List;

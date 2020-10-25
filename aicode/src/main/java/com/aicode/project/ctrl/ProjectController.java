@@ -169,7 +169,7 @@ public class ProjectController {
 
         Project project = projectService.getOne(new LambdaQueryWrapper<Project>()
                 .eq(Project::getCode, code));
-        String workspace = settingService.load(SettingKey.Workspace));
+        String workspace = settingService.load(SettingKey.Workspace);
 
         filePath = workspace + filePath;
         log.info(filePath);

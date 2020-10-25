@@ -1,9 +1,10 @@
 package com.aicode.core.tools.core.model.db.sql.model;
 
 
-import io.aicode.base.core.BeanHelper;
-import io.aicode.base.core.StringHelper;
-import io.aicode.base.core.model.db.table.model.Column;
+import com.aicode.core.tools.core.model.db.table.model.Column;
+import com.aicode.core.tools.core.BeanHelper;
+import com.aicode.core.tools.core.StringHelper;
+import com.aicode.core.tools.core.model.db.table.model.Column;
 
 public class SqlParameter extends Column {
     String parameterClass;
@@ -31,7 +32,9 @@ public class SqlParameter extends Column {
 
 
     public String getParameterClass() {
-        if (StringHelper.isNotBlank(parameterClass)) return parameterClass;
+        if (StringHelper.isNotBlank(parameterClass)) {
+            return parameterClass;
+        }
         return getPossibleShortJavaType();
     }
 
@@ -85,9 +88,14 @@ public class SqlParameter extends Column {
         this.isListParam = isListParam;
     }
 
+    @Override
     public boolean equals(Object obj) {
-        if (obj == this) return true;
-        if (obj == null) return false;
+        if (obj == this) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
         if (obj instanceof SqlParameter) {
             SqlParameter other = (SqlParameter) obj;
             return paramName.equals(other.getParamName());
@@ -96,10 +104,12 @@ public class SqlParameter extends Column {
         }
     }
 
+    @Override
     public int hashCode() {
         return paramName.hashCode();
     }
 
+    @Override
     public String toString() {
         return "paramName:" + paramName + " preferredParameterJavaType:" + getPreferredParameterJavaType();
     }

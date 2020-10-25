@@ -1,8 +1,9 @@
 package com.aicode.core.tools.core.typemapping;
 
 
-import io.aicode.base.core.StringHelper;
-import io.aicode.base.core.model.java.JavaClass;
+
+import com.aicode.core.tools.core.StringHelper;
+import com.aicode.core.tools.core.model.java.JavaClass;
 
 import java.util.Set;
 import java.util.TreeSet;
@@ -26,12 +27,22 @@ public class JavaImport {
     }
 
     public static void addImportClass(Set<JavaClass> set, Class... clazzes) {
-        if (clazzes == null) return;
+        if (clazzes == null) {
+            return;
+        }
         for (Class c : clazzes) {
-            if (c == null) continue;
-            if (c.getName().startsWith("java.lang.")) continue;
-            if (c.isPrimitive()) continue;
-            if ("void".equals(c.getName())) continue;
+            if (c == null) {
+                continue;
+            }
+            if (c.getName().startsWith("java.lang.")) {
+                continue;
+            }
+            if (c.isPrimitive()) {
+                continue;
+            }
+            if ("void".equals(c.getName())) {
+                continue;
+            }
             if (JavaImport.isNeedImport(c.getName())) {
                 set.add(new JavaClass(c));
             }

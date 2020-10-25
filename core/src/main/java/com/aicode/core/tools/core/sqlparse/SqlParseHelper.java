@@ -1,10 +1,11 @@
 package com.aicode.core.tools.core.sqlparse;
 
 
-import io.aicode.base.core.GLogger;
-import io.aicode.base.core.IOHelper;
-import io.aicode.base.core.StringHelper;
-import io.aicode.base.core.model.db.table.TableFactory;
+
+import com.aicode.core.tools.core.GLogger;
+import com.aicode.core.tools.core.IOHelper;
+import com.aicode.core.tools.core.StringHelper;
+import com.aicode.core.tools.core.model.db.table.TableFactory;
 
 import java.io.StringReader;
 import java.sql.PreparedStatement;

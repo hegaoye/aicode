@@ -1,17 +1,17 @@
 package com.aicode.core.tools.core.model.db.sql;
 
 
-import io.aicode.base.core.BeanHelper;
-import io.aicode.base.core.DataSourceProvider;
-import io.aicode.base.core.GLogger;
-import io.aicode.base.core.StringHelper;
-import io.aicode.base.core.model.db.sql.model.Sql;
-import io.aicode.base.core.model.db.sql.model.SqlParameter;
-import io.aicode.base.core.model.db.table.TableFactory;
-import io.aicode.base.core.model.db.table.model.Column;
-import io.aicode.base.core.model.db.table.model.Table;
-import io.aicode.base.core.sqlparse.*;
-import io.aicode.base.core.typemapping.JdbcType;
+import com.aicode.core.tools.core.BeanHelper;
+import com.aicode.core.tools.core.DataSourceProvider;
+import com.aicode.core.tools.core.GLogger;
+import com.aicode.core.tools.core.StringHelper;
+import com.aicode.core.tools.core.model.db.sql.model.Sql;
+import com.aicode.core.tools.core.model.db.sql.model.SqlParameter;
+import com.aicode.core.tools.core.model.db.table.TableFactory;
+import com.aicode.core.tools.core.model.db.table.model.Column;
+import com.aicode.core.tools.core.model.db.table.model.Table;
+import com.aicode.core.tools.core.sqlparse.*;
+import com.aicode.core.tools.core.typemapping.JdbcType;
 
 import java.sql.*;
 import java.util.*;

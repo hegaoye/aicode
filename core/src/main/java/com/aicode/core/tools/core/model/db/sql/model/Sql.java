@@ -1,11 +1,11 @@
 package com.aicode.core.tools.core.model.db.sql.model;
 
 
-import io.aicode.base.core.StringHelper;
-import io.aicode.base.core.model.db.table.model.Column;
-import io.aicode.base.core.model.db.table.model.Table;
-import io.aicode.base.core.sqlparse.SqlParseHelper;
-import io.aicode.base.core.sqlparse.SqlTypeChecker;
+import com.aicode.core.tools.core.StringHelper;
+import com.aicode.core.tools.core.model.db.table.model.Column;
+import com.aicode.core.tools.core.model.db.table.model.Table;
+import com.aicode.core.tools.core.sqlparse.SqlParseHelper;
+import com.aicode.core.tools.core.sqlparse.SqlTypeChecker;
 
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -70,9 +70,13 @@ public class Sql {
 
     public boolean isColumnsInSameTable() {
         // FIXME 还要增加表的列数与columns是否相等,才可以为select 生成 include语句
-        if (columns == null || columns.isEmpty()) return false;
+        if (columns == null || columns.isEmpty()) {
+            return false;
+        }
         Column firstTable = columns.iterator().next();
-        if (columns.size() == 1) return true;
+        if (columns.size() == 1) {
+            return true;
+        }
         if (firstTable.getTable() == null) {
             return false;
         }
@@ -105,14 +109,18 @@ public class Sql {
      * @return
      */
     public String getResultClass() {
-        if (StringHelper.isNotBlank(resultClass)) return resultClass;
+        if (StringHelper.isNotBlank(resultClass)) {
+            return resultClass;
+        }
         if (columns.size() == 1) {
             return columns.iterator().next().getSimpleJavaType();
         }
         if (isColumnsInSameTable()) {
             return columns.iterator().next().getTable().getClassName();
         } else {
-            if (operation == null) return null;
+            if (operation == null) {
+                return null;
+            }
             return StringHelper.makeAllWordFirstLetterUpperCase(StringHelper.toUnderscoreName(operation)) + System.getProperty("generator.sql.resultClass.suffix", "Result");
         }
     }
@@ -141,8 +149,12 @@ public class Sql {
      * <pre>
      */
     public String getParameterClass() {
-        if (StringHelper.isNotBlank(parameterClass)) return parameterClass;
-        if (StringHelper.isBlank(operation)) return null;
+        if (StringHelper.isNotBlank(parameterClass)) {
+            return parameterClass;
+        }
+        if (StringHelper.isBlank(operation)) {
+            return null;
+        }
         if (isSelectSql()) {
             return StringHelper.makeAllWordFirstLetterUpperCase(StringHelper.toUnderscoreName(operation)) + "Query";
         } else {
@@ -353,7 +365,9 @@ public class Sql {
     }
 
     public String toCountSqlForPaging(String sql) {
-        if (sql == null) return null;
+        if (sql == null) {
+            return null;
+        }
         if (isSelectSql()) {
             return SqlParseHelper.toCountSqlForPaging(sql, "select count(*) ");
         }
@@ -390,7 +404,9 @@ public class Sql {
         for (Iterator<Column> it = columns.iterator(); it.hasNext(); ) {
             Column c = it.next();
             sb.append(c.getSqlName());
-            if (it.hasNext()) sb.append(",");
+            if (it.hasNext()) {
+                sb.append(",");
+            }
         }
         return sb.toString();
     }
@@ -490,7 +506,9 @@ public class Sql {
      * @return
      */
     public String getTableClassName() {
-        if (StringHelper.isBlank(tableSqlName)) return null;
+        if (StringHelper.isBlank(tableSqlName)) {
+            return null;
+        }
         String removedPrefixSqlName = Table.removeTableSqlNamePrefix(tableSqlName);
         return StringHelper.makeAllWordFirstLetterUpperCase(StringHelper.toUnderscoreName(removedPrefixSqlName));
     }
@@ -512,6 +530,7 @@ public class Sql {
         return c;
     }
 
+    @Override
     public String toString() {
         return "sourceSql:\n" + sourceSql + "\nsql:" + getSql();
     }

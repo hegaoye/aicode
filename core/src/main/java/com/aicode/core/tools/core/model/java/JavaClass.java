@@ -1,10 +1,10 @@
 package com.aicode.core.tools.core.model.java;
 
 
-import io.aicode.base.core.StringHelper;
-import io.aicode.base.core.typemapping.ActionScriptDataTypesUtils;
-import io.aicode.base.core.typemapping.JavaImport;
-import io.aicode.base.core.typemapping.JavaPrimitiveTypeMapping;
+import com.aicode.core.tools.core.StringHelper;
+import com.aicode.core.tools.core.typemapping.ActionScriptDataTypesUtils;
+import com.aicode.core.tools.core.typemapping.JavaImport;
+import com.aicode.core.tools.core.typemapping.JavaPrimitiveTypeMapping;
 
 import java.beans.BeanInfo;
 import java.beans.Introspector;
@@ -42,8 +42,9 @@ public class JavaClass {
     }
 
     public boolean isHasDefaultConstructor() {
-        if (clazz.isInterface() || clazz.isAnnotation() || clazz.isEnum() || Modifier.isAbstract(clazz.getModifiers()))
+        if (clazz.isInterface() || clazz.isAnnotation() || clazz.isEnum() || Modifier.isAbstract(clazz.getModifiers())) {
             return false;
+        }
         for (Constructor c : clazz.getConstructors()) {
             if (Modifier.isPublic(c.getModifiers())) {
                 if (c.getParameterTypes().length == 0) {

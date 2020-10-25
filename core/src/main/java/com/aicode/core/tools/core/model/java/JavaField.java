@@ -1,7 +1,8 @@
 package com.aicode.core.tools.core.model.java;
 
 
-import io.aicode.base.core.typemapping.ActionScriptDataTypesUtils;
+
+import com.aicode.core.tools.core.typemapping.ActionScriptDataTypesUtils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -55,6 +56,7 @@ public class JavaField {
                 || getJavaType().equalsIgnoreCase("java.sql.Time");
     }
 
+    @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
@@ -62,22 +64,29 @@ public class JavaField {
         return result;
     }
 
+    @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
+        }
         JavaField other = (JavaField) obj;
         if (field == null) {
-            if (other.field != null)
+            if (other.field != null) {
                 return false;
-        } else if (!field.equals(other.field))
+            }
+        } else if (!field.equals(other.field)) {
             return false;
+        }
         return true;
     }
 
+    @Override
     public String toString() {
         return "JavaClass:" + clazz + " JavaField:" + getFieldName();
     }

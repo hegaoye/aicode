@@ -1,9 +1,9 @@
 package com.aicode.core.tools.core.model.db.table;
 
 
-import io.aicode.base.core.*;
-import io.aicode.base.core.model.db.table.model.Column;
-import io.aicode.base.core.model.db.table.model.Table;
+import com.aicode.core.tools.core.*;
+import com.aicode.core.tools.core.model.db.table.model.Column;
+import com.aicode.core.tools.core.model.db.table.model.Table;
 
 import java.io.File;
 import java.sql.*;
@@ -29,7 +29,9 @@ public class TableFactory {
     }
 
     public synchronized static TableFactory getInstance() {
-        if (instance == null) instance = new TableFactory();
+        if (instance == null) {
+            instance = new TableFactory();
+        }
         return instance;
     }
 
@@ -94,8 +96,9 @@ public class TableFactory {
     }
 
     private Table _getTable(String catalog, String schema, String tableName) throws SQLException {
-        if (tableName == null || tableName.trim().length() == 0)
+        if (tableName == null || tableName.trim().length() == 0) {
             throw new IllegalArgumentException("tableName must be not empty");
+        }
         catalog = StringHelper.defaultIfEmpty(catalog, null);
         schema = StringHelper.defaultIfEmpty(schema, null);
 
@@ -424,8 +427,12 @@ public class TableFactory {
     class DbHelper {
         public void close(ResultSet rs, PreparedStatement ps, Statement... statements) {
             try {
-                if (ps != null) ps.close();
-                if (rs != null) rs.close();
+                if (ps != null) {
+                    ps.close();
+                }
+                if (rs != null) {
+                    rs.close();
+                }
                 for (Statement s : statements) {
                     s.close();
                 }

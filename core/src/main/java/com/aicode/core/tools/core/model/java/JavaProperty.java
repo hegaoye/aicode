@@ -1,8 +1,9 @@
 package com.aicode.core.tools.core.model.java;
 
 
-import io.aicode.base.core.typemapping.ActionScriptDataTypesUtils;
-import io.aicode.base.core.typemapping.JavaPrimitiveTypeMapping;
+
+import com.aicode.core.tools.core.typemapping.ActionScriptDataTypesUtils;
+import com.aicode.core.tools.core.typemapping.JavaPrimitiveTypeMapping;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;

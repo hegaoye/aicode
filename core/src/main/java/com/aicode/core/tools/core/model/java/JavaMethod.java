@@ -7,8 +7,9 @@
 package com.aicode.core.tools.core.model.java;
 
 
-import io.aicode.base.core.StringHelper;
-import io.aicode.base.core.typemapping.JavaImport;
+
+import com.aicode.core.tools.core.StringHelper;
+import com.aicode.core.tools.core.typemapping.JavaImport;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -90,6 +91,7 @@ public class JavaMethod {
         return StringHelper.capitalize(getMethodName());
     }
 
+    @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
@@ -97,19 +99,25 @@ public class JavaMethod {
         return result;
     }
 
+    @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
+        }
         JavaMethod other = (JavaMethod) obj;
         if (method == null) {
-            if (other.method != null)
+            if (other.method != null) {
                 return false;
-        } else if (!method.equals(other.method))
+            }
+        } else if (!method.equals(other.method)) {
             return false;
+        }
         return true;
     }
 
@@ -120,6 +128,7 @@ public class JavaMethod {
         return false;
     }
 
+    @Override
     public String toString() {
         return "JavaClass:" + clazz + " JavaMethod:" + getMethodName();
     }

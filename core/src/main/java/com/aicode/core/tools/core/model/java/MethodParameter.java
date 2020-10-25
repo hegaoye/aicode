@@ -1,8 +1,8 @@
 package com.aicode.core.tools.core.model.java;
 
-import io.aicode.base.core.IOHelper;
-import io.aicode.base.core.StringHelper;
-import io.aicode.base.core.paranamer.*;
+import com.aicode.core.tools.core.IOHelper;
+import com.aicode.core.tools.core.StringHelper;
+import com.aicode.core.tools.core.paranamer.*;
 import lombok.Data;
 import org.apache.commons.lang.StringUtils;
 

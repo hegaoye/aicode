@@ -1,7 +1,8 @@
 package com.aicode.core.tools.core.typemapping;
 
 
-import io.aicode.base.core.StringHelper;
+
+import com.aicode.core.tools.core.StringHelper;
 
 import java.util.HashMap;
 import java.util.Map;

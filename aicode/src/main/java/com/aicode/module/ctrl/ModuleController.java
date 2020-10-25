@@ -122,7 +122,7 @@ public class ModuleController {
         if (total > 0) {
             List<Module> moduleList = moduleService.list(queryWrapper, page.genRowStart(), page.getPageSize());
             page.setTotalRow(total);
-            page.setRecords(moduleList);
+            page.setVoList(moduleList);
             log.debug(JSON.toJSONString(page));
         }
         return R.success(page);

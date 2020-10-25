@@ -121,7 +121,7 @@ public class ProjectRepositoryAccountController {
         if (total > 0) {
             List<ProjectRepositoryAccount> projectRepositoryAccountList = projectRepositoryAccountService.list(queryWrapper, page.genRowStart(), page.getPageSize());
             page.setTotalRow(total);
-            page.setRecords(projectRepositoryAccountList);
+            page.setVoList(projectRepositoryAccountList);
         }
         return R.success(page);
     }

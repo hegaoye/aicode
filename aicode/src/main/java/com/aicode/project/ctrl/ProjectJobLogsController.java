@@ -81,7 +81,7 @@ public class ProjectJobLogsController {
         if (total > 0) {
             List<ProjectJobLogs> projectJobLogsList = projectJobLogsService.list(queryWrapper, page.genRowStart(), page.getPageSize());
             page.setTotalRow(total);
-            page.setRecords(projectJobLogsList);
+            page.setVoList(projectJobLogsList);
             log.debug(JSON.toJSONString(page));
         }
 

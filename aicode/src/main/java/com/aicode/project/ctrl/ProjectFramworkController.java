@@ -112,7 +112,7 @@ public class ProjectFramworkController {
         if (total > 0) {
             List<ProjectFramwork> projectFramworkList = projectFramworkService.list(queryWrapper, page.genRowStart(), page.getPageSize());
             page.setTotalRow(total);
-            page.setRecords(projectFramworkList);
+            page.setVoList(projectFramworkList);
             log.debug(JSON.toJSONString(page));
         }
         return R.success(page);

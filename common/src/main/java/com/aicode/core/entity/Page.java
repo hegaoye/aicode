@@ -26,7 +26,7 @@ public final class Page<E> implements java.io.Serializable {
     /**
      * 用于前台展示的VOList
      */
-    private List<E> records;
+    private List<E> voList;
     /**
      * 总记录行数
      */
@@ -57,7 +57,7 @@ public final class Page<E> implements java.io.Serializable {
      * 默认构造方法，所有的构造方法当中，总会初始化voList和params
      */
     public Page() {
-        records = new ArrayList<E>(this.pageSize);
+        voList = new ArrayList<E>(this.pageSize);
         params = new HashMap<String, Object>(0);
         if (curPage > getTotalPage()) {
             this.curPage = getTotalPage();
@@ -73,7 +73,7 @@ public final class Page<E> implements java.io.Serializable {
      * @param pageSize 分页大小
      */
     public Page(int pageSize) {
-        records = new ArrayList<E>(this.pageSize);
+        voList = new ArrayList<E>(this.pageSize);
         params = new HashMap<String, Object>(0);
         this.pageSize = pageSize;
         if (curPage > getTotalPage()) {
@@ -94,7 +94,7 @@ public final class Page<E> implements java.io.Serializable {
         this.pageSize = pageSize;
         this.curPage = curPage;
         params = new HashMap<String, Object>(0);
-        records = new ArrayList<E>(this.pageSize);
+        voList = new ArrayList<E>(this.pageSize);
         if (curPage < 1) {
             this.curPage = 1;
         } else {
@@ -110,7 +110,7 @@ public final class Page<E> implements java.io.Serializable {
      * @param totalRow 总行数
      */
     public Page(int pageSize, int curPage, int totalRow) {
-        records = new ArrayList<E>(this.pageSize);
+        voList = new ArrayList<E>(this.pageSize);
         params = new HashMap<String, Object>(0);
         this.totalRow = totalRow;
         this.pageSize = pageSize;
@@ -132,7 +132,7 @@ public final class Page<E> implements java.io.Serializable {
      * @param sortColumns 排序字符串（不含order by部分）
      */
     public Page(int pageSize, int curPage, int totalRow, String sortColumns) {
-        records = new ArrayList<E>(this.pageSize);
+        voList = new ArrayList<E>(this.pageSize);
         params = new HashMap<String, Object>(0);
         this.totalRow = totalRow;
         this.pageSize = pageSize;

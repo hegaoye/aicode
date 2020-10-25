@@ -8,10 +8,8 @@ import com.aicode.core.exceptions.BaseException;
 import com.aicode.project.entity.ProjectJob;
 import com.aicode.project.service.ProjectJobService;
 import com.aicode.project.vo.ProjectJobPageVO;
-import com.aicode.project.vo.ProjectJobSaveVO;
 import com.aicode.project.vo.ProjectJobVO;
 import com.aicode.core.entity.Page;
-import com.aicode.core.entity.PageVO;
 import com.aicode.core.entity.R;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -28,7 +26,6 @@ import springfox.documentation.annotations.ApiIgnore;
 import javax.servlet.http.HttpServletRequest;
 import javax.websocket.Session;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 任务
@@ -141,7 +138,7 @@ public class ProjectJobController {
         if (total > 0) {
             List<ProjectJob> projectJobList = projectJobService.list(queryWrapper, page.genRowStart(), page.getPageSize());
             page.setTotalRow(total);
-            page.setRecords(projectJobList);
+            page.setVoList(projectJobList);
             log.debug(JSON.toJSONString(page));
         }
         return R.success(page);

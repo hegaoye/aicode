@@ -270,7 +270,7 @@ public class ProjectController {
         if (total > 0) {
             List<Project> projectList = projectService.list(queryWrapper, page.genRowStart(), page.getPageSize());
             page.setTotalRow(total);
-            page.setRecords(projectList);
+            page.setVoList(projectList);
             log.debug(JSON.toJSONString(page));
         }
         return R.success(page);

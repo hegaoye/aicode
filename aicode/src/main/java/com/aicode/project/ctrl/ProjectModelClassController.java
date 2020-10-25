@@ -18,7 +18,6 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
@@ -159,7 +158,7 @@ public class ProjectModelClassController {
         if (total > 0) {
             List<ProjectModelClass> projectModelClassList = projectModelClassService.list(queryWrapper, page.genRowStart(), page.getPageSize());
             page.setTotalRow(total);
-            page.setRecords(projectModelClassList);
+            page.setVoList(projectModelClassList);
             log.debug(JSON.toJSONString(page));
         }
         return R.success(page);

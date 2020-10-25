@@ -119,7 +119,7 @@ public class FrameworksController {
         if (total > 0) {
             List<Frameworks> frameworksList = frameworksService.list(queryWrapper, page.genRowStart(), page.getPageSize());
             page.setTotalRow(total);
-            page.setRecords(frameworksList);
+            page.setVoList(frameworksList);
             log.debug(JSON.toJSONString(page));
         }
         return R.success(page);

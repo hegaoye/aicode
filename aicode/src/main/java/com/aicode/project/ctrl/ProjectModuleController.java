@@ -9,7 +9,6 @@ import com.aicode.core.exceptions.BaseException;
 import com.aicode.project.entity.ProjectModule;
 import com.aicode.project.service.ProjectModuleService;
 import com.aicode.project.vo.ProjectModulePageVO;
-import com.aicode.project.vo.ProjectModuleSaveVO;
 import com.aicode.project.vo.ProjectModuleVO;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -106,7 +105,7 @@ public class ProjectModuleController {
         if (total > 0) {
             List<ProjectModule> projectModuleList = projectModuleService.list(queryWrapper, page.genRowStart(), page.getPageSize());
             page.setTotalRow(total);
-            page.setRecords(projectModuleList);
+            page.setVoList(projectModuleList);
             log.debug(JSON.toJSONString(page));
         }
         return R.success(page);

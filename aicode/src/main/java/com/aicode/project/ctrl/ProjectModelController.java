@@ -147,7 +147,7 @@ public class ProjectModelController {
             queryWrapper.lambda().eq(ProjectModel::getIco, projectModelVO.getIco());
         }
         List<ProjectModel> projectModelList = projectModelService.list(queryWrapper, page.genRowStart(), page.getPageSize());
-        page.setRecords(projectModelList);
+        page.setVoList(projectModelList);
         log.debug(JSON.toJSONString(page));
         return R.success(page);
     }

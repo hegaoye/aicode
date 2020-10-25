@@ -53,6 +53,8 @@ dependencies {
     implementation 'com.alibaba:fastjson:1.2.66'
 
     implementation 'cn.hutool:hutool-all:5.1.5'
+    implementation 'org.eclipse.jgit:org.eclipse.jgit:4.9.2.201712150930-r'
+
 
 }
 

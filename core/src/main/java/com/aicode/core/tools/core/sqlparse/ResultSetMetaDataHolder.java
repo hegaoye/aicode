@@ -1,7 +1,7 @@
 package com.aicode.core.tools.core.sqlparse;
 
 
-import io.aicode.base.core.StringHelper;
+import com.aicode.core.tools.core.StringHelper;
 
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;

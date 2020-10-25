@@ -18,6 +18,7 @@ dependencies {
     implementation project(path: ":core")
     implementation project(path: ":common")
     implementation 'com.baomidou:mybatis-plus-generator:3.3.1'
+    implementation 'com.alibaba:fastjson:1.2.59'
     compileOnly 'org.projectlombok:lombok:1.18.12'
     annotationProcessor 'org.projectlombok:lombok:1.18.12'
 }

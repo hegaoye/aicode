@@ -5,9 +5,10 @@
 package com.aicode.core.tools.core.model.db.table.model;
 
 
-import io.aicode.base.core.ListHashtable;
-import io.aicode.base.core.StringHelper;
-import io.aicode.base.core.model.db.table.TableFactory;
+
+import com.aicode.core.tools.core.ListHashtable;
+import com.aicode.core.tools.core.StringHelper;
+import com.aicode.core.tools.core.model.db.table.TableFactory;
 
 import java.util.List;
 
@@ -83,15 +84,17 @@ public class ForeignKey implements java.io.Serializable {
         List parentPrimaryKeys = parentTable.getPrimaryKeyColumns();
         List foreignPrimaryKeys = foreignTable.getPrimaryKeyColumns();
 
-        if (hasAllPrimaryKeys(parentPrimaryKeys, parentColumns))
+        if (hasAllPrimaryKeys(parentPrimaryKeys, parentColumns)) {
             firstRelation = "one";
-        else
+        } else {
             firstRelation = "many";
+        }
 
-        if (hasAllPrimaryKeys(foreignPrimaryKeys, columns))
+        if (hasAllPrimaryKeys(foreignPrimaryKeys, columns)) {
             secondRelation = "one";
-        else
+        } else {
             secondRelation = "many";
+        }
 
         relationShip = firstRelation + "-to-" + secondRelation;
 
@@ -101,14 +104,16 @@ public class ForeignKey implements java.io.Serializable {
         boolean hasAll = true;
         // if size is not equal then false
         int numKeys = pkeys.size();
-        if (numKeys != cols.size())
+        if (numKeys != cols.size()) {
             return false;
+        }
 
         for (int i = 0; i < numKeys; i++) {
             Column col = (Column) pkeys.get(i);
             String colname = col.getColumnName();
-            if (!cols.contains(colname))
+            if (!cols.contains(colname)) {
                 return false;
+            }
         }
 
         return hasAll;
@@ -160,8 +165,9 @@ public class ForeignKey implements java.io.Serializable {
      * @return Returns the firstRelation.
      */
     public String getFirstRelation() {
-        if (firstRelation == null)
+        if (firstRelation == null) {
             initRelationship();
+        }
         return firstRelation;
     }
 
@@ -186,8 +192,9 @@ public class ForeignKey implements java.io.Serializable {
      * @return Returns the relationShip.
      */
     public String getRelationShip() {
-        if (relationShip == null)
+        if (relationShip == null) {
             initRelationship();
+        }
         return relationShip;
     }
 
@@ -195,8 +202,9 @@ public class ForeignKey implements java.io.Serializable {
      * @return Returns the secondRelation.
      */
     public String getSecondRelation() {
-        if (secondRelation == null)
+        if (secondRelation == null) {
             initRelationship();
+        }
         return secondRelation;
     }
 
@@ -238,6 +246,7 @@ public class ForeignKey implements java.io.Serializable {
             this.columnSqlName = columnSqlName;
         }
 
+        @Override
         public String toString() {
             if (StringHelper.isBlank(schemaName)) {
                 return tableName + "(" + columnSqlName + ")";
@@ -247,7 +256,9 @@ public class ForeignKey implements java.io.Serializable {
         }
 
         public static String toString(ReferenceKey k) {
-            if (k == null) return null;
+            if (k == null) {
+                return null;
+            }
             return k.toString();
         }
 

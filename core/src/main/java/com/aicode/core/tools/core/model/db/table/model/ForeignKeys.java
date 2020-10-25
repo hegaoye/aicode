@@ -1,7 +1,7 @@
 package com.aicode.core.tools.core.model.db.table.model;
 
 
-import io.aicode.base.core.ListHashtable;
+import com.aicode.core.tools.core.ListHashtable;
 
 /**
  * @author Richard
@@ -72,7 +72,9 @@ public class ForeignKeys implements java.io.Serializable {
         Object fkey = getAssociatedTables().get(name);
         if (fkey != null) {
             return (ForeignKey) fkey;
-        } else return null;
+        } else {
+            return null;
+        }
     }
 
     /**

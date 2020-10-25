@@ -1,7 +1,7 @@
 package com.aicode.core.tools.core;
 
 
-import io.aicode.base.core.model.db.table.model.Column;
+import com.aicode.core.tools.core.model.db.table.model.Column;
 
 import java.util.*;
 import java.util.regex.Matcher;

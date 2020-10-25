@@ -109,7 +109,7 @@ public class DisplayAttributeController {
                 String fieldCode = mapFieldColumn.getCode();
                 DisplayAttribute displayAttribute = displayAttributeService.getOne(new LambdaQueryWrapper<DisplayAttribute>()
                         .eq(DisplayAttribute::getMapFieldColumnCode, fieldCode));
-                mapFieldColumn.setDisplayAttribute(JSON.parseObject(JSON.toJSONString(displayAttribute), DisplayAttributeVO.class));
+                mapFieldColumn.setDisplayAttribute(displayAttribute);
             }
         }
         return R.success(mapFieldColumns);

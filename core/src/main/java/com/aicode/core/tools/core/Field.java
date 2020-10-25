@@ -1,7 +1,7 @@
 package com.aicode.core.tools.core;
 
-import io.aicode.base.core.typemapping.DatabaseDataTypesUtils;
-import io.aicode.base.enums.YNEnum;
+import com.aicode.core.enums.YNEnum;
+import com.aicode.core.tools.core.typemapping.DatabaseDataTypesUtils;
 import lombok.Data;
 
 import java.io.Serializable;

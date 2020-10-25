@@ -1,8 +1,8 @@
 package com.aicode.core.tools.core.model.db.table.model.util;
 
 
-import io.aicode.base.core.model.db.table.model.Column;
-import io.aicode.base.core.typemapping.DatabaseDataTypesUtils;
+import com.aicode.core.tools.core.model.db.table.model.Column;
+import com.aicode.core.tools.core.typemapping.DatabaseDataTypesUtils;
 
 public class ColumnHelper {
 

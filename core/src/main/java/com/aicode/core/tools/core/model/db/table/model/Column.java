@@ -1,14 +1,14 @@
 package com.aicode.core.tools.core.model.db.table.model;
 
 
-import io.aicode.base.core.GLogger;
-import io.aicode.base.core.StringHelper;
-import io.aicode.base.core.TestDataGenerator;
-import io.aicode.base.core.model.db.table.model.util.ColumnHelper;
-import io.aicode.base.core.typemapping.ActionScriptDataTypesUtils;
-import io.aicode.base.core.typemapping.DatabaseDataTypesUtils;
-import io.aicode.base.core.typemapping.JavaPrimitiveTypeMapping;
-import io.aicode.base.core.typemapping.JdbcType;
+import com.aicode.core.tools.core.GLogger;
+import com.aicode.core.tools.core.StringHelper;
+import com.aicode.core.tools.core.TestDataGenerator;
+import com.aicode.core.tools.core.model.db.table.model.util.ColumnHelper;
+import com.aicode.core.tools.core.typemapping.ActionScriptDataTypesUtils;
+import com.aicode.core.tools.core.typemapping.DatabaseDataTypesUtils;
+import com.aicode.core.tools.core.typemapping.JavaPrimitiveTypeMapping;
+import com.aicode.core.tools.core.typemapping.JdbcType;
 
 import java.util.List;
 
@@ -487,7 +487,9 @@ public class Column implements java.io.Serializable, Cloneable {
      * 检查是否包含某些关键字,关键字以逗号分隔
      */
     public boolean contains(String keywords) {
-        if (keywords == null) throw new IllegalArgumentException("'keywords' must be not null");
+        if (keywords == null) {
+            throw new IllegalArgumentException("'keywords' must be not null");
+        }
         return StringHelper.contains(getSqlName(), keywords.split(","));
     }
 

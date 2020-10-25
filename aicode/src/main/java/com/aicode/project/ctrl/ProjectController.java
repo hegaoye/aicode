@@ -11,6 +11,8 @@ import com.aicode.core.exceptions.BaseException;
 import com.aicode.core.tools.FileUtil;
 import com.aicode.core.tools.JwtToken;
 import com.aicode.display.service.DisplayAttributeService;
+import com.aicode.frameworks.entity.Frameworks;
+import com.aicode.frameworks.service.FrameworksService;
 import com.aicode.map.service.MapRelationshipService;
 import com.aicode.project.entity.*;
 import com.aicode.project.service.*;
@@ -64,6 +66,9 @@ public class ProjectController {
 
     @Autowired
     private ProjectJobService projectJobService;
+
+    @Autowired
+    private FrameworksService frameworksService;
 
     @Autowired
     private ProjectSqlService projectSqlService;
@@ -152,6 +157,10 @@ public class ProjectController {
 
         List<ProjectFramwork> projectFramworks = projectFramworkService.list(new LambdaQueryWrapper<ProjectFramwork>()
                 .eq(ProjectFramwork::getProjectCode, project.getCode()));
+        projectFramworks.forEach(projectFramwork -> {
+            Frameworks frameworks = frameworksService.getOne(new LambdaQueryWrapper<Frameworks>().eq(Frameworks::getCode, projectFramwork.getFrameworkCode()));
+            projectFramwork.setFrameworks(frameworks);
+        });
         project.setProjectFramworkList(projectFramworks);
 
         List<ProjectJob> projectJobs = projectJobService.list(new LambdaQueryWrapper<ProjectJob>()
@@ -304,12 +313,13 @@ public class ProjectController {
 
         Page<Project> page = new Page<>(pageSize, curPage);
         QueryWrapper<Project> queryWrapper = new QueryWrapper<>();
-        if (accountCode != null) {
-            queryWrapper.lambda().gt(Project::getAccountCode, accountCode);
+        if (StringUtils.isNotBlank(accountCode)) {
+            queryWrapper.lambda().eq(Project::getAccountCode, accountCode);
         }
 
         int total = projectService.count(queryWrapper);
         if (total > 0) {
+            queryWrapper.lambda().orderByDesc(Project::getCreateTime);
             List<Project> projectList = projectService.list(queryWrapper, page.genRowStart(), page.getPageSize());
             page.setTotalRow(total);
             page.setVoList(projectList);

@@ -39,7 +39,7 @@ import java.util.List;
  * @author hegaoye
  */
 @RestController
-@RequestMapping("/projectJob")
+@RequestMapping("/project/job")
 @Slf4j
 @Api(value = "任务控制器", tags = "任务控制器")
 public class ProjectJobController {

@@ -61,8 +61,6 @@ public class GeneratorSVImpl implements GenerateSV {
     private ProjectRepositoryAccountDAO projectRepositoryAccountDAO;
 
     @Resource
-    private ProjectJobLogsDAO projectJobLogsDAO;
-    @Resource
     private ProjectMapDAO projectMapDAO;
     @Resource
     private ProjectFramworkDAO projectFramworkDAO;
@@ -208,7 +206,6 @@ public class GeneratorSVImpl implements GenerateSV {
             WSClientManager.sendMessage(sqllog);
             logsSV.saveLogs(sqllog, path);
 
-
             //5.获取模块信息 TODO
 
             //6.获取版本控制管理信息
@@ -220,20 +217,10 @@ public class GeneratorSVImpl implements GenerateSV {
                 WSClientManager.sendMessage(gitLog);
                 logsSV.saveLogs(gitLog, path);
 
-                projectJobLogsDAO.insert(ProjectJobLogs.builder()
-                        .code(projectJob.getCode())
-                        .log(gitLog)
-                        .build());
-
                 GitTools.commitAndPush(new File(projectPath), projectRepositoryAccount.getAccount(), projectRepositoryAccount.getPassword(), "AI-Code 为您构建代码，享受智慧生活");
                 gitLog = "代码已经提交到 ⇛⇛⇛ <a style='text-decoration:underline;' href='" + projectRepositoryAccount.getHome() + "' target='_blank'>[" + projectRepositoryAccount.getHome() + "] </a>仓库";
                 WSClientManager.sendMessage(gitLog);
                 logsSV.saveLogs(gitLog, path);
-
-                projectJobLogsDAO.insert(ProjectJobLogs.builder()
-                        .code(projectJob.getCode())
-                        .log(gitLog)
-                        .build());
             }
 
             //7.创建压缩文件
@@ -241,11 +228,6 @@ public class GeneratorSVImpl implements GenerateSV {
             String endLog = "代码已打包ZIP, ⇛⇛⇛  <a style='text-decoration:underline;' href='" + project.getDownloadUrl() + "' target='_blank'>[点击下载" + project.getEnglishName() + ".zip]</a>";
             WSClientManager.sendMessage(endLog);
             logsSV.saveLogs(endLog, path);
-            //记录日志
-            projectJobLogsDAO.insert(ProjectJobLogs.builder()
-                    .code(projectJob.getCode())
-                    .log(endLog)
-                    .build());
 
             projectJob.setState(ProjectJobState.Completed.name());
             projectJobDAO.update(projectJob, new LambdaQueryWrapper<ProjectJob>()
@@ -256,10 +238,6 @@ public class GeneratorSVImpl implements GenerateSV {
             log.error(e.getMessage());
             WSClientManager.sendMessage(e.getMessage());
             logsSV.saveLogs(e.getMessage(), path);
-            projectJobLogsDAO.insert(ProjectJobLogs.builder()
-                    .code(projectJob.getCode())
-                    .log("ERROR : " + e.getMessage())
-                    .build());
 
             projectJob.setState(ProjectJobState.Error.name());
             projectJobDAO.update(projectJob, new LambdaQueryWrapper<ProjectJob>()
@@ -269,25 +247,13 @@ public class GeneratorSVImpl implements GenerateSV {
                     .eq(ProjectJob::getCode, projectJob.getCode()));
 
             if (projectJobLoad.getState().equals(ProjectJobState.Completed.name())) {
-                ProjectJobLogs projectJobLogs = new ProjectJobLogs();
-                projectJobLogs.setCode(projectJob.getCode());
-                projectJobLogs.setLog("Finished: SUCCESS");
                 WSClientManager.sendMessage("Finished: SUCCESS");
                 logsSV.saveLogs("Finished: SUCCESS", path);
-                projectJobLogsDAO.insert(projectJobLogs);
             } else {
-                ProjectJobLogs projectJobLogs = new ProjectJobLogs();
-                projectJobLogs.setCode(projectJob.getCode());
-                projectJobLogs.setLog("Finished: ERROR");
                 WSClientManager.sendMessage("Finished: ERROR");
                 logsSV.saveLogs("Finished: ERROR", path);
-                projectJobLogsDAO.insert(projectJobLogs);
             }
-            ProjectJobLogs projectJobLogs = new ProjectJobLogs();
-            projectJobLogs.setCode(projectJob.getCode());
-            projectJobLogs.setLog("End");
             WSClientManager.sendMessage("End");
-            projectJobLogsDAO.insert(projectJobLogs);
         }
     }
 

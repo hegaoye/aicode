@@ -11,6 +11,7 @@ import com.aicode.core.tools.StringTools;
 import com.aicode.core.tools.ZipTools;
 import com.aicode.core.tools.core.StringHelper;
 import com.aicode.display.entity.DisplayAttribute;
+import com.aicode.frameworks.dao.FrameworksDAO;
 import com.aicode.frameworks.dao.FrameworksTemplateDAO;
 import com.aicode.frameworks.entity.Frameworks;
 import com.aicode.frameworks.entity.FrameworksTemplate;
@@ -58,6 +59,12 @@ public class GeneratorSVImpl implements GenerateSV {
 
     @Resource
     private ProjectJobLogsDAO projectJobLogsDAO;
+    @Resource
+    private ProjectMapDAO projectMapDAO;
+    @Resource
+    private ProjectFramworkDAO projectFramworkDAO;
+    @Resource
+    private FrameworksDAO frameworksDAO;
 
     @Resource
     private FrameworksTemplateDAO frameworksTemplateDAO;
@@ -94,32 +101,32 @@ public class GeneratorSVImpl implements GenerateSV {
 
         try {
             //1.创建项目
-            String log = "Start By AI-Code @Copyright <a href='http://www.aicode.io' target='_blank'>AI-Code</a>";
-            WSClientManager.sendMessage(log);
-            logsSV.saveLogs(log, path);
+            String logText = "Start By AI-Code @Copyright <a href='http://www.aicode.io' target='_blank'>AI-Code</a>";
+            WSClientManager.sendMessage(logText);
+            logsSV.saveLogs(logText, path);
 
             Project project = projectDAO.selectOne(new LambdaQueryWrapper<Project>().eq(Project::getCode, projectCode));
             String projectPath = this.buildProject(project);
             projectDAO.update(Project.builder().buildNumber(project.getBuildNumber() != null ? project.getBuildNumber() + 1 : 1).build(),
                     new LambdaQueryWrapper<Project>().eq(Project::getCode, projectCode));
 
-            log = "已初始化项目 【 " + project.getName() + " ( " + project.getEnglishName() + " )】 工作空间";
-            WSClientManager.sendMessage(log);
-            logsSV.saveLogs(log, path);
+            logText = "已初始化项目 【 " + project.getName() + " ( " + project.getEnglishName() + " )】 工作空间";
+            WSClientManager.sendMessage(logText);
+            logsSV.saveLogs(logText, path);
 
             projectJobLogsDAO.insert(ProjectJobLogs.builder()
                     .code(projectJob.getCode())
-                    .log(log)
+                    .log(logText)
                     .build());
-            GeneratorSVImpl.log.info("创建工作空间库完成");
+            log.info("创建工作空间库完成");
             logsSV.saveLogs("创建工作空间库完成", path);
 
 
             //2.获取类信息
-            log = "转化数据库结构与类模型...";
-            WSClientManager.sendMessage(log);
-            logsSV.saveLogs(log, path);
-            List<ProjectMap> projectMapList = project.getProjectMapList();
+            logText = "转化数据库结构与类模型...";
+            WSClientManager.sendMessage(logText);
+            logsSV.saveLogs(logText, path);
+            List<ProjectMap> projectMapList = projectMapDAO.selectList(new LambdaQueryWrapper<ProjectMap>().eq(ProjectMap::getProjectCode, projectCode));
             List<MapClassTable> mapClassTableList = new ArrayList<>();
             projectMapList.forEach(projectMap -> {
                 mapClassTableList.add(projectMap.getMapClassTable());
@@ -128,28 +135,32 @@ public class GeneratorSVImpl implements GenerateSV {
             logsSV.saveLogs("转化数据库结构与类模型成功！", path);
 
             //3.获取模板信息
-            List<ProjectFramwork> projectFramworkList = project.getProjectFramworkList();
+            List<ProjectFramwork> projectFramworkList = projectFramworkDAO.selectList(new LambdaQueryWrapper<ProjectFramwork>().eq(ProjectFramwork::getProjectCode, projectCode));
             //从git中检出技术模板库
-            log = ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>";
-            WSClientManager.sendMessage(log);
+            logText = ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>";
+            WSClientManager.sendMessage(logText);
             WSClientManager.sendMessage("开始 下载技术模板");
-            WSClientManager.sendMessage(log);
-            logsSV.saveLogs(log, path);
+            WSClientManager.sendMessage(logText);
+            logsSV.saveLogs(logText, path);
             logsSV.saveLogs("开始 下载技术模板", path);
-            logsSV.saveLogs(log, path);
+            logsSV.saveLogs(logText, path);
             WSClientManager.sendMessage("git 努力下载中.....");
 
             /**
              * 准备框架模板
              */
+            for (ProjectFramwork projectFramwork : projectFramworkList) {
+                Frameworks frameworksLoad = frameworksDAO.selectOne(new LambdaQueryWrapper<Frameworks>().eq(Frameworks::getCode, projectFramwork.getFrameworkCode()));
+                projectFramwork.setFrameworks(frameworksLoad);
+            }
             TemplateEngineEnum templateEngineEnum = this.prepareframeworksTemplateList(projectFramworkList, path);
 
-            WSClientManager.sendMessage(log);
+            WSClientManager.sendMessage(logText);
             WSClientManager.sendMessage("结束 下载技术模板成功");
-            WSClientManager.sendMessage(log);
-            logsSV.saveLogs(log, path);
+            WSClientManager.sendMessage(logText);
+            logsSV.saveLogs(logText, path);
             logsSV.saveLogs("结束 下载技术模板成功", path);
-            logsSV.saveLogs(log, path);
+            logsSV.saveLogs(logText, path);
 
             //4.生成源码
             WSClientManager.sendMessage("开始生成源码...");
@@ -291,6 +302,7 @@ public class GeneratorSVImpl implements GenerateSV {
         String projectFramworkKeyWords = "";
         for (ProjectFramwork projectFramwork : projectFramworkList) {
             projectFramworkKeyWords = projectFramworkKeyWords + projectFramwork.getFrameworks().getName() + "|";
+
         }
 
         TemplateEngineEnum templateEngineEnum = null;
@@ -404,7 +416,7 @@ public class GeneratorSVImpl implements GenerateSV {
                 .eq(ProjectRepositoryAccount::getProjectCode, project.getCode()));
         if (projectRepositoryAccount != null) {
             if (ProjectRepositoryTypeEnum.GIT == ProjectRepositoryTypeEnum.getEnum(projectRepositoryAccount.getType())) {
-                if (projectRepositoryAccount.getHome().startsWith("git://") && projectRepositoryAccount.getHome().endsWith(".git")) {
+                if (projectRepositoryAccount.getHome().endsWith(".git")) {
                     WSClientManager.sendMessage("初始化设定git项目");
                     GitTools.cloneGit(projectRepositoryAccount.getHome(), projectPath, projectRepositoryAccount.getAccount(), projectRepositoryAccount.getPassword());
                     WSClientManager.sendMessage("初始化设定git项目完成");

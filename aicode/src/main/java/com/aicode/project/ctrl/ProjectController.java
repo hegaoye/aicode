@@ -86,8 +86,7 @@ public class ProjectController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "code", value = "项目编码", required = true, paramType = "query")
     })
-    @PutMapping("/init")
-
+    @PostMapping("/init")
     public R init(String code) {
         Assert.hasText(code, BaseException.BaseExceptionEnum.Empty_Param.toString());
         projectService.execute(code);

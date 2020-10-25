@@ -276,8 +276,9 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
             throw new ProjectException(BaseException.BaseExceptionEnum.Result_Not_Exist);
         }
 
+        List<ProjectSql> projectSqls = projectSqlDAO.selectList(new LambdaQueryWrapper<ProjectSql>().eq(ProjectSql::getProjectCode, code));
         String database = project.getEnglishName();
-        if (project.getProjectSqlList().isEmpty() || StringUtils.isBlank(database)) {
+        if (projectSqls.isEmpty() || StringUtils.isBlank(database)) {
             log.error(BaseException.BaseExceptionEnum.Empty_Param.toString());
             throw new ProjectException(BaseException.BaseExceptionEnum.Empty_Param);
         }
@@ -288,8 +289,8 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
             Setting setting = settingDAO.selectOne(new LambdaQueryWrapper<Setting>()
                     .eq(Setting::getK, SettingKey.DefaultDatabase.name()));
 
-            if (!project.getProjectSqlList().isEmpty()) {
-                project.getProjectSqlList().forEach(projectSql -> {
+            if (!projectSqls.isEmpty()) {
+                projectSqls.forEach(projectSql -> {
                     if (projectSql.getState().equals(ProjectSqlState.Enable.name())) {
                         databaseDAO.createDatabase(projectSql.getTsql(), setting.getV());
                     }
@@ -319,7 +320,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
             throw new ProjectException(BaseException.BaseExceptionEnum.Result_Not_Exist);
         }
 
-        List<ProjectMap> projectMapList = project.getProjectMapList();
+        List<ProjectMap> projectMapList = projectMapDAO.selectList(new LambdaQueryWrapper<ProjectMap>().eq(ProjectMap::getProjectCode, code));
         for (ProjectMap projectMap : projectMapList) {
             mapClassTableDAO.delete(new LambdaQueryWrapper<MapClassTable>().eq(MapClassTable::getCode, projectMap.getMapClassTableCode()));
             mapFieldColumnDAO.delete(new LambdaQueryWrapper<MapFieldColumn>().eq(MapFieldColumn::getCode, projectMap.getMapClassTableCode()));

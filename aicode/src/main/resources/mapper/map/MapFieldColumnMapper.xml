@@ -63,7 +63,7 @@
     </sql>
 
     <insert id="batchInsert" parameterType="java.util.List">
-        insert into fast_money (
+        insert into map_field_column (
         <include refid="columns"/>
         )
         values

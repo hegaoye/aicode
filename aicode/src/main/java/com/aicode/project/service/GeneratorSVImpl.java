@@ -15,9 +15,12 @@ import com.aicode.frameworks.dao.FrameworksDAO;
 import com.aicode.frameworks.dao.FrameworksTemplateDAO;
 import com.aicode.frameworks.entity.Frameworks;
 import com.aicode.frameworks.entity.FrameworksTemplate;
+import com.aicode.map.dao.MapClassTableDAO;
 import com.aicode.map.dao.MapFieldColumnDAO;
+import com.aicode.map.dao.MapRelationshipDAO;
 import com.aicode.map.entity.MapClassTable;
 import com.aicode.map.entity.MapFieldColumn;
+import com.aicode.map.entity.MapRelationship;
 import com.aicode.project.dao.*;
 import com.aicode.project.entity.*;
 import com.aicode.setting.dao.SettingDAO;
@@ -76,6 +79,12 @@ public class GeneratorSVImpl implements GenerateSV {
     private MapFieldColumnDAO mapFieldColumnDAO;
 
     @Resource
+    private MapClassTableDAO mapClassTableDAO;
+
+    @Resource
+    private MapRelationshipDAO mapRelationshipDAO;
+
+    @Resource
     private LogsSV logsSV;
 
 
@@ -129,6 +138,15 @@ public class GeneratorSVImpl implements GenerateSV {
             List<ProjectMap> projectMapList = projectMapDAO.selectList(new LambdaQueryWrapper<ProjectMap>().eq(ProjectMap::getProjectCode, projectCode));
             List<MapClassTable> mapClassTableList = new ArrayList<>();
             projectMapList.forEach(projectMap -> {
+                MapClassTable mapClassTable = mapClassTableDAO.selectOne(new LambdaQueryWrapper<MapClassTable>().eq(MapClassTable::getCode, projectMap.getMapClassTableCode()));
+
+                List<MapFieldColumn> mapFieldColumns = mapFieldColumnDAO.selectList(new LambdaQueryWrapper<MapFieldColumn>().eq(MapFieldColumn::getMapClassTableCode, mapClassTable.getCode()));
+                mapClassTable.setMapFieldColumnList(mapFieldColumns);
+
+                List<MapRelationship> mapRelationships = mapRelationshipDAO.selectList(new LambdaQueryWrapper<MapRelationship>().eq(MapRelationship::getMapClassTableCode, mapClassTable.getCode()));
+                mapClassTable.setMapRelationshipList(mapRelationships);
+
+                projectMap.setMapClassTable(mapClassTable);
                 mapClassTableList.add(projectMap.getMapClassTable());
             });
             WSClientManager.sendMessage("转化数据库结构与类模型成功！");
@@ -136,6 +154,7 @@ public class GeneratorSVImpl implements GenerateSV {
 
             //3.获取模板信息
             List<ProjectFramwork> projectFramworkList = projectFramworkDAO.selectList(new LambdaQueryWrapper<ProjectFramwork>().eq(ProjectFramwork::getProjectCode, projectCode));
+            project.setProjectFramworkList(projectFramworkList);
             //从git中检出技术模板库
             logText = ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>";
             WSClientManager.sendMessage(logText);

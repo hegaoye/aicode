@@ -28,7 +28,7 @@
 
 
     <sql id="columns">
-    id,code,name,description,englishName,databaseType,language,state,copyright,author,phone,basePackage,sqlFile,downloadUrl,buildNumber,isRepository,isParseTable,isParseClass,createTime,updateTime,accountCode,isIncrement
+    id,code,`name`,description,englishName,databaseType,`language`,state,copyright,author,phone,basePackage,sqlFile,downloadUrl,buildNumber,isRepository,isParseTable,isParseClass,createTime,updateTime,accountCode,isIncrement
     </sql>
 
     <sql id="where">

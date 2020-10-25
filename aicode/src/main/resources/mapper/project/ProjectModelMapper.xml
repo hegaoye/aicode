@@ -14,7 +14,7 @@
 
 
     <sql id="columns">
-    id,code,pre_code,name,route,css,is_menu,ico
+    id,code,pre_code,`name`,route,css,is_menu,ico
     </sql>
 
     <sql id="where">

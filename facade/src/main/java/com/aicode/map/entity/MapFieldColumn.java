@@ -46,6 +46,7 @@ public class MapFieldColumn implements java.io.Serializable {
      * 数据库字段:column  属性显示:字段
      */
     @ApiModelProperty(value = "字段")
+    @TableField("`column`")
     private java.lang.String column;
     /**
      * 数据库字段:field  属性显示:属性

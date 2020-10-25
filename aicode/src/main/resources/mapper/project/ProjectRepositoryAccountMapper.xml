@@ -15,7 +15,7 @@
 
 
     <sql id="columns">
-    id,code,projectCode,account,password,home,description,state,type
+    id,code,projectCode,account,password,home,description,state,`type`
     </sql>
 
     <sql id="where">

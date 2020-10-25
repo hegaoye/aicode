@@ -12,7 +12,7 @@
 
 
     <sql id="columns">
-    id,projectCode,code,number,state,createTime
+    id,projectCode,code,`number`,state,createTime
     </sql>
 
     <sql id="where">

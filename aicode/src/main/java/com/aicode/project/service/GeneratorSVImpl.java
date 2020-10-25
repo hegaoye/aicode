@@ -387,7 +387,7 @@ public class GeneratorSVImpl implements GenerateSV {
         String projectPath = this.convertPath(settingWorkspace.getV(), project.getEnglishName(), true);
         //1.检测项目工作工作空间是否存在
         File file = new File(projectPath);
-        if (!file.exists()) {
+        if (file.exists()) {
             FileUtil.delFolder(projectPath);
             WSClientManager.sendMessage("删除已存在[" + project.getEnglishName() + "]项目");
         }

@@ -80,6 +80,7 @@ public class MapRelationshipCtrl extends BaseCtrl {
         mapRelationship.setMainField(mainField);
         mapRelationship.setJoinField(joinField);
         mapRelationshipSV.saveOrUpdate(mapRelationship);
+
         //反向建立关联关系
         MapRelationship mapRelationshipFlag = this.load(associateCode, mapClassTableCode);
         mapRelationshipFlag.setMainField(joinField);
@@ -122,7 +123,7 @@ public class MapRelationshipCtrl extends BaseCtrl {
      */
     @ApiOperation(value = "查询模型关系列表", notes = "查询模型关系列表")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "classTableCode", value = "类表映射编码", required = true, paramType = "query"),
+            @ApiImplicitParam(name = "classTableCode", value = "类表映射编码", required = true, paramType = "query")
     })
     @GetMapping(value = "/list")
     @ResponseBody
@@ -140,7 +141,7 @@ public class MapRelationshipCtrl extends BaseCtrl {
      */
     @ApiOperation(value = "查询类表映射关系列表", notes = "查询类表映射关系列表")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "projectCode", value = "项目名", required = true, paramType = "query"),
+            @ApiImplicitParam(name = "projectCode", value = "项目名", required = true, paramType = "query")
     })
     @GetMapping(value = "/listMapClassTable")
     @ResponseBody

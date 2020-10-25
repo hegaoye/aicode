@@ -312,6 +312,59 @@ public class StringTools {
     }
 
     /**
+     * 获取给定字符串可以转换为 key-value的形式
+     *
+     * @param text 文本
+     * @return 结果
+     */
+    public static Map<String, Object> getStateOrType(String text) {
+        //正则表达式 匹配 【汉字 英文】 或 【英文 汉字】或【英文 数字】 或 【数字 英文】的格式
+        String reg = "[\\u4e00-\\u9fa5]+\\s?\\w+|\\w+\\s?[\\u4e00-\\u9fa5]+|[a-zA-Z]+\\s?\\-?\\d+|\\-?\\d+\\s?[a-zA-Z]+";
+        //中文
+        String regCn = "[\\u4e00-\\u9fa5]+";
+        //英文
+        String regEn = "[a-zA-z]+";
+        //数字
+        String regDigit = "\\-?\\d+";
+        List<String> matchList = StringTools.getByPattern(text, reg);
+        Map<String, Object> map = new HashMap<>();
+        for (String str : matchList) {
+            List<String> cnList = StringTools.getByPattern(str, regCn);
+            String cn = null;
+            if (cnList != null && !cnList.isEmpty()) {
+                cn = cnList.get(0);
+            }
+
+            List<String> enList = StringTools.getByPattern(str, regEn);
+            String en = null;
+            if (enList != null && !enList.isEmpty()) {
+                en = enList.get(0);
+            }
+
+            List<String> digitList = StringTools.getByPattern(str, regDigit);
+            String d = null;
+            if (digitList != null && !digitList.isEmpty()) {
+                d = digitList.get(0);
+            }
+            String key = null;
+            Object value = null;
+
+            if (StringUtils.isNotBlank(cn) && StringUtils.isNotBlank(en)) {
+                key = en;
+                value = cn;
+            } else if (StringUtils.isNotBlank(en) && StringUtils.isNotBlank(d)) {
+                key = en;
+                value = d;
+            }
+            if (key != null) {
+                map.put(key, value);
+            }
+
+        }
+        return map;
+    }
+
+    /**
      * 将字符串中的中文转化为拼音,其他不变
      *
      * @param inputString
@@ -532,10 +585,12 @@ public class StringTools {
     }
 
     public static void main(String[] args) {
-        System.out.println(humpToLine("GaoJieJie"));
-        System.out.println(humpToLine("zaoJieJie"));
-        List<String> s = StringTools.getByPattern("状态： 启用Enable,停用 Disable, 正常 Normal", "[\\u4e00-\\u9fa5]+\\s?\\w+");
+        Map<String, Object> s = getStateOrType("状态： 启用Enable,停用 Disable, 正常 Normal, Enable启用, Disable 停用,Normal 正常 , Enable 1, Disable 0,Normal -1234,1 Enable, 0 Disable,-1234 Normal");
         System.out.println(s);
+        List<String> matchList = StringTools.getByPattern("启用 Enable", "[\\u4e00-\\u9fa5]+");
+        System.out.println(matchList);
+        List<String> matchList1 = StringTools.getByPattern("启用 Enable", "[a-zA-Z]+");
+        System.out.println(matchList1);
 
     }
 

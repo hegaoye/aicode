@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.baidu.fsg.uid.UidGenerator;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import io.aicode.base.core.ModelData;
+import io.aicode.project.entity.ModelData;
 import io.aicode.base.core.StringHelper;
 import io.aicode.base.core.TemplateData;
 import io.aicode.base.core.template.Configuration;
@@ -248,7 +248,7 @@ public class GeneratorSVImpl implements GenerateSV {
             Frameworks frameworks = projectFramwork.getFrameworks();
             if (frameworks.getGitHome() != null) {
                 String project_template_Path = template_Path + frameworks.getGitHome().substring(frameworks.getGitHome().lastIndexOf("/") + 1).replace(".git", "");
-                FileUtil.delFolder(project_template_Path);
+                FileUtils.deleteQuietly(new File(project_template_Path));
             }
         }
     }
@@ -566,7 +566,7 @@ public class GeneratorSVImpl implements GenerateSV {
                         } else if (TemplateEngineEnum.Beetl == templateEngineEnum) {
                             msg = beetlHelper.generate(templateData, targetFilePath, templatePath);
                         }
-                        WSClientManager.sendMessage(msg);
+//                        WSClientManager.sendMessage(msg);
                     }
                 } else {
                     try {

@@ -141,11 +141,11 @@ public class ModuleCtrl extends BaseCtrl {
     })
     @PostMapping("/modify")
     @ResponseBody
-    public BeanRet modify(@ApiIgnore Module Module) {
+    public BeanRet modify(@ApiIgnore Module module) {
         try {
-            Assert.hasText(Module.getName(), BaseException.BaseExceptionEnum.Empty_Param.toString());
-            moduleSV.saveOrUpdate(Module);
-            return BeanRet.create(true, "修改成功", Module);
+            Assert.hasText(module.getName(), BaseException.BaseExceptionEnum.Empty_Param.toString());
+            moduleSV.saveOrUpdate(module);
+            return BeanRet.create(true, "修改成功", module);
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e.getMessage());

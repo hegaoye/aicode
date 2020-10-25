@@ -57,4 +57,5 @@ public class BeetlHelper implements TemplateHelper {
         }
         return "success";
     }
+
 }

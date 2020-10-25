@@ -164,7 +164,8 @@ public class ProjectController {
         project.setProjectFramworkList(projectFramworks);
 
         List<ProjectJob> projectJobs = projectJobService.list(new LambdaQueryWrapper<ProjectJob>()
-                .eq(ProjectJob::getProjectCode, project.getCode()));
+                .eq(ProjectJob::getProjectCode, project.getCode())
+                .orderByDesc(ProjectJob::getCreateTime));
         project.setProjectJobList(projectJobs);
 
         List<ProjectMap> projectMaps = projectMapService.list(new LambdaQueryWrapper<ProjectMap>()

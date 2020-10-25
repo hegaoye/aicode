@@ -137,7 +137,7 @@ public class LogsSVImpl implements LogsSV {
         String accountCode = project.getAccountCode();
         Account account = accountDAO.selectOne(new LambdaQueryWrapper<Account>().eq(Account::getCode, accountCode));
         String accountName = account.getAccount();
-        String name = project.getName();
+        String name = project.getEnglishName();
         //2.用户名+项目名生成唯一的文件夹
         String fileName = accountName + "_" + name + "_logs";
         return fileName;

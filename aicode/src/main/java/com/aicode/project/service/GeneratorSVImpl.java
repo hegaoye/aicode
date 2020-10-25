@@ -123,10 +123,6 @@ public class GeneratorSVImpl implements GenerateSV {
             WSClientManager.sendMessage(logText);
             logsSV.saveLogs(logText, path);
 
-            projectJobLogsDAO.insert(ProjectJobLogs.builder()
-                    .code(projectJob.getCode())
-                    .log(logText)
-                    .build());
             log.info("创建工作空间库完成");
             logsSV.saveLogs("创建工作空间库完成", path);
 
@@ -211,7 +207,7 @@ public class GeneratorSVImpl implements GenerateSV {
             String sqllog = "【已经生成】 " + project.getEnglishName() + "Sql 脚本文件并追加系统配置";
             WSClientManager.sendMessage(sqllog);
             logsSV.saveLogs(sqllog, path);
-            projectJobLogsDAO.insert(new ProjectJobLogs(projectJob.getCode(), sqllog));
+
 
             //5.获取模块信息 TODO
 

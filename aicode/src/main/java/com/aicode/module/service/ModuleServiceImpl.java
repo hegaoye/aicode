@@ -3,6 +3,8 @@
  */
 package com.aicode.module.service;
 
+import com.aicode.core.exceptions.BaseException;
+import com.aicode.core.exceptions.ModuleException;
 import com.baidu.fsg.uid.UidGenerator;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -10,6 +12,7 @@ import com.aicode.module.dao.ModuleDAO;
 import com.aicode.module.dao.mapper.ModuleMapper;
 import com.aicode.module.entity.Module;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -34,7 +37,13 @@ public class ModuleServiceImpl extends ServiceImpl<ModuleMapper, Module> impleme
 
     @Override
     public boolean save(Module entity) {
-//        entity.setId(String.valueOf(uidGenerator.getUID()));
+        if (entity == null
+                || StringUtils.isEmpty(entity.getDescription())
+                || StringUtils.isEmpty(entity.getName())) {
+            log.error(BaseException.BaseExceptionEnum.Empty_Param.toString());
+            throw new ModuleException(BaseException.BaseExceptionEnum.Empty_Param);
+        }
+        entity.setCode(String.valueOf(uidGenerator.getUID()));
         return super.save(entity);
     }
 

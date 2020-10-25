@@ -3,21 +3,24 @@
  */
 package com.aicode.module.ctrl;
 
+import com.aicode.core.entity.Page;
+import com.aicode.core.entity.R;
+import com.aicode.core.exceptions.BaseException;
 import com.aicode.module.entity.Module;
 import com.aicode.module.service.ModuleService;
 import com.aicode.module.vo.ModulePageVO;
-import com.aicode.module.vo.ModuleSaveVO;
 import com.aicode.module.vo.ModuleVO;
-import com.aicode.core.entity.Page;
-import com.aicode.core.entity.PageVO;
-import com.aicode.core.entity.R;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import io.swagger.annotations.*;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
@@ -25,11 +28,16 @@ import java.util.List;
 
 /**
  * 第三方模块池
+ * 1.查询一个详情信息
+ * 2.查询信息集合
+ * 3.添加
+ * 4.修改
+ * 5.删除
  *
  * @author hegaoye
  */
 @RestController
-@RequestMapping("/module")
+@RequestMapping("/Module")
 @Slf4j
 @Api(value = "第三方模块池控制器", tags = "第三方模块池控制器")
 public class ModuleController {
@@ -43,23 +51,38 @@ public class ModuleController {
      * @return R
      */
     @ApiOperation(value = "创建Module", notes = "创建Module")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "name", value = "模块名", required = true, paramType = "query"),
+            @ApiImplicitParam(name = "description", value = "模块说明", required = true, paramType = "query")
+    })
     @PostMapping("/build")
-    public ModuleSaveVO build(@ApiParam(name = "创建Module", value = "传入json格式", required = true)
-                                   @RequestBody ModuleSaveVO moduleSaveVO) {
-        if (null == moduleSaveVO) {
-            return null;
-        }
-        Module newModule = new Module();
-        BeanUtils.copyProperties(moduleSaveVO, newModule);
-
-        moduleService.save(newModule);
-
-        moduleSaveVO = new ModuleSaveVO();
-        BeanUtils.copyProperties(newModule, moduleSaveVO);
-        log.debug(JSON.toJSONString(moduleSaveVO));
-        return moduleSaveVO;
+    public R build(@ApiIgnore Module module) {
+        moduleService.save(module);
+        return R.success(module);
     }
 
+    /**
+     * 查询一个详情信息
+     *
+     * @param code 模板编码
+     * @return BeanRet
+     */
+    @ApiOperation(value = "查询一个详情信息", notes = "查询一个详情信息")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "code", value = "模块编码", required = true, paramType = "query")
+    })
+    @GetMapping(value = "/load")
+
+    public R load(String code) {
+        Assert.hasText(code, BaseException.BaseExceptionEnum.Empty_Param.toString());
+
+        Module module = moduleService.getOne(new LambdaQueryWrapper<Module>()
+                .eq(Module::getCode, code));
+
+        log.info(JSON.toJSONString(module));
+        return R.success(module);
+
+    }
 
     /**
      * 根据条件code查询第三方模块池一个详情信息
@@ -92,18 +115,17 @@ public class ModuleController {
             @ApiImplicitParam(name = "pageSize", value = "分页大小", required = true, paramType = "query"),
     })
     @GetMapping(value = "/list")
-    public PageVO<ModuleVO> list(@ApiIgnore ModulePageVO moduleVO, Integer curPage, Integer pageSize) {
+    public R list(@ApiIgnore ModulePageVO moduleVO, Integer curPage, Integer pageSize) {
         Page<Module> page = new Page<>(pageSize, curPage);
         QueryWrapper<Module> queryWrapper = new QueryWrapper<>();
         int total = moduleService.count(queryWrapper);
-        PageVO<ModuleVO> moduleVOPageVO = new PageVO<>();
         if (total > 0) {
             List<Module> moduleList = moduleService.list(queryWrapper, page.genRowStart(), page.getPageSize());
-            moduleVOPageVO.setTotalRow(total);
-            moduleVOPageVO.setRecords(JSON.parseArray(JSON.toJSONString(moduleList),ModuleVO.class));
+            page.setTotalRow(total);
+            page.setRecords(moduleList);
             log.debug(JSON.toJSONString(page));
         }
-        return moduleVOPageVO;
+        return R.success(page);
     }
 
 
@@ -113,14 +135,17 @@ public class ModuleController {
      * @return R
      */
     @ApiOperation(value = "修改Module", notes = "修改Module")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "code", value = "模板编码", required = true, paramType = "query"),
+            @ApiImplicitParam(name = "name", value = "类型名", paramType = "query"),
+            @ApiImplicitParam(name = "description", value = "类型说明", paramType = "query"),
+            @ApiImplicitParam(name = "state", value = "状态：停用[Disenable]，启用[Enable]", paramType = "query")
+    })
     @PutMapping("/modify")
-    public boolean modify(@ApiParam(name = "修改Module", value = "传入json格式", required = true)
-                          @RequestBody ModuleVO moduleVO) {
-        Module newModule = new Module();
-        BeanUtils.copyProperties(moduleVO, newModule);
-        boolean isUpdated = moduleService.update(newModule, new LambdaQueryWrapper<Module>()
-                .eq(Module::getId, moduleVO.getId()));
-        return isUpdated;
+    public R modify(@ApiIgnore Module module) {
+        moduleService.update(module, new LambdaQueryWrapper<Module>()
+                .eq(Module::getCode, module.getCode()));
+        return R.success(module);
     }
 
 

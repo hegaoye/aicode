@@ -34,7 +34,6 @@ public class MapRelationshipServiceImpl extends ServiceImpl<MapRelationshipMappe
 
     @Override
     public boolean save(MapRelationship entity) {
-//        entity.setId(String.valueOf(uidGenerator.getUID()));
         return super.save(entity);
     }
 

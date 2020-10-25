@@ -3,6 +3,7 @@
  */
 package com.aicode.project.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 import lombok.experimental.Accessors;
@@ -33,6 +34,7 @@ public class ProjectModel implements java.io.Serializable {
      * 数据库字段:pre_code  属性显示:上级模块编码
      */
     @ApiModelProperty(value = "上级模块编码")
+    @TableField("preCode")
     private java.lang.String preCode;
     /**
      * 数据库字段:name  属性显示:模块显示名称
@@ -53,6 +55,7 @@ public class ProjectModel implements java.io.Serializable {
      * 数据库字段:is_menu  属性显示:是否是菜单 Y,N
      */
     @ApiModelProperty(value = "是否是菜单 Y,N")
+    @TableField("isMenu")
     private java.lang.String isMenu;
     /**
      * 数据库字段:ico  属性显示:模块图标

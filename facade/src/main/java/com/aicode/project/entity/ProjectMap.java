@@ -30,11 +30,13 @@ public class ProjectMap implements java.io.Serializable {
      * 数据库字段:projectCode  属性显示:项目编码
      */
     @ApiModelProperty(value = "项目编码")
+    @TableField("projectCode")
     private java.lang.String projectCode;
     /**
      * 数据库字段:mapClassTableCode  属性显示:字段属性映射编码
      */
     @ApiModelProperty(value = "字段属性映射编码")
+    @TableField("mapClassTableCode")
     private java.lang.String mapClassTableCode;
 
     @TableField(exist = false)

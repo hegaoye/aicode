@@ -3,6 +3,7 @@
  */
 package com.aicode.project.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 import lombok.experimental.Accessors;
@@ -28,11 +29,13 @@ public class ProjectModelClass implements java.io.Serializable {
      * 数据库字段:mapClassTableCode  属性显示:类编码
      */
     @ApiModelProperty(value = "类编码")
+    @TableField("mapClassTableCode")
     private java.lang.String mapClassTableCode;
     /**
      * 数据库字段:projectModelCode  属性显示:模块编码
      */
     @ApiModelProperty(value = "模块编码")
+    @TableField("projectModelCode")
     private java.lang.String projectModelCode;
 
 }

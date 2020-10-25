@@ -1,5 +1,6 @@
 package com.aicode.database.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import lombok.Data;
 
 /**
@@ -11,9 +12,11 @@ import lombok.Data;
  * @author lixin hegaoye@qq.com
  */
 @Data
-public class Table  implements java.io.Serializable {
+public class Table implements java.io.Serializable {
 
+    @TableField("tableName")
     private String tableName;//数据库字段:table_name  属性显示:表名
+    @TableField("tableComment")
     private String tableComment;//数据库字段:table_comment  属性显示:数据库注释
 
 }

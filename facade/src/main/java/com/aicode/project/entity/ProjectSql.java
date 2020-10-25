@@ -3,6 +3,7 @@
  */
 package com.aicode.project.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 import lombok.experimental.Accessors;
@@ -28,6 +29,7 @@ public class ProjectSql implements java.io.Serializable {
      * 数据库字段:projectCode  属性显示:项目编码
      */
     @ApiModelProperty(value = "项目编码")
+    @TableField("projectCode")
     private java.lang.String projectCode;
     /**
      * 数据库字段:code  属性显示:tsql编码

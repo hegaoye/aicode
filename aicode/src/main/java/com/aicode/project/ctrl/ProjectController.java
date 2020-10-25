@@ -12,8 +12,8 @@ import com.aicode.core.tools.FileUtil;
 import com.aicode.core.tools.JwtToken;
 import com.aicode.display.service.DisplayAttributeService;
 import com.aicode.map.service.MapRelationshipService;
-import com.aicode.project.entity.Project;
-import com.aicode.project.service.ProjectService;
+import com.aicode.project.entity.*;
+import com.aicode.project.service.*;
 import com.aicode.project.vo.ProjectVO;
 import com.aicode.setting.entity.SettingKey;
 import com.aicode.setting.service.SettingService;
@@ -52,6 +52,24 @@ public class ProjectController {
     private ProjectService projectService;
     @Autowired
     private SettingService settingService;
+
+    @Autowired
+    private ProjectFramworkService projectFramworkService;
+
+    @Autowired
+    private ProjectMapService projectMapService;
+
+    @Autowired
+    private ProjectModuleService projectModuleService;
+
+    @Autowired
+    private ProjectJobService projectJobService;
+
+    @Autowired
+    private ProjectSqlService projectSqlService;
+
+    @Autowired
+    private ProjectRepositoryAccountService projectRepositoryAccountService;
 
     @Autowired
     private DisplayAttributeService displayAttributeService;
@@ -132,6 +150,31 @@ public class ProjectController {
         Assert.hasText(code, BaseException.BaseExceptionEnum.Empty_Param.toString());
         Project project = projectService.getOne(new LambdaQueryWrapper<Project>()
                 .eq(Project::getCode, code));
+
+        List<ProjectFramwork> projectFramworks = projectFramworkService.list(new LambdaQueryWrapper<ProjectFramwork>()
+                .eq(ProjectFramwork::getProjectCode, project.getCode()));
+        project.setProjectFramworkList(projectFramworks);
+
+        List<ProjectJob> projectJobs = projectJobService.list(new LambdaQueryWrapper<ProjectJob>()
+                .eq(ProjectJob::getProjectCode, project.getCode()));
+        project.setProjectJobList(projectJobs);
+
+        List<ProjectMap> projectMaps = projectMapService.list(new LambdaQueryWrapper<ProjectMap>()
+                .eq(ProjectMap::getProjectCode, project.getCode()));
+        project.setProjectMapList(projectMaps);
+
+        List<ProjectModule> projectModules = projectModuleService.list(new LambdaQueryWrapper<ProjectModule>()
+                .eq(ProjectModule::getProjectCode, project.getCode()));
+        project.setProjectModuleList(projectModules);
+
+        List<ProjectRepositoryAccount> projectRepositoryAccounts = projectRepositoryAccountService.list(new LambdaQueryWrapper<ProjectRepositoryAccount>()
+                .eq(ProjectRepositoryAccount::getProjectCode, project.getCode()));
+        project.setProjectRepositoryAccountList(projectRepositoryAccounts);
+
+        List<ProjectSql> projectSqls = projectSqlService.list(new LambdaQueryWrapper<ProjectSql>()
+                .eq(ProjectSql::getProjectCode, project.getCode()));
+        project.setProjectSqlList(projectSqls);
+
         //查询表关系
         int count = mapRelationshipService.countByProjectCode(code);
 

@@ -3,6 +3,7 @@
  */
 package com.aicode.frameworks.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 import lombok.experimental.Accessors;
@@ -33,6 +34,7 @@ public class FrameworksTemplate implements java.io.Serializable {
      * 数据库字段:frameworkCode  属性显示:框架编码
      */
     @ApiModelProperty(value = "框架编码")
+    @TableField("frameworkCode")
     private java.lang.String frameworkCode;
     /**
      * 数据库字段:path  属性显示:模板路径

@@ -35,6 +35,7 @@ public class MapFieldColumn implements java.io.Serializable {
      * 数据库字段:mapClassTableCode  属性显示:映射编码
      */
     @ApiModelProperty(value = "映射编码")
+    @TableField("mapClassTableCode")
     private java.lang.String mapClassTableCode;
     /**
      * 数据库字段:code  属性显示:字段属性映射编码
@@ -55,11 +56,13 @@ public class MapFieldColumn implements java.io.Serializable {
      * 数据库字段:sqlType  属性显示:字段类型
      */
     @ApiModelProperty(value = "字段类型")
+    @TableField("sqlType")
     private java.lang.String sqlType;
     /**
      * 数据库字段:fieldType  属性显示:属性类型
      */
     @ApiModelProperty(value = "属性类型")
+    @TableField("fieldType")
     private java.lang.String fieldType;
     /**
      * 数据库字段:notes  属性显示:注释
@@ -70,21 +73,25 @@ public class MapFieldColumn implements java.io.Serializable {
      * 数据库字段:defaultValue  属性显示:字段默认值
      */
     @ApiModelProperty(value = "字段默认值")
+    @TableField("defaultValue")
     private java.lang.String defaultValue;
     /**
      * 数据库字段:isPrimaryKey  属性显示:是否是主键
      */
     @ApiModelProperty(value = "是否是主键")
+    @TableField("isPrimaryKey")
     private java.lang.String isPrimaryKey;
     /**
      * 数据库字段:isDate  属性显示:是否是时间类型
      */
     @ApiModelProperty(value = "是否是时间类型")
+    @TableField("isDate")
     private java.lang.String isDate;
     /**
      * 数据库字段:isState  属性显示:是否是状态
      */
     @ApiModelProperty(value = "是否是状态")
+    @TableField("isState")
     private java.lang.String isState;
 
     @TableField(exist = false)

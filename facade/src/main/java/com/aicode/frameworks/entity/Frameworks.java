@@ -47,6 +47,7 @@ public class Frameworks implements java.io.Serializable {
      * 数据库字段:gitHome  属性显示:
      */
     @ApiModelProperty(value = "")
+    @TableField("gitHome")
     private java.lang.String gitHome;
     /**
      * 数据库字段:account  属性显示:
@@ -63,6 +64,7 @@ public class Frameworks implements java.io.Serializable {
      * 数据库字段:isPublic  属性显示:
      */
     @ApiModelProperty(value = "")
+    @TableField("isPublic")
     private java.lang.String isPublic;
 
     @TableField(exist = false)

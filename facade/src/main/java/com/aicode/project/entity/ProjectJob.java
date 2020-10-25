@@ -31,6 +31,7 @@ public class ProjectJob implements java.io.Serializable {
      * 数据库字段:projectCode  属性显示:项目编码
      */
     @ApiModelProperty(value = "项目编码")
+    @TableField("projectCode")
     private java.lang.String projectCode;
     /**
      * 数据库字段:code  属性显示:任务编码
@@ -51,6 +52,7 @@ public class ProjectJob implements java.io.Serializable {
      * 数据库字段:createTime  属性显示:执行任务时间
      */
     @ApiModelProperty(value = "执行任务时间")
+    @TableField("createTime")
     private java.util.Date createTime;
 
     @TableField(exist = false)

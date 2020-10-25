@@ -36,31 +36,37 @@ public class ProjectCodeCatalog implements java.io.Serializable {
      * 数据库字段:projectCode  属性显示:项目编码
      */
     @ApiModelProperty(value = "项目编码")
+    @TableField("projectCode")
     private java.lang.String projectCode;
     /**
      * 数据库字段:basePackage  属性显示:项目基础包名
      */
     @ApiModelProperty(value = "项目基础包名")
+    @TableField("basePackage")
     private java.lang.String basePackage;
     /**
      * 数据库字段:fileName  属性显示:文件名
      */
     @ApiModelProperty(value = "文件名")
+    @TableField("fileName")
     private java.lang.String fileName;
     /**
      * 数据库字段:fileSuffix  属性显示:文件后缀
      */
     @ApiModelProperty(value = "文件后缀")
+    @TableField("fileSuffix")
     private java.lang.String fileSuffix;
     /**
      * 数据库字段:relativePath  属性显示:相对路径
      */
     @ApiModelProperty(value = "相对路径")
+    @TableField("relativePath")
     private java.lang.String relativePath;
     /**
      * 数据库字段:absolutePath  属性显示:绝对路径
      */
     @ApiModelProperty(value = "绝对路径")
+    @TableField("absolutePath")
     private java.lang.String absolutePath;
 
 

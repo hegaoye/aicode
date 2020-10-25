@@ -3,6 +3,7 @@
  */
 package com.aicode.module.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 import lombok.experimental.Accessors;
@@ -28,6 +29,7 @@ public class ModuleFile implements java.io.Serializable {
      * 数据库字段:moudleCode  属性显示:模块编码
      */
     @ApiModelProperty(value = "模块编码")
+    @TableField("moudleCode")
     private java.lang.String moudleCode;
     /**
      * 数据库字段:path  属性显示:文件路径

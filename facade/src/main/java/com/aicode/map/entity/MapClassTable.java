@@ -38,11 +38,13 @@ public class MapClassTable implements java.io.Serializable {
      * 数据库字段:tableName  属性显示:表名
      */
     @ApiModelProperty(value = "表名")
+    @TableField("tableName")
     private java.lang.String tableName;
     /**
      * 数据库字段:className  属性显示:类名
      */
     @ApiModelProperty(value = "类名")
+    @TableField("className")
     private java.lang.String className;
     /**
      * 数据库字段:notes  属性显示:注释

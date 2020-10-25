@@ -30,11 +30,13 @@ public class ProjectFramwork implements java.io.Serializable {
      * 数据库字段:frameworkCode  属性显示:技术编码
      */
     @ApiModelProperty(value = "技术编码")
+    @TableField("frameworkCode")
     private java.lang.String frameworkCode;
     /**
      * 数据库字段:projectCode  属性显示:项目编码
      */
     @ApiModelProperty(value = "项目编码")
+    @TableField("projectCode")
     private java.lang.String projectCode;
 
     @TableField(exist = false)

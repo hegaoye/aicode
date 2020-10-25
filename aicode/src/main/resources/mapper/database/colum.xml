@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aicode.database.dao.mapper.ColumMapper">
+
+
+    <select id="list" resultType="com.aicode.database.entity.Column">
+       select COLUMN_NAME,COLUMN_DEFAULT,IS_NULLABLE,DATA_TYPE,COLUMN_KEY,EXTRA,COLUMN_COMMENT
+       from information_schema.columns
+       where table_schema=#{database}
+       and table_name=#{tableName}
+    </select>
+
+
+</mapper>

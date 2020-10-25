@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aicode.display.dao.mapper.DisplayAttributeMapper">
+    <resultMap id="rs_base" type="com.aicode.display.entity.DisplayAttribute">
+        <result property="id" column="id"/>
+        <result property="mapClassTableCode" column="mapClassTableCode"/>
+        <result property="mapFieldColumnCode" column="mapFieldColumnCode"/>
+        <result property="isRequired" column="isRequired"/>
+        <result property="isInsert" column="isInsert"/>
+        <result property="isDeleteCondition" column="isDeleteCondition"/>
+        <result property="isAllowUpdate" column="isAllowUpdate"/>
+        <result property="isListPageDisplay" column="isListPageDisplay"/>
+        <result property="isDetailPageDisplay" column="isDetailPageDisplay"/>
+        <result property="isQueryRequired" column="isQueryRequired"/>
+        <result property="isLineNew" column="isLineNew"/>
+        <result property="matchType" column="matchType"/>
+        <result property="displayType" column="displayType"/>
+        <result property="displayName" column="displayName"/>
+        <result property="displayNo" column="displayNo"/>
+        <result property="fieldValidationMode" column="fieldValidationMode"/>
+        <result property="validateText" column="validateText"/>
+        <result property="displayCss" column="displayCss"/>
+    </resultMap>
+
+
+    <sql id="columns">
+    id,mapClassTableCode,mapFieldColumnCode,isRequired,isInsert,isDeleteCondition,isAllowUpdate,isListPageDisplay,isDetailPageDisplay,isQueryRequired,isLineNew,matchType,displayType,displayName,displayNo,fieldValidationMode,validateText,displayCss
+    </sql>
+
+    <sql id="where">
+        <where>
+            <if test="id!=null and id!=''">
+                AND id = #{id}
+            </if>
+            <if test="mapClassTableCode!=null and mapClassTableCode!=''">
+                AND mapClassTableCode = #{mapClassTableCode}
+            </if>
+            <if test="mapFieldColumnCode!=null and mapFieldColumnCode!=''">
+                AND mapFieldColumnCode = #{mapFieldColumnCode}
+            </if>
+            <if test="isRequireds!=null and isRequireds!=''">
+                AND isRequired in
+                <foreach collection="isRequireds" index="index" item="stateIn" open="(" separator="," close=")">
+                    #{stateIn}
+                </foreach>
+            </if>
+            <if test="isInsert!=null and isInsert!=''">
+                AND isInsert = #{isInsert}
+            </if>
+            <if test="isDeleteCondition!=null and isDeleteCondition!=''">
+                AND isDeleteCondition = #{isDeleteCondition}
+            </if>
+            <if test="isAllowUpdates!=null and isAllowUpdates!=''">
+                AND isAllowUpdate in
+                <foreach collection="isAllowUpdates" index="index" item="stateIn" open="(" separator="," close=")">
+                    #{stateIn}
+                </foreach>
+            </if>
+            <if test="isListPageDisplays!=null and isListPageDisplays!=''">
+                AND isListPageDisplay in
+                <foreach collection="isListPageDisplays" index="index" item="stateIn" open="(" separator="," close=")">
+                    #{stateIn}
+                </foreach>
+            </if>
+            <if test="isDetailPageDisplays!=null and isDetailPageDisplays!=''">
+                AND isDetailPageDisplay in
+                <foreach collection="isDetailPageDisplays" index="index" item="stateIn" open="(" separator=","
+                         close=")">
+                    #{stateIn}
+                </foreach>
+            </if>
+            <if test="isQueryRequireds!=null and isQueryRequireds!=''">
+                AND isQueryRequired in
+                <foreach collection="isQueryRequireds" index="index" item="stateIn" open="(" separator="," close=")">
+                    #{stateIn}
+                </foreach>
+            </if>
+            <if test="isLineNew!=null and isLineNew!=''">
+                AND isLineNew = #{isLineNew}
+            </if>
+            <if test="matchTypes!=null and matchTypes!=''">
+                AND matchType in
+                <foreach collection="matchTypes" index="index" item="stateIn" open="(" separator="," close=")">
+                    #{stateIn}
+                </foreach>
+            </if>
+            <if test="displayTypes!=null and displayTypes!=''">
+                AND displayType in
+                <foreach collection="displayTypes" index="index" item="stateIn" open="(" separator="," close=")">
+                    #{stateIn}
+                </foreach>
+            </if>
+            <if test="displayName!=null and displayName!=''">
+                AND displayName = #{displayName}
+            </if>
+            <if test="displayNo!=null and displayNo!=''">
+                AND displayNo = #{displayNo}
+            </if>
+            <if test="fieldValidationModes!=null and fieldValidationModes!=''">
+                AND fieldValidationMode in
+                <foreach collection="fieldValidationModes" index="index" item="stateIn" open="(" separator=","
+                         close=")">
+                    #{stateIn}
+                </foreach>
+            </if>
+            <if test="validateText!=null and validateText!=''">
+                AND validateText = #{validateText}
+            </if>
+            <if test="displayCsss!=null and displayCsss!=''">
+                AND displayCss in
+                <foreach collection="displayCsss" index="index" item="stateIn" open="(" separator="," close=")">
+                    #{stateIn}
+                </foreach>
+            </if>
+        </where>
+    </sql>
+    <select id="countByProjectCode" resultType="java.lang.Integer">
+       SELECT count(mr.id)
+        FROM project_map pm, map_relationship mr
+        WHERE pm.mapClassTableCode = mr.mapClassTableCode AND pm.projectCode = #{code}
+    </select>
+
+</mapper>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aicode.project.dao.mapper.ProjectModelClassMapper">
+    <resultMap id="rs_base" type="com.aicode.project.entity.ProjectModelClass">
+        <result property="id" column="id"/>
+        <result property="mapClassTableCode" column="mapClassTableCode"/>
+        <result property="projectModelCode" column="projectModelCode"/>
+    </resultMap>
+
+
+    <sql id="columns">
+    id,mapClassTableCode,projectModelCode
+    </sql>
+
+    <sql id="where">
+        <where>
+            <if test="id!=null and id!=''">
+                AND id = #{id}
+            </if>
+            <if test="mapClassTableCode!=null and mapClassTableCode!=''">
+                AND mapClassTableCode = #{mapClassTableCode}
+            </if>
+            <if test="projectModelCode!=null and projectModelCode!=''">
+                AND projectModelCode = #{projectModelCode}
+            </if>
+        </where>
+    </sql>
+
+</mapper>

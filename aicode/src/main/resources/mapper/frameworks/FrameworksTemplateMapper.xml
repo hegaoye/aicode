@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aicode.frameworks.dao.mapper.FrameworksTemplateMapper">
+    <resultMap id="rs_base" type="com.aicode.frameworks.entity.FrameworksTemplate">
+        <result property="id" column="id"/>
+        <result property="code" column="code"/>
+        <result property="frameworkCode" column="frameworkCode"/>
+        <result property="path" column="path"/>
+    </resultMap>
+
+
+    <sql id="columns">
+    id,code,frameworkCode,path
+    </sql>
+
+    <sql id="where">
+        <where>
+            <if test="id!=null and id!=''">
+                AND id = #{id}
+            </if>
+            <if test="code!=null and code!=''">
+                AND code = #{code}
+            </if>
+            <if test="frameworkCode!=null and frameworkCode!=''">
+                AND frameworkCode = #{frameworkCode}
+            </if>
+            <if test="path!=null and path!=''">
+                AND path = #{path}
+            </if>
+        </where>
+    </sql>
+
+</mapper>

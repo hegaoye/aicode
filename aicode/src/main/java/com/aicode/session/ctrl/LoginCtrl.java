@@ -16,6 +16,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.annotation.Resource;
@@ -92,6 +93,11 @@ public class LoginCtrl {
         Assert.hasText(account.getPassword(), BaseException.BaseExceptionEnum.Empty_Param.toString());
         accountService.save(account);
         return R.success();
+    }
+
+    @RequestMapping("/")
+    public ModelAndView index() {
+        return new ModelAndView("index");
     }
 
 

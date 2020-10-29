@@ -379,7 +379,7 @@ public class ProjectController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "code", value = "项目编码", required = true, paramType = "query")
     })
-    @DeleteMapping("/delete")
+    @PostMapping("/delete")
     public R delete(@ApiIgnore ProjectVO projectVO) {
         Project newProject = new Project();
         BeanUtils.copyProperties(projectVO, newProject);

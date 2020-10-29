@@ -128,9 +128,8 @@ public class ProjectSqlController {
      * @return R
      */
     @ApiOperation(value = "修改ProjectSql", notes = "修改ProjectSql")
-    @PutMapping("/modify")
-    public boolean modify(@ApiParam(name = "修改ProjectSql", value = "传入json格式", required = true)
-                          @RequestBody ProjectSqlVO projectSqlVO) {
+    @PostMapping("/modify")
+    public boolean modify(ProjectSqlVO projectSqlVO) {
         ProjectSql newProjectSql = new ProjectSql();
         BeanUtils.copyProperties(projectSqlVO, newProjectSql);
         boolean isUpdated = projectSqlService.update(newProjectSql, new LambdaQueryWrapper<ProjectSql>()

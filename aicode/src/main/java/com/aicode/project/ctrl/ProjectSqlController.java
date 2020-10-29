@@ -129,12 +129,12 @@ public class ProjectSqlController {
      */
     @ApiOperation(value = "修改ProjectSql", notes = "修改ProjectSql")
     @PostMapping("/modify")
-    public boolean modify(ProjectSqlVO projectSqlVO) {
+    public R modify(ProjectSqlVO projectSqlVO) {
         ProjectSql newProjectSql = new ProjectSql();
         BeanUtils.copyProperties(projectSqlVO, newProjectSql);
         boolean isUpdated = projectSqlService.update(newProjectSql, new LambdaQueryWrapper<ProjectSql>()
-                .eq(ProjectSql::getId, projectSqlVO.getId()));
-        return isUpdated;
+                .eq(ProjectSql::getCode, projectSqlVO.getCode()));
+        return R.success();
     }
 
 

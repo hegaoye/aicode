@@ -143,7 +143,7 @@ public class ProjectRepositoryAccountController {
             @ApiImplicitParam(name = "state", value = "状态：停用[Disenable]，启用[Enable]", required = true, paramType = "query"),
             @ApiImplicitParam(name = "type", value = "仓库类型:Git, Svn", required = true, paramType = "query")
     })
-    @PutMapping("/modify")
+    @PostMapping("/modify")
     public R modify(@ApiIgnore ProjectRepositoryAccount projectRepositoryAccount) {
         ProjectRepositoryAccount projectRepositoryAccountLoad = projectRepositoryAccountService.getOne(new LambdaQueryWrapper<ProjectRepositoryAccount>()
                 .eq(ProjectRepositoryAccount::getCode, projectRepositoryAccount.getCode()));

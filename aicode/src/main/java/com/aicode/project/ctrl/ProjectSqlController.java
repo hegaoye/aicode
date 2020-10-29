@@ -8,12 +8,14 @@ import com.aicode.core.exceptions.BaseException;
 import com.aicode.project.entity.ProjectSql;
 import com.aicode.project.service.ProjectSqlService;
 import com.aicode.project.vo.ProjectSqlPageVO;
-import com.aicode.project.vo.ProjectSqlSaveVO;
 import com.aicode.project.vo.ProjectSqlVO;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import io.swagger.annotations.*;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -128,14 +130,23 @@ public class ProjectSqlController {
      * @return R
      */
     @ApiOperation(value = "修改ProjectSql", notes = "修改ProjectSql")
-    @PutMapping("/modify")
-    public boolean modify(@ApiParam(name = "修改ProjectSql", value = "传入json格式", required = true)
-                          @RequestBody ProjectSqlVO projectSqlVO) {
-        ProjectSql newProjectSql = new ProjectSql();
-        BeanUtils.copyProperties(projectSqlVO, newProjectSql);
-        boolean isUpdated = projectSqlService.update(newProjectSql, new LambdaQueryWrapper<ProjectSql>()
-                .eq(ProjectSql::getId, projectSqlVO.getId()));
-        return isUpdated;
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "code", value = "tsql编码", required = true, paramType = "query"),
+            @ApiImplicitParam(name = "tsql", value = "sql脚本", required = true, paramType = "query")
+    })
+    @PostMapping("/modify")
+    public R modify(ProjectSqlVO projectSqlVO) {
+        Assert.hasText(projectSqlVO.getCode(), BaseException.BaseExceptionEnum.Empty_Param.toString());
+        ProjectSql projectSqlLoad = projectSqlService.getOne(new LambdaQueryWrapper<ProjectSql>()
+                .eq(ProjectSql::getCode, projectSqlVO.getCode()));
+        if (null != projectSqlLoad) {
+            projectSqlService.remove(new LambdaQueryWrapper<ProjectSql>().eq(ProjectSql::getCode, projectSqlVO.getCode()));
+            projectSqlLoad.setTsql(projectSqlVO.getTsql());
+            projectSqlService.save(projectSqlLoad);
+            return R.success(projectSqlVO);
+        } else {
+            return R.failed("");
+        }
     }
 
 

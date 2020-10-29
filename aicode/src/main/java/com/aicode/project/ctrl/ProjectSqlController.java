@@ -8,12 +8,14 @@ import com.aicode.core.exceptions.BaseException;
 import com.aicode.project.entity.ProjectSql;
 import com.aicode.project.service.ProjectSqlService;
 import com.aicode.project.vo.ProjectSqlPageVO;
-import com.aicode.project.vo.ProjectSqlSaveVO;
 import com.aicode.project.vo.ProjectSqlVO;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import io.swagger.annotations.*;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -134,40 +136,19 @@ public class ProjectSqlController {
     })
     @PutMapping("/modify")
     public R modify(ProjectSqlVO projectSqlVO) {
-        ProjectSql newProjectSql = new ProjectSql();
-        BeanUtils.copyProperties(projectSqlVO, newProjectSql);
-        projectSqlService.remove(new LambdaQueryWrapper<ProjectSql>().eq(ProjectSql::getCode,projectSqlVO.getCode()));
-        projectSqlService.save(newProjectSql);
-        return R.success();
-    }
-
-    @ApiOperation(value = "修改项目", notes = "修改项目")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "code", value = "tsql编码", required = true, paramType = "query"),
-            @ApiImplicitParam(name = "tsql", value = "sql脚本", required = true, paramType = "query")
-    })
-    @PutMapping("/modify")
-    @ResponseBody
-    public BeanRet modify(@ApiIgnore ProjectSql projectSql) {
-        try {
-            Assert.hasText(projectSql.getCode(), BaseException.BaseExceptionEnum.Empty_Param.toString());
-            Map<String, Object> map = Maps.newHashMap();
-            map.put("code", projectSql.getCode());
-            ProjectSql projectSqlLoad = projectSqlSV.load(map);
-            if (projectSqlLoad != null) {
-                projectSqlSV.delete(projectSql.getCode());
-                projectSqlLoad.setTsql(projectSql.getTsql());
-                projectSqlSV.save(projectSqlLoad);
-                return BeanRet.create(true, "修改项目成功", projectSql);
-            } else {
-                return BeanRet.create(false, "修改项目失败");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            logger.error(e.getMessage());
-            return BeanRet.create(false, "修改项目失败");
+        Assert.hasText(projectSqlVO.getCode(), BaseException.BaseExceptionEnum.Empty_Param.toString());
+        ProjectSql projectSqlLoad = projectSqlService.getOne(new LambdaQueryWrapper<ProjectSql>()
+                .eq(ProjectSql::getCode, projectSqlVO.getCode()));
+        if (null != projectSqlLoad) {
+            projectSqlService.remove(new LambdaQueryWrapper<ProjectSql>().eq(ProjectSql::getCode, projectSqlVO.getCode()));
+            projectSqlLoad.setTsql(projectSqlVO.getTsql());
+            projectSqlService.save(projectSqlLoad);
+            return R.success(projectSqlVO);
+        } else {
+            return R.failed("");
         }
     }
+
 
     /**
      * 删除 项目sql脚本

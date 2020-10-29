@@ -7,7 +7,6 @@ import com.aicode.core.tools.core.StringHelper;
 import com.aicode.display.entity.DisplayAttribute;
 import com.aicode.map.entity.MapClassTable;
 import com.aicode.map.entity.MapFieldColumn;
-import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;
 
@@ -345,7 +344,7 @@ public class TemplateData implements Serializable {
 
                 //转化状态
                 if (YNEnum.Y == YNEnum.getYN(mapFieldColumn.getIsState())) {
-                    if (StringUtils.isNotBlank(mapFieldColumn.getNotes())) {
+                    if (StringTools.isNotEmpty(mapFieldColumn.getNotes())) {
                         Map<String, Object> map = StringTools.getStateOrType(mapFieldColumn.getNotes());
                         if (!map.isEmpty()) {
                             for (Map.Entry<String, Object> entry : map.entrySet()) {

@@ -134,7 +134,7 @@ public class ProjectSqlController {
             @ApiImplicitParam(name = "code", value = "tsql编码", required = true, paramType = "query"),
             @ApiImplicitParam(name = "tsql", value = "sql脚本", required = true, paramType = "query")
     })
-    @PutMapping("/modify")
+    @PostMapping("/modify")
     public R modify(ProjectSqlVO projectSqlVO) {
         Assert.hasText(projectSqlVO.getCode(), BaseException.BaseExceptionEnum.Empty_Param.toString());
         ProjectSql projectSqlLoad = projectSqlService.getOne(new LambdaQueryWrapper<ProjectSql>()

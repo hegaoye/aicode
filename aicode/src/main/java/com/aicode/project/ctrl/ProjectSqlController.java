@@ -128,15 +128,46 @@ public class ProjectSqlController {
      * @return R
      */
     @ApiOperation(value = "修改ProjectSql", notes = "修改ProjectSql")
-    @PostMapping("/modify")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "code", value = "tsql编码", required = true, paramType = "query"),
+            @ApiImplicitParam(name = "tsql", value = "sql脚本", required = true, paramType = "query")
+    })
+    @PutMapping("/modify")
     public R modify(ProjectSqlVO projectSqlVO) {
         ProjectSql newProjectSql = new ProjectSql();
         BeanUtils.copyProperties(projectSqlVO, newProjectSql);
-        boolean isUpdated = projectSqlService.update(newProjectSql, new LambdaQueryWrapper<ProjectSql>()
-                .eq(ProjectSql::getCode, projectSqlVO.getCode()));
+        projectSqlService.remove(new LambdaQueryWrapper<ProjectSql>().eq(ProjectSql::getCode,projectSqlVO.getCode()));
+        projectSqlService.save(newProjectSql);
         return R.success();
     }
 
+    @ApiOperation(value = "修改项目", notes = "修改项目")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "code", value = "tsql编码", required = true, paramType = "query"),
+            @ApiImplicitParam(name = "tsql", value = "sql脚本", required = true, paramType = "query")
+    })
+    @PutMapping("/modify")
+    @ResponseBody
+    public BeanRet modify(@ApiIgnore ProjectSql projectSql) {
+        try {
+            Assert.hasText(projectSql.getCode(), BaseException.BaseExceptionEnum.Empty_Param.toString());
+            Map<String, Object> map = Maps.newHashMap();
+            map.put("code", projectSql.getCode());
+            ProjectSql projectSqlLoad = projectSqlSV.load(map);
+            if (projectSqlLoad != null) {
+                projectSqlSV.delete(projectSql.getCode());
+                projectSqlLoad.setTsql(projectSql.getTsql());
+                projectSqlSV.save(projectSqlLoad);
+                return BeanRet.create(true, "修改项目成功", projectSql);
+            } else {
+                return BeanRet.create(false, "修改项目失败");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error(e.getMessage());
+            return BeanRet.create(false, "修改项目失败");
+        }
+    }
 
     /**
      * 删除 项目sql脚本

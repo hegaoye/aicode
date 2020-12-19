@@ -29,6 +29,8 @@ import com.aicode.setting.entity.SettingKey;
 import com.alibaba.fastjson.JSON;
 import com.baidu.fsg.uid.UidGenerator;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
@@ -410,15 +412,18 @@ public class GeneratorSVImpl implements GenerateSV {
         }
 
         if (file.exists()) {
-            List<ProjectFramwork> frameworksList = project.getProjectFramworkList();
+            QueryWrapper<ProjectFramwork> queryWrapper = new QueryWrapper<>();
+            queryWrapper.lambda().eq(ProjectFramwork::getProjectCode, project.getCode());
+            List<ProjectFramwork> frameworksList = projectFramworkDAO.list(queryWrapper, 0, 100);
             WSClientManager.sendMessage("判断是否是选择多技术项目....");
-            if (frameworksList.size() > 1) {
+            if (CollectionUtils.isNotEmpty(frameworksList)) {
                 WSClientManager.sendMessage("多技术框架项目，将生成多个框架源码....");
                 for (ProjectFramwork projectFramwork : frameworksList) {
-                    File frameworkFile = new File(projectPath + "/" + projectFramwork.getFrameworks().getName());
+                    Frameworks frameworks = frameworksDAO.selectOne(new LambdaQueryWrapper<Frameworks>().eq(Frameworks::getCode, projectFramwork.getFrameworkCode()));
+                    File frameworkFile = new File(projectPath + "/" + frameworks.getName());
                     if (!frameworkFile.exists()) {
                         frameworkFile.mkdir();
-                        WSClientManager.sendMessage("创建" + projectFramwork.getFrameworks().getName() + "文件夹成功!");
+                        WSClientManager.sendMessage("创建" + frameworks.getName() + "文件夹成功!");
                     }
                 }
             }

@@ -1,5 +1,5 @@
 -- 清空数据表
-delete from frameworks;
+delete from frameworks where 1=1;
 
 -- 插入最新frameworks 数据
 -- ----------------------------

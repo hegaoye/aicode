@@ -343,7 +343,7 @@ public class TemplateData implements Serializable {
                 this.fields.add(field);
 
                 //转化状态
-                if (YNEnum.Y == YNEnum.getYN(mapFieldColumn.getIsState())) {
+                if (YNEnum.Y == YNEnum.getYN(mapFieldColumn.getIsState()) && YNEnum.N == YNEnum.getYN(mapFieldColumn.getIsPrimaryKey())) {
                     if (StringTools.isNotEmpty(mapFieldColumn.getNotes())) {
                         Map<String, Object> map = StringTools.getStateOrType(mapFieldColumn.getNotes());
                         if (!map.isEmpty()) {

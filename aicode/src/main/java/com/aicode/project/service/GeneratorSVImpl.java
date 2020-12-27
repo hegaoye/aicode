@@ -600,6 +600,7 @@ public class GeneratorSVImpl implements GenerateSV {
                                     mapStatusList.add(MapStatus.builder()
                                             .statusName(statusClassName)
                                             .targetFilePath(targetPath)
+                                            .notes(mapFieldColumnNotPk.getNotes())
                                             .mapStatusList(mapStatusList1)
                                             .build());
                                 }
@@ -610,6 +611,7 @@ public class GeneratorSVImpl implements GenerateSV {
                                     TemplateData templateDataStatus = JSON.parseObject(JSON.toJSONString(templateData), TemplateData.class);
                                     templateDataStatus.setClassNameState(mapStatus.getStatusName());
                                     templateDataStatus.setStates(mapStatus.getMapStatusList());
+                                    templateDataStatus.setNotes(mapStatus.getNotes());
                                     if (TemplateEngineEnum.Freemarker == templateEngineEnum) {
                                         msg = freemarkerHelper.generate(templateDataStatus, mapStatus.getTargetFilePath(), templatePath);
                                     } else if (TemplateEngineEnum.Beetl == templateEngineEnum) {

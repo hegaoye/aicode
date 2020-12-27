@@ -30,6 +30,10 @@ public class MapStatus implements java.io.Serializable {
      * 目标文件路径
      */
     private String targetFilePath;
+    /**
+     * 备注
+     */
+    private String notes;
 
     /**
      * 状态名

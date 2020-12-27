@@ -342,22 +342,44 @@ public class TemplateData implements Serializable {
                 }
                 this.fields.add(field);
 
-                //转化状态
-                if (YNEnum.Y == YNEnum.getYN(mapFieldColumn.getIsState()) && YNEnum.N == YNEnum.getYN(mapFieldColumn.getIsPrimaryKey())) {
-                    if (StringTools.isNotEmpty(mapFieldColumn.getNotes())) {
-                        Map<String, Object> map = StringTools.getStateOrType(mapFieldColumn.getNotes());
-                        if (!map.isEmpty()) {
-                            for (Map.Entry<String, Object> entry : map.entrySet()) {
-                                MapStatus mapStatus = new MapStatus();
-                                mapStatus.setName(StringHelper.capitalize(entry.getKey()));
-                                mapStatus.setValue(String.valueOf(entry.getValue()));
-                                this.states.add(mapStatus);
-                            }
-                        }
+//                //转化状态
+//                if (YNEnum.Y == YNEnum.getYN(mapFieldColumn.getIsState()) && YNEnum.N == YNEnum.getYN(mapFieldColumn.getIsPrimaryKey())) {
+//                    if (StringTools.isNotEmpty(mapFieldColumn.getNotes())) {
+//                        Map<String, Object> map = StringTools.getStateOrType(mapFieldColumn.getNotes());
+//                        if (!map.isEmpty()) {
+//                            for (Map.Entry<String, Object> entry : map.entrySet()) {
+//                                MapStatus mapStatus = new MapStatus();
+//                                mapStatus.setName(StringHelper.capitalize(entry.getKey()));
+//                                mapStatus.setValue(String.valueOf(entry.getValue()));
+//                                this.states.add(mapStatus);
+//                            }
+//                        }
+//                    }
+//                }
+            }
+        }
+
+    }
+
+    public List<MapStatus> genStatus(MapFieldColumn mapFieldColumn) {
+        List<MapStatus> mapStatusList = new ArrayList<>();
+
+        //转化状态
+        if (YNEnum.Y == YNEnum.getYN(mapFieldColumn.getIsState()) && YNEnum.N == YNEnum.getYN(mapFieldColumn.getIsPrimaryKey())) {
+            if (StringTools.isNotEmpty(mapFieldColumn.getNotes())) {
+                Map<String, Object> map = StringTools.getStateOrType(mapFieldColumn.getNotes());
+                if (!map.isEmpty()) {
+                    for (Map.Entry<String, Object> entry : map.entrySet()) {
+                        MapStatus mapStatus = new MapStatus();
+                        mapStatus.setName(StringHelper.capitalize(entry.getKey()));
+                        mapStatus.setValue(String.valueOf(entry.getValue()));
+                        mapStatusList.add(mapStatus);
                     }
+
                 }
             }
         }
 
+        return null;
     }
 }

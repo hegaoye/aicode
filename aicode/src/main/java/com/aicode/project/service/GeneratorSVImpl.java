@@ -34,6 +34,7 @@ import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
@@ -588,13 +589,42 @@ public class GeneratorSVImpl implements GenerateSV {
                 if (!templatePath.contains(".jar")) {
                     //适配模板引擎
                     String msg = "";
+
                     if (null == adapterTemplateEngine(templatePath)) {
-                        if (TemplateEngineEnum.Freemarker == templateEngineEnum) {
-                            msg = freemarkerHelper.generate(templateData, targetFilePath, templatePath);
-                        } else if (TemplateEngineEnum.Beetl == templateEngineEnum) {
-                            msg = beetlHelper.generate(templateData, targetFilePath, templatePath);
+                        if (templatePath.contains("State.java")) {
+                            List<MapStatus> mapStatusList = new ArrayList<>();
+                            for (MapFieldColumn mapFieldColumnNotPk : mapFieldColumnNotPks) {
+                                List<MapStatus> mapStatusList1 = templateData.genStatus(mapFieldColumnNotPk);
+                                if (CollectionUtils.isNotEmpty(mapStatusList1)) {
+                                    String className = templatePath.replace("State.java", mapFieldColumnNotPk.getUpper() + ".java");
+                                    mapStatusList.add(MapStatus.builder()
+                                            .className(className)
+                                            .mapStatusList(mapStatusList1)
+                                            .build());
+                                }
+                            }
+
+                            if (CollectionUtils.isNotEmpty(mapStatusList)) {
+                                for (MapStatus mapStatus : mapStatusList) {
+                                    TemplateData templateDataStatus = JSON.parseObject(JSON.toJSONString(templateData), TemplateData.class);
+                                    templateDataStatus.setStates(mapStatus.getMapStatusList());
+                                    if (TemplateEngineEnum.Freemarker == templateEngineEnum) {
+                                        msg = freemarkerHelper.generate(templateDataStatus, targetFilePath, templatePath);
+                                    } else if (TemplateEngineEnum.Beetl == templateEngineEnum) {
+                                        msg = beetlHelper.generate(templateDataStatus, targetFilePath, templatePath);
+                                    }
+                                }
+                            }
+                        } else {
+                            if (TemplateEngineEnum.Freemarker == templateEngineEnum) {
+                                msg = freemarkerHelper.generate(templateData, targetFilePath, templatePath);
+                            } else if (TemplateEngineEnum.Beetl == templateEngineEnum) {
+                                msg = beetlHelper.generate(templateData, targetFilePath, templatePath);
+                            }
                         }
-//                        WSClientManager.sendMessage(msg);
+                        if (!msg.equals("success")) {
+                            WSClientManager.sendMessage(msg);
+                        }
                     }
                 } else {
                     try {

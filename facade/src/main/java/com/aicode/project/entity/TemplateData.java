@@ -106,6 +106,11 @@ public class TemplateData implements Serializable {
     private String author;
 
     /**
+     * 枚举类名
+     */
+    private String classNameState;
+
+    /**
      * 类信息对象  集合
      */
     private List<MapClassTable> classes = new ArrayList<>();
@@ -376,10 +381,15 @@ public class TemplateData implements Serializable {
                         mapStatusList.add(mapStatus);
                     }
 
+                    if (mapStatusList.size() <= 1) {
+                        mapStatusList.clear();
+                        return mapStatusList;
+                    }
+
                 }
             }
         }
 
-        return null;
+        return mapStatusList;
     }
 }

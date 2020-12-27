@@ -27,9 +27,14 @@ import java.util.List;
 public class MapStatus implements java.io.Serializable {
 
     /**
-     * 类名
+     * 目标文件路径
      */
-    private String className;
+    private String targetFilePath;
+
+    /**
+     * 状态名
+     */
+    private String statusName;
     /**
      * 枚举名
      */

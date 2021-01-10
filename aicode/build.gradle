@@ -1,0 +1,95 @@
+buildscript {
+    ext {
+        springBootVersion = '2.2.6.RELEASE'
+    }
+    repositories {
+        maven { url "https://plugins.gradle.org/m2/" }
+        maven { url "https://repo.spring.io/milestone" }
+        maven { url "http://repo.spring.io/release" }
+        maven { url "http://repo.spring.io/snapshot" }
+        maven { url "http://maven.jahia.org/maven2" }
+        maven { url "http://oss.jfrog.org/artifactory/oss-snapshot-local/" }
+
+        mavenCentral()
+        jcenter()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'idea'
+//apply plugin: 'spring-boot'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+
+sourceCompatibility = 1.8
+[compileJava, compileTestJava, javadoc]*.options*.encoding = 'UTF-8'
+
+repositories {
+    maven { url "https://plugins.gradle.org/m2/" }
+    maven { url "https://repo.spring.io/milestone" }
+    maven { url "http://repo.spring.io/release" }
+    maven { url "http://repo.spring.io/snapshot" }
+    maven { url "http://maven.jahia.org/maven2" }
+    maven { url "http://oss.jfrog.org/artifactory/oss-snapshot-local/" }
+
+    mavenCentral()
+    jcenter()
+}
+
+ext {
+    set('springCloudVersion', 'Hoxton.SR2')
+    set('springCloudAlibabaVersion', '2.2.0.RELEASE')
+
+}
+dependencies {
+
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+    //----------- mybatis mysql druid start--------------
+    implementation 'mysql:mysql-connector-java:8.0.15'
+    implementation 'com.alibaba:druid:1.1.19'
+    implementation 'com.alibaba:druid-spring-boot-starter:1.1.10'
+    implementation 'com.baomidou:mybatis-plus-generator:3.1.2'
+    implementation 'com.baomidou:mybatis-plus-boot-starter:3.1.2'
+    //-----------mybatis mysql druid end--------------
+
+    //-----------swagger2 start--------------
+    implementation 'io.springfox:springfox-swagger2:2.9.2'
+    implementation 'com.github.xiaoymin:swagger-bootstrap-ui:1.9.4'
+    //-----------swagger2 end--------------
+
+    compileOnly 'org.projectlombok:lombok:1.18.12'
+    annotationProcessor 'org.projectlombok:lombok:1.18.12'
+
+    implementation 'com.alibaba:fastjson:1.2.59'
+    implementation 'com.github.ben-manes.caffeine:caffeine:2.8.1'
+    implementation 'com.github.pagehelper:pagehelper:5.1.11'
+
+    implementation 'commons-io:commons-io:2.4'
+    implementation 'org.apache.commons:commons-lang3:3.4'
+    implementation 'commons-fileupload:commons-fileupload:1.2.1'
+    implementation 'commons-collections:commons-collections:3.2.1'
+    implementation 'org.springframework.boot:spring-boot-starter-freemarker:2.1.2.RELEASE'
+    implementation 'com.ibeetl:beetl:3.0.19.RELEASE'
+
+    implementation project(path: ':core')
+    implementation project(path: ':common')
+    implementation project(path: ':facade')
+
+    implementation fileTree(dir: 'libs', include: ['uid-generator-1.0.0-SNAPSHOT.jar'])
+//    implementation 'org.springframework.boot:spring-boot-devtools'
+    testImplementation('org.springframework.boot:spring-boot-starter-test')
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+        mavenBom "com.alibaba.cloud:spring-cloud-alibaba-dependencies:${springCloudAlibabaVersion}"
+
+    }
+}

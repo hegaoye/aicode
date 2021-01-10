@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aicode.project.dao.mapper.ProjectCodeCatalogMapper">
+    <resultMap id="rs_base" type="com.aicode.project.entity.ProjectCodeCatalog">
+        <result property="id" column="id"/>
+        <result property="code" column="code"/>
+        <result property="projectCode" column="projectCode"/>
+        <result property="basePackage" column="basePackage"/>
+        <result property="fileName" column="fileName"/>
+        <result property="fileSuffix" column="fileSuffix"/>
+        <result property="relativePath" column="relativePath"/>
+        <result property="absolutePath" column="absolutePath"/>
+    </resultMap>
+
+
+    <sql id="columns">
+    id,code,projectCode,basePackage,fileName,fileSuffix,relativePath,absolutePath
+    </sql>
+
+    <sql id="where">
+        <where>
+            <if test="id!=null and id!=''">
+                AND id = #{id}
+            </if>
+            <if test="code!=null and code!=''">
+                AND code = #{code}
+            </if>
+            <if test="projectCode!=null and projectCode!=''">
+                AND projectCode = #{projectCode}
+            </if>
+            <if test="basePackage!=null and basePackage!=''">
+                AND basePackage = #{basePackage}
+            </if>
+            <if test="fileName!=null and fileName!=''">
+                AND fileName = #{fileName}
+            </if>
+            <if test="fileSuffix!=null and fileSuffix!=''">
+                AND fileSuffix = #{fileSuffix}
+            </if>
+            <if test="relativePath!=null and relativePath!=''">
+                AND relativePath = #{relativePath}
+            </if>
+            <if test="absolutePath!=null and absolutePath!=''">
+                AND absolutePath = #{absolutePath}
+            </if>
+        </where>
+    </sql>
+
+</mapper>

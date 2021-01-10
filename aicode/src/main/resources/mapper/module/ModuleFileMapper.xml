@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aicode.module.dao.mapper.ModuleFileMapper">
+    <resultMap id="rs_base" type="com.aicode.module.entity.ModuleFile">
+        <result property="id" column="id"/>
+        <result property="moudleCode" column="moudleCode"/>
+        <result property="path" column="path"/>
+    </resultMap>
+
+
+    <sql id="columns">
+    id,moudleCode,path
+    </sql>
+
+    <sql id="where">
+        <where>
+            <if test="id!=null and id!=''">
+                AND id = #{id}
+            </if>
+            <if test="moudleCode!=null and moudleCode!=''">
+                AND moudleCode = #{moudleCode}
+            </if>
+            <if test="path!=null and path!=''">
+                AND path = #{path}
+            </if>
+        </where>
+    </sql>
+
+</mapper>

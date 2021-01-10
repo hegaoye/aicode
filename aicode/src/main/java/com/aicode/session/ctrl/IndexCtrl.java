@@ -8,13 +8,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 @Slf4j
 @Controller
-@RequestMapping("/")
 @Api(value = "登陆控制器", tags = "登陆控制器")
 public class IndexCtrl {
 
     @RequestMapping("/")
     public String index() {
-        return "index";
+        return "forward:index.html";
     }
 
 

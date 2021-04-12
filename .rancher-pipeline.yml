@@ -1,0 +1,18 @@
+stages:
+- name: build
+  steps:
+  - runScriptConfig:
+      image: java:8
+      shellScript: ./aicode/gradlew :aicode:build -x test
+  - publishImageConfig:
+      dockerfilePath: ./aicode/Dockerfile
+      buildContext: .
+      tag: aicode/test
+      pushRemote: true
+      registry: index.docker.io
+- name: deploy
+  steps:
+  - applyYamlConfig:
+      path: ./aicode/k8s/aicode.yml
+timeout: 60
+notification: {}

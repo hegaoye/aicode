@@ -3,10 +3,7 @@ stages:
   steps:
   - runScriptConfig:
       image: gradle:jdk8
-      shellScript: |-
-        gradle --version
-        gradle clean :aicode:build -x test
-        ls -alh
+      shellScript: gradle --version
   - publishImageConfig:
       dockerfilePath: ./aicode/Dockerfile
       buildContext: .

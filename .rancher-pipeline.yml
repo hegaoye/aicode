@@ -2,7 +2,7 @@ stages:
 - name: build
   steps:
   - runScriptConfig:
-      image: csdmdev/gradle6-jdk11
+      image: mavenlabs/maven-ci
       shellScript: |-
         chmod 777 ./aicode/gradlew
         ./aicode/gradlew clean :aicode:build -x test

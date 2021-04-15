@@ -5,7 +5,8 @@ stages:
       image: gradle:jdk8
       shellScript: |-
         chmod 777 -Rf *
-        gradle clean :aicode:build -x test
+        cd aicode
+        gradle :aicode:build -x test
   - publishImageConfig:
       dockerfilePath: ./aicode/Dockerfile
       buildContext: .

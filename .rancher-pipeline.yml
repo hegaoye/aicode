@@ -2,7 +2,7 @@ stages:
 - name: build
   steps:
   - runScriptConfig:
-      image: asoor/gradle6.3-jdk8
+      image: csdmdev/gradle6-jdk11
       shellScript: |-
         ls -alh
         gradle --verison

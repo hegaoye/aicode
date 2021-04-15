@@ -2,8 +2,8 @@ stages:
 - name: build
   steps:
   - runScriptConfig:
-      image: gradle:jdk8
-      shellScript: gradle build
+      image: gradle:jdk8 gradle build
+      shellScript: gradle --version
   - publishImageConfig:
       dockerfilePath: ./aicode/Dockerfile
       buildContext: .

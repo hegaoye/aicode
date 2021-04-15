@@ -6,6 +6,7 @@ stages:
       shellScript: |-
         gradle --version
         ls -alh *
+        cd aicode
         gradle  :aicode:build -x test
         ls -alh *
   - publishImageConfig:

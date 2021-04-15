@@ -6,6 +6,8 @@ stages:
       shellScript: |-
         gradle --version
         ls -alh *
+        gradle :build -x test
+        ls -alh *
   - publishImageConfig:
       dockerfilePath: ./aicode/Dockerfile
       buildContext: .

@@ -1,11 +1,11 @@
 stages:
 - name: build
   steps:
-  - publishImageConfig:
-      dockerfilePath: ./aicode/Dockerfile
-      buildContext: .
-      tag: aicode
-      registry: 127.0.0.1:34186
+  - runScriptConfig:
+      image: gradle:jdk8
+      shellScript: |-
+        gradle --version
+        ls -alh *
   - publishImageConfig:
       dockerfilePath: ./aicode/Dockerfile
       buildContext: .

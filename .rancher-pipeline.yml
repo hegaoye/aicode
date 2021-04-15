@@ -2,7 +2,7 @@ stages:
 - name: build
   steps:
   - runScriptConfig:
-      image: java:8
+      image: https://hub.docker.com/r/zhuzhu/gradle-jdk8-alpine
       shellScript: |-
         chmod +x ./aicode/gradlew
         ./aicode/gradlew :aicode:build -x test

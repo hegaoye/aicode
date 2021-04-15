@@ -3,7 +3,9 @@ stages:
   steps:
   - runScriptConfig:
       image: java:8
-      shellScript: ./aicode/gradlew :aicode:build -x test
+      shellScript: |-
+        chmod +x ./aicode/gradlew
+        ./aicode/gradlew :aicode:build -x test
   - publishImageConfig:
       dockerfilePath: ./aicode/Dockerfile
       buildContext: .

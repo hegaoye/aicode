@@ -5,10 +5,10 @@ buildscript {
     repositories {
         maven { url "https://plugins.gradle.org/m2/" }
         maven { url "https://repo.spring.io/milestone" }
-        maven { url "http://repo.spring.io/release" }
-        maven { url "http://repo.spring.io/snapshot" }
-        maven { url "http://maven.jahia.org/maven2" }
-        maven { url "http://oss.jfrog.org/artifactory/oss-snapshot-local/" }
+        maven { url "https://repo.spring.io/release" }
+        maven { url "https://repo.spring.io/snapshot" }
+        maven { url "https://maven.jahia.org/maven2" }
+        maven { url "https://oss.jfrog.org/artifactory/oss-snapshot-local/" }
 
         mavenCentral()
         jcenter()
@@ -37,10 +37,10 @@ sourceCompatibility = 1.8
 repositories {
     maven { url "https://plugins.gradle.org/m2/" }
     maven { url "https://repo.spring.io/milestone" }
-    maven { url "http://repo.spring.io/release" }
-    maven { url "http://repo.spring.io/snapshot" }
-    maven { url "http://maven.jahia.org/maven2" }
-    maven { url "http://oss.jfrog.org/artifactory/oss-snapshot-local/" }
+    maven { url "https://repo.spring.io/release" }
+    maven { url "https://repo.spring.io/snapshot" }
+    maven { url "https://maven.jahia.org/maven2" }
+    maven { url "https://oss.jfrog.org/artifactory/oss-snapshot-local/" }
 
     mavenCentral()
     jcenter()

@@ -5,6 +5,7 @@ stages:
       image: gradle:jdk8
       shellScript: |+
         gradle --verison
+        gradle -Penv=dev clean bootRepackage -b aicode/build.gradle
 
   - publishImageConfig:
       dockerfilePath: ./aicode/Dockerfile

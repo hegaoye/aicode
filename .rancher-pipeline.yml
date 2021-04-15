@@ -5,8 +5,8 @@ stages:
       image: gradle:jdk8
       shellScript: |-
         gradle --version
-        ls -alh *
-        gradle :build -x test
+        gradle -b aicode/build.gradle
+
         ls -alh *
   - publishImageConfig:
       dockerfilePath: ./aicode/Dockerfile

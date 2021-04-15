@@ -2,10 +2,10 @@ stages:
 - name: build
   steps:
   - runScriptConfig:
-      image: adoptopenjdk/openjdk8
+      image: gradle:jdk8
       shellScript: |-
-        chmod 777 ./aicode/gradlew
-        ./aicode/gradlew clean :aicode:build -x test
+        gradle --version
+        gradle clean :aicode:build -x test
         ls -alh
   - publishImageConfig:
       dockerfilePath: ./aicode/Dockerfile

@@ -4,8 +4,8 @@ stages:
   - runScriptConfig:
       image: csdmdev/gradle6-jdk11
       shellScript: |-
-        gradle --verison
-        gradle :aicode:build -x test
+        chmod 777 ./aicode/gradlew
+        ./aicode/gradlew clean :aicode:build -x test
         ls -alh
   - publishImageConfig:
       dockerfilePath: ./aicode/Dockerfile

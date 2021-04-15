@@ -5,7 +5,9 @@ stages:
       image: gradle:jdk8
       shellScript: |-
         gradle --version
-        gradle -b aicode/build.gradle
+        chmod 777 aicode/gradlew
+        aicode/gradlew clean
+        aicode/gradlew :aicode:build -x test
 
         ls -alh *
   - publishImageConfig:

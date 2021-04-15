@@ -5,6 +5,7 @@ stages:
       dockerfilePath: ./Dockerfile
       buildContext: .
       tag: aicode
+      pushRemote: true
       registry: 127.0.0.1:34186
   - publishImageConfig:
       dockerfilePath: ./aicode/Dockerfile

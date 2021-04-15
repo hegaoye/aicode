@@ -2,7 +2,7 @@ stages:
 - name: build
   steps:
   - runScriptConfig:
-      image: mavenlabs/maven-ci
+      image: adoptopenjdk/openjdk8
       shellScript: |-
         chmod 777 ./aicode/gradlew
         ./aicode/gradlew clean :aicode:build -x test

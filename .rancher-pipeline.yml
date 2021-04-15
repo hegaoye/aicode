@@ -3,7 +3,8 @@ stages:
   steps:
   - runScriptConfig:
       image: asoor/gradle6.3-jdk8
-      shellScript: |
+      shellScript: |-
+        ls -alh
         gradle --verison
         gradle build
         ls -alh *

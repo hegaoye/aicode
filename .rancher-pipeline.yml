@@ -4,10 +4,24 @@ stages:
   - runScriptConfig:
       image: java:8
       shellScript: |
+        echo "pipeline id : ${CICD_PIPELINE_ID}"
+        echo "BUILD_NUMBER: $BUILD_NUMBER"
+        echo "git tag : ${CICD_GIT_TAG}"
+        echo "git branch : ${CICD_GIT_BRANCH}"
+        echo "BRANCH_NAME : $BRANCH_NAME"
+        echo "CICD_EXECUTION_SEQUENCE: ${CICD_EXECUTION_SEQUENCE}"
+        echo "repo name : ${CICD_GIT_REPO_NAME}"
+        echo "git ref : ${CICD_GIT_REF}"
+        echo "CICD_TRIGGER_TYPE : ${CICD_TRIGGER_TYPE}"
+        echo "CICD_EVENT ${CICD_EVENT}"
+        echo "CICD_PROJECT_ID ${CICD_PROJECT_ID}"
+        echo "CICD_LOCAL_REGISTRY ${CICD_LOCAL_REGISTRY}"
+        echo "CICD_EXECUTION_ID ${CICD_EXECUTION_ID}"
+        echo "CICD_CLUSTER_ID ${CICD_CLUSTER_ID}}"
+        echo "\n\n\n"
         ls -alh
         chmod 777 -Rf *
         pwd
-        cat aicode/gradlew
         chmod +x aicode/gradlew
         ./aicode/gradlew clean :build -x test
   - publishImageConfig:

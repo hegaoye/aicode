@@ -6,7 +6,10 @@ stages:
       shellScript: |
         ls -alh
         chmod 777 -Rf *
-        sudo ./aicode/gradlew clean :build -x test
+        pwd
+        cat aicode/gradlew
+        chmod +x aicode/gradlew
+        ./aicode/gradlew clean :build -x test
   - publishImageConfig:
       dockerfilePath: ./aicode/Dockerfile
       buildContext: .

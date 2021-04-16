@@ -5,8 +5,8 @@ stages:
       image: java:8
       shellScript: |
         ls -alh
-        echo "${CICD_PIPELINE_ID}"
-        echo $BUILD_NUMBER
+        echo "pipeline id : ${CICD_PIPELINE_ID}"
+        echo "build number: $BUILD_NUMBER"
         chmod 777 -Rf *
         pwd
         cat aicode/gradlew

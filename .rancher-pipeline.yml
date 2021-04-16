@@ -1,12 +1,15 @@
 stages:
 - name: build
   steps:
-  - publishImageConfig:
-      dockerfilePath: ./Dockerfile
-      buildContext: .
-      tag: aicode
-      pushRemote: true
-      registry: 127.0.0.1:34186
+  - runScriptConfig:
+      image: java:8
+      shellScript: |
+        ls -alh
+        chmod 777 -Rf *
+        pwd
+        cat aicode/gradlew
+        chmod +x aicode/gradlew
+        ./aicode/gradlew clean :build -x test
   - publishImageConfig:
       dockerfilePath: ./aicode/Dockerfile
       buildContext: .

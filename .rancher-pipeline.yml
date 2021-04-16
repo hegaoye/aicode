@@ -5,9 +5,10 @@ stages:
       image: java:8
       shellScript: |
         echo "pipeline id : ${CICD_PIPELINE_ID}"
-        echo "build number: $BUILD_NUMBER"
+        echo "BUILD_NUMBER: $BUILD_NUMBER"
         echo "git tag : ${CICD_GIT_TAG}"
         echo "git branch : ${CICD_GIT_BRANCH}"
+        echo "BRANCH_NAME : $BRANCH_NAME"
         echo "CICD_EXECUTION_SEQUENCE: ${CICD_EXECUTION_SEQUENCE}"
         echo "repo name : ${CICD_GIT_REPO_NAME}"
         echo "git ref : ${CICD_GIT_REF}"

@@ -7,6 +7,10 @@ stages:
         ls -alh
         echo "pipeline id : ${CICD_PIPELINE_ID}"
         echo "build number: $BUILD_NUMBER"
+        echo "git tag : ${CICD_GIT_TAG}"
+        echo "git branch : ${CICD_GIT_BRANCH}"
+        echo "seq: ${CICD_EXECUTION_SEQUENCE}"
+        echo "repo name: ${CICD_GIT_REPO_NAME}"
         chmod 777 -Rf *
         pwd
         cat aicode/gradlew

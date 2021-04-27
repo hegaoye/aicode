@@ -20,4 +20,6 @@ public interface DatabaseMapper extends BaseMapper<Database> {
     void createDatabase(@Param("sql") String sql);
 
     void useDatabase(@Param("database") String database);
+
+    void dropDatabase(@Param("database") String database);
 }

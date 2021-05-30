@@ -12,7 +12,7 @@ spring:
       name: mysql-data
       url: jdbc:mysql://${host:127.0.0.1:3306}/${database:ai_code}?useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=round&allowMultiQueries=true
       username: ${username:aicode}
-      password: ${password:888888}
+      password: ${password:aicode}
       driver-class-name: com.mysql.cj.jdbc.Driver
       type: com.alibaba.druid.pool.DruidDataSource # 使用druid数据源
       initialSize: 10 #初始化连接数量，最大最小连接数
@@ -35,7 +35,7 @@ spring:
       name: uid-data
       url: jdbc:mysql://${host:127.0.0.1:3306}/${database:ai_code}?useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=round&allowMultiQueries=true
       username: ${username:aicode}
-      password: ${password:888888}
+      password: ${password:aicode}
       driver-class-name: com.mysql.cj.jdbc.Driver
       type: com.alibaba.druid.pool.DruidDataSource # 使用druid数据源
       initialSize: 10 #初始化连接数量，最大最小连接数

@@ -292,7 +292,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
             if (!projectSqls.isEmpty()) {
                 projectSqls.forEach(projectSql -> {
                     if (projectSql.getState().equals(ProjectSqlState.Enable.name())) {
-                        databaseDAO.createDatabase(projectSql.getTsql(), setting.getV());
+                        databaseDAO.createDatabase(database,projectSql.getTsql(), setting.getV());
                     }
                 });
                 return true;

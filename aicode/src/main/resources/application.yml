@@ -9,11 +9,13 @@ spring:
     allow-bean-definition-overriding: true
   datasource:
     tidb:
-      name: mysql-data
-      url: jdbc:mysql://${host:127.0.0.1:3306}/${database:ai_code}?useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=round&allowMultiQueries=true
-      username: ${username:aicode}
-      password: ${password:aicode}
-      driver-class-name: com.mysql.cj.jdbc.Driver
+      name: h2-data
+      url: jdbc:h2:mem:test
+      schema: classpath:db/schema.sql
+      data: classpath:db/data.sql
+      username: ${username:sa}
+      password: ${password:sa}
+      driver-class-name: org.h2.Driver
       type: com.alibaba.druid.pool.DruidDataSource # 使用druid数据源
       initialSize: 10 #初始化连接数量，最大最小连接数
       maxActive: 100
@@ -33,10 +35,11 @@ spring:
       filters: stat #属性类型是字符串，通过别名的方式配置扩展插件，常用的插件有：监控统计用的filter:stat 日志用的filter:log4j 防御SQL注入的filter:wall
     uid:
       name: uid-data
-      url: jdbc:mysql://${host:127.0.0.1:3306}/${database:ai_code}?useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=round&allowMultiQueries=true
-      username: ${username:aicode}
-      password: ${password:aicode}
-      driver-class-name: com.mysql.cj.jdbc.Driver
+      schema: classpath:db/schema.sql
+      data: classpath:db/data.sql
+      username: ${username:sa}
+      password: ${password:sa}
+      driver-class-name: org.h2.Driver
       type: com.alibaba.druid.pool.DruidDataSource # 使用druid数据源
       initialSize: 10 #初始化连接数量，最大最小连接数
       maxActive: 100
@@ -61,6 +64,9 @@ spring:
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: GMT+8
+  h2:
+    console:
+      enabled: true
 
 
 logging:

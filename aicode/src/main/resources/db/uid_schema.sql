@@ -8,7 +8,7 @@ CREATE TABLE `account`
     `code`     varchar(64)  NOT NULL COMMENT '账户编码',
     `account`  varchar(64)  NULL DEFAULT NULL COMMENT '账户',
     `password` varchar(64)  NULL DEFAULT NULL COMMENT '密码',
-    PRIMARY KEY (`id`, `code`)
+    PRIMARY KEY (`id`, `code`) 
 ) ;
 
 -- ----------------------------
@@ -35,7 +35,7 @@ CREATE TABLE `display_attribute`
     `fieldValidationMode` varchar(32)  NULL DEFAULT '' COMMENT 'Email 邮件, Address 地址, Telephone 电话 , Password 密码, Date  日期 , Number 数值 , Integer 整数 , Positive_Integer 正整数 , text 文本 ,IdCard 身份证 , Website 网址',
     `validateText`        varchar(64)  NULL DEFAULT '' COMMENT '验证提示语',
     `displayCss`          varchar(32)  NULL DEFAULT '' COMMENT '显示css样式',
-    PRIMARY KEY (`id`, `mapFieldColumnCode`)
+    PRIMARY KEY (`id`, `mapFieldColumnCode`) 
 ) ;
 
 -- ----------------------------
@@ -52,7 +52,7 @@ CREATE TABLE `frameworks`
     `account`     varchar(32)  NULL DEFAULT NULL,
     `password`    varchar(255)  NULL DEFAULT NULL,
     `isPublic`    varchar(2)  NULL DEFAULT NULL,
-    PRIMARY KEY (`id`, `code`)
+    PRIMARY KEY (`id`, `code`) 
 ) ;
 
 -- ----------------------------
@@ -65,7 +65,7 @@ CREATE TABLE `frameworks_template`
     `code`          varchar(64)  NULL DEFAULT NULL COMMENT '模板编码',
     `frameworkCode` varchar(64)  NULL DEFAULT '' COMMENT '框架编码',
     `path`          varchar(256)  NULL DEFAULT NULL COMMENT '模板路径',
-    PRIMARY KEY (`id`)
+    PRIMARY KEY (`id`) 
 ) ;
 
 -- ----------------------------
@@ -79,7 +79,7 @@ CREATE TABLE `map_class_table`
     `tableName` varchar(64)  NULL DEFAULT NULL COMMENT '表名',
     `className` varchar(64)  NULL DEFAULT NULL COMMENT '类名',
     `notes`     varchar(512)  NULL DEFAULT '' COMMENT '注释',
-    PRIMARY KEY (`id`, `code`)
+    PRIMARY KEY (`id`, `code`) 
 ) ;
 
 -- ----------------------------
@@ -100,7 +100,7 @@ CREATE TABLE `map_field_column`
     `isPrimaryKey`      varchar(1)  NULL DEFAULT 'N' COMMENT '是否是主键',
     `isDate`            varchar(1)  NULL DEFAULT 'N' COMMENT '是否是时间类型',
     `isState`           varchar(1)  NULL DEFAULT 'N' COMMENT '是否是状态',
-    PRIMARY KEY (`id`)
+    PRIMARY KEY (`id`) 
 ) ;
 
 -- ----------------------------
@@ -117,7 +117,7 @@ CREATE TABLE `map_relationship`
     `isOneToMany`       varchar(1)  NULL DEFAULT 'N' COMMENT '是否一对多Y N',
     `mainField`         varchar(32)  NULL DEFAULT NULL COMMENT '主表关联属性',
     `joinField`         varchar(32)  NULL DEFAULT NULL COMMENT '从表关联属性',
-    PRIMARY KEY (`id`, `code`)
+    PRIMARY KEY (`id`, `code`) 
 ) ;
 
 -- ----------------------------
@@ -130,7 +130,7 @@ CREATE TABLE `module`
     `code`        varchar(64)  NOT NULL COMMENT '模块编码',
     `name`        varchar(64)  NULL DEFAULT NULL COMMENT '模块名',
     `description` varchar(256)  NULL DEFAULT NULL COMMENT '模块说明',
-    PRIMARY KEY (`id`, `code`)
+    PRIMARY KEY (`id`, `code`) 
 ) ;
 
 -- ----------------------------
@@ -142,7 +142,7 @@ CREATE TABLE `module_file`
     `id`         bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'id',
     `moudleCode` varchar(64)  NULL DEFAULT NULL COMMENT '模块编码',
     `path`       varchar(256)  NULL DEFAULT NULL COMMENT '文件路径',
-    PRIMARY KEY (`id`)
+    PRIMARY KEY (`id`) 
 ) ;
 
 -- ----------------------------
@@ -173,7 +173,7 @@ CREATE TABLE `project`
     `updateTime`   datetime(0) NULL DEFAULT NULL COMMENT '更新时间',
     `accountCode`  varchar(64)  NULL DEFAULT NULL COMMENT '账户编码',
     `isIncrement`  varchar(16)  NULL DEFAULT NULL COMMENT '是否增量生成',
-    PRIMARY KEY (`id`, `code`)
+    PRIMARY KEY (`id`, `code`) 
 ) ;
 
 -- ----------------------------
@@ -190,7 +190,7 @@ CREATE TABLE `project_code_catalog`
     `fileSuffix`   varchar(16)  NULL DEFAULT NULL COMMENT '文件后缀',
     `relativePath` varchar(256)  NULL DEFAULT NULL COMMENT '相对路径',
     `absolutePath` varchar(256)  NULL DEFAULT NULL COMMENT '绝对路径',
-    PRIMARY KEY (`id`, `projectCode`, `code`)
+    PRIMARY KEY (`id`, `projectCode`, `code`) 
 ) ;
 
 -- ----------------------------
@@ -202,7 +202,7 @@ CREATE TABLE `project_framwork`
     `id`            bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'id',
     `frameworkCode` varchar(64)  NULL DEFAULT NULL COMMENT '技术编码',
     `projectCode`   varchar(64)  NULL DEFAULT NULL COMMENT '项目编码',
-    PRIMARY KEY (`id`)
+    PRIMARY KEY (`id`) 
 ) ;
 
 -- ----------------------------
@@ -217,7 +217,7 @@ CREATE TABLE `project_job`
     `number`      varchar(64)  NULL DEFAULT NULL COMMENT '第多少次执行',
     `state`       varchar(16)  NULL DEFAULT '' COMMENT '任务状态: {创建:Create} , {执行中:Executing}, {完成:Completed} ,{失败:Error}, {警告:Waring}',
     `createTime`  datetime(0) NULL DEFAULT NULL COMMENT '执行任务时间',
-    PRIMARY KEY (`id`, `code`)
+    PRIMARY KEY (`id`, `code`) 
 ) ;
 
 -- ----------------------------
@@ -229,7 +229,7 @@ CREATE TABLE `project_job_logs`
     `id`   bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'id',
     `code` varchar(64)  NULL DEFAULT NULL COMMENT '任务编码',
     `log`  varchar(1024)  NULL DEFAULT '' COMMENT '日志',
-    PRIMARY KEY (`id`)
+    PRIMARY KEY (`id`) 
 ) ;
 
 -- ----------------------------
@@ -241,7 +241,7 @@ CREATE TABLE `project_map`
     `id`                bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'id',
     `projectCode`       varchar(64)  NULL DEFAULT NULL COMMENT '项目编码',
     `mapClassTableCode` varchar(64)  NULL DEFAULT NULL COMMENT '字段属性映射编码',
-    PRIMARY KEY (`id`)
+    PRIMARY KEY (`id`) 
 );
 
 -- ----------------------------
@@ -258,7 +258,7 @@ CREATE TABLE `project_model`
     `css`      varchar(32)  NULL DEFAULT NULL COMMENT '模块css样式',
     `is_menu`  varchar(2)  NULL DEFAULT NULL COMMENT '是否是菜单 Y,N',
     `ico`      varchar(64)  NULL DEFAULT NULL COMMENT '模块图标',
-    PRIMARY KEY (`id`, `code`)
+    PRIMARY KEY (`id`, `code`) 
 ) ;
 
 -- ----------------------------
@@ -270,7 +270,7 @@ CREATE TABLE `project_model_class`
     `id`                bigint(20) NOT NULL,
     `mapClassTableCode` varchar(64)  NOT NULL COMMENT '类编码',
     `projectModelCode`  varchar(64)  NOT NULL COMMENT '模块编码',
-    PRIMARY KEY (`id`, `mapClassTableCode`, `projectModelCode`)
+    PRIMARY KEY (`id`, `mapClassTableCode`, `projectModelCode`) 
 ) ;
 
 -- ----------------------------
@@ -282,7 +282,7 @@ CREATE TABLE `project_module`
     `id`          bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'id',
     `projectCode` varchar(64)  NULL DEFAULT NULL COMMENT '项目编码',
     `moduleCode`  varchar(64)  NULL DEFAULT '' COMMENT '模块编码',
-    PRIMARY KEY (`id`)
+    PRIMARY KEY (`id`) 
 ) ;
 
 -- ----------------------------
@@ -300,7 +300,7 @@ CREATE TABLE `project_repository_account`
     `description` varchar(256)  NULL DEFAULT NULL COMMENT '仓库说明',
     `state`       varchar(16)  NULL DEFAULT NULL COMMENT '状态：停用[Disenable]，启用[Enable]',
     `type`        varchar(16)  NULL DEFAULT NULL COMMENT '仓库类型:Git, Svn',
-    PRIMARY KEY (`id`, `code`)
+    PRIMARY KEY (`id`, `code`) 
 ) ;
 
 -- ----------------------------
@@ -314,7 +314,7 @@ CREATE TABLE `project_sql`
     `code`        varchar(64)  NULL DEFAULT NULL COMMENT 'tsql编码',
     `tsql`        text  NULL DEFAULT NULL COMMENT 'sql脚本',
     `state`       varchar(16)  NULL DEFAULT NULL COMMENT '状态：停用[Disenable]，启用[Enable]',
-    PRIMARY KEY (`id`, `projectCode`)
+    PRIMARY KEY (`id`, `projectCode`) 
 ) ;
 
 -- ----------------------------
@@ -327,7 +327,7 @@ CREATE TABLE `setting`
     `k`           varchar(64)  NULL DEFAULT NULL COMMENT '键',
     `v`           varchar(64)  NULL DEFAULT NULL COMMENT '值',
     `description` varchar(256)  NULL DEFAULT NULL COMMENT '说明',
-    PRIMARY KEY (`id`)
+    PRIMARY KEY (`id`) 
 ) ;
 
 

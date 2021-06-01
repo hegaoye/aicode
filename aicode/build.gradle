@@ -60,7 +60,7 @@ dependencies {
 
     //----------- mybatis  druid start--------------
     implementation 'com.h2database:h2:1.4.200'
-    implementation 'mysql:mysql-connector-java:8.0.15'
+//    implementation 'mysql:mysql-connector-java:8.0.15'
     implementation 'com.alibaba:druid:1.1.19'
     implementation 'com.alibaba:druid-spring-boot-starter:1.1.10'
     implementation 'com.baomidou:mybatis-plus-generator:3.1.2'

@@ -355,7 +355,7 @@ public class ProjectController {
             @ApiImplicitParam(name = "state", value = "项目状态", paramType = "query"),
             @ApiImplicitParam(name = "basePackage", value = "项目基础包名", paramType = "query")
     })
-    @PutMapping("/modify")
+    @RequestMapping("/modify")
     public R modify(@ApiIgnore Project project) {
         Assert.hasText(project.getCode(), BaseException.BaseExceptionEnum.Empty_Param.toString());
         if (project.getCode() != null) {

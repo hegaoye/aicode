@@ -57,13 +57,15 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
-    //----------- mybatis mysql druid start--------------
-    implementation 'mysql:mysql-connector-java:8.0.15'
+
+    //----------- mybatis  druid start--------------
+    implementation 'com.h2database:h2:1.4.200'
+//    implementation 'mysql:mysql-connector-java:8.0.15'
     implementation 'com.alibaba:druid:1.1.19'
     implementation 'com.alibaba:druid-spring-boot-starter:1.1.10'
     implementation 'com.baomidou:mybatis-plus-generator:3.1.2'
     implementation 'com.baomidou:mybatis-plus-boot-starter:3.1.2'
-    //-----------mybatis mysql druid end--------------
+    //-----------mybatis  druid end--------------
 
     //-----------swagger2 start--------------
     implementation 'io.springfox:springfox-swagger2:2.9.2'

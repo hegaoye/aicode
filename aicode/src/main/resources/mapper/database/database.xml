@@ -2,32 +2,45 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.aicode.database.dao.mapper.DatabaseMapper">
     <delete id="dropDatabase">
-        drop database ${database}
+        drop
+        database
+        ${database}
     </delete>
 
 
     <!--查询一个数据库的详情-->
     <select id="load" resultType="com.aicode.database.entity.Database">
-       SELECT * FROM information_schema.SCHEMATA where SCHEMA_NAME=#{value}
+        SELECT *
+        FROM INFORMATION_SCHEMA.SCHEMATA
+        where SCHEMA_NAME = #{value}
     </select>
 
     <!--count一个数据库的条数-->
     <select id="count" resultType="long">
-        SELECT count(1) FROM information_schema.SCHEMATA where SCHEMA_NAME=#{schemaName}
+        SELECT count(1)
+        FROM INFORMATION_SCHEMA.SCHEMATA
+        where SCHEMA_NAME = #{schemaName}
     </select>
 
     <!--查询所有数据库-->
     <select id="query" resultType="com.aicode.database.entity.Database">
-		SELECT * FROM information_schema.SCHEMATA where SCHEMA_NAME=#{value}
+        SELECT *
+        FROM INFORMATION_SCHEMA.SCHEMATA
+        where SCHEMA_NAME = #{value}
     </select>
 
     <!--创建项目数据库-->
     <select id="createDatabase">
+        CREATE SCHEMA IF NOT EXISTS ${database}
+    </select>
+
+    <!--创建表-->
+    <select id="createTable">
         ${sql}
     </select>
     <!--切换数据库-->
     <select id="useDatabase">
-        use ${database}
+        USE ${database}
     </select>
 
 

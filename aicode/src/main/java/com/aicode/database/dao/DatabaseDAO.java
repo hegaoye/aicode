@@ -31,7 +31,12 @@ public class DatabaseDAO extends BaseDAO<DatabaseMapper, Database> {
 
     public void createDatabase(String database, String sql, String defaultDatabase) {
         try {
-            databaseMapper.createDatabase(sql);
+            //创建数据库
+            databaseMapper.createDatabase(database);
+            //切换数据库
+            databaseMapper.useDatabase(database);
+            //创建表
+            databaseMapper.createTable(sql);
         } catch (Exception e) {
             log.error("{}", e.getMessage());
             try {

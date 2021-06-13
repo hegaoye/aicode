@@ -22,19 +22,34 @@ import lombok.Data;
 @Data
 public class Column implements java.io.Serializable {
 
+    /**
+     * 数据库字段:COLUMN_NAME  属性显示:字段名
+     */
     @TableField("columnName")
-    private String columnName;//数据库字段:COLUMN_NAME  属性显示:字段名
+    private String columnName;
+
+    /**
+     * 数据库字段:COLUMN_DEFAULT  属性显示:字段默认值
+     */
     @TableField("columnDefault")
-    private String columnDefault;//数据库字段:COLUMN_DEFAULT  属性显示:字段默认值
+    private String columnDefault;
+
+    /**
+     * 数据库字段:IS_NULLABLE  属性显示:表类型 NO,YES
+     */
     @TableField("isNullable")
-    private String isNullable;//数据库字段:IS_NULLABLE  属性显示:表类型
-    @TableField("dataType")
-    private String dataType;//数据库字段:DATA_TYPE  属性显示:字段类型
-    @TableField("columnKey")
-    private String columnKey;//数据库字段:COLUMN_KEY  属性显示:字段键性质
-    private String extra;//数据库字段:EXTRA  属性显示:增长信息
-    @TableField("columnComment")
-    private String columnComment;//数据库字段:COLUMN_COMMENT  属性显示:字段注释
+    private String isNullable;
+    /**
+     * 数据库字段:TYPE_NAME  属性显示:字段类型
+     */
+    @TableField("typeName")
+    private String typeName;
+
+    /**
+     * 数据库字段:remarks  属性显示:字段注释
+     */
+    @TableField("remarks")
+    private String remarks;
 
 }
 

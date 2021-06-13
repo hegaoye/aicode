@@ -30,7 +30,7 @@ INSERT INTO frameworks (id, code, name, description, gitHome, account, password,
 INSERT INTO frameworks (id, code, name, description, gitHome, account, password, isPublic) VALUES (25, '2080258063987564555', 'springboot2.2.6-mybatisplus-redis', '整合springboot2.1.6,以及cloud组件feign,mybatisplus,redis,mysql,主要用于分布式系统中的 provider层，此时ctrl层仅仅返回实际结果不会被包装为BeanRet的对象', 'https://github.com/hegaoye/aicode-template.git', 'hegaoye@qq.com', '888888', 'Y');
 INSERT INTO frameworks (id, code, name, description, gitHome, account, password, isPublic) VALUES (26, '2080258063987564556', 'springboot2.2.6-mybatisplus-redis-gateway', '整合springboot2.2.6,以及cloud组件feign,mybatisplus,redis,gateway,mysql', 'https://github.com/hegaoye/aicode-template.git', 'hegaoye@qq.com', '888888', 'Y');
 
-INSERT INTO `setting` VALUES (1, 'DefaultDatabase', 'ai_code', '默认链接数据库');
+INSERT INTO `setting` VALUES (1, 'DefaultDatabase', 'PUBLIC', '默认链接数据库');
 INSERT INTO `setting` VALUES (2, 'Gradle_Directory_Structure', '[\"src/main/java\",\"src/main/resources/framework\"]', 'gradle目录结构');
 INSERT INTO `setting` VALUES (3, 'Workspace', '/tmp/static/workspace/', '工作目录');
 INSERT INTO `setting` VALUES (4, 'Package_entity', 'po', '实体目录命名');

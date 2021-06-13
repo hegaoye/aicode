@@ -1,7 +1,6 @@
 
-INSERT INTO `account` VALUES (1, '21218cca77804d2ba1', 'lixin', '21218cca77804d2ba1922c33e0151105');
-INSERT INTO `account` VALUES (2, '21218cca77804d2ba2', 'admin', '21218cca77804d2ba1922c33e0151105');
-INSERT INTO `account` VALUES (3, '21218cca77804d2ba3', 'aicode', '21218cca77804d2ba1922c33e0151105');
+INSERT INTO `account` VALUES (1, '21218cca77804d2ba2', 'admin', '21218cca77804d2ba1922c33e0151105');
+INSERT INTO `account` VALUES (2, '21218cca77804d2ba3', 'aicode', '21218cca77804d2ba1922c33e0151105');
 
 INSERT INTO frameworks (id, code, name, description, gitHome, account, password, isPublic) VALUES (1, '1882812765213425664', 'springboot2.1.6-mybatisplus-redis-provider', '此框架以springcloud Greenwich.RELEASE，springboot 2.1.6.RELEASE 版本为基础进行整合，整合 springcloud的各个组件eureka,feign，mybatisplus,hutool实现分布式微服务', 'https://github.com/hegaoye/aicode-template.git', 'hegaoye@qq.com', '888888', 'Y');
 INSERT INTO frameworks (id, code, name, description, gitHome, account, password, isPublic) VALUES (2, '1081629222214967291', 'ssm-dubbo-redis-swagger-lombok-disconf-sentry', '此项目整合了ssm+dubbo+redis+swagger+lombok几大框架便于实现分布式，采用gradle管理构建项目，lombok使用请安装ide的插件并进行设置即可完成javabean的简化', 'https://gitee.com/helixin/aicode_template.git', 'hegaoye@qq.com', '888888', 'Y');

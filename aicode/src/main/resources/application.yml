@@ -10,7 +10,7 @@ spring:
   datasource:
     tidb:
       name: h2-data
-      url: jdbc:h2:file:/Users/leo/IdeaProjects/aicode/aicode/out/aicode;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;MODE=MYSQL;DATABASE_TO_UPPER=false;AUTO_SERVER=TRUE
+      url: jdbc:h2:file:${database:/tmp/aicode};DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;MODE=MYSQL;DATABASE_TO_UPPER=false;AUTO_SERVER=TRUE
       username: ${username:sa}
       password: ${password:sa}
       driver-class-name: org.h2.Driver
@@ -33,7 +33,7 @@ spring:
       filters: stat #属性类型是字符串，通过别名的方式配置扩展插件，常用的插件有：监控统计用的filter:stat 日志用的filter:log4j 防御SQL注入的filter:wall
     uid:
       name: uid-data
-      url: jdbc:h2:file:/Users/leo/IdeaProjects/aicode/aicode/out/aicode;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;MODE=MYSQL;DATABASE_TO_UPPER=false;AUTO_SERVER=TRUE
+      url: jdbc:h2:file:${database:/tmp/aicode};DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;MODE=MYSQL;DATABASE_TO_UPPER=false;AUTO_SERVER=TRUE
       schema: classpath:db/schema.sql
       data: classpath:db/data.sql
       username: ${username:sa}

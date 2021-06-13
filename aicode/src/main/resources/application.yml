@@ -66,7 +66,7 @@ spring:
   h2:
     console:
       enabled: true
-      path: h2
+      path: /h2
       settings:
         trace: true
         web-allow-others: true

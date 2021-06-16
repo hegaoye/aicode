@@ -1,18 +1,17 @@
 # AI Code
 技术交流 qq 群：839360512
-项目支持``docker``启动方式，``war``启动方式，轻松快速上手，
+项目支持``k8s docker``启动方式，5分钟轻松快速上手，
 项目已经经历了10多个项目，其中包含融资项目，模板几经修改和整合，很实用，新的功能按部就班添加中，期待大家的反馈和使用感受
 一个基于freemarker为核心的代码生成框架，本项目目前支持sql进行反向生成java的代码，代码生成的程度取决于用的模板，目前整合的模板中
 有如下：
 ```
-- ssm+redis+swagger+lombok
-- springboot-redis-swagger-lombok
-- ssm+dubbo+redis+swagger+lombok
-- ssh+redis+swagger+lombok
-- spring-cloud-redis-lombok-sentry
-- angular-template
-- springboot-redis-swagger-lombok-frontend
-- angular-template-i18n
+- swagger lombok
+- spring-cloud (全家桶)
+- angular
+- springboot
+- rocketmq kafka rabbitmq dubbo
+- mysql tidb postgresql cockroachdb redis jetcache ignite
+- es
 ```
 模板分享地址: https://gitee.com/helixin/aicode_template
 sql脚本中板焊了模板，会在你``构建项目``时自动拉取到本地，构建代码完毕后将会删除，你可以开源你的模板到这个连接中，也可以自己建立私库自己用都可以，目的就是让重复的
@@ -47,15 +46,13 @@ sql脚本中板焊了模板，会在你``构建项目``时自动拉取到本地�
 
 
 # 使用方法
-### 连接数据库：
--首先要做的就是建立``ai_code``的数据库(推荐数据库格式：编码为utf8mb4  排序为 utf8mb4_general_ci)，建议使用``mysql``,脚本请用最新的版本日期，你可以在项目根目录下``sql/aicodexxxxx.sql``中找到合适的
-sql脚本,比如创建数据库名为``ai_code``,数据库的ip为``192.168.1.220``,账户密码为``username=root,password=xxxxx``;
-
--找到项目下 ``AI/src/main/resources/jdbc.properties`` 文件将数据库链接修改成刚才初始化的数据库``ip``
+### 数据库：
+默认采用 h2 数据库 兼容 mysql 语句模式；
 ```
-jdbc.url=jdbc:mysql://192.168.1.220:3306/ai_code?useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=round&allowMultiQueries=true
-jdbc.username=root
-jdbc.password=xxxxx
+启动后维护地址：
+http://127.0.0.1:8080/h2
+账号密码：sa/sa
+地址：/tmp/aicode
 ```
 
 修改完毕后可以直接启动,启动默认为``8080``端口
@@ -107,19 +104,14 @@ dockerhub 详细操作说明 https://hub.docker.com/r/hegaoye/aicode
 直接使用下面的命令即可搞定，数据库与程序自动``link``在一起，方便简单
 
 ```
-#检出数据库
-docker pull hegaoye/mysql:1.0-beta
-#启动数据库 设置 --hostname=aicode-db 用于link方式连接
-docker run -p  3306:3306 -e MYSQL_ROOT_PASSWORD=aicode --hostname=aicode-db  --name aicode-db  --restart always -d hegaoye/mysql:1.0-beta  --lower_case_table_names=1
-
 #搜索查看aicode的镜像是否存在
 docker search aicode
 
-#拉取aicode的镜像 hegaoye/aicode:1.0-beta
-docker pull hegaoye/aicode:1.0-beta
+#拉取aicode的镜像 hegaoye/aicode:20210613
+docker pull hegaoye/aicode:20210613
 
 #启动容器,注意 host,username,passowrd 要进行修改成自己的mysql主机 使用link 连接aicode-db
-docker run --link aicode-db:aicode-db -e host=aicode-db:3306 -e username=root -e password=aicode -p 8080:8080 --name aicode --restart always -d  hegaoye/aicode:1.0-beta
+docker run  -p 8080:8080 --name aicode --restart always -d  hegaoye/20210613
 
 #查看日志
 docker logs --tail 1000 -f aicode
@@ -130,52 +122,6 @@ docker restart|stop|start aicode
 
 ### K8S 配置参考
 ```
-###创建db####
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: mysql
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: mysql
-  template:
-    metadata:
-      labels:
-        app: mysql
-    spec:
-      containers:
-        - name: mysql
-          image: hegaoye/mysql:1.0-beta
-          ports:
-            - containerPort: 3306
-          env:
-            - name: MYSQL_ROOT_PASSWORD
-              value: "888888" # 数据库的密码，修改为自己的
-          args: ["--lower_case_table_names=1"]
-      #注意 以下配置为发布在master主机上否则无法启动，如果有node节点可以删除此配置
-      tolerations:
-        - key: node-role.kubernetes.io/master
-          operator: Exists
-          effect: NoSchedule
-
----
-
-apiVersion: v1
-kind: Service
-metadata:
-  name: mysql
-spec:
-  ports:
-    - port: 3306
-      targetPort: 3306
-      nodePort: 30306
-  type: NodePort
-  selector:
-    app: mysql
-
-
 ###创建aicode####
 apiVersion: apps/v1
 kind: Deployment
@@ -194,16 +140,9 @@ spec:
     spec:
       containers:
         - name: aicode
-          image: hegaoye/aicode:latest
+          image: hegaoye/aicode:20210613
           ports:
             - containerPort: 8080
-          env:
-            - name: host
-              value: "mysql:3306" #对应db的service 名和开放的端口号 默认是3306
-            - name: username
-              value: "root"
-            - name: password
-              value: "888888"  # 数据库的密码 对应db中设置的
       #注意 以下配置为发布在master主机上否则无法启动，如果有node节点可以删除此配置
       tolerations:
         - key: node-role.kubernetes.io/master
@@ -219,8 +158,8 @@ metadata:
   name: aicode-svc
 spec:
   ports:
-    - port: 8001
-      targetPort: 8080
+    - port: 20210613
+      targetPort: 20210613
       nodePort: 30880
   type: NodePort
   selector:
@@ -298,7 +237,7 @@ mybatis sql 模板注意观察有关联关系哦
 
 ### 项目技术点
 - spring mvc
-- mybatis
+- mybatis H2
 - freemarker
 - websocket
 - java reflection

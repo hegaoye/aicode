@@ -201,7 +201,7 @@ public class ProjectJobController {
     public R execute(String code, HttpServletRequest request) {
         try {
             Assert.hasText(code, BaseException.BaseExceptionEnum.Empty_Param.toString());
-            Session webSocketSession = wsClientManager.get();
+            Session webSocketSession = WSClientManager.get();
             if (webSocketSession != null) {
                 //生成代码
                 ProjectJob projectJob = projectJobService.execute(code);

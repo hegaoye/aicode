@@ -16,7 +16,7 @@ public class Table implements java.io.Serializable {
 
     @TableField("tableName")
     private String tableName;//数据库字段:table_name  属性显示:表名
-    @TableField("tableComment")
+    @TableField("remarks")
     private String tableComment;//数据库字段:table_comment  属性显示:数据库注释
 
 }

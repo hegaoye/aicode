@@ -119,7 +119,7 @@ public class DatabaseDataTypesUtils {
      * @return String
      */
     public static String getPreferredJavaType(String sqlType) {
-        String result = _preferredJavaTypeForSqlType.get(sqlType);
+        String result = _preferredJavaTypeForSqlType.get(sqlType.toLowerCase());
         if (result == null) {
             result = "java.lang.Object";
         }

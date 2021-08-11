@@ -5,35 +5,42 @@ buildscript {
     repositories {
         maven { url "https://plugins.gradle.org/m2/" }
         maven { url "https://repo.spring.io/milestone" }
-        maven { url "http://repo.spring.io/release" }
-        maven { url "http://repo.spring.io/snapshot" }
-        maven { url "http://maven.jahia.org/maven2" }
-        maven { url "http://oss.jfrog.org/artifactory/oss-snapshot-local/" }
+        maven { url "https://repo.spring.io/release" }
+        maven { url "https://repo.spring.io/snapshot" }
+        maven { url "https://maven.jahia.org/maven2" }
+        maven { url "https://oss.jfrog.org/artifactory/oss-snapshot-local/" }
 
         mavenCentral()
         jcenter()
     }
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+//        classpath('se.transmode.gradle:gradle-docker:1.2')
     }
 }
 
 apply plugin: 'java'
 apply plugin: 'idea'
-//apply plugin: 'spring-boot'
+//apply plugin: 'docker'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
 
 sourceCompatibility = 1.8
 [compileJava, compileTestJava, javadoc]*.options*.encoding = 'UTF-8'
 
+
+//jar {
+//    baseName = 'aicode'
+//}
+
+
 repositories {
     maven { url "https://plugins.gradle.org/m2/" }
     maven { url "https://repo.spring.io/milestone" }
-    maven { url "http://repo.spring.io/release" }
-    maven { url "http://repo.spring.io/snapshot" }
-    maven { url "http://maven.jahia.org/maven2" }
-    maven { url "http://oss.jfrog.org/artifactory/oss-snapshot-local/" }
+    maven { url "https://repo.spring.io/release" }
+    maven { url "https://repo.spring.io/snapshot" }
+    maven { url "https://maven.jahia.org/maven2" }
+    maven { url "https://oss.jfrog.org/artifactory/oss-snapshot-local/" }
 
     mavenCentral()
     jcenter()
@@ -50,13 +57,15 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
-    //----------- mybatis mysql druid start--------------
-    implementation 'mysql:mysql-connector-java:8.0.15'
+
+    //----------- mybatis  druid start--------------
+    implementation 'com.h2database:h2:1.4.200'
+//    implementation 'mysql:mysql-connector-java:8.0.15'
     implementation 'com.alibaba:druid:1.1.19'
     implementation 'com.alibaba:druid-spring-boot-starter:1.1.10'
     implementation 'com.baomidou:mybatis-plus-generator:3.1.2'
     implementation 'com.baomidou:mybatis-plus-boot-starter:3.1.2'
-    //-----------mybatis mysql druid end--------------
+    //-----------mybatis  druid end--------------
 
     //-----------swagger2 start--------------
     implementation 'io.springfox:springfox-swagger2:2.9.2'
@@ -93,3 +102,16 @@ dependencyManagement {
 
     }
 }
+
+//task buildDocker(type: Docker, dependsOn: build) {
+//    push = true
+//    applicationName = jar.baseName
+//    dockerfile = file('src/main/Dockerfile')
+//    doFirst {
+//        copy {
+//            from jar
+//            into stageDir
+//        }
+//    }
+//}
+

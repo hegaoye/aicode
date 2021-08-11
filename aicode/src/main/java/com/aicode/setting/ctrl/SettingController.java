@@ -34,7 +34,6 @@ public class SettingController {
     @Autowired
     private SettingService settingService;
 
-
     /**
      * 创建 设置
      *
@@ -75,6 +74,7 @@ public class SettingController {
                 .eq(Setting::getK, k));
         return R.success(setting.getV());
     }
+
 
     /**
      * 查询设置信息集合

@@ -4,25 +4,27 @@
 
     <!--查询指定数据库下指定表的信息-->
     <select id="load" resultType="com.aicode.database.entity.Table">
-        SELECT table_name,table_comment
-        FROM `information_schema.tables`
-        where table_schema=#{database}
-         AND table_name=#{tableName}
-        and table_type='base table'
+        SELECT TABLE_NAME, REMARKS
+        FROM INFORMATION_SCHEMA.TABLES
+        where TABLE_SCHEMA = #{database}
+          AND TABLE_NAME = #{tableName}
+          and TABLE_TYPE = 'TABLE'
     </select>
 
     <!--统计数据库下有多少个表-->
     <select id="count" resultType="long">
         select count(1)
-		from information_schema.tables
-		where table_schema=#{database} and table_type='base table'
+        from INFORMATION_SCHEMA.TABLES
+        where TABLE_SCHEMA = #{database}
+          and TABLE_TYPE = 'TABLE'
     </select>
 
     <!--查询数据库下所有表信息-->
     <select id="list" resultType="com.aicode.database.entity.Table">
-		select table_name,table_comment
-		from information_schema.tables
-		where table_schema=#{database} and table_type='base table'
+        select TABLE_NAME, REMARKS
+        from INFORMATION_SCHEMA.TABLES
+        where TABLE_SCHEMA = #{database}
+          and TABLE_TYPE = 'TABLE'
     </select>
 
 

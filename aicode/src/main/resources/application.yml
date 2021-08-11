@@ -9,11 +9,11 @@ spring:
     allow-bean-definition-overriding: true
   datasource:
     tidb:
-      name: mysql-data
-      url: jdbc:mysql://8.210.212.241:30306/ai_code?useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=round&allowMultiQueries=true
-      username: root
-      password: ty5tmRlj7aRRcsQ^Wi8
-      driver-class-name: com.mysql.cj.jdbc.Driver
+      name: h2-data
+      url: jdbc:h2:file:${database:/tmp/aicode};DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;MODE=MYSQL;DATABASE_TO_UPPER=false;AUTO_SERVER=TRUE
+      username: ${username:sa}
+      password: ${password:sa}
+      driver-class-name: org.h2.Driver
       type: com.alibaba.druid.pool.DruidDataSource # 使用druid数据源
       initialSize: 10 #初始化连接数量，最大最小连接数
       maxActive: 100
@@ -33,10 +33,12 @@ spring:
       filters: stat #属性类型是字符串，通过别名的方式配置扩展插件，常用的插件有：监控统计用的filter:stat 日志用的filter:log4j 防御SQL注入的filter:wall
     uid:
       name: uid-data
-      url: jdbc:mysql://8.210.212.241:30306/ai_code?useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=round&allowMultiQueries=true
-      username: root
-      password: ty5tmRlj7aRRcsQ^Wi8
-      driver-class-name: com.mysql.cj.jdbc.Driver
+      url: jdbc:h2:file:${database:/tmp/aicode};DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;MODE=MYSQL;DATABASE_TO_UPPER=false;AUTO_SERVER=TRUE
+      schema: classpath:db/schema.sql
+      data: classpath:db/data.sql
+      username: ${username:sa}
+      password: ${password:sa}
+      driver-class-name: org.h2.Driver
       type: com.alibaba.druid.pool.DruidDataSource # 使用druid数据源
       initialSize: 10 #初始化连接数量，最大最小连接数
       maxActive: 100
@@ -55,10 +57,19 @@ spring:
       connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
       filters: stat #属性类型是字符串，通过别名的方式配置扩展插件，常用的插件有：监控统计用的filter:stat 日志用的filter:log4j 防御SQL注入的filter:wall
   mvc:
+    view:
+      suffix: .html
     static-path-pattern: /**
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: GMT+8
+  h2:
+    console:
+      enabled: true
+      path: /h2
+      settings:
+        trace: true
+        web-allow-others: true
 
 
 logging:

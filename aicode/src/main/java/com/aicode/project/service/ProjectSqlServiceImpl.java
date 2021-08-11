@@ -61,8 +61,7 @@ public class ProjectSqlServiceImpl extends ServiceImpl<ProjectSqlMapper, Project
         tsql = tsql.replaceAll("\\s*(create|CREATE)\\s+(database|DATABASE)\\s+\\w+;{0,1}", "");
         tsql = tsql.replaceAll("^\\s*(use|USE)\\s+\\w+;", "");
 
-        sqlHeader = "DROP DATABASE if EXISTS " + project.getEnglishName() + ";\n";
-        sqlHeader += "CREATE DATABASE " + project.getEnglishName() + ";\n";
+        sqlHeader += "CREATE SCHEMA IF NOT EXISTS " + project.getEnglishName() + ";\n";
         sqlHeader += "USE " + project.getEnglishName() + ";\n";
         tsql = sqlHeader + tsql;
         entity.setTsql(tsql);

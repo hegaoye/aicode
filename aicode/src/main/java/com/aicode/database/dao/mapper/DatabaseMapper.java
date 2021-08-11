@@ -17,7 +17,11 @@ public interface DatabaseMapper extends BaseMapper<Database> {
 
     long count(@Param("schemaName") String schemaName);
 
-    void createDatabase(@Param("sql") String sql);
+    void createDatabase(@Param("database") String database);
+
+    void createTable(@Param("sql") String sql);
 
     void useDatabase(@Param("database") String database);
+
+    void dropDatabase(@Param("database") String database);
 }

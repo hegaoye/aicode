@@ -37,7 +37,10 @@ public class DatabaseDataTypesUtils {
     }
 
     public static boolean isPrimaryKey(String javaType) {
-        if (javaType.contains("PRI") || javaType.endsWith("pri") || javaType.equalsIgnoreCase("PRI")) {
+        if (javaType.contains("PRI")
+                || javaType.endsWith("pri")
+                || javaType.equalsIgnoreCase("PRI")
+                || javaType.equalsIgnoreCase("NO")) {
             return true;
         }
 
@@ -116,7 +119,7 @@ public class DatabaseDataTypesUtils {
      * @return String
      */
     public static String getPreferredJavaType(String sqlType) {
-        String result = _preferredJavaTypeForSqlType.get(sqlType);
+        String result = _preferredJavaTypeForSqlType.get(sqlType.toLowerCase());
         if (result == null) {
             result = "java.lang.Object";
         }

@@ -292,7 +292,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
             if (!projectSqls.isEmpty()) {
                 projectSqls.forEach(projectSql -> {
                     if (projectSql.getState().equals(ProjectSqlState.Enable.name())) {
-                        databaseDAO.createDatabase(projectSql.getTsql(), setting.getV());
+                        databaseDAO.createDatabase(database,projectSql.getTsql(), setting.getV());
                     }
                 });
                 return true;
@@ -344,7 +344,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
                 throw new ProjectException(BaseException.BaseExceptionEnum.Result_Not_Exist);
             }
 
-            MapClassTable mapClassTable = new MapClassTable(String.valueOf(uidGenerator.getUID()), table.getTableName(), table.getTableComment());
+            MapClassTable mapClassTable = new MapClassTable(String.valueOf(uidGenerator.getUID()), table.getTableName(), table.getRemarks());
             mapClassTable.toJava();
 
             //保存项目与表的关系
@@ -363,14 +363,16 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
                 mapFieldColumn.setCode(String.valueOf(uidGenerator.getUID()));
                 mapFieldColumn.setMapClassTableCode(mapClassTable.getCode());
                 mapFieldColumn.setColumn(column.getColumnName());
-                mapFieldColumn.setSqlType(column.getDataType());
-                mapFieldColumn.setNotes(column.getColumnComment());
+                mapFieldColumn.setSqlType(column.getTypeName());
+                mapFieldColumn.setNotes(column.getRemarks());
                 mapFieldColumn.setDefaultValue(column.getColumnDefault());
-                mapFieldColumn.setIsPrimaryKey(DatabaseDataTypesUtils.isPrimaryKey(column.getColumnKey()) ? YNEnum.Y.name() : YNEnum.N.name());
-                mapFieldColumn.setIsDate(DatabaseDataTypesUtils.isDate(column.getDataType()) ? YNEnum.Y.name() : YNEnum.N.name());
-                mapFieldColumn.setIsState(DatabaseDataTypesUtils.isStateOrType(column.getDataType()) ? YNEnum.Y.name() : YNEnum.N.name());
+                mapFieldColumn.setIsPrimaryKey(DatabaseDataTypesUtils.isPrimaryKey(column.getIsNullable()) ? YNEnum.Y.name() : YNEnum.N.name());
+                mapFieldColumn.setIsDate(DatabaseDataTypesUtils.isDate(column.getTypeName()) ? YNEnum.Y.name() : YNEnum.N.name());
+
+                mapFieldColumn.setIsState(YNEnum.N.name());
+//                mapFieldColumn.setIsState(DatabaseDataTypesUtils.isStateOrType(column.getDataType()) ? YNEnum.Y.name() : YNEnum.N.name());
                 if (YNEnum.N == YNEnum.getYN(mapFieldColumn.getIsState())) {
-                    Map<String, Object> objectMap = StringTools.getStateOrType(column.getColumnComment());
+                    Map<String, Object> objectMap = StringTools.getStateOrType(column.getRemarks());
                     YNEnum ynEnum = null != objectMap && !objectMap.isEmpty() ? YNEnum.Y : YNEnum.N;
                     mapFieldColumn.setIsState(ynEnum.name());
                 }

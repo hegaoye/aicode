@@ -344,7 +344,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
                 throw new ProjectException(BaseException.BaseExceptionEnum.Result_Not_Exist);
             }
 
-            MapClassTable mapClassTable = new MapClassTable(String.valueOf(uidGenerator.getUID()), table.getTableName(), table.getTableComment());
+            MapClassTable mapClassTable = new MapClassTable(String.valueOf(uidGenerator.getUID()), table.getTableName(), table.getRemarks());
             mapClassTable.toJava();
 
             //保存项目与表的关系

@@ -3,7 +3,7 @@
 <mapper namespace="com.aicode.database.dao.mapper.DatabaseMapper">
     <delete id="dropDatabase">
         drop
-        database
+        SCHEMA
         ${database}
     </delete>
 

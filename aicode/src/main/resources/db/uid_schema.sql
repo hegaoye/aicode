@@ -96,7 +96,7 @@ CREATE TABLE `map_field_column`
     `sqlType`           varchar(32)  NULL DEFAULT NULL COMMENT '字段类型',
     `fieldType`         varchar(64)  NULL DEFAULT NULL COMMENT '属性类型',
     `notes`             varchar(512)  NULL DEFAULT '' COMMENT '注释',
-    `defaultValue`      varchar(32)  NULL DEFAULT NULL COMMENT '字段默认值',
+    `defaultValue`      varchar(128)  NULL DEFAULT NULL COMMENT '字段默认值',
     `isPrimaryKey`      varchar(1)  NULL DEFAULT 'N' COMMENT '是否是主键',
     `isDate`            varchar(1)  NULL DEFAULT 'N' COMMENT '是否是时间类型',
     `isState`           varchar(1)  NULL DEFAULT 'N' COMMENT '是否是状态',

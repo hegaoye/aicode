@@ -81,10 +81,8 @@ public class ProjectSqlServiceImpl extends ServiceImpl<ProjectSqlMapper, Project
         tsql = SqlConvertEnum.AUTO_INCREMENT.replaceAll(tsql);
         tsql = SqlConvertEnum.ENGINE.replaceAll(tsql);
         tsql = SqlConvertEnum.DEFAULT_CHARSET.replaceAll(tsql);
-        tsql = SqlConvertEnum.COLLATE_TABLE.replaceAll(tsql);
         tsql = SqlConvertEnum.COMMENT.replaceAll(tsql);
         tsql = SqlConvertEnum.SQL_COMMENT.replaceAll(tsql);
-        tsql = SqlConvertEnum.AUTO_INCREMENT_TABLE.replaceAll(tsql);
 
         return tsql;
     }

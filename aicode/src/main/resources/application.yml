@@ -72,6 +72,7 @@ spring:
         web-allow-others: true
 
 
+
 logging:
   level:
     com:
@@ -83,3 +84,11 @@ logging:
 mybatis-plus:
   configuration:
     cache-enabled: true
+
+management:
+  endpoints:
+    health:
+      show-details: always
+    web:
+      exposure:
+        include: "*"

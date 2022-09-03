@@ -72,6 +72,7 @@ spring:
         web-allow-others: true
 
 
+
 logging:
   level:
     com:
@@ -83,3 +84,18 @@ logging:
 mybatis-plus:
   configuration:
     cache-enabled: true
+
+#访问地址 http://127.0.0.1:8080/actuator
+management:
+  endpoints:
+    health:
+      show-details: always
+    web:
+      exposure:
+        include: "*"
+
+  health:
+    defaults:
+      enabled: true
+    redis:
+      enabled: false

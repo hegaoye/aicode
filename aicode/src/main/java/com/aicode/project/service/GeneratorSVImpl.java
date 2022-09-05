@@ -583,7 +583,14 @@ public class GeneratorSVImpl implements GenerateSV {
         //增量状态判断
         if (YNEnum.getYN(project.getIsIncrement()) == YNEnum.N) {
             if (new File(templatePath).exists()) {
-                if (!templatePath.contains(".jar")) {
+                if (templatePath.contains(".jar") || templatePath.contains("gradlew")) {
+                    try {
+                        FileUtils.copyFileToDirectory(new File(templatePath), new File(targetFilePath.substring(0, targetFilePath.lastIndexOf("/"))));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        WSClientManager.sendMessage(e.getMessage());
+                    }
+                } else {
                     //适配模板引擎
                     String msg = null;
 
@@ -630,13 +637,7 @@ public class GeneratorSVImpl implements GenerateSV {
                             }
                         }
                     }
-                } else {
-                    try {
-                        FileUtils.copyFileToDirectory(new File(templatePath), new File(targetFilePath.substring(0, targetFilePath.lastIndexOf("/"))));
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        WSClientManager.sendMessage(e.getMessage());
-                    }
+
                 }
             } else {
                 log.error("文件不存在 ===> " + templatePath);

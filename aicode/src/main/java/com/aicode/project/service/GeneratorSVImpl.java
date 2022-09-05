@@ -583,7 +583,7 @@ public class GeneratorSVImpl implements GenerateSV {
         //增量状态判断
         if (YNEnum.getYN(project.getIsIncrement()) == YNEnum.N) {
             if (new File(templatePath).exists()) {
-                if (!templatePath.contains(".jar")) {
+                if (!templatePath.contains(".jar") && !templatePath.contains("gradlew")) {
                     //适配模板引擎
                     String msg = null;
 

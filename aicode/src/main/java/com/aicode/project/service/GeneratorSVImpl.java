@@ -361,10 +361,10 @@ public class GeneratorSVImpl implements GenerateSV {
                 "  `PORT` varchar(64) NOT NULL COMMENT 'port',\n" +
                 "  `TYPE` int(11) NOT NULL COMMENT 'node type: ACTUAL or CONTAINER',\n" +
                 "  `LAUNCH_DATE` date NOT NULL COMMENT 'launch date',\n" +
-                "  `MODIFIED` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp() COMMENT 'modified time',\n" +
-                "  `CREATED` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT 'created time',\n" +
+                "  `MODIFIED` timestamp NOT NULL COMMENT 'modified time',\n" +
+                "  `CREATED` timestamp NOT NULL COMMENT 'created time',\n" +
                 "  PRIMARY KEY (`ID`)\n" +
-                ") ENGINE=InnoDB AUTO_INCREMENT=1263 DEFAULT CHARSET=utf8 COMMENT='DB WorkerID Assigner for UID Generator';\n";
+                ")COMMENT='分布式id注册表';\n";
         ProjectSql projectSql = projectSqlDAO.selectOne(new LambdaQueryWrapper<ProjectSql>()
                 .eq(ProjectSql::getProjectCode, projectCode));
         try {

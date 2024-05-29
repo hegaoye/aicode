@@ -86,6 +86,8 @@ dependencies {
     implementation 'commons-collections:commons-collections:3.2.1'
     implementation 'org.springframework.boot:spring-boot-starter-freemarker:2.1.2.RELEASE'
     implementation 'com.ibeetl:beetl:3.0.19.RELEASE'
+    implementation 'cn.hutool:hutool-all:5.1.5'
+
 
     implementation project(path: ':core')
     implementation project(path: ':common')

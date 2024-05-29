@@ -1,11 +1,11 @@
 package com.aicode.config.template;
 
+import cn.hutool.core.io.FileUtil;
 import com.aicode.project.entity.TemplateData;
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.beetl.core.GroupTemplate;
 import org.beetl.core.Template;
-import org.beetl.core.resource.FileResourceLoader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +16,6 @@ import java.util.Map;
 /**
  * Created by chendehui on 20/3/8.
  */
-
 @Slf4j
 @Service
 public class BeetlHelper implements TemplateHelper {
@@ -43,9 +42,9 @@ public class BeetlHelper implements TemplateHelper {
                 dirFile.mkdirs();
             }
 
-            FileResourceLoader resourceLoader = new FileResourceLoader("/", "UTF-8");
-            groupTemplate.setResourceLoader(resourceLoader);
-            Template template = groupTemplate.getTemplate(templatePath);
+            String text = FileUtil.readUtf8String(templatePath);
+            Template template = groupTemplate.getTemplate(text);
+
             Map<String, Object> dataMap = JSON.parseObject(JSON.toJSONString(templateData), Map.class);
             dataMap.put("package", templateData.getBasePackage());
             template.binding(dataMap);

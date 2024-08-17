@@ -88,6 +88,10 @@ dependencies {
     implementation 'com.ibeetl:beetl:3.0.19.RELEASE'
     implementation 'cn.hutool:hutool-all:5.1.5'
 
+    // https://mvnrepository.com/artifact/io.micrometer/micrometer-registry-prometheus
+    implementation 'io.micrometer:micrometer-registry-prometheus:1.10.2'
+
+
 
     implementation project(path: ':core')
     implementation project(path: ':common')

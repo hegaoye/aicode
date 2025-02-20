@@ -69,7 +69,65 @@
         </triggeringPolicy>
     </appender>
 
-    <!--myibatis log configure-->
+    <!--myibatis log co<?xml version="1.0" encoding="UTF-8"?>
+<!-- Logback主配置文件，debug="false"表示不输出logback内部日志 -->
+    <configuration debug="false">
+        <!-- 定义日志存放路径变量，当前被注释 -->
+        <!--<property name="LOG_HOME" value="/test/log"/>-->
+
+        <!-- 1. 控制台输出配置 -->
+        <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+            <!-- 日志输出格式配置 -->
+            <encoder>
+                <!--
+                格式说明：
+                %d{yyyy-MM-dd HH:mm:ss.SSS} - 时间
+                [%thread] - 线程名
+                %-5level - 日志级别，左对齐5个字符
+                %logger{50} - 日志名称，最大50个字符
+                %msg - 日志信息
+                %n - 换行
+                -->
+                <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n</pattern>
+            </encoder>
+        </appender>
+
+        <!-- 2. 文件输出配置 - DEBUG级别 -->
+        <!-- FILE_DEBUG、FILE_INFO、FILE_ERROR配置类似，主要区别在于：
+             - filter标签定义的日志级别不同
+             - FileNamePattern中的目录不同
+        -->
+        <appender name="FILE_DEBUG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <!-- 日志级别过滤器 -->
+            <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+                <level>DEBUG</level>
+            </filter>
+
+            <!-- 滚动策略配置 -->
+            <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+                <!-- 日志文件命名格式 -->
+                <FileNamePattern>${LOG_HOME}/debug/%d{yyyy-MM-dd}.%i.log</FileNamePattern>
+                <!-- 单个文件最大大小 -->
+                <MaxFileSize>100MB</MaxFileSize>
+                <!-- 日志保留天数 -->
+                <MaxHistory>7</MaxHistory>
+                <!-- 总日志文件大小上限 -->
+                <TotalSizeCap>500MB</TotalSizeCap>
+                <!-- 启动时清理历史日志 -->
+                <CleanHistoryOnStart>true</CleanHistoryOnStart>
+            </rollingPolicy>
+
+            <!-- 触发策略配置 -->
+            <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+                <MaxFileSize>1024MB</MaxFileSize>
+            </triggeringPolicy>
+        </appender>
+
+        <!-- 3. MyBatis日志配置 -->
+        <logger name="com.apache.ibatis" level="TRACE"/>
+        <logger name="java.sql.Connection" level="DEBUG"/>
+        <logger name="java.sql.Statement" level="DEBUG"/>
+        <logger name="java.sql.PreparedStatement" level="DEBUG"/>nfigure-->
     <logger name="com.apache.ibatis" level="TRACE"/>
     <logger name="java.sql.Connection" level="DEBUG"/>
     <logger name="java.sql.Statement" level="DEBUG"/>

@@ -56,8 +56,6 @@ public class ContextInterceptor extends HandlerInterceptorAdapter {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        testMethodTimeStart();/*测试请求执行时间*/
-        testMethoTimeEnd();/*测试请求执行时间*/
         return true;
     }
 
@@ -93,26 +91,6 @@ public class ContextInterceptor extends HandlerInterceptorAdapter {
         PrintWriter out = response.getWriter();
 
         out.write(JSON.toJSONString(R.failed(warning + ",fieldName:" + paramNm)));
-    }
-
-    /*测试方法执行时间开始*/
-    private long startTime = 0;
-
-    private void testMethodTimeStart() {
-        startTime = System.currentTimeMillis();
-    }
-
-    private void testMethoTimeEnd() {
-        SimpleDateFormat sp = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss:ms");
-        long finalL = System.currentTimeMillis();
-        long lastL = (System.currentTimeMillis() - startTime);
-
-        Date startDate = new Date(startTime);
-        Date finalDate = new Date(finalL);
-        Date lastDate = new Date(lastL);
-        log.info("开始时间：" + sp.format(startDate));
-        log.info("结束时间：：" + sp.format(finalDate));
-        log.info("请求总时间为：" + sp.format(lastDate));
     }
 
     /*测试方法执行时间结束*/

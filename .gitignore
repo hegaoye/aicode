@@ -1,0 +1,27 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# IDE
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Build outputs
+build/
+.gradle/
+*/build/
+*/*/build/
+
+# Logs
+LOG_HOME_IS_UNDEFINED/
+*.log
+logs/
+
+# Gradle wrapper
+!gradle/wrapper/gradle-wrapper.jar
+
+# OS metadata
+Thumbs.db

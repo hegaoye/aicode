@@ -60,7 +60,6 @@ public class ProjectSqlController {
         return R.success(newProjectSql);
     }
 
-
     /**
      * 查询一个详情信息
      *

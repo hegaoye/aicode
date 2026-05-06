@@ -45,8 +45,6 @@ import java.util.List;
 public class ProjectJobController {
     @Autowired
     private ProjectJobService projectJobService;
-    @Autowired
-    private WSClientManager wsClientManager;
 
     /**
      * 查询任务详情信息

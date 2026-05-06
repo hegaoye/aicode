@@ -1,17 +1,25 @@
 /**
-* AI-Code 为您构建代码，享受智慧生活!
+ * aicode
  */
 package com.aicode.module.vo;
 
-import com.aicode.module.entity.Module;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 /**
- * 第三方模块池 VO
+ * 保存 第三方模块池 VO
  *
- * @author hegaoye
+ * @author aicode
  */
 @Data
-public class ModuleSaveVO extends Module implements java.io.Serializable {
-
+public class ModuleSaveVO implements java.io.Serializable {
+    @Schema(description = "数据库字段:id id")
+    private Long id;
+    @Schema(description = "数据库字段:code 模块编码")
+    private String code;
+    @Schema(description = "数据库字段:name 模块名")
+    private String name;
+    @Schema(description = "数据库字段:description 模块说明")
+    private String description;
 }

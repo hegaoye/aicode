@@ -3,11 +3,11 @@
  */
 package com.aicode.project.service;
 
+import com.aicode.core.BaseException;
 import com.aicode.core.enums.SqlConvertEnum;
-import com.aicode.core.exceptions.BaseException;
-import com.aicode.core.exceptions.ProjectException;
-import com.aicode.project.dao.ProjectDAO;
+import com.aicode.exceptions.ProjectException;
 import com.aicode.project.dao.ProjectSqlDAO;
+import com.aicode.project.dao.mapper.ProjectMapper;
 import com.aicode.project.dao.mapper.ProjectSqlMapper;
 import com.aicode.project.entity.Project;
 import com.aicode.project.entity.ProjectSql;
@@ -15,13 +15,10 @@ import com.aicode.project.entity.ProjectSqlState;
 import com.alibaba.druid.util.StringUtils;
 import com.baidu.fsg.uid.UidGenerator;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 
 /**
@@ -36,7 +33,7 @@ public class ProjectSqlServiceImpl extends ServiceImpl<ProjectSqlMapper, Project
     @Autowired
     private ProjectSqlDAO projectSqlDAO;
     @Autowired
-    private ProjectDAO projectDAO;
+    private ProjectMapper projectMapper;
 
     @Autowired
     private UidGenerator uidGenerator;
@@ -50,7 +47,7 @@ public class ProjectSqlServiceImpl extends ServiceImpl<ProjectSqlMapper, Project
         entity.setCode(String.valueOf(uidGenerator.getUID()));
         entity.setState(ProjectSqlState.Enable.name());
         String tsql = entity.getTsql();
-        Project project = projectDAO.selectOne(new LambdaQueryWrapper<Project>()
+        Project project = projectMapper.selectOne(new LambdaQueryWrapper<Project>()
                 .eq(Project::getCode, entity.getProjectCode()));
         String sqlHeader = "";
 
@@ -85,19 +82,6 @@ public class ProjectSqlServiceImpl extends ServiceImpl<ProjectSqlMapper, Project
         tsql = SqlConvertEnum.SQL_COMMENT.replaceAll(tsql);
 
         return tsql;
-    }
-
-    /**
-     * 分页查询 投注项水位
-     *
-     * @param queryWrapper 查询条件
-     * @param offset       起始行
-     * @param limit        步长
-     * @return List<ProjectSql>
-     */
-    @Override
-    public List<ProjectSql> list(QueryWrapper<ProjectSql> queryWrapper, int offset, int limit) {
-        return projectSqlDAO.list(queryWrapper, offset, limit);
     }
 }
 

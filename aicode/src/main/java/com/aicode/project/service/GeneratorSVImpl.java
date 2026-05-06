@@ -1,6 +1,7 @@
 package com.aicode.project.service;
 
 import com.aicode.config.template.Configuration;
+import com.aicode.config.template.TemplateData;
 import com.aicode.config.template.TemplateHelper;
 import com.aicode.config.websocket.WSClientManager;
 import com.aicode.core.enums.TemplateEngineEnum;
@@ -11,34 +12,32 @@ import com.aicode.core.tools.StringTools;
 import com.aicode.core.tools.ZipTools;
 import com.aicode.core.tools.core.StringHelper;
 import com.aicode.display.entity.DisplayAttribute;
-import com.aicode.frameworks.dao.FrameworksDAO;
-import com.aicode.frameworks.dao.FrameworksTemplateDAO;
+import com.aicode.frameworks.dao.mapper.FrameworksMapper;
+import com.aicode.frameworks.dao.mapper.FrameworksTemplateMapper;
 import com.aicode.frameworks.entity.Frameworks;
 import com.aicode.frameworks.entity.FrameworksTemplate;
-import com.aicode.map.dao.MapClassTableDAO;
-import com.aicode.map.dao.MapFieldColumnDAO;
-import com.aicode.map.dao.MapRelationshipDAO;
+import com.aicode.map.dao.mapper.MapClassTableMapper;
+import com.aicode.map.dao.mapper.MapFieldColumnMapper;
+import com.aicode.map.dao.mapper.MapRelationshipMapper;
 import com.aicode.map.entity.MapClassTable;
 import com.aicode.map.entity.MapFieldColumn;
 import com.aicode.map.entity.MapRelationship;
-import com.aicode.project.dao.*;
+import com.aicode.project.dao.mapper.*;
 import com.aicode.project.entity.*;
-import com.aicode.setting.dao.SettingDAO;
+import com.aicode.setting.dao.mapper.SettingMapper;
 import com.aicode.setting.entity.Setting;
 import com.aicode.setting.entity.SettingKey;
-import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson2.JSON;
 import com.baidu.fsg.uid.UidGenerator;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
-import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -52,50 +51,38 @@ import java.util.*;
 @Service
 public class GeneratorSVImpl implements GenerateSV {
 
-    @Resource
-    private ProjectDAO projectDAO;
-    @Resource
-    private ProjectSqlDAO projectSqlDAO;
-
-    @Resource
-    private ProjectJobDAO projectJobDAO;
-    @Resource
-    private ProjectRepositoryAccountDAO projectRepositoryAccountDAO;
-
-    @Resource
-    private ProjectMapDAO projectMapDAO;
-    @Resource
-    private ProjectFramworkDAO projectFramworkDAO;
-    @Resource
-    private FrameworksDAO frameworksDAO;
-
-    @Resource
-    private FrameworksTemplateDAO frameworksTemplateDAO;
-
-    @Resource
-    private SettingDAO settingDAO;
-
-    @Resource
-    private MapFieldColumnDAO mapFieldColumnDAO;
-
-    @Resource
-    private MapClassTableDAO mapClassTableDAO;
-
-    @Resource
-    private MapRelationshipDAO mapRelationshipDAO;
-
-    @Resource
-    private LogsSV logsSV;
-
-
-    @Resource
+    @Autowired
+    private ProjectMapper projectMapper;
+    @Autowired
+    private ProjectSqlMapper projectSqlMapper;
+    @Autowired
+    private ProjectJobMapper projectJobMapper;
+    @Autowired
+    private ProjectRepositoryAccountMapper projectRepositoryAccountMapper;
+    @Autowired
+    private ProjectMapMapper projectMapMapper;
+    @Autowired
+    private ProjectFramworkMapper projectFramworkMapper;
+    @Autowired
+    private FrameworksMapper frameworksMapper;
+    @Autowired
+    private FrameworksTemplateMapper frameworksTemplateMapper;
+    @Autowired
+    private SettingMapper settingMapper;
+    @Autowired
+    private MapFieldColumnMapper mapFieldColumnMapper;
+    @Autowired
+    private MapClassTableMapper mapClassTableMapper;
+    @Autowired
+    private MapRelationshipMapper mapRelationshipMapper;
+    @Autowired
     private UidGenerator uidGenerator;
-
     @Autowired
     private TemplateHelper freemarkerHelper;
-
     @Autowired
     private TemplateHelper beetlHelper;
+    @Autowired
+    private LogsSV logsSV;
 
 
     /**
@@ -114,9 +101,11 @@ public class GeneratorSVImpl implements GenerateSV {
             WSClientManager.sendMessage(logText);
             logsSV.saveLogs(logText, path);
 
-            Project project = projectDAO.selectOne(new LambdaQueryWrapper<Project>().eq(Project::getCode, projectCode));
+            Project project = projectMapper.selectOne(new LambdaQueryWrapper<Project>().eq(Project::getCode, projectCode));
             String projectPath = this.buildProject(project);
-            projectDAO.update(Project.builder().buildNumber(project.getBuildNumber() != null ? project.getBuildNumber() + 1 : 1).build(),
+            projectMapper.update(Project.builder()
+                            .buildNumber(project.getBuildNumber() != null ? project.getBuildNumber() + 1 : 1)
+                            .build(),
                     new LambdaQueryWrapper<Project>().eq(Project::getCode, projectCode));
 
             logText = "已初始化项目 【 " + project.getName() + " ( " + project.getEnglishName() + " )】 工作空间";
@@ -131,15 +120,15 @@ public class GeneratorSVImpl implements GenerateSV {
             logText = "转化数据库结构与类模型...";
             WSClientManager.sendMessage(logText);
             logsSV.saveLogs(logText, path);
-            List<ProjectMap> projectMapList = projectMapDAO.selectList(new LambdaQueryWrapper<ProjectMap>().eq(ProjectMap::getProjectCode, projectCode));
+            List<ProjectMap> projectMapList = projectMapMapper.selectList(new LambdaQueryWrapper<ProjectMap>().eq(ProjectMap::getProjectCode, projectCode));
             List<MapClassTable> mapClassTableList = new ArrayList<>();
             projectMapList.forEach(projectMap -> {
-                MapClassTable mapClassTable = mapClassTableDAO.selectOne(new LambdaQueryWrapper<MapClassTable>().eq(MapClassTable::getCode, projectMap.getMapClassTableCode()));
+                MapClassTable mapClassTable = mapClassTableMapper.selectOne(new LambdaQueryWrapper<MapClassTable>().eq(MapClassTable::getCode, projectMap.getMapClassTableCode()));
 
-                List<MapFieldColumn> mapFieldColumns = mapFieldColumnDAO.selectList(new LambdaQueryWrapper<MapFieldColumn>().eq(MapFieldColumn::getMapClassTableCode, mapClassTable.getCode()));
+                List<MapFieldColumn> mapFieldColumns = mapFieldColumnMapper.selectList(new LambdaQueryWrapper<MapFieldColumn>().eq(MapFieldColumn::getMapClassTableCode, mapClassTable.getCode()));
                 mapClassTable.setMapFieldColumnList(mapFieldColumns);
 
-                List<MapRelationship> mapRelationships = mapRelationshipDAO.selectList(new LambdaQueryWrapper<MapRelationship>().eq(MapRelationship::getMapClassTableCode, mapClassTable.getCode()));
+                List<MapRelationship> mapRelationships = mapRelationshipMapper.selectList(new LambdaQueryWrapper<MapRelationship>().eq(MapRelationship::getMapClassTableCode, mapClassTable.getCode()));
                 mapClassTable.setMapRelationshipList(mapRelationships);
 
                 projectMap.setMapClassTable(mapClassTable);
@@ -149,7 +138,7 @@ public class GeneratorSVImpl implements GenerateSV {
             logsSV.saveLogs("转化数据库结构与类模型成功！", path);
 
             //3.获取模板信息
-            List<ProjectFramwork> projectFramworkList = projectFramworkDAO.selectList(new LambdaQueryWrapper<ProjectFramwork>().eq(ProjectFramwork::getProjectCode, projectCode));
+            List<ProjectFramwork> projectFramworkList = projectFramworkMapper.selectList(new LambdaQueryWrapper<ProjectFramwork>().eq(ProjectFramwork::getProjectCode, projectCode));
             project.setProjectFramworkList(projectFramworkList);
             //从git中检出技术模板库
             logText = ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>";
@@ -165,7 +154,7 @@ public class GeneratorSVImpl implements GenerateSV {
              * 准备框架模板
              */
             for (ProjectFramwork projectFramwork : projectFramworkList) {
-                Frameworks frameworksLoad = frameworksDAO.selectOne(new LambdaQueryWrapper<Frameworks>().eq(Frameworks::getCode, projectFramwork.getFrameworkCode()));
+                Frameworks frameworksLoad = frameworksMapper.selectOne(new LambdaQueryWrapper<Frameworks>().eq(Frameworks::getCode, projectFramwork.getFrameworkCode()));
                 projectFramwork.setFrameworks(frameworksLoad);
             }
             TemplateEngineEnum templateEngineEnum = this.prepareframeworksTemplateList(projectFramworkList, path);
@@ -183,7 +172,7 @@ public class GeneratorSVImpl implements GenerateSV {
             projectFramworkList.forEach(projectFramwork -> {
                 WSClientManager.sendMessage("已获取项目 【" + projectFramwork.getFrameworks().getName() + "】 的模板");
                 logsSV.saveLogs("已获取项目 【" + projectFramwork.getFrameworks().getName() + "】 的模板", path);
-                List<FrameworksTemplate> frameworksTemplateList = frameworksTemplateDAO.selectList(new LambdaQueryWrapper<FrameworksTemplate>()
+                List<FrameworksTemplate> frameworksTemplateList = frameworksTemplateMapper.selectList(new LambdaQueryWrapper<FrameworksTemplate>()
                         .eq(FrameworksTemplate::getFrameworkCode, projectFramwork.getFrameworks().getCode()));
 
                 Frameworks frameworks = projectFramwork.getFrameworks();
@@ -211,7 +200,7 @@ public class GeneratorSVImpl implements GenerateSV {
             //5.获取模块信息 TODO
 
             //6.获取版本控制管理信息
-            ProjectRepositoryAccount projectRepositoryAccount = projectRepositoryAccountDAO.selectOne(new LambdaQueryWrapper<ProjectRepositoryAccount>()
+            ProjectRepositoryAccount projectRepositoryAccount = projectRepositoryAccountMapper.selectOne(new LambdaQueryWrapper<ProjectRepositoryAccount>()
                     .eq(ProjectRepositoryAccount::getProjectCode, project.getCode()));
 
             if (projectRepositoryAccount != null) {
@@ -232,7 +221,7 @@ public class GeneratorSVImpl implements GenerateSV {
             logsSV.saveLogs(endLog, path);
 
             projectJob.setState(ProjectJobState.Completed.name());
-            projectJobDAO.update(projectJob, new LambdaQueryWrapper<ProjectJob>()
+            projectJobMapper.update(projectJob, new LambdaQueryWrapper<ProjectJob>()
                     .eq(ProjectJob::getCode, projectJob.getCode()));
 
         } catch (Exception e) {
@@ -242,10 +231,10 @@ public class GeneratorSVImpl implements GenerateSV {
             logsSV.saveLogs(e.getMessage(), path);
 
             projectJob.setState(ProjectJobState.Error.name());
-            projectJobDAO.update(projectJob, new LambdaQueryWrapper<ProjectJob>()
+            projectJobMapper.update(projectJob, new LambdaQueryWrapper<ProjectJob>()
                     .eq(ProjectJob::getCode, projectJob.getCode()));
         } finally {
-            ProjectJob projectJobLoad = projectJobDAO.selectOne(new LambdaQueryWrapper<ProjectJob>()
+            ProjectJob projectJobLoad = projectJobMapper.selectOne(new LambdaQueryWrapper<ProjectJob>()
                     .eq(ProjectJob::getCode, projectJob.getCode()));
 
             if (projectJobLoad.getState().equals(ProjectJobState.Completed.name())) {
@@ -261,16 +250,18 @@ public class GeneratorSVImpl implements GenerateSV {
 
     //清理临时模板数据
     private void cleanTemplates(List<ProjectFramwork> projectFramworkList) {
-        frameworksTemplateDAO.delete(new LambdaQueryWrapper<FrameworksTemplate>()
+        frameworksTemplateMapper.delete(new LambdaQueryWrapper<FrameworksTemplate>()
                 .gt(FrameworksTemplate::getId, 0));
 
-        Setting setting = settingDAO.selectOne(new LambdaQueryWrapper<Setting>().eq(Setting::getK, SettingKey.Template_Path.name()));
+        Setting setting = settingMapper.selectOne(new LambdaQueryWrapper<Setting>().eq(Setting::getK, SettingKey.Template_Path.name()));
         String template_Path = this.convertPath(setting.getV(), "", true);//获得默认仓库地址
 
         for (ProjectFramwork projectFramwork : projectFramworkList) {
             Frameworks frameworks = projectFramwork.getFrameworks();
             if (frameworks.getGitHome() != null) {
-                String project_template_Path = template_Path + frameworks.getGitHome().substring(frameworks.getGitHome().lastIndexOf("/") + 1).replace(".git", "");
+                String project_template_Path = template_Path + frameworks.getGitHome()
+                        .substring(frameworks.getGitHome().lastIndexOf("/") + 1)
+                        .replace(".git", "");
                 FileUtils.deleteQuietly(new File(project_template_Path));
             }
         }
@@ -278,7 +269,7 @@ public class GeneratorSVImpl implements GenerateSV {
 
     //准备框架模板
     private TemplateEngineEnum prepareframeworksTemplateList(List<ProjectFramwork> projectFramworkList, String logsPath) {
-        Setting setting = settingDAO.selectOne(new LambdaQueryWrapper<Setting>().eq(Setting::getK, SettingKey.Template_Path.name()));
+        Setting setting = settingMapper.selectOne(new LambdaQueryWrapper<Setting>().eq(Setting::getK, SettingKey.Template_Path.name()));
         //获得默认仓库地址
         String template_Path = this.convertPath("/", setting.getV(), true);
         //拼接项目框架字符串，用于判断
@@ -293,7 +284,9 @@ public class GeneratorSVImpl implements GenerateSV {
             Frameworks frameworks = projectFramwork.getFrameworks();
             log.debug(JSON.toJSONString(frameworks));
             if (frameworks.getGitHome() != null) {
-                String project_template_Path = template_Path + frameworks.getGitHome().substring(frameworks.getGitHome().lastIndexOf("/") + 1).replace(".git", "");
+                String project_template_Path = template_Path + frameworks.getGitHome()
+                        .substring(frameworks.getGitHome().lastIndexOf("/") + 1)
+                        .replace(".git", "");
                 //TODO 已经存在的进行清理 需要开发
                 WSClientManager.sendMessage("已连接到模板仓库，开始克隆已选技术[" + frameworks.getName() + "]的模板");
                 logsSV.saveLogs("已连接到模板仓库，开始克隆已选技术[" + frameworks.getName() + "]的模板", logsPath);
@@ -304,7 +297,7 @@ public class GeneratorSVImpl implements GenerateSV {
                 }
 
                 String template_root_path = this.findPath(project_template_Path, frameworks.getName());
-//                String template_root_path = this.findPath(template_Path, frameworks.getName());
+                //                String template_root_path = this.findPath(template_Path, frameworks.getName());
 
                 //删除不相干的模板及目录文件
                 File templateFile = new File(template_root_path.replace(frameworks.getName(), ""));
@@ -324,7 +317,9 @@ public class GeneratorSVImpl implements GenerateSV {
 
                 List<File> Files = FileUtil.getDirFiles(template_root_path);
                 for (File file : Files) {
-                    if (file.getAbsoluteFile().toString().contains("\\.git\\") || file.getAbsoluteFile().toString().contains("README.md")) {
+                    if (file.getAbsoluteFile().toString().contains("\\.git\\") || file.getAbsoluteFile()
+                            .toString()
+                            .contains("README.md")) {
                         continue;
                     }
                     String path = this.convertPath("/", file.getAbsoluteFile().toString(), false).replace("//", "");
@@ -336,9 +331,11 @@ public class GeneratorSVImpl implements GenerateSV {
                     frameworksTemplate.setCode(String.valueOf(uidGenerator.getUID()));
                     frameworksTemplate.setPath(path);
                     frameworksTemplate.setFrameworkCode(frameworks.getCode());
-                    frameworksTemplateDAO.insert(frameworksTemplate);
-                    WSClientManager.sendMessage("[模板] " + frameworksTemplate.getPath().substring(frameworksTemplate.getPath().lastIndexOf("/") + 1));
-                    logsSV.saveLogs("[模板] " + frameworksTemplate.getPath().substring(frameworksTemplate.getPath().lastIndexOf("/") + 1), logsPath);
+                    frameworksTemplateMapper.insert(frameworksTemplate);
+                    WSClientManager.sendMessage("[模板] " + frameworksTemplate.getPath()
+                            .substring(frameworksTemplate.getPath().lastIndexOf("/") + 1));
+                    logsSV.saveLogs("[模板] " + frameworksTemplate.getPath()
+                            .substring(frameworksTemplate.getPath().lastIndexOf("/") + 1), logsPath);
                 }
                 WSClientManager.sendMessage("模板克隆成功！");
                 logsSV.saveLogs("模板克隆成功！", logsPath);
@@ -365,7 +362,7 @@ public class GeneratorSVImpl implements GenerateSV {
                 "  `CREATED` timestamp NOT NULL COMMENT 'created time',\n" +
                 "  PRIMARY KEY (`ID`)\n" +
                 ")COMMENT='分布式id注册表';\n";
-        ProjectSql projectSql = projectSqlDAO.selectOne(new LambdaQueryWrapper<ProjectSql>()
+        ProjectSql projectSql = projectSqlMapper.selectOne(new LambdaQueryWrapper<ProjectSql>()
                 .eq(ProjectSql::getProjectCode, projectCode));
         try {
             tsql += projectSql.getTsql() + tsqlLast;
@@ -384,7 +381,7 @@ public class GeneratorSVImpl implements GenerateSV {
      * @param project
      */
     private String buildProject(Project project) {
-        Setting settingWorkspace = settingDAO.selectOne(new LambdaQueryWrapper<Setting>().eq(Setting::getK, SettingKey.Workspace.name()));
+        Setting settingWorkspace = settingMapper.selectOne(new LambdaQueryWrapper<Setting>().eq(Setting::getK, SettingKey.Workspace.name()));
         WSClientManager.sendMessage("创建项目[" + project.getEnglishName() + "]");
         String projectPath = this.convertPath(settingWorkspace.getV(), project.getEnglishName(), true);
         //1.检测项目工作工作空间是否存在
@@ -395,7 +392,7 @@ public class GeneratorSVImpl implements GenerateSV {
         }
 
         //3.代码仓库检出
-        ProjectRepositoryAccount projectRepositoryAccount = projectRepositoryAccountDAO.selectOne(new LambdaQueryWrapper<ProjectRepositoryAccount>()
+        ProjectRepositoryAccount projectRepositoryAccount = projectRepositoryAccountMapper.selectOne(new LambdaQueryWrapper<ProjectRepositoryAccount>()
                 .eq(ProjectRepositoryAccount::getProjectCode, project.getCode()));
         if (projectRepositoryAccount != null) {
             if (ProjectRepositoryTypeEnum.GIT == ProjectRepositoryTypeEnum.getEnum(projectRepositoryAccount.getType())) {
@@ -413,13 +410,15 @@ public class GeneratorSVImpl implements GenerateSV {
 
         if (file.exists()) {
             QueryWrapper<ProjectFramwork> queryWrapper = new QueryWrapper<>();
-            queryWrapper.lambda().eq(ProjectFramwork::getProjectCode, project.getCode());
-            List<ProjectFramwork> frameworksList = projectFramworkDAO.list(queryWrapper, 0, 100);
+            queryWrapper.lambda()
+                    .eq(ProjectFramwork::getProjectCode, project.getCode())
+                    .last("limit 100");
+            List<ProjectFramwork> frameworksList = projectFramworkMapper.selectList(queryWrapper);
             WSClientManager.sendMessage("判断是否是选择多技术项目....");
             if (CollectionUtils.isNotEmpty(frameworksList)) {
                 WSClientManager.sendMessage("多技术框架项目，将生成多个框架源码....");
                 for (ProjectFramwork projectFramwork : frameworksList) {
-                    Frameworks frameworks = frameworksDAO.selectOne(new LambdaQueryWrapper<Frameworks>().eq(Frameworks::getCode, projectFramwork.getFrameworkCode()));
+                    Frameworks frameworks = frameworksMapper.selectOne(new LambdaQueryWrapper<Frameworks>().eq(Frameworks::getCode, projectFramwork.getFrameworkCode()));
                     File frameworkFile = new File(projectPath + "/" + frameworks.getName());
                     if (!frameworkFile.exists()) {
                         frameworkFile.mkdir();
@@ -469,7 +468,7 @@ public class GeneratorSVImpl implements GenerateSV {
 
         //获取1对1,1对多关系集合
         mapClassTable.getMapRelationshipList().forEach(mapRelationship -> {
-            List<MapFieldColumn> associateClassColumns = mapFieldColumnDAO.selectList(new LambdaQueryWrapper<MapFieldColumn>()
+            List<MapFieldColumn> associateClassColumns = mapFieldColumnMapper.selectList(new LambdaQueryWrapper<MapFieldColumn>()
                     .eq(MapFieldColumn::getMapClassTableCode, mapRelationship.getAssociateClass().getCode()));
             if (YNEnum.getYN(mapRelationship.getIsOneToOne()) == YNEnum.Y) {
                 oneToOneList.add(new TemplateData(project, mapRelationship.getAssociateClass(), mapRelationship.getMainField(),
@@ -527,7 +526,7 @@ public class GeneratorSVImpl implements GenerateSV {
                 mapFieldColumnPks, mapFieldColumnNotPks, mapFieldColumnTable, modelClasses, modelDatas, oneToOneList, oneToManyList);
         templateData.setDisplayAttributes(displayAttributes);
 
-        Setting settingTemplatePath = settingDAO.selectOne(new LambdaQueryWrapper<Setting>()
+        Setting settingTemplatePath = settingMapper.selectOne(new LambdaQueryWrapper<Setting>()
                 .eq(Setting::getK, SettingKey.Template_Path.name()));
 
         //生成路径处理
@@ -535,7 +534,8 @@ public class GeneratorSVImpl implements GenerateSV {
         if (frameworksTemplatePath.contains("/${module}") || frameworksTemplatePath.contains("/$module$")) {
             frameworksTemplatePath = frameworksTemplatePath.substring(frameworksTemplatePath.indexOf("/$"));
         } else if (frameworksTemplatePath.contains(frameworks.getName())) {
-            frameworksTemplatePath = frameworksTemplatePath.substring(frameworksTemplatePath.indexOf(frameworks.getName()) + frameworks.getName().length());
+            frameworksTemplatePath = frameworksTemplatePath.substring(frameworksTemplatePath.indexOf(frameworks.getName()) + frameworks.getName()
+                    .length());
         } else {
             frameworksTemplatePath = frameworksTemplatePath.replaceFirst("/", "");
             if (frameworksTemplatePath.indexOf("/") > 0) {
@@ -656,8 +656,8 @@ public class GeneratorSVImpl implements GenerateSV {
         try {
             //定义文件名默认 aicode.json  ，以及可能的错误名字进行兼容
             File aicodeFile = null;
-            String[] fileName = {"aicode.json", "aicode", "ai-code.json", "ai-code"};
-            List<String> fileNameList = Lists.newArrayList(fileName);
+            String[] fileNameArray = {"aicode.json", "aicode", "ai-code.json", "ai-code"};
+            List<String> fileNameList = Arrays.asList(fileNameArray);
             for (String name : fileNameList) {
                 if (path.endsWith(name)) {
                     aicodeFile = new File(path);
@@ -687,10 +687,10 @@ public class GeneratorSVImpl implements GenerateSV {
      * @param project 项目信息
      */
     private void zipProject(Project project) {
-        Setting settingWorkspace = settingDAO.selectOne(new LambdaQueryWrapper<Setting>().eq(Setting::getK, SettingKey.Workspace.name()));
+        Setting settingWorkspace = settingMapper.selectOne(new LambdaQueryWrapper<Setting>().eq(Setting::getK, SettingKey.Workspace.name()));
         String projectWorkspacePath = this.convertPath(settingWorkspace.getV(), project.getEnglishName(), true);
 
-        Setting repositoryPathSetting = settingDAO.selectOne(new LambdaQueryWrapper<Setting>().eq(Setting::getK, (SettingKey.Repository_Path.name())));
+        Setting repositoryPathSetting = settingMapper.selectOne(new LambdaQueryWrapper<Setting>().eq(Setting::getK, (SettingKey.Repository_Path.name())));
         String destination = repositoryPathSetting.getV() + "/" + project.getEnglishName();
 
 
@@ -711,7 +711,7 @@ public class GeneratorSVImpl implements GenerateSV {
         }
         ZipTools.zip(destination, projectWorkspacePath);
         project.setDownloadUrl("/project/download/" + project.getEnglishName());
-        projectDAO.update(project, new LambdaQueryWrapper<Project>()
+        projectMapper.update(project, new LambdaQueryWrapper<Project>()
                 .eq(Project::getCode, project.getCode()));
     }
 
@@ -729,7 +729,12 @@ public class GeneratorSVImpl implements GenerateSV {
         } else {
             absolutePath = path + "/" + filename;
         }
-        absolutePath = absolutePath.replace("////", "/").replace("///", "/").replace("//", "/").replace("\\\\\\", "/").replace("\\\\", "/").replace("\\", "/");
+        absolutePath = absolutePath.replace("////", "/")
+                .replace("///", "/")
+                .replace("//", "/")
+                .replace("\\\\\\", "/")
+                .replace("\\\\", "/")
+                .replace("\\", "/");
         return absolutePath;
     }
 

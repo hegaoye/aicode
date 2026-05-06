@@ -1,17 +1,25 @@
 /**
-* AI-Code 为您构建代码，享受智慧生活!
+ * aicode
  */
 package com.aicode.frameworks.vo;
 
-import com.aicode.frameworks.entity.FrameworksTemplate;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 /**
- * 框架配置文件模板 VO
+ * 保存 框架配置文件模板 VO
  *
- * @author hegaoye
+ * @author aicode
  */
 @Data
-public class FrameworksTemplateSaveVO extends FrameworksTemplate implements java.io.Serializable {
-
+public class FrameworksTemplateSaveVO implements java.io.Serializable {
+    @Schema(description = "数据库字段:id ")
+    private java.lang.Long id;
+    @Schema(description = "数据库字段:code 模板编码")
+    private java.lang.String code;
+    @Schema(description = "数据库字段:frameworkCode 框架编码")
+    private java.lang.String frameworkCode;
+    @Schema(description = "数据库字段:path 模板路径")
+    private java.lang.String path;
 }

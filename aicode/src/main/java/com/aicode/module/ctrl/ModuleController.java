@@ -1,75 +1,56 @@
 /*
- * AI-Code 为您构建代码，享受智慧生活!
+ * aicode
  */
 package com.aicode.module.ctrl;
 
-import com.aicode.core.entity.Page;
-import com.aicode.core.entity.R;
-import com.aicode.core.exceptions.BaseException;
+import com.aicode.core.BaseException;
+import com.aicode.core.R;
 import com.aicode.module.entity.Module;
 import com.aicode.module.service.ModuleService;
-import com.aicode.module.vo.ModulePageVO;
 import com.aicode.module.vo.ModuleVO;
-import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
-
-import java.util.List;
 
 /**
  * 第三方模块池
- * 1.查询一个详情信息
- * 2.查询信息集合
- * 3.添加
- * 4.修改
- * 5.删除
  *
- * @author hegaoye
+ * @author aicode
  */
-@RestController
-@RequestMapping("/Module")
 @Slf4j
-@Api(value = "第三方模块池控制器", tags = "第三方模块池控制器")
+@RestController
+@RequestMapping("/module")
+@Tag(name = "第三方模块池控制器", description = "第三方模块池控制器")
 public class ModuleController {
     @Autowired
     private ModuleService moduleService;
 
-
-    /**
-     * 创建 第三方模块池
-     *
-     * @return R
-     */
-    @ApiOperation(value = "创建Module", notes = "创建Module")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "name", value = "模块名", required = true, paramType = "query"),
-            @ApiImplicitParam(name = "description", value = "模块说明", required = true, paramType = "query")
+    @Operation(summary = "创建Module", description = "创建Module")
+    @Parameters({
+            @Parameter(name = "name", description = "模块名", required = true),
+            @Parameter(name = "description", description = "模块说明", required = true)
     })
     @PostMapping("/build")
-    public R build(@ApiIgnore Module module) {
+    public R build(@Parameter(hidden = true) Module module) {
         moduleService.save(module);
         return R.success(module);
     }
 
-    /**
-     * 查询一个详情信息
-     *
-     * @param code 模板编码
-     * @return BeanRet
-     */
-    @ApiOperation(value = "查询一个详情信息", notes = "查询一个详情信息")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "code", value = "模块编码", required = true, paramType = "query")
+
+    @Operation(summary = "查询一个详情信息", description = "查询一个详情信息")
+    @Parameters({
+            @Parameter(name = "code", description = "模块编码", required = true)
     })
     @GetMapping(value = "/load")
 
@@ -84,15 +65,10 @@ public class ModuleController {
 
     }
 
-    /**
-     * 根据条件code查询第三方模块池一个详情信息
-     *
-     * @param code 模块编码
-     * @return ModuleVO
-     */
-    @ApiOperation(value = "创建Module", notes = "创建Module")
+
+    @Operation(summary = "创建Module", description = "创建Module")
     @GetMapping("/load/code/{code}")
-    public ModuleVO loadByCode(@PathVariable java.lang.String code) {
+    public ModuleVO loadByCode(@PathVariable String code) {
         if (code == null) {
             return null;
         }
@@ -104,63 +80,55 @@ public class ModuleController {
         return moduleVO;
     }
 
-    /**
-     * 查询第三方模块池信息集合
-     *
-     * @return 分页对象
-     */
-    @ApiOperation(value = "查询Module信息集合", notes = "查询Module信息集合")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "curPage", value = "当前页", required = true, paramType = "query"),
-            @ApiImplicitParam(name = "pageSize", value = "分页大小", required = true, paramType = "query"),
+
+    @Operation(summary = "查询Module信息集合", description = "查询Module信息集合")
+    @Parameters({
+            @Parameter(name = "curPage", description = "当前页", required = true),
+            @Parameter(name = "pageSize", description = "分页大小", required = true),
     })
     @GetMapping(value = "/list")
-    public R list(@ApiIgnore ModulePageVO moduleVO, Integer curPage, Integer pageSize) {
-        Page<Module> page = new Page<>(pageSize, curPage);
+    public R list(Integer curPage, Integer pageSize) {
+        IPage<Module> page = new Page<>(curPage, pageSize);
+
         QueryWrapper<Module> queryWrapper = new QueryWrapper<>();
-        int total = moduleService.count(queryWrapper);
+        long total = moduleService.count(queryWrapper);
+
+        com.aicode.core.Page<Module> pageVO = new com.aicode.core.Page<>(pageSize, curPage);
+
         if (total > 0) {
-            List<Module> moduleList = moduleService.list(queryWrapper, page.genRowStart(), page.getPageSize());
-            page.setTotalRow(total);
-            page.setVoList(moduleList);
+            queryWrapper.lambda().orderByDesc(Module::getId);
+
+            IPage<Module> modulePage = moduleService.page(page, queryWrapper);
+
+            pageVO.setTotalRow(total);
+            pageVO.setVoList(modulePage.getRecords());
             log.debug(JSON.toJSONString(page));
         }
-        return R.success(page);
+        return R.success(pageVO);
     }
 
 
-    /**
-     * 修改 第三方模块池
-     *
-     * @return R
-     */
-    @ApiOperation(value = "修改Module", notes = "修改Module")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "code", value = "模板编码", required = true, paramType = "query"),
-            @ApiImplicitParam(name = "name", value = "类型名", paramType = "query"),
-            @ApiImplicitParam(name = "description", value = "类型说明", paramType = "query"),
-            @ApiImplicitParam(name = "state", value = "状态：停用[Disenable]，启用[Enable]", paramType = "query")
+    @Operation(summary = "修改Module", description = "修改Module")
+    @Parameters({
+            @Parameter(name = "code", description = "模板编码", required = true),
+            @Parameter(name = "name", description = "类型名"),
+            @Parameter(name = "description", description = "类型说明"),
+            @Parameter(name = "state", description = "状态：停用[Disenable]，启用[Enable]")
     })
     @PutMapping("/modify")
-    public R modify(@ApiIgnore Module module) {
+    public R modify(@Parameter(hidden = true) Module module) {
         moduleService.update(module, new LambdaQueryWrapper<Module>()
                 .eq(Module::getCode, module.getCode()));
         return R.success(module);
     }
 
-
-    /**
-     * 删除 第三方模块池
-     *
-     * @return R
-     */
-    @ApiOperation(value = "删除Module", notes = "删除Module")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "id", paramType = "query"),
-            @ApiImplicitParam(name = "code", value = "模块编码", paramType = "query")
+    @Operation(summary = "删除Module", description = "删除Module")
+    @Parameters({
+            @Parameter(name = "id", description = "id"),
+            @Parameter(name = "code", description = "模块编码")
     })
     @DeleteMapping("/delete")
-    public R delete(@ApiIgnore ModuleVO moduleVO) {
+    public R delete(@Parameter(hidden = true) ModuleVO moduleVO) {
         Module newModule = new Module();
         BeanUtils.copyProperties(moduleVO, newModule);
         moduleService.remove(new LambdaQueryWrapper<Module>()

@@ -1,8 +1,6 @@
 package com.aicode.project.dao;
 
 import com.aicode.project.dao.mapper.ProjectMapMapper;
-import com.aicode.project.entity.ProjectMap;
-import com.aicode.core.base.BaseDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -13,7 +11,7 @@ import org.springframework.stereotype.Repository;
  * @author hegaoye
  */
 @Repository
-public class ProjectMapDAO extends BaseDAO<ProjectMapMapper, ProjectMap> {
+public class ProjectMapDAO {
 
 
     /**

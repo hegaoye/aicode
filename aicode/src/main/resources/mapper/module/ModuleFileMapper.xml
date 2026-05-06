@@ -9,7 +9,7 @@
 
 
     <sql id="columns">
-    id,moudleCode,path
+        id,moudleCode,path
     </sql>
 
     <sql id="where">

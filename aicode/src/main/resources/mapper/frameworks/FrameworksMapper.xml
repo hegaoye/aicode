@@ -14,7 +14,7 @@
 
 
     <sql id="columns">
-    id,code,name,description,gitHome,account,password,isPublic
+        id,code,name,description,gitHome,account,password,isPublic
     </sql>
 
     <sql id="where">

@@ -3,7 +3,7 @@
  */
 package com.aicode.project.vo;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 /**
@@ -17,42 +17,42 @@ public class ProjectModelVO implements java.io.Serializable {
     /**
      * 数据库字段:id  属性显示:
      */
-    @ApiModelProperty(value = "")
-    private java.lang.Long id;
+    @Schema(description = "")
+    private Long id;
     /**
      * 数据库字段:code  属性显示:模块编码
      */
-    @ApiModelProperty(value = "模块编码")
-    private java.lang.String code;
+    @Schema(description = "模块编码")
+    private String code;
     /**
      * 数据库字段:pre_code  属性显示:上级模块编码
      */
-    @ApiModelProperty(value = "上级模块编码")
-    private java.lang.String preCode;
+    @Schema(description = "上级模块编码")
+    private String preCode;
     /**
      * 数据库字段:name  属性显示:模块显示名称
      */
-    @ApiModelProperty(value = "模块显示名称")
-    private java.lang.String name;
+    @Schema(description = "模块显示名称")
+    private String name;
     /**
      * 数据库字段:route  属性显示:模块路由
      */
-    @ApiModelProperty(value = "模块路由")
-    private java.lang.String route;
+    @Schema(description = "模块路由")
+    private String route;
     /**
      * 数据库字段:css  属性显示:模块css样式
      */
-    @ApiModelProperty(value = "模块css样式")
-    private java.lang.String css;
+    @Schema(description = "模块css样式")
+    private String css;
     /**
      * 数据库字段:is_menu  属性显示:是否是菜单 Y,N
      */
-    @ApiModelProperty(value = "是否是菜单 Y,N")
-    private java.lang.String isMenu;
+    @Schema(description = "是否是菜单 Y,N")
+    private String isMenu;
     /**
      * 数据库字段:ico  属性显示:模块图标
      */
-    @ApiModelProperty(value = "模块图标")
-    private java.lang.String ico;
+    @Schema(description = "模块图标")
+    private String ico;
 
 }

@@ -18,16 +18,6 @@ import java.util.List;
 public interface SettingService extends IService<Setting> {
 
     /**
-     * 分页查询
-     *
-     * @param queryWrapper 查询条件
-     * @param offset       起始行
-     * @param limit        步长
-     * @return List<Setting>
-     */
-    List<Setting> list(QueryWrapper<Setting> queryWrapper, int offset, int limit);
-
-    /**
      * 根据key 获得 value
      *
      * @param key Setting.Key

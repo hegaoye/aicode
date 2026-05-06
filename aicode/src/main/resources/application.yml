@@ -1,16 +1,24 @@
 server:
   port: 8080
+  shutdown: graceful
 
 spring:
+  application:
+    name: aicode
+  threads:
+    virtual:
+      enabled: true
   output:
     ansi:
       enabled: always
   main:
     allow-bean-definition-overriding: true
+  lifecycle:
+    timeout-per-shutdown-phase: 30s
   datasource:
     tidb:
       name: h2-data
-      url: jdbc:h2:file:${database:/tmp/aicode};DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;MODE=MYSQL;DATABASE_TO_UPPER=false;AUTO_SERVER=TRUE
+      url: jdbc:h2:file:${database:/tmp/aicode};DB_CLOSE_DELAY=-1;MODE=MYSQL;DATABASE_TO_UPPER=false;AUTO_SERVER=TRUE
       username: ${username:sa}
       password: ${password:sa}
       driver-class-name: org.h2.Driver
@@ -33,7 +41,7 @@ spring:
       filters: stat #属性类型是字符串，通过别名的方式配置扩展插件，常用的插件有：监控统计用的filter:stat 日志用的filter:log4j 防御SQL注入的filter:wall
     uid:
       name: uid-data
-      url: jdbc:h2:file:${database:/tmp/aicode};DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;MODE=MYSQL;DATABASE_TO_UPPER=false;AUTO_SERVER=TRUE
+      url: jdbc:h2:file:${database:/tmp/aicode};DB_CLOSE_DELAY=-1;MODE=MYSQL;DATABASE_TO_UPPER=false;AUTO_SERVER=TRUE
       schema: classpath:db/schema.sql
       data: classpath:db/data.sql
       username: ${username:sa}
@@ -71,38 +79,35 @@ spring:
         trace: true
         web-allow-others: true
 
-
-
-logging:
-  level:
-    com:
-      ds: debug
-
-  path: /var/log/tomcat/
-  config: classpath:logback.xml
-
-mybatis-plus:
-  configuration:
-    cache-enabled: true
-
-#访问地址 http://127.0.0.1:8080/actuator
+#项目基础资料监控
+#访问地址 http://127.0.0.1:8088/actuator
 management:
+  endpoint:
+    env:
+      enabled: true
+    shutdown:
+      enabled: true
   endpoints:
     health:
       show-details: always
     web:
       exposure:
         include: "*"
-  health:
-    defaults:
-      enabled: true
   metrics:
-    export:
-      prometheus:
-        enabled: true
-  #自定义管理端口 避免被外部探测
+    tags:
+      application: ${spring.application.name}
+  health:
+    probes:
+      enabled: true
+  #自定义管理端口
   server:
     port: 8088
 
 
-
+#日志控制
+logging:
+  level:
+    #日志级别控制
+    com.aicode: debug
+  #修改日志级别时同时修改文件名
+  config: classpath:logback-debug.xml

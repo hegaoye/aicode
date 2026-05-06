@@ -3,24 +3,22 @@
  */
 package com.aicode.project.service;
 
-import com.aicode.core.exceptions.BaseException;
-import com.aicode.core.exceptions.ProjectJobException;
-import com.aicode.core.tools.Executors;
+import com.aicode.core.BaseException;
+import com.aicode.exceptions.ProjectJobException;
+import com.aicode.project.dao.mapper.ProjectJobMapper;
+import com.aicode.project.entity.ProjectJob;
 import com.aicode.project.entity.ProjectJobState;
 import com.alibaba.druid.util.StringUtils;
 import com.baidu.fsg.uid.UidGenerator;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.aicode.project.dao.ProjectJobDAO;
-import com.aicode.project.dao.mapper.ProjectJobMapper;
-import com.aicode.project.entity.ProjectJob;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
-import java.util.List;
 import java.util.Date;
+import java.util.List;
 
 
 /**
@@ -33,7 +31,7 @@ import java.util.Date;
 public class ProjectJobServiceImpl extends ServiceImpl<ProjectJobMapper, ProjectJob> implements ProjectJobService {
 
     @Autowired
-    private ProjectJobDAO projectJobDAO;
+    private ProjectJobMapper projectJobMapper;
 
     @Autowired
     private UidGenerator uidGenerator;
@@ -66,7 +64,8 @@ public class ProjectJobServiceImpl extends ServiceImpl<ProjectJobMapper, Project
      */
     @Override
     public List<ProjectJob> list(QueryWrapper<ProjectJob> queryWrapper, int offset, int limit) {
-        return projectJobDAO.list(queryWrapper, offset, limit);
+        queryWrapper.last("limit " + offset + "," + limit);
+        return projectJobMapper.selectList(queryWrapper);
     }
 
 
@@ -79,7 +78,7 @@ public class ProjectJobServiceImpl extends ServiceImpl<ProjectJobMapper, Project
      * 5.获取模块信息
      * 6.获取版本控制管理信息
      *
-     * @param projectCode      任务编码
+     * @param projectCode 任务编码
      * @return
      */
 
@@ -87,19 +86,28 @@ public class ProjectJobServiceImpl extends ServiceImpl<ProjectJobMapper, Project
     public ProjectJob execute(String projectCode) {
         //创建任务追踪
         ProjectJob projectJob = new ProjectJob();
+        projectJob.setId(uidGenerator.getUID());
         projectJob.setCode(String.valueOf(uidGenerator.getUID()));
         projectJob.setProjectCode(projectCode);
         projectJob.setState(ProjectJobState.Executing.name());
         projectJob.setNumber(1);
         projectJob.setCreateTime(new Date());
-        projectJobDAO.insert(projectJob);
-        Executors.cacheThreadExecutor(new Runnable() {
-            @Override
-            public void run() {
-                generateSV.aiCode(projectCode, projectJob);
-            }
-        });
+        projectJobMapper.insert(projectJob);
+
+        //执行异步任务
+        this.generateCode(projectCode, projectJob);
+        //        Executors.cacheThreadExecutor(new Runnable() {
+        //            @Override
+        //            public void run() {
+        //                generateSV.aiCode(projectCode, projectJob);
+        //            }
+        //        });
         return projectJob;
+    }
+
+    @Async
+    public void generateCode(String projectCode, ProjectJob projectJob) {
+        generateSV.aiCode(projectCode, projectJob);
     }
 }
 

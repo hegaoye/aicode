@@ -1,17 +1,25 @@
 /**
-* AI-Code 为您构建代码，享受智慧生活!
+ * aicode
  */
 package com.aicode.account.vo;
 
-import com.aicode.account.entity.Account;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 /**
- * 账户 VO
+ * 保存 账户 VO
  *
- * @author hegaoye
+ * @author aicode
  */
 @Data
-public class AccountSaveVO extends Account implements java.io.Serializable {
-
+public class AccountSaveVO implements java.io.Serializable {
+    @Schema(description = "数据库字段:id ")
+    private Long id;
+    @Schema(description = "数据库字段:code 账户编码")
+    private String code;
+    @Schema(description = "数据库字段:account 账户")
+    private String account;
+    @Schema(description = "数据库字段:password 密码")
+    private String password;
 }

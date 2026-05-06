@@ -1,29 +1,29 @@
 package com.aicode.config.template;
 
-import com.aicode.project.entity.TemplateData;
-import com.alibaba.fastjson.JSON;
-import com.google.common.collect.Maps;
-import freemarker.template.Template;
+import com.alibaba.fastjson2.JSON;
 import freemarker.template.Configuration;
+import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
 import java.nio.charset.Charset;
+import java.util.HashMap;
 import java.util.Map;
 
 @Slf4j
 @Service
 public class FreemarkerHelper implements TemplateHelper {
     public static void main(String[] args) throws IOException, TemplateException {
-        Map<String, Object> map = Maps.newHashMap();
+        Map<String, Object> map = new HashMap<>();
         map.put("fileName", "Hegaoye");
         map.put("className", "public\tclass\t" + map.get("fileName") + "\t");
         map.put("extends", "extends\tPage\timplements\tSerializable\t");
         map.put("basePackage", "package\tcom.szh.test.ctrl;");
         map.put("import", "import\tcom.aixin.core.entity.Page;\nimport\torg.apache.commons.lang.builder.ToStringBuilder;\nimport\torg.apache.commons.lang.builder.ToStringStyle;\nimport\tjava.io.Serializable;");
-        String targetFilePath = "C:\\worspaces\\template\\src\\main\\webapp\\workspace\\szh\\sv\\src\\main\\java\\com\\szh\\test\\ctrl\\" + map.get("fileName").toString() + ".java";
+        String targetFilePath = "C:\\worspaces\\template\\src\\main\\webapp\\workspace\\szh\\sv\\src\\main\\java\\com\\szh\\test\\ctrl\\" + map.get("fileName")
+                .toString() + ".java";
         new FreemarkerHelper().generate(null, targetFilePath, "C:\\worspaces\\template\\AI\\src\\main\\webapp\\templates\\Test.java");
     }
 

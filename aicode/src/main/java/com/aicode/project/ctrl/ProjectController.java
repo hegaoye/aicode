@@ -1,13 +1,12 @@
 /*
- * AI-Code 为您构建代码，享受智慧生活!
+ * aicode
  */
 package com.aicode.project.ctrl;
 
-import com.aicode.core.entity.Page;
-import com.aicode.core.entity.R;
+import com.aicode.core.BaseException;
+import com.aicode.core.R;
 import com.aicode.core.enums.Constants;
 import com.aicode.core.enums.YNEnum;
-import com.aicode.core.exceptions.BaseException;
 import com.aicode.core.tools.FileUtil;
 import com.aicode.core.tools.JwtToken;
 import com.aicode.display.service.DisplayAttributeService;
@@ -19,13 +18,16 @@ import com.aicode.project.service.*;
 import com.aicode.project.vo.ProjectVO;
 import com.aicode.setting.entity.SettingKey;
 import com.aicode.setting.service.SettingService;
-import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -33,9 +35,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
 
-import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.util.List;
 import java.util.Map;
@@ -43,42 +43,33 @@ import java.util.Map;
 /**
  * 项目信息
  *
- * @author hegaoye
+ * @author aicode
  */
+@Slf4j
 @RestController
 @RequestMapping("/project")
-@Slf4j
-@Api(value = "项目信息控制器", tags = "项目信息控制器")
+@Tag(name = "项目信息控制器", description = "项目信息控制器")
 public class ProjectController {
     @Autowired
     private ProjectService projectService;
     @Autowired
     private SettingService settingService;
-
     @Autowired
     private ProjectFramworkService projectFramworkService;
-
     @Autowired
     private ProjectMapService projectMapService;
-
     @Autowired
     private ProjectModuleService projectModuleService;
-
     @Autowired
     private ProjectJobService projectJobService;
-
     @Autowired
     private FrameworksService frameworksService;
-
     @Autowired
     private ProjectSqlService projectSqlService;
-
     @Autowired
     private ProjectRepositoryAccountService projectRepositoryAccountService;
-
     @Autowired
     private DisplayAttributeService displayAttributeService;
-
     @Autowired
     private MapRelationshipService mapRelationshipService;
 
@@ -87,9 +78,9 @@ public class ProjectController {
      *
      * @return BeanRet
      */
-    @ApiOperation(value = "执行脚本", notes = "执行脚本")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "code", value = "项目编码", required = true, paramType = "query")
+    @Operation(summary = "执行脚本", description = "执行脚本")
+    @Parameters({
+            @Parameter(name = "code", description = "项目编码", required = true)
     })
     @PostMapping("/init")
     public R init(String code) {
@@ -100,9 +91,9 @@ public class ProjectController {
 
 
     @GetMapping("/download/{proejctName}")
-    @ApiOperation(value = "下载项目源码", notes = "下载项目源码")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "proejctName", value = "项目名", required = true, paramType = "path")
+    @Operation(summary = "下载项目源码", description = "下载项目源码")
+    @Parameters({
+            @Parameter(name = "proejctName", description = "项目名", required = true)
     })
     public void downloadFile(@PathVariable("proejctName") String proejctName, HttpServletResponse response) throws Exception {
         if (StringUtils.isBlank(proejctName)) {
@@ -151,9 +142,9 @@ public class ProjectController {
      * @param code 项目编码
      * @return BeanRet
      */
-    @ApiOperation(value = "查询一个详情信息", notes = "查询一个详情信息")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "code", value = "项目编码", paramType = "query")
+    @Operation(summary = "查询一个详情信息", description = "查询一个详情信息")
+    @Parameters({
+            @Parameter(name = "code", description = "项目编码")
     })
     @GetMapping(value = "/load")
     public R load(String code) {
@@ -212,9 +203,9 @@ public class ProjectController {
      * @param filePath 文件路径
      * @return BeanRet
      */
-    @ApiOperation(value = "查询文件路径", notes = "查询文件路径")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "code", value = "项目编码", paramType = "query")
+    @Operation(summary = "查询文件路径", description = "查询文件路径")
+    @Parameters({
+            @Parameter(name = "code", description = "项目编码")
     })
     @GetMapping(value = "/scan/path")
     public R scanPath(String code, String filePath) throws IOException {
@@ -252,20 +243,20 @@ public class ProjectController {
      *
      * @return R
      */
-    @ApiOperation(value = "创建Project", notes = "创建Project")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "name", value = "项目名 最长128个汉字", required = true, paramType = "query"),
-            @ApiImplicitParam(name = "englishName", value = "项目英文名 （项目数据库名） 最长256个英文字符", required = true, paramType = "query"),
-            @ApiImplicitParam(name = "description", value = "项目描述 最长256个汉字", required = true, paramType = "query"),
-            @ApiImplicitParam(name = "databaseType", value = "数据库类型:Mysql,Oracle...", required = true, paramType = "query"),
-            @ApiImplicitParam(name = "language", value = "项目语言:Java,Python,Js...", required = true, paramType = "query"),
-            @ApiImplicitParam(name = "copyright", value = "项目版权文字信息", required = true, paramType = "query"),
-            @ApiImplicitParam(name = "author", value = "作者", required = true, paramType = "query"),
-            @ApiImplicitParam(name = "phone", value = "联系方式", required = true, paramType = "query"),
-            @ApiImplicitParam(name = "basePackage", value = "项目基础包名", required = true, paramType = "query")
+    @Operation(summary = "创建Project", description = "创建Project")
+    @Parameters({
+            @Parameter(name = "name", description = "项目名 最长128个汉字", required = true),
+            @Parameter(name = "englishName", description = "项目英文名 （项目数据库名） 最长256个英文字符", required = true),
+            @Parameter(name = "description", description = "项目描述 最长256个汉字", required = true),
+            @Parameter(name = "databaseType", description = "数据库类型:Mysql,Oracle...", required = true),
+            @Parameter(name = "language", description = "项目语言:Java,Python,Js...", required = true),
+            @Parameter(name = "copyright", description = "项目版权文字信息", required = true),
+            @Parameter(name = "author", description = "作者", required = true),
+            @Parameter(name = "phone", description = "联系方式", required = true),
+            @Parameter(name = "basePackage", description = "项目基础包名", required = true)
     })
     @PostMapping("/build")
-    public R build(@ApiIgnore Project project, String token) {
+    public R build(@Parameter(hidden = true) Project project, String token) {
         Assert.hasText(project.getName(), BaseException.BaseExceptionEnum.Empty_Param.toString());
         Assert.hasText(project.getEnglishName(), BaseException.BaseExceptionEnum.Empty_Param.toString());
         Assert.hasText(project.getAuthor(), BaseException.BaseExceptionEnum.Empty_Param.toString());
@@ -290,9 +281,9 @@ public class ProjectController {
      * @param code 项目编码
      * @return ProjectVO
      */
-    @ApiOperation(value = "创建Project", notes = "创建Project")
+    @Operation(summary = "创建Project", description = "创建Project")
     @GetMapping("/load/code/{code}")
-    public ProjectVO loadByCode(@PathVariable java.lang.String code) {
+    public ProjectVO loadByCode(@PathVariable String code) {
         if (code == null) {
             return null;
         }
@@ -309,30 +300,26 @@ public class ProjectController {
      *
      * @return 分页对象
      */
-    @ApiOperation(value = "查询Project信息集合", notes = "查询Project信息集合")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "curPage", value = "当前页", required = true, paramType = "query"),
-            @ApiImplicitParam(name = "pageSize", value = "分页大小", required = true, paramType = "query")
+    @Operation(summary = "查询Project信息集合", description = "查询Project信息集合")
+    @Parameters({
+            @Parameter(name = "curPage", description = "当前页", required = true),
+            @Parameter(name = "pageSize", description = "分页大小", required = true)
     })
     @GetMapping(value = "/list")
     public R list(String token, Integer curPage, Integer pageSize) {
         String accountCode = JwtToken.getTokenValue(token, Constants.AccountCode.val.toString());
 
-        Page<Project> page = new Page<>(pageSize, curPage);
-        QueryWrapper<Project> queryWrapper = new QueryWrapper<>();
-        if (StringUtils.isNotBlank(accountCode)) {
-            queryWrapper.lambda().eq(Project::getAccountCode, accountCode);
-        }
+        List<Project> projectList = projectService.lambdaQuery()
+                .eq(Project::getAccountCode, accountCode)
+                .orderByDesc(Project::getCreateTime)
+                .list();
 
-        int total = projectService.count(queryWrapper);
-        if (total > 0) {
-            queryWrapper.lambda().orderByDesc(Project::getCreateTime);
-            List<Project> projectList = projectService.list(queryWrapper, page.genRowStart(), page.getPageSize());
-            page.setTotalRow(total);
-            page.setVoList(projectList);
-            log.debug(JSON.toJSONString(page));
-        }
-        return R.success(page);
+        com.aicode.core.Page pageVO = new com.aicode.core.Page();
+        pageVO.setTotalRow(projectList.size());
+        pageVO.setVoList(projectList);
+        log.debug(JSON.toJSONString(pageVO));
+
+        return R.success(pageVO);
     }
 
 
@@ -341,22 +328,22 @@ public class ProjectController {
      *
      * @return R
      */
-    @ApiOperation(value = "修改Project", notes = "修改Project")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "code", value = "项目编码", required = true, paramType = "query"),
-            @ApiImplicitParam(name = "name", value = "项目名 最长128个汉字", paramType = "query"),
-            @ApiImplicitParam(name = "englishName", value = "项目英文名 （项目数据库名） 最长256个英文字符", paramType = "query"),
-            @ApiImplicitParam(name = "description", value = "项目描述 最长256个汉字", paramType = "query"),
-            @ApiImplicitParam(name = "databaseType", value = "数据库类型:Mysql,Oracle...", paramType = "query"),
-            @ApiImplicitParam(name = "language", value = "项目语言:Java,Python,Js...", paramType = "query"),
-            @ApiImplicitParam(name = "copyright", value = "项目版权文字信息", paramType = "query"),
-            @ApiImplicitParam(name = "author", value = "作者", paramType = "query"),
-            @ApiImplicitParam(name = "phone", value = "联系方式", paramType = "query"),
-            @ApiImplicitParam(name = "state", value = "项目状态", paramType = "query"),
-            @ApiImplicitParam(name = "basePackage", value = "项目基础包名", paramType = "query")
+    @Operation(summary = "修改Project", description = "修改Project")
+    @Parameters({
+            @Parameter(name = "code", description = "项目编码", required = true),
+            @Parameter(name = "name", description = "项目名 最长128个汉字"),
+            @Parameter(name = "englishName", description = "项目英文名 （项目数据库名） 最长256个英文字符"),
+            @Parameter(name = "description", description = "项目描述 最长256个汉字"),
+            @Parameter(name = "databaseType", description = "数据库类型:Mysql,Oracle..."),
+            @Parameter(name = "language", description = "项目语言:Java,Python,Js..."),
+            @Parameter(name = "copyright", description = "项目版权文字信息"),
+            @Parameter(name = "author", description = "作者"),
+            @Parameter(name = "phone", description = "联系方式"),
+            @Parameter(name = "state", description = "项目状态"),
+            @Parameter(name = "basePackage", description = "项目基础包名")
     })
     @RequestMapping("/modify")
-    public R modify(@ApiIgnore Project project) {
+    public R modify(@Parameter(hidden = true) Project project) {
         Assert.hasText(project.getCode(), BaseException.BaseExceptionEnum.Empty_Param.toString());
         if (project.getCode() != null) {
             Project projectLoad = projectService.getOne(new LambdaQueryWrapper<Project>()
@@ -381,12 +368,12 @@ public class ProjectController {
      *
      * @return R
      */
-    @ApiOperation(value = "删除Project", notes = "删除Project")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "code", value = "项目编码", required = true, paramType = "query")
+    @Operation(summary = "删除Project", description = "删除Project")
+    @Parameters({
+            @Parameter(name = "code", description = "项目编码", required = true)
     })
     @PostMapping("/delete")
-    public R delete(@ApiIgnore ProjectVO projectVO) {
+    public R delete(@Parameter(hidden = true) ProjectVO projectVO) {
         Project newProject = new Project();
         BeanUtils.copyProperties(projectVO, newProject);
         projectService.delete(projectVO.getCode());

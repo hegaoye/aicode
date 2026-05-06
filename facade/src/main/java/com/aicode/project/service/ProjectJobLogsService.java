@@ -16,15 +16,7 @@ import java.util.List;
  */
 public interface ProjectJobLogsService extends IService<ProjectJobLogs> {
 
-    /**
-     * 分页查询
-     *
-     * @param queryWrapper 查询条件
-     * @param offset       起始行
-     * @param limit        步长
-     * @return List<ProjectJobLogs>
-     */
-    List<ProjectJobLogs> list(QueryWrapper<ProjectJobLogs> queryWrapper, int offset, int limit);
+
 }
 
 

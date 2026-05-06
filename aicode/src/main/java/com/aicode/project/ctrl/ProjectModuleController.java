@@ -3,25 +3,27 @@
  */
 package com.aicode.project.ctrl;
 
-import com.aicode.core.entity.Page;
-import com.aicode.core.entity.R;
-import com.aicode.core.exceptions.BaseException;
+
+import com.aicode.core.BaseException;
+import com.aicode.core.R;
 import com.aicode.project.entity.ProjectModule;
 import com.aicode.project.service.ProjectModuleService;
 import com.aicode.project.vo.ProjectModulePageVO;
 import com.aicode.project.vo.ProjectModuleVO;
-import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import io.swagger.annotations.*;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
-
-import java.util.List;
 
 /**
  * 项目选择模块
@@ -35,7 +37,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/project/mouldles")
 @Slf4j
-@Api(value = "项目选择模块控制器", tags = "项目选择模块控制器")
+@Tag(name = "项目选择模块控制器", description = "项目选择模块控制器")
 public class ProjectModuleController {
     @Autowired
     private ProjectModuleService projectModuleService;
@@ -47,10 +49,10 @@ public class ProjectModuleController {
      * @param moudleCode  模块编码
      * @return BeanRet
      */
-    @ApiOperation(value = "查询一个详情信息", notes = "查询一个详情信息")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "projectCode", value = "项目编码", required = true, paramType = "query"),
-            @ApiImplicitParam(name = "moudleCode", value = "模块编码", required = true, paramType = "query")
+    @Operation(summary = "查询一个详情信息", description = "查询一个详情信息")
+    @Parameters({
+            @Parameter(name = "projectCode", description = "项目编码", required = true),
+            @Parameter(name = "moudleCode", description = "模块编码", required = true)
     })
     @GetMapping(value = "/load")
     public R load(String projectCode, String moudleCode) {
@@ -70,13 +72,13 @@ public class ProjectModuleController {
      *
      * @return R
      */
-    @ApiOperation(value = "创建ProjectModule", notes = "创建ProjectModule")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "projectCode", value = "项目编码", required = true, paramType = "query"),
-            @ApiImplicitParam(name = "moudleCode", value = "模块编码", required = true, paramType = "query")
+    @Operation(summary = "创建ProjectModule", description = "创建ProjectModule")
+    @Parameters({
+            @Parameter(name = "projectCode", description = "项目编码", required = true),
+            @Parameter(name = "moudleCode", description = "模块编码", required = true)
     })
     @PostMapping("/add")
-    public R build(@ApiIgnore ProjectModule projectModule) {
+    public R build(@Parameter(hidden = true) ProjectModule projectModule) {
 
         projectModuleService.save(projectModule);
 
@@ -89,26 +91,28 @@ public class ProjectModuleController {
      *
      * @return 分页对象
      */
-    @ApiOperation(value = "查询ProjectModule信息集合", notes = "查询ProjectModule信息集合")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "projectCode", value = "项目编码", required = true, paramType = "query"),
-            @ApiImplicitParam(name = "curPage", value = "当前页", required = true, paramType = "query"),
-            @ApiImplicitParam(name = "pageSize", value = "分页大小", required = true, paramType = "query")
+    @Operation(summary = "查询ProjectModule信息集合", description = "查询ProjectModule信息集合")
+    @Parameters({
+            @Parameter(name = "projectCode", description = "项目编码", required = true),
+            @Parameter(name = "curPage", description = "当前页", required = true),
+            @Parameter(name = "pageSize", description = "分页大小", required = true)
     })
     @GetMapping(value = "/list")
-    public R list(@ApiIgnore ProjectModulePageVO projectModuleVO, Integer curPage, Integer pageSize) {
-        Page<ProjectModule> page = new Page<>(pageSize, curPage);
+    public R list(@Parameter(hidden = true) ProjectModulePageVO projectModuleVO, Integer curPage, Integer pageSize) {
+        IPage<ProjectModule> page = new Page<>(pageSize, curPage);
         QueryWrapper<ProjectModule> queryWrapper = new QueryWrapper<>();
         queryWrapper.lambda().eq(ProjectModule::getProjectCode, projectModuleVO.getProjectCode());
 
-        int total = projectModuleService.count(queryWrapper);
+        com.aicode.core.Page pageVO = new com.aicode.core.Page();
+        long total = projectModuleService.count(queryWrapper);
         if (total > 0) {
-            List<ProjectModule> projectModuleList = projectModuleService.list(queryWrapper, page.genRowStart(), page.getPageSize());
-            page.setTotalRow(total);
-            page.setVoList(projectModuleList);
+            IPage<ProjectModule> projectModuleIPage = projectModuleService.page(page, queryWrapper);
+
+            pageVO.setTotalRow(total);
+            pageVO.setVoList(projectModuleIPage.getRecords());
             log.debug(JSON.toJSONString(page));
         }
-        return R.success(page);
+        return R.success(pageVO);
     }
 
 
@@ -117,10 +121,9 @@ public class ProjectModuleController {
      *
      * @return R
      */
-    @ApiOperation(value = "修改ProjectModule", notes = "修改ProjectModule")
+    @Operation(summary = "修改ProjectModule", description = "修改ProjectModule")
     @PutMapping("/modify")
-    public boolean modify(@ApiParam(name = "修改ProjectModule", value = "传入json格式", required = true)
-                          @RequestBody ProjectModuleVO projectModuleVO) {
+    public boolean modify(@RequestBody ProjectModuleVO projectModuleVO) {
         ProjectModule newProjectModule = new ProjectModule();
         BeanUtils.copyProperties(projectModuleVO, newProjectModule);
         boolean isUpdated = projectModuleService.update(newProjectModule, new LambdaQueryWrapper<ProjectModule>()
@@ -134,12 +137,12 @@ public class ProjectModuleController {
      *
      * @return R
      */
-    @ApiOperation(value = "删除ProjectModule", notes = "删除ProjectModule")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "id", paramType = "query")
+    @Operation(summary = "删除ProjectModule", description = "删除ProjectModule")
+    @Parameters({
+            @Parameter(name = "id", description = "id")
     })
     @DeleteMapping("/delete")
-    public R delete(@ApiIgnore ProjectModuleVO projectModuleVO) {
+    public R delete(@Parameter(hidden = true) ProjectModuleVO projectModuleVO) {
         ProjectModule newProjectModule = new ProjectModule();
         BeanUtils.copyProperties(projectModuleVO, newProjectModule);
         projectModuleService.remove(new LambdaQueryWrapper<ProjectModule>()

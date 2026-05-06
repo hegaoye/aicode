@@ -1,11 +1,11 @@
 /*
- * AI-Code 为您构建代码，享受智慧生活!
+ * aicode
  */
 package com.aicode.map.ctrl;
 
-import com.aicode.core.entity.R;
+import com.aicode.core.BaseException;
+import com.aicode.core.R;
 import com.aicode.core.enums.YNEnum;
-import com.aicode.core.exceptions.BaseException;
 import com.aicode.map.entity.MapClassTable;
 import com.aicode.map.entity.MapFieldColumn;
 import com.aicode.map.entity.MapRelationship;
@@ -15,13 +15,16 @@ import com.aicode.map.service.MapRelationshipService;
 import com.aicode.map.vo.MapRelationshipVO;
 import com.aicode.project.entity.ProjectMap;
 import com.aicode.project.service.ProjectMapService;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
 import com.baidu.fsg.uid.UidGenerator;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import io.swagger.annotations.*;
+import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,41 +37,32 @@ import java.util.stream.Collectors;
 /**
  * 模型关系
  *
- * @author hegaoye
+ * @author aicode
  */
+@Slf4j
 @RestController
 @RequestMapping("/project/relationship")
-@Slf4j
-@Api(value = "模型关系控制器", tags = "模型关系控制器")
+@Tag(name = "模型关系控制器", description = "模型关系控制器")
 public class MapRelationshipController {
     @Autowired
     private MapRelationshipService mapRelationshipService;
-
     @Autowired
     private ProjectMapService projectMapService;
-
     @Autowired
     private MapClassTableService mapClassTableService;
-
     @Autowired
     private MapFieldColumnService mapFieldColumnService;
-
     @Autowired
     private UidGenerator uidGenerator;
 
-    /**
-     * 创建 模型关系
-     *
-     * @return R
-     */
-    @ApiOperation(value = "创建MapRelationship", notes = "创建MapRelationship")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "mapClassTableCode", value = "关联编码", required = true, paramType = "query"),
-            @ApiImplicitParam(name = "associateCode", value = "被关联编码", required = true, paramType = "query"),
-            @ApiImplicitParam(name = "oneToOne", value = "一对一", required = true, paramType = "query"),
-            @ApiImplicitParam(name = "oneToMany", value = "一对多", required = true, paramType = "query"),
-            @ApiImplicitParam(name = "mainField", value = "主表关联属性", required = true, paramType = "query"),
-            @ApiImplicitParam(name = "joinField", value = "从表关联属性", required = true, paramType = "query"),
+    @Operation(summary = "创建MapRelationship", description = "创建MapRelationship")
+    @Parameters({
+            @Parameter(name = "mapClassTableCode", description = "关联编码", required = true),
+            @Parameter(name = "associateCode", description = "被关联编码", required = true),
+            @Parameter(name = "oneToOne", description = "一对一", required = true),
+            @Parameter(name = "oneToMany", description = "一对多", required = true),
+            @Parameter(name = "mainField", description = "主表关联属性", required = true),
+            @Parameter(name = "joinField", description = "从表关联属性", required = true),
     })
     @PostMapping("/build")
     public R build(String mapClassTableCode, String associateCode, YNEnum oneToOne,
@@ -97,13 +91,7 @@ public class MapRelationshipController {
         return R.success();
     }
 
-    /**
-     * 查询关系是否存在，不存在的情况下，创建一个实体返回
-     *
-     * @param mapClassTableCode 主表code
-     * @param associateCode     附表code
-     * @return MapRelationship
-     */
+
     private MapRelationship load(String mapClassTableCode, String associateCode) {
         MapRelationship mapRelationship;
 
@@ -123,15 +111,9 @@ public class MapRelationshipController {
     }
 
 
-    /**
-     * 根据条件code查询模型关系一个详情信息
-     *
-     * @param code 关系编码
-     * @return MapRelationshipVO
-     */
-    @ApiOperation(value = "创建MapRelationship", notes = "创建MapRelationship")
+    @Operation(summary = "创建MapRelationship", description = "创建MapRelationship")
     @GetMapping("/load/code/{code}")
-    public MapRelationshipVO loadByCode(@PathVariable java.lang.String code) {
+    public MapRelationshipVO loadByCode(@PathVariable String code) {
         if (code == null) {
             return null;
         }
@@ -143,14 +125,10 @@ public class MapRelationshipController {
         return mapRelationshipVO;
     }
 
-    /**
-     * 查询模型关系信息集合
-     *
-     * @return 分页对象
-     */
-    @ApiOperation(value = "查询MapRelationship信息集合", notes = "查询MapRelationship信息集合")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "classTableCode", value = "类表映射编码", required = true, paramType = "query"),
+
+    @Operation(summary = "查询MapRelationship信息集合", description = "查询MapRelationship信息集合")
+    @Parameters({
+            @Parameter(name = "classTableCode", description = "类表映射编码", required = true),
     })
     @GetMapping(value = "/list")
     public R list(String classTableCode) {
@@ -160,22 +138,18 @@ public class MapRelationshipController {
         return R.success(relationships);
     }
 
-    /**
-     * 查询类表映射关系列表
-     *
-     * @param projectCode 项目名
-     * @return BeanRet
-     */
-    @ApiOperation(value = "查询类表映射关系列表", notes = "查询类表映射关系列表")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "projectCode", value = "项目名", required = true, paramType = "query")
+
+    @Operation(summary = "查询类表映射关系列表", description = "查询类表映射关系列表")
+    @Parameters({
+            @Parameter(name = "projectCode", description = "项目名", required = true)
     })
     @GetMapping(value = "/listMapClassTable")
-
     public R listMapClassTable(String projectCode) {
         Assert.hasText(projectCode, BaseException.BaseExceptionEnum.Empty_Param.toString());
         List<ProjectMap> projectMapList = projectMapService.list(new LambdaQueryWrapper<ProjectMap>()
                 .eq(ProjectMap::getProjectCode, projectCode));
+        log.info("projectCode: {} , projectMapList: {}", projectCode, projectMapList);
+
         if (CollectionUtils.isNotEmpty(projectMapList)) {
             List<MapClassTable> mapRelationships = mapClassTableService.list(new LambdaQueryWrapper<MapClassTable>()
                     .in(MapClassTable::getCode, projectMapList.stream()
@@ -184,19 +158,13 @@ public class MapRelationshipController {
 
         }
 
-        return R.failed("");
+        return R.failed(BaseException.BaseExceptionEnum.Result_Not_Exist);
     }
 
 
-    /**
-     * 查询模型关系列表
-     *
-     * @param classTableCode 类表映射编码
-     * @return BeanRet
-     */
-    @ApiOperation(value = "查询模型关系列表", notes = "查询模型关系列表")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "classTableCode", value = "类表映射编码", required = true, paramType = "query"),
+    @Operation(summary = "查询模型关系列表", description = "查询模型关系列表")
+    @Parameters({
+            @Parameter(name = "classTableCode", description = "类表映射编码", required = true),
     })
     @GetMapping(value = "/listByClassTableCode")
     public R listByProjectCode(String classTableCode) {
@@ -207,21 +175,16 @@ public class MapRelationshipController {
     }
 
 
-    /**
-     * 查询字段信息
-     *
-     * @return 分页对象
-     */
-    @ApiOperation(value = "查询字段信息--设置表的关联关系时使用", notes = "查询字段信息--设置表的关联关系时使用")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "mapClassTableCode", value = "映射编码", paramType = "query"),
-            @ApiImplicitParam(name = "associateCode", value = "被关联编码", paramType = "query"),
+    @Operation(summary = "查询字段信息--设置表的关联关系时使用", description = "查询字段信息--设置表的关联关系时使用")
+    @Parameters({
+            @Parameter(name = "mapClassTableCode", description = "映射编码"),
+            @Parameter(name = "associateCode", description = "被关联编码"),
     })
     @GetMapping(value = "/listMapFieldColumn")
     @ResponseBody
     public R listMapFieldColumn(String mapClassTableCode, String associateCode) {
         if (StringUtils.isEmpty(mapClassTableCode)) {
-            return R.failed("分页对象不能为空");
+            return R.failed(BaseException.BaseExceptionEnum.Empty_Param);
         }
         JSONObject jsonObject = new JSONObject();
         List<MapFieldColumn> fields = mapFieldColumnService.list(new LambdaQueryWrapper<MapFieldColumn>()
@@ -241,15 +204,9 @@ public class MapRelationshipController {
     }
 
 
-    /**
-     * 修改 模型关系
-     *
-     * @return R
-     */
-    @ApiOperation(value = "修改MapRelationship", notes = "修改MapRelationship")
+    @Operation(summary = "修改MapRelationship", description = "修改MapRelationship")
     @PutMapping("/modify")
-    public boolean modify(@ApiParam(name = "修改MapRelationship", value = "传入json格式", required = true)
-                          @RequestBody MapRelationshipVO mapRelationshipVO) {
+    public boolean modify(@RequestBody MapRelationshipVO mapRelationshipVO) {
         MapRelationship newMapRelationship = new MapRelationship();
         BeanUtils.copyProperties(mapRelationshipVO, newMapRelationship);
         boolean isUpdated = mapRelationshipService.update(newMapRelationship, new LambdaQueryWrapper<MapRelationship>()
@@ -258,14 +215,9 @@ public class MapRelationshipController {
     }
 
 
-    /**
-     * 删除 模型关系
-     *
-     * @return R
-     */
-    @ApiOperation(value = "删除MapRelationship", notes = "删除MapRelationship")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "codes", value = "编码，多个编码使用逗号隔开", required = true, paramType = "query"),
+    @Operation(summary = "删除MapRelationship", description = "删除MapRelationship")
+    @Parameters({
+            @Parameter(name = "codes", description = "编码，多个编码使用逗号隔开", required = true),
     })
     @DeleteMapping("/delete")
     public R delete(String codes) {

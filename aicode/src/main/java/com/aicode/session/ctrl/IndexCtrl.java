@@ -1,6 +1,6 @@
 package com.aicode.session.ctrl;
 
-import io.swagger.annotations.Api;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 @Slf4j
 @Controller
-@Api(value = "登陆控制器", tags = "登陆控制器")
+@Tag(name = "登陆控制器", description = "登陆控制器")
 public class IndexCtrl {
 
     @RequestMapping("/")

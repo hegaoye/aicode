@@ -16,15 +16,7 @@ import java.util.List;
  */
 public interface ProjectMapService extends IService<ProjectMap> {
 
-    /**
-     * 分页查询
-     *
-     * @param queryWrapper 查询条件
-     * @param offset       起始行
-     * @param limit        步长
-     * @return List<ProjectMap>
-     */
-    List<ProjectMap> list(QueryWrapper<ProjectMap> queryWrapper, int offset, int limit);
+
 }
 
 

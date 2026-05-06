@@ -1,17 +1,33 @@
 /**
-* AI-Code 为您构建代码，享受智慧生活!
+ * aicode
  */
 package com.aicode.frameworks.vo;
 
-import com.aicode.frameworks.entity.Frameworks;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 /**
- * 框架技术池 VO
+ * 保存 框架技术池 VO
  *
- * @author hegaoye
+ * @author aicode
  */
 @Data
-public class FrameworksSaveVO extends Frameworks implements java.io.Serializable {
-
+public class FrameworksSaveVO implements java.io.Serializable {
+    @Schema(description = "数据库字段:id id")
+    private java.lang.Long id;
+    @Schema(description = "数据库字段:code 技术编码")
+    private java.lang.String code;
+    @Schema(description = "数据库字段:name 技术名称")
+    private java.lang.String name;
+    @Schema(description = "数据库字段:description 技术描述")
+    private java.lang.String description;
+    @Schema(description = "数据库字段:gitHome ")
+    private java.lang.String gitHome;
+    @Schema(description = "数据库字段:account ")
+    private java.lang.String account;
+    @Schema(description = "数据库字段:password ")
+    private java.lang.String password;
+    @Schema(description = "数据库字段:isPublic ")
+    private java.lang.String isPublic;
 }

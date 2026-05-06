@@ -1,54 +1,48 @@
 /*
- * AI-Code 为您构建代码，享受智慧生活!
+ * aicode
  */
 package com.aicode.display.ctrl;
 
-import com.aicode.core.entity.R;
+import com.aicode.core.BaseException;
+import com.aicode.core.R;
 import com.aicode.display.entity.DisplayAttribute;
 import com.aicode.display.service.DisplayAttributeService;
 import com.aicode.display.vo.DisplayAttributeVO;
 import com.aicode.map.entity.MapFieldColumn;
 import com.aicode.map.service.MapFieldColumnService;
-import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
 
 /**
  * 显示属性
  *
- * @author hegaoye
+ * @author aicode
  */
 @RestController
 @RequestMapping("/displayAttribute")
 @Slf4j
-@Api(value = "显示属性控制器", tags = "显示属性控制器")
+@Tag(name = "显示属性控制器", description = "显示属性控制器")
 public class DisplayAttributeController {
     @Autowired
     private DisplayAttributeService displayAttributeService;
-
     @Autowired
     private MapFieldColumnService mapFieldColumnService;
 
-    /**
-     * 创建 显示属性
-     *
-     * @return R
-     */
-    @ApiOperation(value = "创建DisplayAttribute", notes = "创建DisplayAttribute")
+    @Operation(summary = "创建DisplayAttribute", description = "创建DisplayAttribute")
     @PostMapping("/save")
     public R build(@RequestBody List<DisplayAttribute> displayAttributes) {
         if (displayAttributes == null || displayAttributes.size() <= 0) {
-            return R.failed("参数不能为空");
+            return R.failed(BaseException.BaseExceptionEnum.Empty_Param);
         }
         DisplayAttribute displayAttributeFlag;
         for (DisplayAttribute displayAttribute : displayAttributes) {
@@ -70,15 +64,9 @@ public class DisplayAttributeController {
     }
 
 
-    /**
-     * 根据条件mapFieldColumnCode查询显示属性一个详情信息
-     *
-     * @param mapFieldColumnCode 字段编码
-     * @return DisplayAttributeVO
-     */
-    @ApiOperation(value = "创建DisplayAttribute", notes = "创建DisplayAttribute")
+    @Operation(summary = "创建DisplayAttribute", description = "创建DisplayAttribute")
     @GetMapping("/load/mapFieldColumnCode/{mapFieldColumnCode}")
-    public R loadByMapFieldColumnCode(@PathVariable java.lang.String mapFieldColumnCode) {
+    public R loadByMapFieldColumnCode(@PathVariable String mapFieldColumnCode) {
         if (mapFieldColumnCode == null) {
             return null;
         }
@@ -90,14 +78,9 @@ public class DisplayAttributeController {
         return R.success(displayAttributeVO);
     }
 
-    /**
-     * 查询显示属性信息集合
-     *
-     * @return 分页对象
-     */
-    @ApiOperation(value = "查询DisplayAttribute信息集合", notes = "查询DisplayAttribute信息集合")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "mapClassTableCode", value = "映射编码", paramType = "query"),
+    @Operation(summary = "查询DisplayAttribute信息集合", description = "查询DisplayAttribute信息集合")
+    @Parameters({
+            @Parameter(name = "mapClassTableCode", description = "映射编码"),
     })
     @GetMapping(value = "/list")
     public R list(String mapClassTableCode) {
@@ -116,50 +99,39 @@ public class DisplayAttributeController {
     }
 
 
-    /**
-     * 修改 显示属性
-     *
-     * @return R
-     */
-    @ApiOperation(value = "修改DisplayAttribute", notes = "修改DisplayAttribute")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "mapFieldColumnCode", value = "字段编码", paramType = "query"),
-            @ApiImplicitParam(name = "isRequired", value = "是否必填 Y,N", paramType = "query"),
-            @ApiImplicitParam(name = "isInsert", value = "是否插入", paramType = "query"),
-            @ApiImplicitParam(name = "isDeleteCondition", value = "是否是删除条件", paramType = "query"),
-            @ApiImplicitParam(name = "isAllowUpdate", value = "是否允许修改 Y,N", paramType = "query"),
-            @ApiImplicitParam(name = "isListPageDisplay", value = "是否分页列表显示 Y,N", paramType = "query"),
-            @ApiImplicitParam(name = "isDetailPageDisplay", value = "是否详情页显示 Y,N", paramType = "query"),
-            @ApiImplicitParam(name = "isQueryRequired", value = "是否是查询条件 Y,N", paramType = "query"),
-            @ApiImplicitParam(name = "isLineNew", value = "是否换行", paramType = "query"),
-            @ApiImplicitParam(name = "matchType", value = "匹配方式 =,!=,>=,<=,>,<,like,左like，右like,between,in", paramType = "query"),
-            @ApiImplicitParam(name = "displayType", value = "显示格式 自动完成 Autocomplete,级联选择 Cascader,日期选择框 DatePicker,时间选择 TimePicker,输入框 Input,数字输入框 InputNumber,提及 Mention,邮箱 Email，电话Phone，手机Mobile，备注说明 Summary，选择器 Select，单选 Radio，多选框 Checkbox,评分 Rate,加载展位图 Skeleton,滑动输入条 Silder，开关 Switch,穿梭框 Transfer,选择树 TreeSelect ,上传 Upload,头像 Avatar", paramType = "query"),
-            @ApiImplicitParam(name = "displayName", value = "显示列名称", paramType = "query"),
-            @ApiImplicitParam(name = "displayNo", value = "显示顺序", paramType = "query"),
-            @ApiImplicitParam(name = "fieldValidationMode", value = "字段验证方式", paramType = "query"),
-            @ApiImplicitParam(name = "validateText", value = "验证提示语", paramType = "query"),
-            @ApiImplicitParam(name = "displayCss", value = "显示css样式", paramType = "query")
+    @Operation(summary = "修改DisplayAttribute", description = "修改DisplayAttribute")
+    @Parameters({
+            @Parameter(name = "mapFieldColumnCode", description = "字段编码"),
+            @Parameter(name = "isRequired", description = "是否必填 Y,N"),
+            @Parameter(name = "isInsert", description = "是否插入"),
+            @Parameter(name = "isDeleteCondition", description = "是否是删除条件"),
+            @Parameter(name = "isAllowUpdate", description = "是否允许修改 Y,N"),
+            @Parameter(name = "isListPageDisplay", description = "是否分页列表显示 Y,N"),
+            @Parameter(name = "isDetailPageDisplay", description = "是否详情页显示 Y,N"),
+            @Parameter(name = "isQueryRequired", description = "是否是查询条件 Y,N"),
+            @Parameter(name = "isLineNew", description = "是否换行"),
+            @Parameter(name = "matchType", description = "匹配方式 =,!=,>=,<=,>,<,like,左like，右like,between,in"),
+            @Parameter(name = "displayType", description = "显示格式 自动完成 Autocomplete,级联选择 Cascader,日期选择框 DatePicker,时间选择 TimePicker,输入框 Input,数字输入框 InputNumber,提及 Mention,邮箱 Email，电话Phone，手机Mobile，备注说明 Summary，选择器 Select，单选 Radio，多选框 Checkbox,评分 Rate,加载展位图 Skeleton,滑动输入条 Silder，开关 Switch,穿梭框 Transfer,选择树 TreeSelect ,上传 Upload,头像 Avatar"),
+            @Parameter(name = "displayName", description = "显示列名称"),
+            @Parameter(name = "displayNo", description = "显示顺序"),
+            @Parameter(name = "fieldValidationMode", description = "字段验证方式"),
+            @Parameter(name = "validateText", description = "验证提示语"),
+            @Parameter(name = "displayCss", description = "显示css样式")
     })
     @PutMapping("/modify")
-    public R modify(@ApiIgnore DisplayAttribute displayAttribute) {
+    public R modify(@Parameter(hidden = true) DisplayAttribute displayAttribute) {
         displayAttributeService.update(displayAttribute, new LambdaQueryWrapper<DisplayAttribute>()
                 .eq(DisplayAttribute::getMapFieldColumnCode, displayAttribute.getMapFieldColumnCode()));
         return R.success();
     }
 
-
-    /**
-     * 删除 显示属性
-     *
-     * @return R
-     */
-    @ApiOperation(value = "删除DisplayAttribute", notes = "删除DisplayAttribute")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "", paramType = "query"),
-            @ApiImplicitParam(name = "mapFieldColumnCode", value = "字段编码", paramType = "query")
+    @Operation(summary = "删除DisplayAttribute", description = "删除DisplayAttribute")
+    @Parameters({
+            @Parameter(name = "id", description = ""),
+            @Parameter(name = "mapFieldColumnCode", description = "字段编码")
     })
     @DeleteMapping("/delete")
-    public R delete(@ApiIgnore DisplayAttributeVO displayAttributeVO) {
+    public R delete(@Parameter(hidden = true) DisplayAttributeVO displayAttributeVO) {
         DisplayAttribute newDisplayAttribute = new DisplayAttribute();
         BeanUtils.copyProperties(displayAttributeVO, newDisplayAttribute);
         displayAttributeService.remove(new LambdaQueryWrapper<DisplayAttribute>()

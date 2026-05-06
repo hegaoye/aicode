@@ -1,19 +1,23 @@
 /*
- * AI-Code 为您构建代码，享受智慧生活!
+ * aicode
  */
 package com.aicode.project.ctrl;
 
-import com.aicode.core.entity.Page;
-import com.aicode.core.entity.R;
-import com.aicode.core.exceptions.BaseException;
+import com.aicode.core.BaseException;
+import com.aicode.core.R;
 import com.aicode.project.entity.ProjectFramwork;
 import com.aicode.project.service.ProjectFramworkService;
 import com.aicode.project.vo.ProjectFramworkPageVO;
 import com.aicode.project.vo.ProjectFramworkVO;
-import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import io.swagger.annotations.*;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -21,23 +25,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
 
 /**
  * 项目应用技术
  *
- * @author hegaoye
+ * @author aicode
  */
+@Slf4j
 @RestController
 @RequestMapping("/project/framwork")
-@Slf4j
-@Api(value = "项目应用技术控制器", tags = "项目应用技术控制器")
+@Tag(name = "项目应用技术控制器", description = "项目应用技术控制器")
 public class ProjectFramworkController {
     @Autowired
     private ProjectFramworkService projectFramworkService;
-
 
     /**
      * 查询一个详情信息
@@ -46,10 +48,10 @@ public class ProjectFramworkController {
      * @param frameworkCode 技术编码
      * @return BeanRet
      */
-    @ApiOperation(value = "查询一个详情信息", notes = "查询一个详情信息")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "projectCode", value = "项目编码", required = true, paramType = "query"),
-            @ApiImplicitParam(name = "frameworkCode", value = "技术编码", required = true, paramType = "query")
+    @Operation(summary = "查询一个详情信息", description = "查询一个详情信息")
+    @Parameters({
+            @Parameter(name = "projectCode", description = "项目编码", required = true),
+            @Parameter(name = "frameworkCode", description = "技术编码", required = true)
     })
     @GetMapping(value = "/load")
     public R load(String projectCode, String frameworkCode) {
@@ -70,15 +72,15 @@ public class ProjectFramworkController {
      *
      * @return R
      */
-    @ApiOperation(value = "创建ProjectFramwork", notes = "创建ProjectFramwork")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "projectStr", value = "项目技术json", required = true, paramType = "query")
+    @Operation(summary = "创建ProjectFramwork", description = "创建ProjectFramwork")
+    @Parameters({
+            @Parameter(name = "projectStr", description = "项目技术json", required = true)
     })
     @PostMapping({"/build", "/add"})
-    public R build(@ApiIgnore String projectStr) {
+    public R build(@Parameter(hidden = true) String projectStr) {
         List<ProjectFramwork> projectFramwors = JSON.parseArray(projectStr, ProjectFramwork.class);
         if (CollectionUtils.isEmpty(projectFramwors)) {
-            return R.failed("");
+            return R.failed(BaseException.BaseExceptionEnum.Empty_Param);
         }
         projectFramworkService.remove(new LambdaQueryWrapper<ProjectFramwork>()
                 .eq(ProjectFramwork::getProjectCode, projectFramwors.get(0).getProjectCode()));
@@ -94,28 +96,31 @@ public class ProjectFramworkController {
      *
      * @return 分页对象
      */
-    @ApiOperation(value = "查询ProjectFramwork信息集合", notes = "查询ProjectFramwork信息集合")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "projectCode", value = "项目编码", required = true, paramType = "query"),
-            @ApiImplicitParam(name = "curPage", value = "当前页", required = true, paramType = "query"),
-            @ApiImplicitParam(name = "pageSize", value = "分页大小", required = true, paramType = "query")
+    @Operation(summary = "查询ProjectFramwork信息集合", description = "查询ProjectFramwork信息集合")
+    @Parameters({
+            @Parameter(name = "projectCode", description = "项目编码", required = true),
+            @Parameter(name = "curPage", description = "当前页", required = true),
+            @Parameter(name = "pageSize", description = "分页大小", required = true)
     })
     @GetMapping(value = "/list")
-    public R list(@ApiIgnore ProjectFramworkPageVO projectFramworkVO, Integer curPage, Integer pageSize) {
-        Page<ProjectFramwork> page = new Page<>(pageSize, curPage);
+    public R list(@Parameter(hidden = true) ProjectFramworkPageVO projectFramworkVO, Integer curPage, Integer pageSize) {
+        IPage<ProjectFramwork> page = new Page<>(curPage, pageSize);
+
         QueryWrapper<ProjectFramwork> queryWrapper = new QueryWrapper<>();
         if (StringUtils.isNotBlank(projectFramworkVO.getProjectCode())) {
             queryWrapper.lambda().eq(ProjectFramwork::getProjectCode, projectFramworkVO.getProjectCode());
         }
 
-        int total = projectFramworkService.count(queryWrapper);
+        com.aicode.core.Page pageVO = new com.aicode.core.Page();
+        long total = projectFramworkService.count(queryWrapper);
         if (total > 0) {
-            List<ProjectFramwork> projectFramworkList = projectFramworkService.list(queryWrapper, page.genRowStart(), page.getPageSize());
-            page.setTotalRow(total);
-            page.setVoList(projectFramworkList);
+            IPage<ProjectFramwork> projectFramworkPage = projectFramworkService.page(page, queryWrapper);
+
+            pageVO.setTotalRow(total);
+            pageVO.setVoList(projectFramworkPage.getRecords());
             log.debug(JSON.toJSONString(page));
         }
-        return R.success(page);
+        return R.success(pageVO);
     }
 
 
@@ -124,10 +129,9 @@ public class ProjectFramworkController {
      *
      * @return R
      */
-    @ApiOperation(value = "修改ProjectFramwork", notes = "修改ProjectFramwork")
+    @Operation(summary = "修改ProjectFramwork", description = "修改ProjectFramwork")
     @PutMapping("/modify")
-    public boolean modify(@ApiParam(name = "修改ProjectFramwork", value = "传入json格式", required = true)
-                          @RequestBody ProjectFramworkVO projectFramworkVO) {
+    public boolean modify(@RequestBody ProjectFramworkVO projectFramworkVO) {
         ProjectFramwork newProjectFramwork = new ProjectFramwork();
         BeanUtils.copyProperties(projectFramworkVO, newProjectFramwork);
         boolean isUpdated = projectFramworkService.update(newProjectFramwork, new LambdaQueryWrapper<ProjectFramwork>()
@@ -141,13 +145,13 @@ public class ProjectFramworkController {
      *
      * @return R
      */
-    @ApiOperation(value = "删除ProjectFramwork", notes = "删除ProjectFramwork")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "projectCode", value = "项目编码", required = true, paramType = "query"),
-            @ApiImplicitParam(name = "frameworkCode", value = "添加项目技术", required = true, paramType = "query")
+    @Operation(summary = "删除ProjectFramwork", description = "删除ProjectFramwork")
+    @Parameters({
+            @Parameter(name = "projectCode", description = "项目编码", required = true),
+            @Parameter(name = "frameworkCode", description = "添加项目技术", required = true)
     })
     @DeleteMapping("/delete")
-    public R delete(@ApiIgnore ProjectFramworkVO projectFramworkVO) {
+    public R delete(@Parameter(hidden = true) ProjectFramworkVO projectFramworkVO) {
         Assert.hasText(projectFramworkVO.getFrameworkCode(), BaseException.BaseExceptionEnum.Empty_Param.toString());
         Assert.hasText(projectFramworkVO.getProjectCode(), BaseException.BaseExceptionEnum.Empty_Param.toString());
 

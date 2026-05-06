@@ -3,14 +3,14 @@ package com.aicode.config;
 import com.baomidou.mybatisplus.core.MybatisConfiguration;
 import com.baomidou.mybatisplus.core.MybatisXMLLanguageDriver;
 import com.baomidou.mybatisplus.core.config.GlobalConfig;
-import com.baomidou.mybatisplus.extension.plugins.PaginationInterceptor;
-import com.baomidou.mybatisplus.extension.plugins.PerformanceInterceptor;
+import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.spring.MybatisSqlSessionFactoryBean;
 import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.type.JdbcType;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,6 +24,12 @@ import javax.sql.DataSource;
 @MapperScan(basePackages = "com.aicode.*.dao.mapper", sqlSessionTemplateRef = "tidbSqlSessionTemplate")
 public class MybatisPlusConfigTidb {
 
+    @Autowired
+    private MybatisPlusMetaObjectHandler mybatisPlusMetaObjectHandler;
+
+    @Autowired
+    private MybatisPlusInterceptor mybatisPlusInterceptor;
+
     @Primary
     @Bean("tidbSqlSessionFactory")
     public SqlSessionFactory tidbSqlSessionFactory(@Qualifier("tidbDataSource") DataSource dataSource) throws Exception {
@@ -36,11 +42,12 @@ public class MybatisPlusConfigTidb {
         sqlSessionFactory.setMapperLocations(new PathMatchingResourcePatternResolver().
                 getResources("classpath:mapper/*/*.xml"));
         sqlSessionFactory.setPlugins(new Interceptor[]{
-                new PaginationInterceptor(),
-                new PerformanceInterceptor()
-//                        .setFormat(true),
+                mybatisPlusInterceptor
         });
-        sqlSessionFactory.setGlobalConfig(new GlobalConfig().setBanner(false));
+
+        GlobalConfig globalConfig = new GlobalConfig();
+        globalConfig.setMetaObjectHandler(mybatisPlusMetaObjectHandler);
+        sqlSessionFactory.setGlobalConfig(globalConfig.setBanner(false));
         return sqlSessionFactory.getObject();
     }
 

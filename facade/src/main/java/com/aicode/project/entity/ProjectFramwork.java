@@ -5,7 +5,7 @@ package com.aicode.project.entity;
 
 import com.aicode.frameworks.entity.Frameworks;
 import com.baomidou.mybatisplus.annotation.TableField;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import lombok.experimental.Accessors;
 
@@ -24,20 +24,20 @@ public class ProjectFramwork implements java.io.Serializable {
     /**
      * 数据库字段:id  属性显示:id
      */
-    @ApiModelProperty(value = "id")
-    private java.lang.Long id;
+    @Schema(description = "id")
+    private Long id;
     /**
      * 数据库字段:frameworkCode  属性显示:技术编码
      */
-    @ApiModelProperty(value = "技术编码")
+    @Schema(description = "技术编码")
     @TableField("frameworkCode")
-    private java.lang.String frameworkCode;
+    private String frameworkCode;
     /**
      * 数据库字段:projectCode  属性显示:项目编码
      */
-    @ApiModelProperty(value = "项目编码")
+    @Schema(description = "项目编码")
     @TableField("projectCode")
-    private java.lang.String projectCode;
+    private String projectCode;
 
     @TableField(exist = false)
     private Frameworks frameworks;

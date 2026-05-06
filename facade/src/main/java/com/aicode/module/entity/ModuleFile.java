@@ -1,17 +1,17 @@
 /*
- * AI-Code 为您构建代码，享受智慧生活!
+ * demo
  */
 package com.aicode.module.entity;
 
 import com.baomidou.mybatisplus.annotation.TableField;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import lombok.experimental.Accessors;
 
 /**
  * 模块文件信息 的实体类
  *
- * @author hegaoye
+ * @author aicode
  */
 @Data
 @AllArgsConstructor
@@ -20,21 +20,12 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 public class ModuleFile implements java.io.Serializable {
-    /**
-     * 数据库字段:id  属性显示:id
-     */
-    @ApiModelProperty(value = "id")
-    private java.lang.Long id;
-    /**
-     * 数据库字段:moudleCode  属性显示:模块编码
-     */
-    @ApiModelProperty(value = "模块编码")
+    @Schema(description = "数据库字段:id id")
+    private Long id;
+    @Schema(description = "数据库字段:moudleCode 模块编码")
     @TableField("moudleCode")
-    private java.lang.String moudleCode;
-    /**
-     * 数据库字段:path  属性显示:文件路径
-     */
-    @ApiModelProperty(value = "文件路径")
-    private java.lang.String path;
+    private String moudleCode;
+    @Schema(description = "数据库字段:path 文件路径")
+    private String path;
 
 }

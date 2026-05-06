@@ -1,17 +1,27 @@
 /**
-* AI-Code 为您构建代码，享受智慧生活!
+ * aicode
  */
 package com.aicode.map.vo;
 
-import com.aicode.map.entity.MapClassTable;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 /**
- * 类表映射信息 VO
+ * 保存 类表映射信息 VO
  *
- * @author hegaoye
+ * @author aicode
  */
 @Data
-public class MapClassTableSaveVO extends MapClassTable implements java.io.Serializable {
-
+public class MapClassTableSaveVO implements java.io.Serializable {
+    @Schema(description = "数据库字段:id id")
+    private Long id;
+    @Schema(description = "数据库字段:code 映射编码")
+    private String code;
+    @Schema(description = "数据库字段:tableName 表名")
+    private String tableName;
+    @Schema(description = "数据库字段:className 类名")
+    private String className;
+    @Schema(description = "数据库字段:notes 注释")
+    private String notes;
 }

@@ -1,8 +1,6 @@
 package com.aicode.config.template;
 
 
-import com.aicode.project.entity.TemplateData;
-
 /**
  * 模板引擎接口，实现此接口可以自动切换模板引擎
  * Created by lixin on 20/3/8.

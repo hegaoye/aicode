@@ -1,50 +1,49 @@
 /*
- * AI-Code 为您构建代码，享受智慧生活!
+ * aicode
  */
 package com.aicode.project.ctrl;
 
-import com.aicode.core.entity.Page;
-import com.aicode.core.entity.R;
+import com.aicode.core.R;
 import com.aicode.project.entity.ProjectJobLogs;
 import com.aicode.project.service.ProjectJobLogsService;
 import com.aicode.project.vo.ProjectJobLogsPageVO;
 import com.aicode.project.vo.ProjectJobLogsSaveVO;
 import com.aicode.project.vo.ProjectJobLogsVO;
-import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import io.swagger.annotations.*;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
-
-import java.util.List;
 
 /**
  * 任务日志
  *
- * @author hegaoye
+ * @author aicode
  */
 @RestController
 @RequestMapping("/projectJobLogs")
 @Slf4j
-@Api(value = "任务日志控制器", tags = "任务日志控制器")
+@Tag(name = "任务日志控制器", description = "任务日志控制器")
 public class ProjectJobLogsController {
     @Autowired
     private ProjectJobLogsService projectJobLogsService;
-
 
     /**
      * 创建 任务日志
      *
      * @return R
      */
-    @ApiOperation(value = "创建ProjectJobLogs", notes = "创建ProjectJobLogs")
+    @Operation(summary = "创建ProjectJobLogs", description = "创建ProjectJobLogs")
     @PostMapping("/build")
-    public ProjectJobLogsSaveVO build(@ApiParam(name = "创建ProjectJobLogs", value = "传入json格式", required = true)
-                                      @RequestBody ProjectJobLogsSaveVO projectJobLogsSaveVO) {
+    public ProjectJobLogsSaveVO build(@RequestBody ProjectJobLogsSaveVO projectJobLogsSaveVO) {
         if (null == projectJobLogsSaveVO) {
             return null;
         }
@@ -65,27 +64,33 @@ public class ProjectJobLogsController {
      *
      * @return 分页对象
      */
-    @ApiOperation(value = "查询ProjectJobLogs信息集合", notes = "查询ProjectJobLogs信息集合")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "code", value = "任务编码", paramType = "query"),
-            @ApiImplicitParam(name = "curPage", value = "当前页", required = true, paramType = "query"),
-            @ApiImplicitParam(name = "pageSize", value = "分页大小", required = true, paramType = "query")
+    @Operation(summary = "查询ProjectJobLogs信息集合", description = "查询ProjectJobLogs信息集合")
+    @Parameters({
+            @Parameter(name = "code", description = "任务编码"),
+            @Parameter(name = "curPage", description = "当前页", required = true),
+            @Parameter(name = "pageSize", description = "分页大小", required = true)
     })
     @GetMapping(value = "/list")
-    public R list(@ApiIgnore ProjectJobLogsPageVO projectJobLogsVO, Integer curPage, Integer pageSize) {
-        Page<ProjectJobLogs> page = new Page<>(pageSize, curPage);
+    public R list(@Parameter(hidden = true) ProjectJobLogsPageVO projectJobLogsVO, Integer curPage, Integer pageSize) {
+        IPage<ProjectJobLogs> page = new Page<>(curPage, pageSize);
+
         QueryWrapper<ProjectJobLogs> queryWrapper = new QueryWrapper<>();
         queryWrapper.lambda().eq(ProjectJobLogs::getCode, projectJobLogsVO.getCode());
 
-        int total = projectJobLogsService.count(queryWrapper);
+        com.aicode.core.Page pageVO = new com.aicode.core.Page();
+        long total = projectJobLogsService.count(queryWrapper);
         if (total > 0) {
-            List<ProjectJobLogs> projectJobLogsList = projectJobLogsService.list(queryWrapper, page.genRowStart(), page.getPageSize());
-            page.setTotalRow(total);
-            page.setVoList(projectJobLogsList);
+
+            queryWrapper.lambda().orderByDesc(ProjectJobLogs::getId);
+
+            IPage<ProjectJobLogs> projectJobLogsPage = projectJobLogsService.page(page, queryWrapper);
+
+            pageVO.setTotalRow(total);
+            pageVO.setVoList(projectJobLogsPage.getRecords());
             log.debug(JSON.toJSONString(page));
         }
 
-        return R.success(page);
+        return R.success(pageVO);
     }
 
 
@@ -94,10 +99,9 @@ public class ProjectJobLogsController {
      *
      * @return R
      */
-    @ApiOperation(value = "修改ProjectJobLogs", notes = "修改ProjectJobLogs")
+    @Operation(summary = "修改ProjectJobLogs", description = "修改ProjectJobLogs")
     @PutMapping("/modify")
-    public boolean modify(@ApiParam(name = "修改ProjectJobLogs", value = "传入json格式", required = true)
-                          @RequestBody ProjectJobLogsVO projectJobLogsVO) {
+    public boolean modify(@RequestBody ProjectJobLogsVO projectJobLogsVO) {
         ProjectJobLogs newProjectJobLogs = new ProjectJobLogs();
         BeanUtils.copyProperties(projectJobLogsVO, newProjectJobLogs);
         boolean isUpdated = projectJobLogsService.update(newProjectJobLogs, new LambdaQueryWrapper<ProjectJobLogs>()
@@ -111,12 +115,12 @@ public class ProjectJobLogsController {
      *
      * @return R
      */
-    @ApiOperation(value = "删除ProjectJobLogs", notes = "删除ProjectJobLogs")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "id", paramType = "query")
+    @Operation(summary = "删除ProjectJobLogs", description = "删除ProjectJobLogs")
+    @Parameters({
+            @Parameter(name = "id", description = "id")
     })
     @DeleteMapping("/delete")
-    public R delete(@ApiIgnore ProjectJobLogsVO projectJobLogsVO) {
+    public R delete(@Parameter(hidden = true) ProjectJobLogsVO projectJobLogsVO) {
         ProjectJobLogs newProjectJobLogs = new ProjectJobLogs();
         BeanUtils.copyProperties(projectJobLogsVO, newProjectJobLogs);
         projectJobLogsService.remove(new LambdaQueryWrapper<ProjectJobLogs>()

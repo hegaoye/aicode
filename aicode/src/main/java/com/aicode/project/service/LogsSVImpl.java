@@ -6,43 +6,41 @@
 package com.aicode.project.service;
 
 
-import com.aicode.account.dao.AccountDAO;
+import cn.hutool.core.date.DateUtil;
+import com.aicode.account.dao.mapper.AccountMapper;
 import com.aicode.account.entity.Account;
-import com.aicode.core.entity.R;
+import com.aicode.core.BaseException;
+import com.aicode.core.R;
 import com.aicode.core.enums.SuffixTypeEnum;
-import com.aicode.core.exceptions.BaseException;
-import com.aicode.core.tools.DateTools;
 import com.aicode.core.tools.FileUtil;
 import com.aicode.core.tools.StringTools;
-import com.aicode.project.dao.ProjectDAO;
+import com.aicode.project.dao.mapper.ProjectMapper;
 import com.aicode.project.entity.Project;
 import com.aicode.setting.entity.SettingKey;
 import com.aicode.setting.service.SettingService;
+import com.alibaba.fastjson2.util.DateUtils;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.io.*;
-import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 
-@Component
+@Slf4j
 @Service
 public class LogsSVImpl implements LogsSV {
 
     @Resource
     private SettingService settingService;
-
     @Resource
-    private ProjectDAO projectDAO;
-
+    private ProjectMapper projectMapper;
     @Resource
-    private AccountDAO accountDAO;
+    private AccountMapper accountMapper;
 
     /**
      * 创建日志文件
@@ -60,13 +58,13 @@ public class LogsSVImpl implements LogsSV {
         String filePath = null;
         try {
             //1.根据项目编码查询出用户和项目信息
-            Project project = projectDAO.selectOne(new LambdaQueryWrapper<Project>()
+            Project project = projectMapper.selectOne(new LambdaQueryWrapper<Project>()
                     .eq(Project::getCode, projectCode));
             if (project == null) {
                 return null;
             }
             String accountCode = project.getAccountCode();
-            Account account = accountDAO.selectOne(new LambdaQueryWrapper<Account>().eq(Account::getCode, accountCode));
+            Account account = accountMapper.selectOne(new LambdaQueryWrapper<Account>().eq(Account::getCode, accountCode));
             String accountName = account.getAccount();
             String name = project.getEnglishName();
             //2.用户名+项目名生成唯一的文件夹
@@ -75,7 +73,7 @@ public class LogsSVImpl implements LogsSV {
             String path = workspace + fileName;
             FileUtil.createDir(path, null);
             //3.根据时间戳生成文件
-            String dateStr = DateTools.dateToNum14(date);
+            String dateStr = DateUtils.format(date, "yyyyMMddHHmmss");
             String logName = dateStr + SuffixTypeEnum.Log.val;
             FileUtil.createDir(path, logName);
             //文件路径
@@ -130,12 +128,12 @@ public class LogsSVImpl implements LogsSV {
      */
     @Override
     public String loadFilePath(String projectCode) {
-        Project project = projectDAO.selectOne(new LambdaQueryWrapper<Project>().eq(Project::getCode, projectCode));
+        Project project = projectMapper.selectOne(new LambdaQueryWrapper<Project>().eq(Project::getCode, projectCode));
         if (project == null) {
             return null;
         }
         String accountCode = project.getAccountCode();
-        Account account = accountDAO.selectOne(new LambdaQueryWrapper<Account>().eq(Account::getCode, accountCode));
+        Account account = accountMapper.selectOne(new LambdaQueryWrapper<Account>().eq(Account::getCode, accountCode));
         String accountName = account.getAccount();
         String name = project.getEnglishName();
         //2.用户名+项目名生成唯一的文件夹
@@ -152,10 +150,11 @@ public class LogsSVImpl implements LogsSV {
      */
     @Override
     public R scanPath(String projectCode, String datetime) {
+        log.info("projectCode:{} datetime:{}", projectCode, datetime);
         String name = this.loadFilePath(projectCode);
         String filePath = null;
         try {
-            String date = DateTools.stringToNum14(datetime, "yyyy-MM-dd HH:mm:ss");
+            String date = DateUtil.format(DateUtil.parse(datetime), "yyyyMMddHHmmss");
             if (StringTools.isNotEmpty(date)) {
                 filePath = name + "/" + date + SuffixTypeEnum.Log.val;
             }
@@ -177,7 +176,7 @@ public class LogsSVImpl implements LogsSV {
                     e.printStackTrace();
                 }
             }
-        } catch (ParseException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 

@@ -16,6 +16,6 @@ import java.util.List;
 @Repository
 public interface ColumMapper extends BaseMapper<Column> {
 
-    List<Column> list(@Param("database") String database,@Param("tableName") String tableName);
+    List<Column> list(@Param("database") String database, @Param("tableName") String tableName);
 
 }

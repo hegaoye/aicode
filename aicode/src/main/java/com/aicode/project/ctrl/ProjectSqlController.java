@@ -3,25 +3,28 @@
  */
 package com.aicode.project.ctrl;
 
-import com.aicode.core.entity.R;
-import com.aicode.core.exceptions.BaseException;
+
+import com.aicode.core.BaseException;
+import com.aicode.core.R;
 import com.aicode.project.entity.ProjectSql;
 import com.aicode.project.service.ProjectSqlService;
 import com.aicode.project.vo.ProjectSqlPageVO;
 import com.aicode.project.vo.ProjectSqlVO;
-import com.alibaba.fastjson.JSON;
+
+import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
+
 
 import java.util.List;
 
@@ -38,7 +41,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/project/sql")
 @Slf4j
-@Api(value = "项目sql脚本控制器", tags = "项目sql脚本控制器")
+@Tag(name = "项目sql脚本控制器", description = "项目sql脚本控制器")
 public class ProjectSqlController {
     @Autowired
     private ProjectSqlService projectSqlService;
@@ -49,13 +52,13 @@ public class ProjectSqlController {
      *
      * @return R
      */
-    @ApiOperation(value = "创建ProjectSql", notes = "创建ProjectSql")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "projectCode", value = "项目编码", required = true, paramType = "query"),
-            @ApiImplicitParam(name = "tsql", value = "sql脚本", required = true, paramType = "query")
+    @Operation(summary = "创建ProjectSql", description = "创建ProjectSql")
+    @Parameters({
+            @Parameter(name = "projectCode", description = "项目编码", required = true),
+            @Parameter(name = "tsql", description = "sql脚本", required = true)
     })
     @PostMapping("/build")
-    public R build(@ApiIgnore ProjectSql newProjectSql) {
+    public R build(@Parameter(hidden = true) ProjectSql newProjectSql) {
         projectSqlService.save(newProjectSql);
         return R.success(newProjectSql);
     }
@@ -66,10 +69,10 @@ public class ProjectSqlController {
      *
      * @return BeanRet
      */
-    @ApiOperation(value = "查询一个详情信息", notes = "查询一个详情信息")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "code", value = "sql编码", paramType = "query"),
-            @ApiImplicitParam(name = "projectCode", value = "项目编码", paramType = "query")
+    @Operation(summary = "查询一个详情信息", description = "查询一个详情信息")
+    @Parameters({
+            @Parameter(name = "code", description = "sql编码"),
+            @Parameter(name = "projectCode", description = "项目编码")
     })
     @GetMapping(value = "/load")
     public R load(String code, String projectCode) {
@@ -89,9 +92,9 @@ public class ProjectSqlController {
      * @param projectCode 项目编码
      * @return ProjectSqlVO
      */
-    @ApiOperation(value = "创建ProjectSql", notes = "创建ProjectSql")
+    @Operation(summary = "创建ProjectSql", description = "创建ProjectSql")
     @GetMapping("/load/projectCode/{projectCode}")
-    public ProjectSqlVO loadByProjectCode(@PathVariable java.lang.String projectCode) {
+    public ProjectSqlVO loadByProjectCode(@PathVariable String projectCode) {
         if (projectCode == null) {
             return null;
         }
@@ -108,12 +111,12 @@ public class ProjectSqlController {
      *
      * @return 分页对象
      */
-    @ApiOperation(value = "查询ProjectSql信息集合", notes = "查询ProjectSql信息集合")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "projectCode", value = "项目编码", required = true, paramType = "query")
+    @Operation(summary = "查询ProjectSql信息集合", description = "查询ProjectSql信息集合")
+    @Parameters({
+            @Parameter(name = "projectCode", description = "项目编码", required = true)
     })
     @GetMapping(value = "/list")
-    public R list(@ApiIgnore ProjectSqlPageVO projectSqlVO) {
+    public R list(@Parameter(hidden = true) ProjectSqlPageVO projectSqlVO) {
         QueryWrapper<ProjectSql> queryWrapper = new QueryWrapper<>();
         if (projectSqlVO.getCode() != null) {
             queryWrapper.lambda().eq(ProjectSql::getProjectCode, projectSqlVO.getProjectCode());
@@ -129,10 +132,10 @@ public class ProjectSqlController {
      *
      * @return R
      */
-    @ApiOperation(value = "修改ProjectSql", notes = "修改ProjectSql")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "code", value = "tsql编码", required = true, paramType = "query"),
-            @ApiImplicitParam(name = "tsql", value = "sql脚本", required = true, paramType = "query")
+    @Operation(summary = "修改ProjectSql", description = "修改ProjectSql")
+    @Parameters({
+            @Parameter(name = "code", description = "tsql编码", required = true),
+            @Parameter(name = "tsql", description = "sql脚本", required = true)
     })
     @PostMapping("/modify")
     public R modify(ProjectSqlVO projectSqlVO) {
@@ -145,7 +148,7 @@ public class ProjectSqlController {
             projectSqlService.save(projectSqlLoad);
             return R.success(projectSqlVO);
         } else {
-            return R.failed("");
+            return R.failed(BaseException.BaseExceptionEnum.Server_Error);
         }
     }
 
@@ -155,13 +158,13 @@ public class ProjectSqlController {
      *
      * @return R
      */
-    @ApiOperation(value = "删除ProjectSql", notes = "删除ProjectSql")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "", paramType = "query"),
-            @ApiImplicitParam(name = "projectCode", value = "项目编码", paramType = "query")
+    @Operation(summary = "删除ProjectSql", description = "删除ProjectSql")
+    @Parameters({
+            @Parameter(name = "id", description = ""),
+            @Parameter(name = "projectCode", description = "项目编码")
     })
     @DeleteMapping("/delete")
-    public R delete(@ApiIgnore ProjectSqlVO projectSqlVO) {
+    public R delete(@Parameter(hidden = true) ProjectSqlVO projectSqlVO) {
         ProjectSql newProjectSql = new ProjectSql();
         BeanUtils.copyProperties(projectSqlVO, newProjectSql);
         projectSqlService.remove(new LambdaQueryWrapper<ProjectSql>()

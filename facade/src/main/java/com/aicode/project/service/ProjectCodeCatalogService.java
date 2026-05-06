@@ -16,15 +16,7 @@ import java.util.List;
  */
 public interface ProjectCodeCatalogService extends IService<ProjectCodeCatalog> {
 
-    /**
-     * 分页查询
-     *
-     * @param queryWrapper 查询条件
-     * @param offset       起始行
-     * @param limit        步长
-     * @return List<ProjectCodeCatalog>
-     */
-    List<ProjectCodeCatalog> list(QueryWrapper<ProjectCodeCatalog> queryWrapper, int offset, int limit);
+
 }
 
 

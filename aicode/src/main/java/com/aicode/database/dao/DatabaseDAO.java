@@ -1,14 +1,9 @@
 package com.aicode.database.dao;
 
-import com.aicode.core.base.BaseDAO;
 import com.aicode.database.dao.mapper.DatabaseMapper;
-import com.aicode.database.entity.Database;
-import com.aicode.database.entity.Table;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
 
 /**
  * DisplayAttribute DAO
@@ -18,7 +13,7 @@ import java.util.List;
  */
 @Slf4j
 @Repository
-public class DatabaseDAO extends BaseDAO<DatabaseMapper, Database> {
+public class DatabaseDAO {
 
 
     @Autowired

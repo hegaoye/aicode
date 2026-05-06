@@ -1,6 +1,5 @@
 package com.aicode.database.dao;
 
-import com.aicode.core.base.BaseDAO;
 import com.aicode.database.dao.mapper.TableMapper;
 import com.aicode.database.entity.Table;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +14,7 @@ import java.util.List;
  * @author hegaoye
  */
 @Repository
-public class TableDAO extends BaseDAO<TableMapper, Table> {
+public class TableDAO {
 
 
     /**

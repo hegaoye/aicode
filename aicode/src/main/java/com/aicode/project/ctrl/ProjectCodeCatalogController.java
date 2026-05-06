@@ -1,51 +1,51 @@
 /*
- * AI-Code 为您构建代码，享受智慧生活!
+ * aicode
  */
 package com.aicode.project.ctrl;
 
+import com.aicode.core.PageVO;
+import com.aicode.core.R;
 import com.aicode.project.entity.ProjectCodeCatalog;
 import com.aicode.project.service.ProjectCodeCatalogService;
-import com.aicode.project.vo.ProjectCodeCatalogPageVO;
 import com.aicode.project.vo.ProjectCodeCatalogSaveVO;
 import com.aicode.project.vo.ProjectCodeCatalogVO;
-import com.aicode.core.entity.Page;
-import com.aicode.core.entity.PageVO;
-import com.aicode.core.entity.R;
-import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import io.swagger.annotations.*;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
 
 /**
  * 生成源码资料
  *
- * @author hegaoye
+ * @author aicode
  */
 @RestController
 @RequestMapping("/projectCodeCatalog")
 @Slf4j
-@Api(value = "生成源码资料控制器", tags = "生成源码资料控制器")
+@Tag(name = "生成源码资料控制器", description = "生成源码资料控制器")
 public class ProjectCodeCatalogController {
     @Autowired
     private ProjectCodeCatalogService projectCodeCatalogService;
-
 
     /**
      * 创建 生成源码资料
      *
      * @return R
      */
-    @ApiOperation(value = "创建ProjectCodeCatalog", notes = "创建ProjectCodeCatalog")
+    @Operation(summary = "创建ProjectCodeCatalog", description = "创建ProjectCodeCatalog")
     @PostMapping("/build")
-    public ProjectCodeCatalogSaveVO build(@ApiParam(name = "创建ProjectCodeCatalog", value = "传入json格式", required = true)
-                                   @RequestBody ProjectCodeCatalogSaveVO projectCodeCatalogSaveVO) {
+    public ProjectCodeCatalogSaveVO build(@RequestBody ProjectCodeCatalogSaveVO projectCodeCatalogSaveVO) {
         if (null == projectCodeCatalogSaveVO) {
             return null;
         }
@@ -67,9 +67,9 @@ public class ProjectCodeCatalogController {
      * @param code 编码
      * @return ProjectCodeCatalogVO
      */
-    @ApiOperation(value = "创建ProjectCodeCatalog", notes = "创建ProjectCodeCatalog")
+    @Operation(summary = "创建ProjectCodeCatalog", description = "创建ProjectCodeCatalog")
     @GetMapping("/load/code/{code}")
-    public ProjectCodeCatalogVO loadByCode(@PathVariable java.lang.String code) {
+    public ProjectCodeCatalogVO loadByCode(@PathVariable String code) {
         if (code == null) {
             return null;
         }
@@ -80,15 +80,16 @@ public class ProjectCodeCatalogController {
         log.debug(JSON.toJSONString(projectCodeCatalogVO));
         return projectCodeCatalogVO;
     }
+
     /**
      * 根据条件projectCode查询生成源码资料一个详情信息
      *
      * @param projectCode 项目编码
      * @return ProjectCodeCatalogVO
      */
-    @ApiOperation(value = "创建ProjectCodeCatalog", notes = "创建ProjectCodeCatalog")
+    @Operation(summary = "创建ProjectCodeCatalog", description = "创建ProjectCodeCatalog")
     @GetMapping("/load/projectCode/{projectCode}")
-    public ProjectCodeCatalogVO loadByProjectCode(@PathVariable java.lang.String projectCode) {
+    public ProjectCodeCatalogVO loadByProjectCode(@PathVariable String projectCode) {
         if (projectCode == null) {
             return null;
         }
@@ -105,21 +106,26 @@ public class ProjectCodeCatalogController {
      *
      * @return 分页对象
      */
-    @ApiOperation(value = "查询ProjectCodeCatalog信息集合", notes = "查询ProjectCodeCatalog信息集合")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "curPage", value = "当前页", required = true, paramType = "query"),
-            @ApiImplicitParam(name = "pageSize", value = "分页大小", required = true, paramType = "query"),
+    @Operation(summary = "查询ProjectCodeCatalog信息集合", description = "查询ProjectCodeCatalog信息集合")
+    @Parameters({
+            @Parameter(name = "curPage", description = "当前页", required = true),
+            @Parameter(name = "pageSize", description = "分页大小", required = true),
     })
     @GetMapping(value = "/list")
-    public PageVO<ProjectCodeCatalogVO> list(@ApiIgnore ProjectCodeCatalogPageVO projectCodeCatalogVO, Integer curPage, Integer pageSize) {
-        Page<ProjectCodeCatalog> page = new Page<>(pageSize, curPage);
+    public PageVO<ProjectCodeCatalogVO> list(Integer curPage, Integer pageSize) {
+        IPage<ProjectCodeCatalog> page = new Page<>(curPage, pageSize);
         QueryWrapper<ProjectCodeCatalog> queryWrapper = new QueryWrapper<>();
-        int total = projectCodeCatalogService.count(queryWrapper);
+        long total = projectCodeCatalogService.count(queryWrapper);
         PageVO<ProjectCodeCatalogVO> projectCodeCatalogVOPageVO = new PageVO<>();
         if (total > 0) {
-            List<ProjectCodeCatalog> projectCodeCatalogList = projectCodeCatalogService.list(queryWrapper, page.genRowStart(), page.getPageSize());
+            queryWrapper.lambda().orderByDesc(ProjectCodeCatalog::getId);
+
+            IPage<ProjectCodeCatalog> projectCodeCatalogPage = projectCodeCatalogService.page(page, queryWrapper);
+            List<ProjectCodeCatalogVO> projectCodeCatalogPageVOList = JSON.parseArray(JSON.toJSONString(projectCodeCatalogPage.getRecords()), ProjectCodeCatalogVO.class);
+
+
             projectCodeCatalogVOPageVO.setTotalRow(total);
-            projectCodeCatalogVOPageVO.setRecords(JSON.parseArray(JSON.toJSONString(projectCodeCatalogList),ProjectCodeCatalogVO.class));
+            projectCodeCatalogVOPageVO.setRecords(projectCodeCatalogPageVOList);
             log.debug(JSON.toJSONString(page));
         }
         return projectCodeCatalogVOPageVO;
@@ -131,10 +137,9 @@ public class ProjectCodeCatalogController {
      *
      * @return R
      */
-    @ApiOperation(value = "修改ProjectCodeCatalog", notes = "修改ProjectCodeCatalog")
+    @Operation(summary = "修改ProjectCodeCatalog", description = "修改ProjectCodeCatalog")
     @PutMapping("/modify")
-    public boolean modify(@ApiParam(name = "修改ProjectCodeCatalog", value = "传入json格式", required = true)
-                          @RequestBody ProjectCodeCatalogVO projectCodeCatalogVO) {
+    public boolean modify(@RequestBody ProjectCodeCatalogVO projectCodeCatalogVO) {
         ProjectCodeCatalog newProjectCodeCatalog = new ProjectCodeCatalog();
         BeanUtils.copyProperties(projectCodeCatalogVO, newProjectCodeCatalog);
         boolean isUpdated = projectCodeCatalogService.update(newProjectCodeCatalog, new LambdaQueryWrapper<ProjectCodeCatalog>()
@@ -148,19 +153,20 @@ public class ProjectCodeCatalogController {
      *
      * @return R
      */
-    @ApiOperation(value = "删除ProjectCodeCatalog", notes = "删除ProjectCodeCatalog")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "", paramType = "query"),
-            @ApiImplicitParam(name = "code", value = "编码", paramType = "query"),
-            @ApiImplicitParam(name = "projectCode", value = "项目编码", paramType = "query")
+    @Operation(summary = "删除ProjectCodeCatalog", description = "删除ProjectCodeCatalog")
+    @Parameters({
+            @Parameter(name = "id", description = ""),
+            @Parameter(name = "code", description = "编码"),
+            @Parameter(name = "projectCode", description = "项目编码")
     })
     @DeleteMapping("/delete")
-    public R delete(@ApiIgnore ProjectCodeCatalogVO projectCodeCatalogVO) {
+    public R delete(@Parameter(hidden = true) ProjectCodeCatalogVO projectCodeCatalogVO) {
         ProjectCodeCatalog newProjectCodeCatalog = new ProjectCodeCatalog();
         BeanUtils.copyProperties(projectCodeCatalogVO, newProjectCodeCatalog);
         projectCodeCatalogService.remove(new LambdaQueryWrapper<ProjectCodeCatalog>()
                 .eq(ProjectCodeCatalog::getId, projectCodeCatalogVO.getId()));
         return R.success("删除成功");
     }
+
 
 }

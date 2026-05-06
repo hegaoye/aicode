@@ -10,7 +10,7 @@
 
 
     <sql id="columns">
-    id,code,name,description
+        id,code,name,description
     </sql>
 
     <sql id="where">

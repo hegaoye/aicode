@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * 百度 UID 注入
+ * 百度 UID 注入  todo: 修改 源码后 重新打包后再启用
  */
 @Configuration
 public class BaiduUidConfig {
@@ -20,9 +20,9 @@ public class BaiduUidConfig {
     public DefaultUidGenerator uidGenerator(DisposableWorkerIdAssigner disposableWorkerIdAssigner) {
         DefaultUidGenerator defaultUidGenerator = new DefaultUidGenerator();
         defaultUidGenerator.setWorkerIdAssigner(disposableWorkerIdAssigner);
-        defaultUidGenerator.setTimeBits(29);
-        defaultUidGenerator.setWorkerBits(21);
-        defaultUidGenerator.setSeqBits(13);
+        defaultUidGenerator.setTimeBits(31);
+        defaultUidGenerator.setWorkerBits(23);
+        defaultUidGenerator.setSeqBits(9);
         defaultUidGenerator.setEpochStr("2016-09-20");
         return defaultUidGenerator;
     }

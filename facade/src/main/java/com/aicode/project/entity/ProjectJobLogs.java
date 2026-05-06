@@ -3,12 +3,15 @@
  */
 package com.aicode.project.entity;
 
-import com.aicode.core.tools.DateTools;
-import io.swagger.annotations.ApiModelProperty;
+import cn.hutool.core.date.DateUtil;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import lombok.experimental.Accessors;
 
+import java.text.DateFormat;
 import java.util.Date;
+
+import static cn.hutool.core.date.DatePattern.NORM_DATETIME_MS_PATTERN;
 
 /**
  * 任务日志 的实体类
@@ -25,22 +28,22 @@ public class ProjectJobLogs implements java.io.Serializable {
     /**
      * 数据库字段:id  属性显示:id
      */
-    @ApiModelProperty(value = "id")
-    private java.lang.Long id;
+    @Schema(description = "id")
+    private Long id;
     /**
      * 数据库字段:code  属性显示:任务编码
      */
-    @ApiModelProperty(value = "任务编码")
-    private java.lang.String code;
+    @Schema(description = "任务编码")
+    private String code;
     /**
      * 数据库字段:log  属性显示:日志
      */
-    @ApiModelProperty(value = "日志")
-    private java.lang.String log;
+    @Schema(description = "日志")
+    private String log;
 
 
     public ProjectJobLogs(String code, String log) {
         this.code = code;
-        this.log = "> ✔ " + DateTools.yyyyMMddHHmmssSSS(new Date()) + "&nbsp;&nbsp;" + log;
+        this.log = "> ✔ " + DateUtil.format(new Date(), NORM_DATETIME_MS_PATTERN) + "&nbsp;&nbsp;" + log;
     }
 }

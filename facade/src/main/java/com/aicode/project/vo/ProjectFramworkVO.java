@@ -3,7 +3,7 @@
  */
 package com.aicode.project.vo;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 /**
@@ -17,17 +17,17 @@ public class ProjectFramworkVO implements java.io.Serializable {
     /**
      * 数据库字段:id  属性显示:id
      */
-    @ApiModelProperty(value = "id")
-    private java.lang.Long id;
+    @Schema(description = "id")
+    private Long id;
     /**
      * 数据库字段:frameworkCode  属性显示:技术编码
      */
-    @ApiModelProperty(value = "技术编码")
-    private java.lang.String frameworkCode;
+    @Schema(description = "技术编码")
+    private String frameworkCode;
     /**
      * 数据库字段:projectCode  属性显示:项目编码
      */
-    @ApiModelProperty(value = "项目编码")
-    private java.lang.String projectCode;
+    @Schema(description = "项目编码")
+    private String projectCode;
 
 }

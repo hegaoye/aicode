@@ -1,51 +1,51 @@
 /*
- * AI-Code 为您构建代码，享受智慧生活!
+ * aicode
  */
 package com.aicode.project.ctrl;
 
+import com.aicode.core.PageVO;
+import com.aicode.core.R;
 import com.aicode.project.entity.ProjectMap;
 import com.aicode.project.service.ProjectMapService;
-import com.aicode.project.vo.ProjectMapPageVO;
 import com.aicode.project.vo.ProjectMapSaveVO;
 import com.aicode.project.vo.ProjectMapVO;
-import com.aicode.core.entity.Page;
-import com.aicode.core.entity.PageVO;
-import com.aicode.core.entity.R;
-import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import io.swagger.annotations.*;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
 
 /**
  * 项目数据表
  *
- * @author hegaoye
+ * @author aicode
  */
 @RestController
 @RequestMapping("/projectMap")
 @Slf4j
-@Api(value = "项目数据表控制器", tags = "项目数据表控制器")
+@Tag(name = "项目数据表控制器", description = "项目数据表控制器")
 public class ProjectMapController {
     @Autowired
     private ProjectMapService projectMapService;
-
 
     /**
      * 创建 项目数据表
      *
      * @return R
      */
-    @ApiOperation(value = "创建ProjectMap", notes = "创建ProjectMap")
+    @Operation(summary = "创建ProjectMap", description = "创建ProjectMap")
     @PostMapping("/build")
-    public ProjectMapSaveVO build(@ApiParam(name = "创建ProjectMap", value = "传入json格式", required = true)
-                                   @RequestBody ProjectMapSaveVO projectMapSaveVO) {
+    public ProjectMapSaveVO build(@RequestBody ProjectMapSaveVO projectMapSaveVO) {
         if (null == projectMapSaveVO) {
             return null;
         }
@@ -61,27 +61,30 @@ public class ProjectMapController {
     }
 
 
-
     /**
      * 查询项目数据表信息集合
      *
      * @return 分页对象
      */
-    @ApiOperation(value = "查询ProjectMap信息集合", notes = "查询ProjectMap信息集合")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "curPage", value = "当前页", required = true, paramType = "query"),
-            @ApiImplicitParam(name = "pageSize", value = "分页大小", required = true, paramType = "query"),
+    @Operation(summary = "查询ProjectMap信息集合", description = "查询ProjectMap信息集合")
+    @Parameters({
+            @Parameter(name = "curPage", description = "当前页", required = true),
+            @Parameter(name = "pageSize", description = "分页大小", required = true),
     })
     @GetMapping(value = "/list")
-    public PageVO<ProjectMapVO> list(@ApiIgnore ProjectMapPageVO projectMapVO, Integer curPage, Integer pageSize) {
-        Page<ProjectMap> page = new Page<>(pageSize, curPage);
+    public PageVO<ProjectMapVO> list(Integer curPage, Integer pageSize) {
+        IPage<ProjectMap> page = new Page<>(curPage, pageSize);
         QueryWrapper<ProjectMap> queryWrapper = new QueryWrapper<>();
-        int total = projectMapService.count(queryWrapper);
+        long total = projectMapService.count(queryWrapper);
         PageVO<ProjectMapVO> projectMapVOPageVO = new PageVO<>();
         if (total > 0) {
-            List<ProjectMap> projectMapList = projectMapService.list(queryWrapper, page.genRowStart(), page.getPageSize());
+            queryWrapper.lambda().orderByDesc(ProjectMap::getId);
+
+            IPage<ProjectMap> projectMapPage = projectMapService.page(page, queryWrapper);
+            List<ProjectMapVO> projectMapPageVOList = JSON.parseArray(JSON.toJSONString(projectMapPage.getRecords()), ProjectMapVO.class);
+
             projectMapVOPageVO.setTotalRow(total);
-            projectMapVOPageVO.setRecords(JSON.parseArray(JSON.toJSONString(projectMapList),ProjectMapVO.class));
+            projectMapVOPageVO.setRecords(projectMapPageVOList);
             log.debug(JSON.toJSONString(page));
         }
         return projectMapVOPageVO;
@@ -93,10 +96,9 @@ public class ProjectMapController {
      *
      * @return R
      */
-    @ApiOperation(value = "修改ProjectMap", notes = "修改ProjectMap")
+    @Operation(summary = "修改ProjectMap", description = "修改ProjectMap")
     @PutMapping("/modify")
-    public boolean modify(@ApiParam(name = "修改ProjectMap", value = "传入json格式", required = true)
-                          @RequestBody ProjectMapVO projectMapVO) {
+    public boolean modify(@RequestBody ProjectMapVO projectMapVO) {
         ProjectMap newProjectMap = new ProjectMap();
         BeanUtils.copyProperties(projectMapVO, newProjectMap);
         boolean isUpdated = projectMapService.update(newProjectMap, new LambdaQueryWrapper<ProjectMap>()
@@ -110,17 +112,18 @@ public class ProjectMapController {
      *
      * @return R
      */
-    @ApiOperation(value = "删除ProjectMap", notes = "删除ProjectMap")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "id", paramType = "query")
+    @Operation(summary = "删除ProjectMap", description = "删除ProjectMap")
+    @Parameters({
+            @Parameter(name = "id", description = "id")
     })
     @DeleteMapping("/delete")
-    public R delete(@ApiIgnore ProjectMapVO projectMapVO) {
+    public R delete(@Parameter(hidden = true) ProjectMapVO projectMapVO) {
         ProjectMap newProjectMap = new ProjectMap();
         BeanUtils.copyProperties(projectMapVO, newProjectMap);
         projectMapService.remove(new LambdaQueryWrapper<ProjectMap>()
                 .eq(ProjectMap::getId, projectMapVO.getId()));
         return R.success("删除成功");
     }
+
 
 }

@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
  * Account mapper
  * 直接与xml映射
  *
- * @author hegaoye
+ * @author aicode
  */
 @Repository
 public interface AccountMapper extends BaseMapper<Account> {

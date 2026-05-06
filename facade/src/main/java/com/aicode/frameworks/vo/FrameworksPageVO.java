@@ -1,58 +1,36 @@
 /*
- * AI-Code 为您构建代码，享受智慧生活!
+ * aicode
  */
 package com.aicode.frameworks.vo;
 
-import io.swagger.annotations.ApiModelProperty;
-import com.aicode.core.base.BaseVO;
+import com.aicode.core.BaseVO;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * 框架技术池 分页 对象 VO
  *
- * @author hegaoye
+ * @author aicode
  */
 @Data
+@EqualsAndHashCode(callSuper = false)
 public class FrameworksPageVO extends BaseVO implements java.io.Serializable {
-    /**
-     * 数据库字段:id  属性显示:id
-     */
-    @ApiModelProperty(value = "id")
+    @Schema(description = "数据库字段:id id")
     private java.lang.Long id;
-    /**
-     * 数据库字段:code  属性显示:技术编码
-     */
-    @ApiModelProperty(value = "技术编码")
+    @Schema(description = "数据库字段:code 技术编码")
     private java.lang.String code;
-    /**
-     * 数据库字段:name  属性显示:技术名称
-     */
-    @ApiModelProperty(value = "技术名称")
+    @Schema(description = "数据库字段:name 技术名称")
     private java.lang.String name;
-    /**
-     * 数据库字段:description  属性显示:技术描述
-     */
-    @ApiModelProperty(value = "技术描述")
+    @Schema(description = "数据库字段:description 技术描述")
     private java.lang.String description;
-    /**
-     * 数据库字段:gitHome  属性显示:
-     */
-    @ApiModelProperty(value = "")
+    @Schema(description = "数据库字段:gitHome ")
     private java.lang.String gitHome;
-    /**
-     * 数据库字段:account  属性显示:
-     */
-    @ApiModelProperty(value = "")
+    @Schema(description = "数据库字段:account ")
     private java.lang.String account;
-    /**
-     * 数据库字段:password  属性显示:
-     */
-    @ApiModelProperty(value = "")
+    @Schema(description = "数据库字段:password ")
     private java.lang.String password;
-    /**
-     * 数据库字段:isPublic  属性显示:
-     */
-    @ApiModelProperty(value = "")
+    @Schema(description = "数据库字段:isPublic ")
     private java.lang.String isPublic;
-
 }

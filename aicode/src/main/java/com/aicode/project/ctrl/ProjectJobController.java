@@ -1,47 +1,41 @@
 /*
- * AI-Code 为您构建代码，享受智慧生活!
+ * aicode
  */
 package com.aicode.project.ctrl;
 
 import com.aicode.config.websocket.WSClientManager;
-import com.aicode.core.exceptions.BaseException;
+import com.aicode.core.BaseException;
+import com.aicode.core.R;
 import com.aicode.project.entity.ProjectJob;
 import com.aicode.project.service.ProjectJobService;
 import com.aicode.project.vo.ProjectJobPageVO;
 import com.aicode.project.vo.ProjectJobVO;
-import com.aicode.core.entity.Page;
-import com.aicode.core.entity.R;
-import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.StringUtils;
-import io.swagger.annotations.*;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.websocket.Session;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.websocket.Session;
-import java.util.List;
 
 /**
  * 任务
- * 1.查询任务详情信息
- * 2.查询项目任务信息集合
- * 3.创建任务
- * 4.修改任务
- * 5.删除任务
- * 6.执行任务
  *
- * @author hegaoye
+ * @author aicode
  */
 @RestController
 @RequestMapping("/project/job")
 @Slf4j
-@Api(value = "任务控制器", tags = "任务控制器")
+@Tag(name = "任务控制器", description = "任务控制器")
 public class ProjectJobController {
     @Autowired
     private ProjectJobService projectJobService;
@@ -52,9 +46,9 @@ public class ProjectJobController {
      * @param code 任务编码
      * @return BeanRet
      */
-    @ApiOperation(value = "查询任务详情信息", notes = "查询任务详情信息")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "code", value = "任务编码", paramType = "query")
+    @Operation(summary = "查询任务详情信息", description = "查询任务详情信息")
+    @Parameters({
+            @Parameter(name = "code", description = "任务编码")
     })
     @GetMapping(value = "/load")
 
@@ -72,14 +66,14 @@ public class ProjectJobController {
      *
      * @return R
      */
-    @ApiOperation(value = "创建ProjectJob", notes = "创建ProjectJob")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "projectCode", value = "项目编码", required = true, paramType = "query"),
-            @ApiImplicitParam(name = "name", value = "任务名", required = true, paramType = "query"),
-            @ApiImplicitParam(name = "description", value = "任务描述", required = true, paramType = "query")
+    @Operation(summary = "创建ProjectJob", description = "创建ProjectJob")
+    @Parameters({
+            @Parameter(name = "projectCode", description = "项目编码", required = true),
+            @Parameter(name = "name", description = "任务名", required = true),
+            @Parameter(name = "description", description = "任务描述", required = true)
     })
     @PostMapping("/build")
-    public R build(@ApiIgnore ProjectJob projectJob) {
+    public R build(@Parameter(hidden = true) ProjectJob projectJob) {
 
         ProjectJob projectJobLoad = projectJobService.getOne(new LambdaQueryWrapper<ProjectJob>()
                 .eq(ProjectJob::getProjectCode, projectJob.getProjectCode()));
@@ -99,9 +93,9 @@ public class ProjectJobController {
      * @param code 任务编码
      * @return ProjectJobVO
      */
-    @ApiOperation(value = "创建ProjectJob", notes = "创建ProjectJob")
+    @Operation(summary = "创建ProjectJob", description = "创建ProjectJob")
     @GetMapping("/load/code/{code}")
-    public ProjectJobVO loadByCode(@PathVariable java.lang.String code) {
+    public ProjectJobVO loadByCode(@PathVariable String code) {
         if (code == null) {
             return null;
         }
@@ -118,28 +112,32 @@ public class ProjectJobController {
      *
      * @return 分页对象
      */
-    @ApiOperation(value = "查询ProjectJob信息集合", notes = "查询ProjectJob信息集合")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "code", value = "项目编码", paramType = "query"),
-            @ApiImplicitParam(name = "curPage", value = "当前页", required = true, paramType = "query"),
-            @ApiImplicitParam(name = "pageSize", value = "分页大小", required = true, paramType = "query")
+    @Operation(summary = "查询ProjectJob信息集合", description = "查询ProjectJob信息集合")
+    @Parameters({
+            @Parameter(name = "code", description = "项目编码"),
+            @Parameter(name = "curPage", description = "当前页", required = true),
+            @Parameter(name = "pageSize", description = "分页大小", required = true)
     })
     @GetMapping(value = "/list")
-    public R list(@ApiIgnore ProjectJobPageVO projectJobVO, Integer curPage, Integer pageSize) {
-        Page<ProjectJob> page = new Page<>(pageSize, curPage);
+    public R list(@Parameter(hidden = true) ProjectJobPageVO projectJobVO, Integer curPage, Integer pageSize) {
+
+        IPage<ProjectJob> page = new Page<>(curPage, pageSize);
         QueryWrapper<ProjectJob> queryWrapper = new QueryWrapper<>();
-        if (StringUtils.isNotEmpty(projectJobVO.getProjectCode())) {
+        if (com.baomidou.mybatisplus.core.toolkit.StringUtils.isNotEmpty(projectJobVO.getProjectCode())) {
             queryWrapper.lambda().gt(ProjectJob::getProjectCode, projectJobVO.getProjectCode());
         }
 
-        int total = projectJobService.count(queryWrapper);
+        com.aicode.core.Page pageVO = new com.aicode.core.Page();
+        long total = projectJobService.count(queryWrapper);
         if (total > 0) {
-            List<ProjectJob> projectJobList = projectJobService.list(queryWrapper, page.genRowStart(), page.getPageSize());
-            page.setTotalRow(total);
-            page.setVoList(projectJobList);
+            queryWrapper.lambda().orderByDesc(ProjectJob::getId);
+
+            IPage<ProjectJob> projectJobPage = projectJobService.page(page, queryWrapper);
+            pageVO.setTotalRow(total);
+            pageVO.setVoList(projectJobPage.getRecords());
             log.debug(JSON.toJSONString(page));
         }
-        return R.success(page);
+        return R.success(pageVO);
     }
 
 
@@ -148,16 +146,16 @@ public class ProjectJobController {
      *
      * @return R
      */
-    @ApiOperation(value = "修改ProjectJob", notes = "修改ProjectJob")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "code", value = "项目编码", required = true, paramType = "query"),
-            @ApiImplicitParam(name = "name", value = "任务名", paramType = "query"),
-            @ApiImplicitParam(name = "state", value = "任务状态", paramType = "query"),
-            @ApiImplicitParam(name = "description", value = "任务描述", paramType = "query")
+    @Operation(summary = "修改ProjectJob", description = "修改ProjectJob")
+    @Parameters({
+            @Parameter(name = "code", description = "项目编码", required = true),
+            @Parameter(name = "name", description = "任务名"),
+            @Parameter(name = "state", description = "任务状态"),
+            @Parameter(name = "description", description = "任务描述")
     })
     @PutMapping("/modify")
-    public R modify(@ApiIgnore ProjectJob projectJob) {
-        if (StringUtils.isEmpty(projectJob.getState())) {
+    public R modify(@Parameter(hidden = true) ProjectJob projectJob) {
+        if (com.baomidou.mybatisplus.core.toolkit.StringUtils.isEmpty(projectJob.getState())) {
             R.failed(BaseException.BaseExceptionEnum.Empty_Param);
         }
         projectJobService.update(projectJob, new LambdaQueryWrapper<ProjectJob>()
@@ -171,12 +169,12 @@ public class ProjectJobController {
      *
      * @return R
      */
-    @ApiOperation(value = "删除ProjectJob", notes = "删除ProjectJob")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "code", value = "任务编码", paramType = "query")
+    @Operation(summary = "删除ProjectJob", description = "删除ProjectJob")
+    @Parameters({
+            @Parameter(name = "code", description = "任务编码")
     })
     @DeleteMapping("/delete")
-    public R delete(@ApiIgnore ProjectJobVO projectJobVO) {
+    public R delete(@Parameter(hidden = true) ProjectJobVO projectJobVO) {
         ProjectJob newProjectJob = new ProjectJob();
         BeanUtils.copyProperties(projectJobVO, newProjectJob);
         projectJobService.remove(new LambdaQueryWrapper<ProjectJob>()
@@ -190,9 +188,9 @@ public class ProjectJobController {
      * @param code 项目编码
      * @return BeanRet
      */
-    @ApiOperation(value = "执行任务", notes = "执行任务")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "code", value = "任务编码", paramType = "query")
+    @Operation(summary = "执行任务", description = "执行任务")
+    @Parameters({
+            @Parameter(name = "code", description = "任务编码")
     })
     @GetMapping(value = "/execute")
 
@@ -205,11 +203,12 @@ public class ProjectJobController {
                 ProjectJob projectJob = projectJobService.execute(code);
                 return R.success(projectJob);
             }
-            return R.failed("");
+            return R.failed(BaseException.BaseExceptionEnum.Result_Not_Exist);
         } catch (Exception e) {
             e.printStackTrace();
             log.error(e.getMessage());
-            return R.failed("执行任务失败");
+            return R.failed(BaseException.BaseExceptionEnum.Server_Error);
         }
     }
+
 }

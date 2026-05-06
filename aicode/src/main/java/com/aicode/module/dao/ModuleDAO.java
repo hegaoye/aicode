@@ -1,8 +1,6 @@
 package com.aicode.module.dao;
 
 import com.aicode.module.dao.mapper.ModuleMapper;
-import com.aicode.module.entity.Module;
-import com.aicode.core.base.BaseDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -10,10 +8,10 @@ import org.springframework.stereotype.Repository;
  * Module DAO
  * 数据服务层
  *
- * @author hegaoye
+ * @author aicode
  */
 @Repository
-public class ModuleDAO extends BaseDAO<ModuleMapper, Module> {
+public class ModuleDAO {
 
 
     /**

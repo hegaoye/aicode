@@ -3,10 +3,7 @@ package com.aicode.config;
 import com.baomidou.mybatisplus.core.MybatisConfiguration;
 import com.baomidou.mybatisplus.core.MybatisXMLLanguageDriver;
 import com.baomidou.mybatisplus.core.config.GlobalConfig;
-import com.baomidou.mybatisplus.extension.plugins.PaginationInterceptor;
-import com.baomidou.mybatisplus.extension.plugins.PerformanceInterceptor;
 import com.baomidou.mybatisplus.extension.spring.MybatisSqlSessionFactoryBean;
-import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.type.JdbcType;
 import org.mybatis.spring.SqlSessionTemplate;
@@ -32,12 +29,10 @@ public class MybatisPlusConfigUid {
         configuration.setJdbcTypeForNull(JdbcType.NULL);
         sqlSessionFactory.setConfiguration(configuration);
         sqlSessionFactory.setMapperLocations(new PathMatchingResourcePatternResolver().
-                getResources("classpath:/META-INF/mybatis/mapper/WORKER*.xml"));
-        sqlSessionFactory.setPlugins(new Interceptor[]{
-                new PaginationInterceptor(),
-                new PerformanceInterceptor()
-//                        .setFormat(true),
-        });
+                getResources("classpath:/META-INF/mybatis/mapper/worker_node.xml"));
+        //        sqlSessionFactory.setPlugins(new Interceptor[]{
+        //                new MybatisPlusInterceptor()
+        //        });
         sqlSessionFactory.setGlobalConfig(new GlobalConfig().setBanner(false));
         return sqlSessionFactory.getObject();
     }

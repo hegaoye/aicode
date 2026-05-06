@@ -1,11 +1,11 @@
 package com.aicode.config.websocket;
 
+import jakarta.websocket.*;
+import jakarta.websocket.server.ServerEndpoint;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import javax.websocket.*;
-import javax.websocket.server.ServerEndpoint;
 
 @Slf4j
 @ServerEndpoint(value = "/websocket.shtml", configurator = WebsocketSpringCofigurator.class)

@@ -10,7 +10,7 @@
 
 
     <sql id="columns">
-    id,code,frameworkCode,path
+        id,code,frameworkCode,path
     </sql>
 
     <sql id="where">

@@ -3,24 +3,27 @@
  */
 package com.aicode.project.ctrl;
 
-import com.aicode.core.entity.Page;
-import com.aicode.core.entity.R;
+
+import com.aicode.core.BaseException;
+import com.aicode.core.R;
 import com.aicode.project.entity.ProjectModel;
 import com.aicode.project.service.ProjectModelService;
 import com.aicode.project.vo.ProjectModelPageVO;
 import com.aicode.project.vo.ProjectModelVO;
-import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
-import io.swagger.annotations.*;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
-
-import java.util.List;
 
 /**
  * 模块
@@ -30,7 +33,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/projectModel")
 @Slf4j
-@Api(value = "模块控制器", tags = "模块控制器")
+@Tag(name = "模块控制器", description = "模块控制器")
 public class ProjectModelController {
     @Autowired
     private ProjectModelService projectModelService;
@@ -41,14 +44,14 @@ public class ProjectModelController {
      * @param id
      * @return BeanRet
      */
-    @ApiOperation(value = "查询模块详情信息", notes = "查询模块详情信息")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "", paramType = "query")
+    @Operation(summary = "查询模块详情信息", description = "查询模块详情信息")
+    @Parameters({
+            @Parameter(name = "id", description = "")
     })
     @GetMapping(value = "/loadById/{id}")
     public R loadById(@PathVariable Long id) {
         if (id == null) {
-            return R.failed("");
+            return R.failed(BaseException.BaseExceptionEnum.Empty_Param);
         }
         ProjectModel projectModel = projectModelService.getById(id);
         log.info(JSON.toJSONString(projectModel));
@@ -61,14 +64,14 @@ public class ProjectModelController {
      * @param code 模块编码
      * @return BeanRet
      */
-    @ApiOperation(value = "查询模块详情信息", notes = "查询模块详情信息")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "code", value = "模块编码", paramType = "query")
+    @Operation(summary = "查询模块详情信息", description = "查询模块详情信息")
+    @Parameters({
+            @Parameter(name = "code", description = "模块编码")
     })
     @GetMapping(value = "/loadByCode/{code}")
     public R loadByCode(@PathVariable String code) {
         if (StringUtils.isNotEmpty(code)) {
-            return R.failed("");
+            return R.failed(BaseException.BaseExceptionEnum.Empty_Param);
         }
 
         ProjectModel projectModel = projectModelService.getOne(new LambdaQueryWrapper<ProjectModel>()
@@ -82,19 +85,19 @@ public class ProjectModelController {
      *
      * @return R
      */
-    @ApiOperation(value = "创建ProjectModel", notes = "创建ProjectModel")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "", paramType = "query", required = true),
-            @ApiImplicitParam(name = "code", value = "模块编码", paramType = "query", required = true),
-            @ApiImplicitParam(name = "preCode", value = "上级模块编码", paramType = "query", required = true),
-            @ApiImplicitParam(name = "name", value = "模块显示名称", paramType = "query", required = true),
-            @ApiImplicitParam(name = "route", value = "模块路由", paramType = "query", required = true),
-            @ApiImplicitParam(name = "css", value = "模块css样式", paramType = "query", required = true),
-            @ApiImplicitParam(name = "isMenu", value = "是否是菜单 Y,N", paramType = "query", required = true),
-            @ApiImplicitParam(name = "ico", value = "模块图标", paramType = "query", required = true)
+    @Operation(summary = "创建ProjectModel", description = "创建ProjectModel")
+    @Parameters({
+            @Parameter(name = "id", description = "", required = true),
+            @Parameter(name = "code", description = "模块编码", required = true),
+            @Parameter(name = "preCode", description = "上级模块编码", required = true),
+            @Parameter(name = "name", description = "模块显示名称", required = true),
+            @Parameter(name = "route", description = "模块路由", required = true),
+            @Parameter(name = "css", description = "模块css样式", required = true),
+            @Parameter(name = "isMenu", description = "是否是菜单 Y,N", required = true),
+            @Parameter(name = "ico", description = "模块图标", required = true)
     })
     @PostMapping("/build")
-    public R build(@ApiIgnore ProjectModel projectModel) {
+    public R build(@Parameter(hidden = true) ProjectModel projectModel) {
         projectModelService.save(projectModel);
         return R.success(projectModel);
     }
@@ -105,22 +108,22 @@ public class ProjectModelController {
      *
      * @return 分页对象
      */
-    @ApiOperation(value = "查询ProjectModel信息集合", notes = "查询ProjectModel信息集合")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "curPage", value = "当前页", required = true, paramType = "query"),
-            @ApiImplicitParam(name = "pageSize", value = "分页大小", required = true, paramType = "query"),
-            @ApiImplicitParam(name = "id", value = "", paramType = "query"),
-            @ApiImplicitParam(name = "code", value = "模块编码", paramType = "query"),
-            @ApiImplicitParam(name = "preCode", value = "上级模块编码", paramType = "query"),
-            @ApiImplicitParam(name = "name", value = "模块显示名称", paramType = "query"),
-            @ApiImplicitParam(name = "route", value = "模块路由", paramType = "query"),
-            @ApiImplicitParam(name = "css", value = "模块css样式", paramType = "query"),
-            @ApiImplicitParam(name = "isMenu", value = "是否是菜单 Y,N", paramType = "query"),
-            @ApiImplicitParam(name = "ico", value = "模块图标", paramType = "query")
+    @Operation(summary = "查询ProjectModel信息集合", description = "查询ProjectModel信息集合")
+    @Parameters({
+            @Parameter(name = "curPage", description = "当前页", required = true),
+            @Parameter(name = "pageSize", description = "分页大小", required = true),
+            @Parameter(name = "id", description = ""),
+            @Parameter(name = "code", description = "模块编码"),
+            @Parameter(name = "preCode", description = "上级模块编码"),
+            @Parameter(name = "name", description = "模块显示名称"),
+            @Parameter(name = "route", description = "模块路由"),
+            @Parameter(name = "css", description = "模块css样式"),
+            @Parameter(name = "isMenu", description = "是否是菜单 Y,N"),
+            @Parameter(name = "ico", description = "模块图标")
     })
     @GetMapping(value = "/list")
-    public R list(@ApiIgnore ProjectModelPageVO projectModelVO, Integer curPage, Integer pageSize) {
-        Page<ProjectModel> page = new Page<>(pageSize, curPage);
+    public R list(@Parameter(hidden = true) ProjectModelPageVO projectModelVO, Integer curPage, Integer pageSize) {
+        IPage<ProjectModel> page = new Page<>(pageSize, curPage);
         QueryWrapper<ProjectModel> queryWrapper = new QueryWrapper<>();
         if (projectModelVO.getId() != null) {
             queryWrapper.lambda().eq(ProjectModel::getId, projectModelVO.getId());
@@ -146,10 +149,13 @@ public class ProjectModelController {
         if (StringUtils.isNotEmpty(projectModelVO.getIco())) {
             queryWrapper.lambda().eq(ProjectModel::getIco, projectModelVO.getIco());
         }
-        List<ProjectModel> projectModelList = projectModelService.list(queryWrapper, page.genRowStart(), page.getPageSize());
-        page.setVoList(projectModelList);
+        IPage<ProjectModel> projectMapPage = projectModelService.page(page, queryWrapper);
+
+
+        com.aicode.core.Page pageVO = new com.aicode.core.Page();
+        pageVO.setVoList(projectMapPage.getRecords());
         log.debug(JSON.toJSONString(page));
-        return R.success(page);
+        return R.success(pageVO);
     }
 
 
@@ -158,20 +164,19 @@ public class ProjectModelController {
      *
      * @return R
      */
-    @ApiOperation(value = "修改ProjectModel", notes = "修改ProjectModel")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "", paramType = "query"),
-            @ApiImplicitParam(name = "code", value = "模块编码", paramType = "query"),
-            @ApiImplicitParam(name = "preCode", value = "上级模块编码", paramType = "query"),
-            @ApiImplicitParam(name = "name", value = "模块显示名称", paramType = "query"),
-            @ApiImplicitParam(name = "route", value = "模块路由", paramType = "query"),
-            @ApiImplicitParam(name = "css", value = "模块css样式", paramType = "query"),
-            @ApiImplicitParam(name = "isMenu", value = "是否是菜单 Y,N", paramType = "query"),
-            @ApiImplicitParam(name = "ico", value = "模块图标", paramType = "query")
+    @Operation(summary = "修改ProjectModel", description = "修改ProjectModel")
+    @Parameters({
+            @Parameter(name = "id", description = ""),
+            @Parameter(name = "code", description = "模块编码"),
+            @Parameter(name = "preCode", description = "上级模块编码"),
+            @Parameter(name = "name", description = "模块显示名称"),
+            @Parameter(name = "route", description = "模块路由"),
+            @Parameter(name = "css", description = "模块css样式"),
+            @Parameter(name = "isMenu", description = "是否是菜单 Y,N"),
+            @Parameter(name = "ico", description = "模块图标")
     })
     @PutMapping("/modify")
-    public R modify(@ApiParam(name = "修改ProjectModel", value = "传入json格式", required = true)
-                    @RequestBody ProjectModel projectModel) {
+    public R modify(@RequestBody ProjectModel projectModel) {
         LambdaQueryWrapper<ProjectModel> lambdaQueryWrapper = new LambdaQueryWrapper<ProjectModel>();
         if (projectModel.getId() != null) {
             lambdaQueryWrapper.eq(ProjectModel::getId, projectModel.getId());
@@ -189,13 +194,13 @@ public class ProjectModelController {
      *
      * @return R
      */
-    @ApiOperation(value = "删除ProjectModel", notes = "删除ProjectModel")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "", paramType = "query"),
-            @ApiImplicitParam(name = "code", value = "模块编码", paramType = "query")
+    @Operation(summary = "删除ProjectModel", description = "删除ProjectModel")
+    @Parameters({
+            @Parameter(name = "id", description = ""),
+            @Parameter(name = "code", description = "模块编码")
     })
     @DeleteMapping("/delete")
-    public R delete(@ApiIgnore ProjectModelVO projectModelVO) {
+    public R delete(@Parameter(hidden = true) ProjectModelVO projectModelVO) {
         ProjectModel newProjectModel = new ProjectModel();
         BeanUtils.copyProperties(projectModelVO, newProjectModel);
         projectModelService.remove(new LambdaQueryWrapper<ProjectModel>()

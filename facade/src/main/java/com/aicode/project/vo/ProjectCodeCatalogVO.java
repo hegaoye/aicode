@@ -3,7 +3,7 @@
  */
 package com.aicode.project.vo;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 /**
@@ -17,42 +17,42 @@ public class ProjectCodeCatalogVO implements java.io.Serializable {
     /**
      * 数据库字段:id  属性显示:
      */
-    @ApiModelProperty(value = "")
-    private java.lang.Long id;
+    @Schema(description = "")
+    private Long id;
     /**
      * 数据库字段:code  属性显示:编码
      */
-    @ApiModelProperty(value = "编码")
-    private java.lang.String code;
+    @Schema(description = "编码")
+    private String code;
     /**
      * 数据库字段:projectCode  属性显示:项目编码
      */
-    @ApiModelProperty(value = "项目编码")
-    private java.lang.String projectCode;
+    @Schema(description = "项目编码")
+    private String projectCode;
     /**
      * 数据库字段:basePackage  属性显示:项目基础包名
      */
-    @ApiModelProperty(value = "项目基础包名")
-    private java.lang.String basePackage;
+    @Schema(description = "项目基础包名")
+    private String basePackage;
     /**
      * 数据库字段:fileName  属性显示:文件名
      */
-    @ApiModelProperty(value = "文件名")
-    private java.lang.String fileName;
+    @Schema(description = "文件名")
+    private String fileName;
     /**
      * 数据库字段:fileSuffix  属性显示:文件后缀
      */
-    @ApiModelProperty(value = "文件后缀")
-    private java.lang.String fileSuffix;
+    @Schema(description = "文件后缀")
+    private String fileSuffix;
     /**
      * 数据库字段:relativePath  属性显示:相对路径
      */
-    @ApiModelProperty(value = "相对路径")
-    private java.lang.String relativePath;
+    @Schema(description = "相对路径")
+    private String relativePath;
     /**
      * 数据库字段:absolutePath  属性显示:绝对路径
      */
-    @ApiModelProperty(value = "绝对路径")
-    private java.lang.String absolutePath;
+    @Schema(description = "绝对路径")
+    private String absolutePath;
 
 }

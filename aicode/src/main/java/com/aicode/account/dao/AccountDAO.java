@@ -1,8 +1,6 @@
 package com.aicode.account.dao;
 
 import com.aicode.account.dao.mapper.AccountMapper;
-import com.aicode.account.entity.Account;
-import com.aicode.core.base.BaseDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -10,10 +8,10 @@ import org.springframework.stereotype.Repository;
  * Account DAO
  * 数据服务层
  *
- * @author hegaoye
+ * @author aicode
  */
 @Repository
-public class AccountDAO extends BaseDAO<AccountMapper, Account> {
+public class AccountDAO {
 
 
     /**

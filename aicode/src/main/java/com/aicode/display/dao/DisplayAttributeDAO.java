@@ -1,8 +1,6 @@
 package com.aicode.display.dao;
 
 import com.aicode.display.dao.mapper.DisplayAttributeMapper;
-import com.aicode.display.entity.DisplayAttribute;
-import com.aicode.core.base.BaseDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -10,10 +8,10 @@ import org.springframework.stereotype.Repository;
  * DisplayAttribute DAO
  * 数据服务层
  *
- * @author hegaoye
+ * @author aicode
  */
 @Repository
-public class DisplayAttributeDAO extends BaseDAO<DisplayAttributeMapper, DisplayAttribute> {
+public class DisplayAttributeDAO {
 
 
     /**
@@ -21,7 +19,6 @@ public class DisplayAttributeDAO extends BaseDAO<DisplayAttributeMapper, Display
      */
     @Autowired
     private DisplayAttributeMapper displayAttributeMapper;
-
 
     public int countByProjectCode(String code) {
         return displayAttributeMapper.countByProjectCode(code);

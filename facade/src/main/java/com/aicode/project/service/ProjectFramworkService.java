@@ -16,15 +16,7 @@ import java.util.List;
  */
 public interface ProjectFramworkService extends IService<ProjectFramwork> {
 
-    /**
-     * 分页查询
-     *
-     * @param queryWrapper 查询条件
-     * @param offset       起始行
-     * @param limit        步长
-     * @return List<ProjectFramwork>
-     */
-    List<ProjectFramwork> list(QueryWrapper<ProjectFramwork> queryWrapper, int offset, int limit);
+
 }
 
 

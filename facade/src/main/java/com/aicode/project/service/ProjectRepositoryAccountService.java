@@ -16,15 +16,7 @@ import java.util.List;
  */
 public interface ProjectRepositoryAccountService extends IService<ProjectRepositoryAccount> {
 
-    /**
-     * 分页查询
-     *
-     * @param queryWrapper 查询条件
-     * @param offset       起始行
-     * @param limit        步长
-     * @return List<ProjectRepositoryAccount>
-     */
-    List<ProjectRepositoryAccount> list(QueryWrapper<ProjectRepositoryAccount> queryWrapper, int offset, int limit);
+
 }
 
 

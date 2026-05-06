@@ -15,7 +15,7 @@ import javax.sql.DataSource;
 @Configuration
 public class DataSourceConfig {
     //主数据源配置 tidb数据源
-//    @Primary
+    //    @Primary
     @ConfigurationProperties(prefix = "spring.datasource.tidb")
     @Bean(name = "tidbDataSourceProperties")
     public DataSourceProperties tidbDataSourceProperties() {
@@ -23,7 +23,7 @@ public class DataSourceConfig {
     }
 
     //主数据源 tidb数据源
-//    @Primary
+    //    @Primary
     @Bean(name = "tidbDataSource")
     public DataSource tidbDataSource(@Qualifier("tidbDataSourceProperties") DataSourceProperties tidbDataSourceProperties) {
         return tidbDataSourceProperties.initializeDataSourceBuilder().build();

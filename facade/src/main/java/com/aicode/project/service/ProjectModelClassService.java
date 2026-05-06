@@ -16,15 +16,7 @@ import java.util.List;
  */
 public interface ProjectModelClassService extends IService<ProjectModelClass> {
 
-    /**
-     * 分页查询
-     *
-     * @param queryWrapper 查询条件
-     * @param offset       起始行
-     * @param limit        步长
-     * @return List<ProjectModelClass>
-     */
-    List<ProjectModelClass> list(QueryWrapper<ProjectModelClass> queryWrapper, int offset, int limit);
+
 }
 
 

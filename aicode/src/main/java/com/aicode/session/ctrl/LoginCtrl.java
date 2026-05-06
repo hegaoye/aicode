@@ -2,25 +2,25 @@ package com.aicode.session.ctrl;
 
 import com.aicode.account.entity.Account;
 import com.aicode.account.service.AccountService;
-import com.aicode.core.entity.R;
+import com.aicode.core.BaseException;
+import com.aicode.core.R;
 import com.aicode.core.enums.Constants;
-import com.aicode.core.exceptions.BaseException;
 import com.aicode.core.tools.JwtToken;
-import com.aicode.core.tools.security.Md5;
-import com.alibaba.fastjson.JSON;
+import com.aicode.core.tools.Md5;
+import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
-import springfox.documentation.annotations.ApiIgnore;
-
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletResponse;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 
 /**
@@ -31,24 +31,17 @@ import javax.servlet.http.HttpServletResponse;
 @Slf4j
 @RestController
 @RequestMapping("/login")
-@Api(value = "登陆控制器", tags = "登陆控制器")
+@Tag(name = "登陆控制器", description = "登陆控制器")
 public class LoginCtrl {
 
-    @Resource
+    @Autowired
     private AccountService accountService;
 
 
-    /**
-     * 登陆
-     *
-     * @param account  账户
-     * @param password 密码
-     * @return
-     */
-    @ApiOperation(value = "查询一个详情信息", notes = "查询一个详情信息")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "account", value = "账户", required = true, paramType = "query"),
-            @ApiImplicitParam(name = "password", value = "密码", required = true, paramType = "query")
+    @Operation(summary = "查询一个详情信息", description = "查询一个详情信息")
+    @Parameters(value = {
+            @Parameter(name = "account", required = true, description = "账户"),
+            @Parameter(name = "password", required = true, description = "密码"),
     })
     @GetMapping(value = "/signin")
     public R signin(String account, String password, HttpServletResponse response) {
@@ -70,23 +63,18 @@ public class LoginCtrl {
         } catch (Exception e) {
             e.printStackTrace();
             log.error(e.getMessage());
-            return R.failed("验证失败");
+            return R.failed(BaseException.BaseExceptionEnum.Illegal_Param);
         }
     }
 
 
-    /**
-     * 注册
-     *
-     * @return BeanRet
-     */
-    @ApiOperation(value = "注册", notes = "注册")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "account", value = "账户", required = true, paramType = "query"),
-            @ApiImplicitParam(name = "password", value = "密码", required = true, paramType = "query")
+    @Operation(summary = "注册", description = "注册")
+    @Parameters(value = {
+            @Parameter(name = "account", required = true, description = "账户"),
+            @Parameter(name = "password", required = true, description = "密码"),
     })
     @PostMapping("/reg")
-    public R reg(@ApiIgnore Account account) {
+    public R reg(@Parameter(hidden = true) Account account) {
         Assert.hasText(account.getAccount(), BaseException.BaseExceptionEnum.Empty_Param.toString());
         Assert.hasText(account.getPassword(), BaseException.BaseExceptionEnum.Empty_Param.toString());
         accountService.save(account);

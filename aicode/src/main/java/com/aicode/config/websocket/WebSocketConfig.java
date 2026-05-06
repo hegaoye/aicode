@@ -13,6 +13,7 @@ public class WebSocketConfig {
     public ServerEndpointExporter serverEndpointExporter() {
         return new ServerEndpointExporter();
     }
+
     @Bean
     public WebsocketSpringCofigurator websocketSpringCofigurator() {
         return new WebsocketSpringCofigurator(); // This is just to get context

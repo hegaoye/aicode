@@ -1,11 +1,11 @@
 package com.aicode.config.websocket;
 
+import jakarta.websocket.server.ServerEndpointConfig;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
-import javax.websocket.server.ServerEndpointConfig;
 
 public class WebsocketSpringCofigurator extends ServerEndpointConfig.Configurator implements ApplicationContextAware {
 

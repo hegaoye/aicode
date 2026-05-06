@@ -1,38 +1,28 @@
 /*
- * AI-Code 为您构建代码，享受智慧生活!
+ * aicode
  */
 package com.aicode.module.vo;
 
-import io.swagger.annotations.ApiModelProperty;
-import com.aicode.core.base.BaseVO;
+import com.aicode.core.BaseVO;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * 第三方模块池 分页 对象 VO
  *
- * @author hegaoye
+ * @author aicode
  */
 @Data
+@EqualsAndHashCode(callSuper = false)
 public class ModulePageVO extends BaseVO implements java.io.Serializable {
-    /**
-     * 数据库字段:id  属性显示:id
-     */
-    @ApiModelProperty(value = "id")
-    private java.lang.Long id;
-    /**
-     * 数据库字段:code  属性显示:模块编码
-     */
-    @ApiModelProperty(value = "模块编码")
-    private java.lang.String code;
-    /**
-     * 数据库字段:name  属性显示:模块名
-     */
-    @ApiModelProperty(value = "模块名")
-    private java.lang.String name;
-    /**
-     * 数据库字段:description  属性显示:模块说明
-     */
-    @ApiModelProperty(value = "模块说明")
-    private java.lang.String description;
-
+    @Schema(description = "数据库字段:id id")
+    private Long id;
+    @Schema(description = "数据库字段:code 模块编码")
+    private String code;
+    @Schema(description = "数据库字段:name 模块名")
+    private String name;
+    @Schema(description = "数据库字段:description 模块说明")
+    private String description;
 }

@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
  * FrameworksTemplate mapper
  * 直接与xml映射
  *
- * @author hegaoye
+ * @author aicode
  */
 @Repository
 public interface FrameworksTemplateMapper extends BaseMapper<FrameworksTemplate> {

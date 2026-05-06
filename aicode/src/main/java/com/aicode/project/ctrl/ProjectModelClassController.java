@@ -3,26 +3,26 @@
  */
 package com.aicode.project.ctrl;
 
-import com.aicode.core.entity.Page;
-import com.aicode.core.entity.R;
+
+import com.aicode.core.BaseException;
+import com.aicode.core.R;
 import com.aicode.project.entity.ProjectModelClass;
 import com.aicode.project.service.ProjectModelClassService;
 import com.aicode.project.vo.ProjectModelClassPageVO;
 import com.aicode.project.vo.ProjectModelClassVO;
 import com.alibaba.druid.util.StringUtils;
-import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
-
-import java.util.List;
 
 /**
  * 模块下的类
@@ -32,7 +32,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/projectModelClass")
 @Slf4j
-@Api(value = "模块下的类控制器", tags = "模块下的类控制器")
+@Tag(name = "模块下的类控制器", description = "模块下的类控制器")
 public class ProjectModelClassController {
     @Autowired
     private ProjectModelClassService projectModelClassService;
@@ -44,15 +44,15 @@ public class ProjectModelClassController {
      * @param id
      * @return BeanRet
      */
-    @ApiOperation(value = "查询模块下的类详情信息", notes = "查询模块下的类详情信息")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "", paramType = "query")
+    @Operation(summary = "查询模块下的类详情信息", description = "查询模块下的类详情信息")
+    @Parameters({
+            @Parameter(name = "id", description = "")
     })
     @GetMapping(value = "/loadById/{id}")
 
     public R loadById(@PathVariable Long id) {
         if (id == null) {
-            return R.failed("");
+            return R.failed(BaseException.BaseExceptionEnum.Empty_Param);
         }
 
         ProjectModelClass projectModelClass = projectModelClassService.getById(id);
@@ -65,14 +65,15 @@ public class ProjectModelClassController {
      *
      * @return R
      */
-    @ApiOperation(value = "创建ProjectModelClass", notes = "创建ProjectModelClass")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "", paramType = "query", required = true),
-            @ApiImplicitParam(name = "mapClassTableCode", value = "类编码", paramType = "query", required = true),
-            @ApiImplicitParam(name = "projectModelCode", value = "模块编码", paramType = "query", required = true)
+    @Operation(summary = "创建ProjectModelClass", description = "创建ProjectModelClass")
+    @Parameters({
+            @Parameter(name = "id", description = "", required = true),
+            @Parameter(name = "mapClassTableCode", description = "类编码", required = true),
+            @Parameter(name = "projectModelCode", description = "模块编码", required = true)
     })
+
     @PostMapping({"/build", "save"})
-    public ProjectModelClassVO build(@ApiIgnore ProjectModelClass projectModelClass) {
+    public ProjectModelClassVO build(@Parameter(hidden = true) ProjectModelClass projectModelClass) {
         projectModelClassService.save(projectModelClass);
         log.debug(JSON.toJSONString(projectModelClass));
         return JSON.parseObject(JSON.toJSONString(projectModelClass), ProjectModelClassVO.class);
@@ -85,15 +86,15 @@ public class ProjectModelClassController {
      * @param mapClassTableCode 类编码
      * @return BeanRet
      */
-    @ApiOperation(value = "查询模块下的类详情信息", notes = "查询模块下的类详情信息")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "mapClassTableCode", value = "类编码", paramType = "query")
+    @Operation(summary = "查询模块下的类详情信息", description = "查询模块下的类详情信息")
+    @Parameters({
+            @Parameter(name = "mapClassTableCode", description = "类编码")
     })
     @GetMapping(value = "/loadByMapClassTableCode")
 
     public R loadByMapClassTableCode(@PathVariable String mapClassTableCode) {
         if (StringUtils.isEmpty(mapClassTableCode)) {
-            return R.failed("");
+            return R.failed(BaseException.BaseExceptionEnum.Empty_Param);
         }
         ProjectModelClass projectModelClass = projectModelClassService.getOne(new LambdaQueryWrapper<ProjectModelClass>()
                 .eq(ProjectModelClass::getMapClassTableCode, mapClassTableCode));
@@ -108,15 +109,15 @@ public class ProjectModelClassController {
      * @param projectModelCode 模块编码
      * @return BeanRet
      */
-    @ApiOperation(value = "查询模块下的类详情信息", notes = "查询模块下的类详情信息")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "projectModelCode", value = "模块编码", paramType = "query")
+    @Operation(summary = "查询模块下的类详情信息", description = "查询模块下的类详情信息")
+    @Parameters({
+            @Parameter(name = "projectModelCode", description = "模块编码")
     })
     @GetMapping(value = "/loadByProjectModelCode")
 
     public R loadByProjectModelCode(@PathVariable String projectModelCode) {
         if (StringUtils.isEmpty(projectModelCode)) {
-            return R.failed("");
+            return R.failed(BaseException.BaseExceptionEnum.Empty_Param);
         }
 
         ProjectModelClass projectModelClass = projectModelClassService.getOne(new LambdaQueryWrapper<ProjectModelClass>()
@@ -130,38 +131,43 @@ public class ProjectModelClassController {
      *
      * @return 分页对象
      */
-    @ApiOperation(value = "查询ProjectModelClass信息集合", notes = "查询ProjectModelClass信息集合")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "curPage", value = "当前页", required = true, paramType = "query"),
-            @ApiImplicitParam(name = "pageSize", value = "分页大小", required = true, paramType = "query"),
-            @ApiImplicitParam(name = "id", value = "", paramType = "query"),
-            @ApiImplicitParam(name = "mapClassTableCode", value = "类编码", paramType = "query"),
-            @ApiImplicitParam(name = "projectModelCode", value = "模块编码", paramType = "query")
+    @Operation(summary = "查询ProjectModelClass信息集合", description = "查询ProjectModelClass信息集合")
+    @Parameters({
+            @Parameter(name = "curPage", description = "当前页", required = true),
+            @Parameter(name = "pageSize", description = "分页大小", required = true),
+            @Parameter(name = "id", description = ""),
+            @Parameter(name = "mapClassTableCode", description = "类编码"),
+            @Parameter(name = "projectModelCode", description = "模块编码")
     })
     @GetMapping(value = "/list")
-    public R list(@ApiIgnore ProjectModelClassPageVO projectModelClassVO, Integer curPage, Integer pageSize) {
-        Page<ProjectModelClass> page = new Page<>(pageSize, curPage);
+    public R list(@Parameter(hidden = true) ProjectModelClassPageVO projectModelClassVO, Integer curPage, Integer pageSize) {
+        IPage<ProjectModelClass> page = new Page<>(curPage, pageSize);
         QueryWrapper<ProjectModelClass> queryWrapper = new QueryWrapper<>();
         if (projectModelClassVO.getId() > 0) {
             queryWrapper.lambda().eq(ProjectModelClass::getId, projectModelClassVO.getId());
         }
 
         if (!StringUtils.isEmpty(projectModelClassVO.getMapClassTableCode())) {
-            queryWrapper.lambda().eq(ProjectModelClass::getMapClassTableCode, projectModelClassVO.getMapClassTableCode());
+            queryWrapper.lambda()
+                    .eq(ProjectModelClass::getMapClassTableCode, projectModelClassVO.getMapClassTableCode());
         }
 
         if (!StringUtils.isEmpty(projectModelClassVO.getProjectModelCode())) {
             queryWrapper.lambda().eq(ProjectModelClass::getProjectModelCode, projectModelClassVO.getProjectModelCode());
         }
 
-        int total = projectModelClassService.count(queryWrapper);
+        com.aicode.core.Page pageVO = new com.aicode.core.Page();
+        long total = projectModelClassService.count(queryWrapper);
         if (total > 0) {
-            List<ProjectModelClass> projectModelClassList = projectModelClassService.list(queryWrapper, page.genRowStart(), page.getPageSize());
-            page.setTotalRow(total);
-            page.setVoList(projectModelClassList);
+            queryWrapper.lambda().orderByDesc(ProjectModelClass::getId);
+
+            IPage<ProjectModelClass> projectMapPage = projectModelClassService.page(page, queryWrapper);
+
+            pageVO.setTotalRow(total);
+            pageVO.setVoList(projectMapPage.getRecords());
             log.debug(JSON.toJSONString(page));
         }
-        return R.success(page);
+        return R.success(pageVO);
     }
 
 
@@ -170,14 +176,14 @@ public class ProjectModelClassController {
      *
      * @return R
      */
-    @ApiOperation(value = "修改ProjectModelClass", notes = "修改ProjectModelClass")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "", paramType = "query"),
-            @ApiImplicitParam(name = "mapClassTableCode", value = "类编码", paramType = "query"),
-            @ApiImplicitParam(name = "projectModelCode", value = "模块编码", paramType = "query")
+    @Operation(summary = "修改ProjectModelClass", description = "修改ProjectModelClass")
+    @Parameters({
+            @Parameter(name = "id", description = ""),
+            @Parameter(name = "mapClassTableCode", description = "类编码"),
+            @Parameter(name = "projectModelCode", description = "模块编码")
     })
     @PutMapping("/modify")
-    public R modify(@ApiIgnore ProjectModelClass projectModelClass) {
+    public R modify(@Parameter(hidden = true) ProjectModelClass projectModelClass) {
         projectModelClassService.updateById(projectModelClass);
         return R.success();
     }
@@ -188,22 +194,22 @@ public class ProjectModelClassController {
      *
      * @return R
      */
-    @ApiOperation(value = "删除ProjectModelClass", notes = "删除ProjectModelClass")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "", paramType = "query"),
-            @ApiImplicitParam(name = "mapClassTableCode", value = "类编码", paramType = "query"),
-            @ApiImplicitParam(name = "projectModelCode", value = "模块编码", paramType = "query")
+    @Operation(summary = "删除ProjectModelClass", description = "删除ProjectModelClass")
+    @Parameters({
+            @Parameter(name = "id", description = ""),
+            @Parameter(name = "mapClassTableCode", description = "类编码"),
+            @Parameter(name = "projectModelCode", description = "模块编码")
     })
     @DeleteMapping("/delete")
     public R delete(Long id, String mapClassTableCode, String projectModelCode) {
         if (id == null) {
-            return R.failed("");
+            return R.failed(BaseException.BaseExceptionEnum.Empty_Param);
         }
         if (mapClassTableCode == null) {
-            return R.failed("");
+            return R.failed(BaseException.BaseExceptionEnum.Empty_Param);
         }
         if (projectModelCode == null) {
-            return R.failed("");
+            return R.failed(BaseException.BaseExceptionEnum.Empty_Param);
         }
         projectModelClassService.remove(new LambdaQueryWrapper<ProjectModelClass>()
                 .eq(ProjectModelClass::getId, id)

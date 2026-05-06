@@ -1,8 +1,6 @@
 package com.aicode.map.dao;
 
 import com.aicode.map.dao.mapper.MapRelationshipMapper;
-import com.aicode.map.entity.MapRelationship;
-import com.aicode.core.base.BaseDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -10,10 +8,10 @@ import org.springframework.stereotype.Repository;
  * MapRelationship DAO
  * 数据服务层
  *
- * @author hegaoye
+ * @author aicode
  */
 @Repository
-public class MapRelationshipDAO extends BaseDAO<MapRelationshipMapper, MapRelationship> {
+public class MapRelationshipDAO {
 
 
     /**
@@ -22,8 +20,8 @@ public class MapRelationshipDAO extends BaseDAO<MapRelationshipMapper, MapRelati
     @Autowired
     private MapRelationshipMapper mapRelationshipMapper;
 
-
     public int countByProjectCode(String code) {
         return mapRelationshipMapper.countByProjectCode(code);
     }
+
 }

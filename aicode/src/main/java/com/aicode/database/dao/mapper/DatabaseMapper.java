@@ -1,12 +1,9 @@
 package com.aicode.database.dao.mapper;
 
 import com.aicode.database.entity.Database;
-import com.aicode.database.entity.Table;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
 
 /**
  * @author hegaoye

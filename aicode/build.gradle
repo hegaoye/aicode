@@ -3,6 +3,7 @@ buildscript {
         springBootVersion = '2.2.6.RELEASE'
     }
     repositories {
+        gradlePluginPortal()
         maven { url "https://plugins.gradle.org/m2/" }
         maven { url "https://repo.spring.io/milestone" }
         maven { url "https://repo.spring.io/release" }
@@ -11,17 +12,14 @@ buildscript {
         maven { url "https://oss.jfrog.org/artifactory/oss-snapshot-local/" }
 
         mavenCentral()
-        jcenter()
     }
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
-//        classpath('se.transmode.gradle:gradle-docker:1.2')
     }
 }
 
 apply plugin: 'java'
 apply plugin: 'idea'
-//apply plugin: 'docker'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
 
@@ -88,7 +86,6 @@ dependencies {
     implementation 'com.ibeetl:beetl:3.0.19.RELEASE'
     implementation 'cn.hutool:hutool-all:5.1.5'
 
-
     implementation project(path: ':core')
     implementation project(path: ':common')
     implementation project(path: ':facade')
@@ -106,14 +103,18 @@ dependencyManagement {
     }
 }
 
-//task buildDocker(type: Docker, dependsOn: build) {
-//    push = true
-//    applicationName = jar.baseName
-//    dockerfile = file('src/main/Dockerfile')
-//    doFirst {
-//        copy {
-//            from jar
-//            into stageDir
+//bootBuildImage {
+//    imageName = "18.163.5.234/white-label/aicode:20250908"
+//    publish = true
+//    docker {
+//        host = "unix:///var/run/docker.sock"
+////        host = "tcp://192.168.8.125:2375"
+//        publishRegistry {
+//            tlsVerify = false
+//            username = "admin"
+//            password = "X0m72urncru2ugyazMfn"
+//            url = "https://18.163.5.234" //harbor 地址 https://ip:port
+//            email = "robot@gamil.com"
 //        }
 //    }
 //}

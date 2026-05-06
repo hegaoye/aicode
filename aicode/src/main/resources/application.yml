@@ -1,5 +1,5 @@
 server:
-  port: 9090
+  port: 8080
 
 spring:
   output:
@@ -93,9 +93,16 @@ management:
     web:
       exposure:
         include: "*"
-
   health:
     defaults:
       enabled: true
-    redis:
-      enabled: false
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+  #自定义管理端口 避免被外部探测
+  server:
+    port: 8088
+
+
+

@@ -4,16 +4,16 @@ CREATE DATABASE newaicode;
 USE newaicode;
 DROP TABLE IF EXISTS `account`;
 CREATE TABLE `account`  (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `id` bigint(20) NOT NULL ,
   `code` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '账户编码',
   `account` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '账户',
   `password` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '密码',
   PRIMARY KEY (`id`, `code`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 15 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '账户' ROW_FORMAT = Dynamic;
+) COMMENT = '账户' ROW_FORMAT = Dynamic;
 
 DROP TABLE IF EXISTS `display_attribute`;
 CREATE TABLE `display_attribute`  (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `id` bigint(20) NOT NULL ,
   `mapClassTableCode` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT '' COMMENT '类模型编码',
   `mapFieldColumnCode` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '字段编码',
   `isRequired` varchar(2) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT '' COMMENT '是否必填 Y,N',
@@ -32,11 +32,11 @@ CREATE TABLE `display_attribute`  (
   `validateText` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT '' COMMENT '验证提示语',
   `displayCss` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT '' COMMENT '显示css样式',
   PRIMARY KEY (`id`, `mapFieldColumnCode`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 559 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '显示属性' ROW_FORMAT = Dynamic;
+) COMMENT = '显示属性' ROW_FORMAT = Dynamic;
 
 DROP TABLE IF EXISTS `frameworks`;
 CREATE TABLE `frameworks`  (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `id` bigint(20) NOT NULL  COMMENT 'id',
   `code` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '技术编码',
   `name` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '技术名称',
   `description` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '技术描述',
@@ -45,30 +45,30 @@ CREATE TABLE `frameworks`  (
   `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
   `isPublic` varchar(2) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
   PRIMARY KEY (`id`, `code`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 28 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '框架技术池' ROW_FORMAT = Dynamic;
+) COMMENT = '框架技术池' ROW_FORMAT = Dynamic;
 
 DROP TABLE IF EXISTS `frameworks_template`;
 CREATE TABLE `frameworks_template`  (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `id` bigint(20) NOT NULL ,
   `code` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '模板编码',
   `frameworkCode` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT '' COMMENT '框架编码',
   `path` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '模板路径',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 205745 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '框架配置文件模板' ROW_FORMAT = Dynamic;
+) COMMENT = '框架配置文件模板' ROW_FORMAT = Dynamic;
 
 DROP TABLE IF EXISTS `map_class_table`;
 CREATE TABLE `map_class_table`  (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `id` bigint(20) NOT NULL  COMMENT 'id',
   `code` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '映射编码',
   `tableName` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '表名',
   `className` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '类名',
   `notes` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT '' COMMENT '注释',
   PRIMARY KEY (`id`, `code`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1441 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '类表映射信息' ROW_FORMAT = Dynamic;
+) COMMENT = '类表映射信息' ROW_FORMAT = Dynamic;
 
 DROP TABLE IF EXISTS `map_field_column`;
 CREATE TABLE `map_field_column`  (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `id` bigint(20) NOT NULL  COMMENT 'id',
   `mapClassTableCode` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '映射编码',
   `code` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '字段属性映射编码',
   `column` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '字段',
@@ -81,11 +81,11 @@ CREATE TABLE `map_field_column`  (
   `isDate` varchar(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT 'N' COMMENT '是否是时间类型',
   `isState` varchar(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT 'N' COMMENT '是否是状态',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 12181 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '字段属性映射信息' ROW_FORMAT = Dynamic;
+) COMMENT = '字段属性映射信息' ROW_FORMAT = Dynamic;
 
 DROP TABLE IF EXISTS `map_relationship`;
 CREATE TABLE `map_relationship`  (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `id` bigint(20) NOT NULL  COMMENT 'id',
   `code` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '关系编码',
   `mapClassTableCode` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT '' COMMENT '映射编码',
   `associateCode` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '被关联编码',
@@ -94,28 +94,28 @@ CREATE TABLE `map_relationship`  (
   `mainField` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '主表关联属性',
   `joinField` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '从表关联属性',
   PRIMARY KEY (`id`, `code`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 236 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '模型关系' ROW_FORMAT = Dynamic;
+) COMMENT = '模型关系' ROW_FORMAT = Dynamic;
 
 DROP TABLE IF EXISTS `module`;
 CREATE TABLE `module`  (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `id` bigint(20) NOT NULL  COMMENT 'id',
   `code` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '模块编码',
   `name` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '模块名',
   `description` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '模块说明',
   PRIMARY KEY (`id`, `code`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '第三方模块池' ROW_FORMAT = Dynamic;
+) COMMENT = '第三方模块池' ROW_FORMAT = Dynamic;
 
 DROP TABLE IF EXISTS `module_file`;
 CREATE TABLE `module_file`  (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `id` bigint(20) NOT NULL  COMMENT 'id',
   `moudleCode` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '模块编码',
   `path` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '文件路径',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '模块文件信息' ROW_FORMAT = Dynamic;
+) COMMENT = '模块文件信息' ROW_FORMAT = Dynamic;
 
 DROP TABLE IF EXISTS `project`;
 CREATE TABLE `project`  (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `id` bigint(20) NOT NULL  COMMENT 'id',
   `code` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '项目编码',
   `name` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '项目名',
   `description` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '项目描述',
@@ -138,11 +138,11 @@ CREATE TABLE `project`  (
   `accountCode` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '账户编码',
   `isIncrement` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '是否增量生成',
   PRIMARY KEY (`id`, `code`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 231 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '项目信息' ROW_FORMAT = Dynamic;
+) COMMENT = '项目信息' ROW_FORMAT = Dynamic;
 
 DROP TABLE IF EXISTS `project_code_catalog`;
 CREATE TABLE `project_code_catalog`  (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `id` bigint(20) NOT NULL ,
   `code` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '编码',
   `projectCode` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '项目编码',
   `basePackage` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '项目基础包名',
@@ -151,42 +151,42 @@ CREATE TABLE `project_code_catalog`  (
   `relativePath` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '相对路径',
   `absolutePath` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '绝对路径',
   PRIMARY KEY (`id`, `projectCode`, `code`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '生成源码资料' ROW_FORMAT = Dynamic;
+) COMMENT = '生成源码资料' ROW_FORMAT = Dynamic;
 
 DROP TABLE IF EXISTS `project_framwork`;
 CREATE TABLE `project_framwork`  (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `id` bigint(20) NOT NULL  COMMENT 'id',
   `frameworkCode` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '技术编码',
   `projectCode` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '项目编码',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 241 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '项目应用技术' ROW_FORMAT = Dynamic;
+) COMMENT = '项目应用技术' ROW_FORMAT = Dynamic;
 
 DROP TABLE IF EXISTS `project_job`;
 CREATE TABLE `project_job`  (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `id` bigint(20) NOT NULL  COMMENT 'id',
   `projectCode` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '项目编码',
   `code` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '任务编码',
   `number` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '第多少次执行',
   `state` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT '' COMMENT '任务状态: {创建:Create} , {执行中:Executing}, {完成:Completed} ,{失败:Error}, {警告:Waring}',
   `createTime` datetime(0) NULL DEFAULT NULL COMMENT '执行任务时间',
   PRIMARY KEY (`id`, `code`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1150 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '任务' ROW_FORMAT = Dynamic;
+) COMMENT = '任务' ROW_FORMAT = Dynamic;
 
 DROP TABLE IF EXISTS `project_job_logs`;
 CREATE TABLE `project_job_logs`  (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `id` bigint(20) NOT NULL  COMMENT 'id',
   `code` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '任务编码',
   `log` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT '' COMMENT '日志',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 63597 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '任务日志' ROW_FORMAT = Dynamic;
+) COMMENT = '任务日志' ROW_FORMAT = Dynamic;
 
 DROP TABLE IF EXISTS `project_map`;
 CREATE TABLE `project_map`  (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `id` bigint(20) NOT NULL  COMMENT 'id',
   `projectCode` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '项目编码',
   `mapClassTableCode` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '字段属性映射编码',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1442 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '项目数据表' ROW_FORMAT = Dynamic;
+) COMMENT = '项目数据表' ROW_FORMAT = Dynamic;
 
 DROP TABLE IF EXISTS `project_model`;
 CREATE TABLE `project_model`  (
@@ -199,7 +199,7 @@ CREATE TABLE `project_model`  (
   `is_menu` varchar(2) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL COMMENT '是否是菜单 Y,N',
   `ico` varchar(64) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL COMMENT '模块图标',
   PRIMARY KEY (`id`, `code`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = latin1 COLLATE = latin1_swedish_ci COMMENT = '模块' ROW_FORMAT = Dynamic;
+) COMMENT = '模块' ROW_FORMAT = Dynamic;
 
 DROP TABLE IF EXISTS `project_model_class`;
 CREATE TABLE `project_model_class`  (
@@ -207,19 +207,19 @@ CREATE TABLE `project_model_class`  (
   `mapClassTableCode` varchar(64) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL COMMENT '类编码',
   `projectModelCode` varchar(64) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL COMMENT '模块编码',
   PRIMARY KEY (`id`, `mapClassTableCode`, `projectModelCode`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = latin1 COLLATE = latin1_swedish_ci COMMENT = '模块下的类' ROW_FORMAT = Dynamic;
+) COMMENT = '模块下的类' ROW_FORMAT = Dynamic;
 
 DROP TABLE IF EXISTS `project_module`;
 CREATE TABLE `project_module`  (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `id` bigint(20) NOT NULL  COMMENT 'id',
   `projectCode` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '项目编码',
   `moduleCode` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT '' COMMENT '模块编码',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '项目选择模块' ROW_FORMAT = Dynamic;
+) COMMENT = '项目选择模块' ROW_FORMAT = Dynamic;
 
 DROP TABLE IF EXISTS `project_repository_account`;
 CREATE TABLE `project_repository_account`  (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `id` bigint(20) NOT NULL  COMMENT 'id',
   `code` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '版本管理编码',
   `projectCode` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '项目编码',
   `account` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '帐户名',
@@ -229,33 +229,33 @@ CREATE TABLE `project_repository_account`  (
   `state` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '状态：停用[Disenable]，启用[Enable]',
   `type` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '仓库类型:Git, Svn',
   PRIMARY KEY (`id`, `code`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 136 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '版本控制管理' ROW_FORMAT = Dynamic;
+) COMMENT = '版本控制管理' ROW_FORMAT = Dynamic;
 
 DROP TABLE IF EXISTS `project_sql`;
 CREATE TABLE `project_sql`  (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `id` bigint(20) NOT NULL ,
   `projectCode` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '项目编码',
   `code` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT 'tsql编码',
   `tsql` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT 'sql脚本',
   `state` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '状态：停用[Disenable]，启用[Enable]',
   PRIMARY KEY (`id`, `projectCode`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 193 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '项目sql脚本' ROW_FORMAT = Dynamic;
+) COMMENT = '项目sql脚本' ROW_FORMAT = Dynamic;
 
 DROP TABLE IF EXISTS `setting`;
 CREATE TABLE `setting`  (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `id` bigint(20) NOT NULL  COMMENT 'id',
   `k` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '键',
   `v` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '值',
   `description` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '说明',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 9 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '设置' ROW_FORMAT = Dynamic;
+) COMMENT = '设置' ROW_FORMAT = Dynamic;
 
 
 
 
 
 CREATE TABLE `worker_node` (
-  `ID` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'auto increment id',
+  `ID` bigint(20) NOT NULL  COMMENT 'auto increment id',
   `HOST_NAME` varchar(64) NOT NULL COMMENT 'host name',
   `PORT` varchar(64) NOT NULL COMMENT 'port',
   `TYPE` int(11) NOT NULL COMMENT 'node type: ACTUAL or CONTAINER',
@@ -263,4 +263,4 @@ CREATE TABLE `worker_node` (
   `MODIFIED` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp() COMMENT 'modified time',
   `CREATED` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT 'created time',
   PRIMARY KEY (`ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=1263 DEFAULT CHARSET=utf8 COMMENT='DB WorkerID Assigner for UID Generator';
+) ENGINE=InnoDB =1263 DEFAULT CHARSET=utf8 COMMENT='DB WorkerID Assigner for UID Generator';

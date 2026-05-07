@@ -39,6 +39,8 @@ public class ModuleFileController {
     @Autowired
     private ModuleFileService moduleFileService;
 
+    
+    @Deprecated
     @Operation(summary = "创建ModuleFile", description = "创建ModuleFile")
     @PostMapping("/build")
     public ModuleFileSaveVO build(@RequestBody ModuleFileSaveVO moduleFileSaveVO) {
@@ -57,6 +59,7 @@ public class ModuleFileController {
     }
 
 
+    @Deprecated
     @Operation(summary = "查询ModuleFile信息集合", description = "查询ModuleFile信息集合")
     @Parameters({
             @Parameter(name = "curPage", description = "当前页", required = true),
@@ -84,6 +87,8 @@ public class ModuleFileController {
     }
 
 
+    
+    @Deprecated
     @Operation(summary = "修改ModuleFile", description = "修改ModuleFile")
     @PutMapping("/modify")
     public boolean modify(@RequestBody ModuleFileVO moduleFileVO) {
@@ -95,6 +100,8 @@ public class ModuleFileController {
     }
 
 
+    
+    @Deprecated
     @Operation(summary = "删除ModuleFile", description = "删除ModuleFile")
     @Parameters({
             @Parameter(name = "id", description = "id")

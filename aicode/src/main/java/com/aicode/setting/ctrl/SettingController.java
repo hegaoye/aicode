@@ -37,6 +37,8 @@ public class SettingController {
     @Autowired
     private SettingService settingService;
 
+    
+    @Deprecated
     @Operation(summary = "创建Setting", description = "创建Setting")
     @PostMapping("/build")
     public SettingSaveVO build(@RequestBody SettingSaveVO settingSaveVO) {
@@ -54,6 +56,8 @@ public class SettingController {
         return settingSaveVO;
     }
 
+    
+    @Deprecated
     @Operation(summary = "加载一个系统中的参数设置", description = "加载一个系统中的参数设置")
     @Parameters({
             @Parameter(name = "k", description = "键", required = true)
@@ -67,6 +71,8 @@ public class SettingController {
     }
 
 
+    
+    @Deprecated
     @Operation(summary = "查询Setting信息集合", description = "查询Setting信息集合")
     @GetMapping(value = "/list")
     public R list() {
@@ -75,6 +81,8 @@ public class SettingController {
     }
 
 
+    
+    @Deprecated
     @Operation(summary = "修改Setting", description = "修改Setting")
     @Parameters({
             @Parameter(name = "k", description = "键", required = true),
@@ -90,6 +98,8 @@ public class SettingController {
         return R.success();
     }
 
+    
+    @Deprecated
     @Operation(summary = "删除Setting", description = "删除Setting")
     @Parameters({
             @Parameter(name = "id", description = "id")

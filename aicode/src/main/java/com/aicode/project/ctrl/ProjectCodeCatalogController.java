@@ -43,6 +43,7 @@ public class ProjectCodeCatalogController {
      *
      * @return R
      */
+    
     @Operation(summary = "创建ProjectCodeCatalog", description = "创建ProjectCodeCatalog")
     @PostMapping("/build")
     public ProjectCodeCatalogSaveVO build(@RequestBody ProjectCodeCatalogSaveVO projectCodeCatalogSaveVO) {
@@ -67,6 +68,8 @@ public class ProjectCodeCatalogController {
      * @param code 编码
      * @return ProjectCodeCatalogVO
      */
+    
+    @Deprecated
     @Operation(summary = "创建ProjectCodeCatalog", description = "创建ProjectCodeCatalog")
     @GetMapping("/load/code/{code}")
     public ProjectCodeCatalogVO loadByCode(@PathVariable String code) {
@@ -87,6 +90,8 @@ public class ProjectCodeCatalogController {
      * @param projectCode 项目编码
      * @return ProjectCodeCatalogVO
      */
+    
+    @Deprecated
     @Operation(summary = "创建ProjectCodeCatalog", description = "创建ProjectCodeCatalog")
     @GetMapping("/load/projectCode/{projectCode}")
     public ProjectCodeCatalogVO loadByProjectCode(@PathVariable String projectCode) {
@@ -106,6 +111,7 @@ public class ProjectCodeCatalogController {
      *
      * @return 分页对象
      */
+    
     @Operation(summary = "查询ProjectCodeCatalog信息集合", description = "查询ProjectCodeCatalog信息集合")
     @Parameters({
             @Parameter(name = "curPage", description = "当前页", required = true),
@@ -137,6 +143,7 @@ public class ProjectCodeCatalogController {
      *
      * @return R
      */
+    
     @Operation(summary = "修改ProjectCodeCatalog", description = "修改ProjectCodeCatalog")
     @PutMapping("/modify")
     public boolean modify(@RequestBody ProjectCodeCatalogVO projectCodeCatalogVO) {
@@ -153,6 +160,7 @@ public class ProjectCodeCatalogController {
      *
      * @return R
      */
+    
     @Operation(summary = "删除ProjectCodeCatalog", description = "删除ProjectCodeCatalog")
     @Parameters({
             @Parameter(name = "id", description = ""),

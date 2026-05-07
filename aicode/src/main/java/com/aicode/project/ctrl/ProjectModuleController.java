@@ -121,6 +121,7 @@ public class ProjectModuleController {
      *
      * @return R
      */
+    @Deprecated
     @Operation(summary = "修改ProjectModule", description = "修改ProjectModule")
     @PutMapping("/modify")
     public boolean modify(@RequestBody ProjectModuleVO projectModuleVO) {
@@ -137,6 +138,7 @@ public class ProjectModuleController {
      *
      * @return R
      */
+    @Deprecated
     @Operation(summary = "删除ProjectModule", description = "删除ProjectModule")
     @Parameters({
             @Parameter(name = "id", description = "id")

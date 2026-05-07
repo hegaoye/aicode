@@ -46,12 +46,12 @@ public class ProjectJobController {
      * @param code 任务编码
      * @return BeanRet
      */
+    
     @Operation(summary = "查询任务详情信息", description = "查询任务详情信息")
     @Parameters({
             @Parameter(name = "code", description = "任务编码")
     })
     @GetMapping(value = "/load")
-
     public R load(String code) {
         Assert.hasText(code, BaseException.BaseExceptionEnum.Empty_Param.toString());
         ProjectJob projectJob = projectJobService.getOne(new LambdaQueryWrapper<ProjectJob>()
@@ -66,6 +66,7 @@ public class ProjectJobController {
      *
      * @return R
      */
+    
     @Operation(summary = "创建ProjectJob", description = "创建ProjectJob")
     @Parameters({
             @Parameter(name = "projectCode", description = "项目编码", required = true),
@@ -93,6 +94,8 @@ public class ProjectJobController {
      * @param code 任务编码
      * @return ProjectJobVO
      */
+    
+    @Deprecated
     @Operation(summary = "创建ProjectJob", description = "创建ProjectJob")
     @GetMapping("/load/code/{code}")
     public ProjectJobVO loadByCode(@PathVariable String code) {
@@ -112,6 +115,7 @@ public class ProjectJobController {
      *
      * @return 分页对象
      */
+    
     @Operation(summary = "查询ProjectJob信息集合", description = "查询ProjectJob信息集合")
     @Parameters({
             @Parameter(name = "code", description = "项目编码"),
@@ -146,6 +150,7 @@ public class ProjectJobController {
      *
      * @return R
      */
+    
     @Operation(summary = "修改ProjectJob", description = "修改ProjectJob")
     @Parameters({
             @Parameter(name = "code", description = "项目编码", required = true),
@@ -169,6 +174,7 @@ public class ProjectJobController {
      *
      * @return R
      */
+    
     @Operation(summary = "删除ProjectJob", description = "删除ProjectJob")
     @Parameters({
             @Parameter(name = "code", description = "任务编码")
@@ -188,6 +194,7 @@ public class ProjectJobController {
      * @param code 项目编码
      * @return BeanRet
      */
+    @Deprecated
     @Operation(summary = "执行任务", description = "执行任务")
     @Parameters({
             @Parameter(name = "code", description = "任务编码")

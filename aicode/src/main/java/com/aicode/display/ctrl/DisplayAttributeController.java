@@ -64,6 +64,8 @@ public class DisplayAttributeController {
     }
 
 
+    
+    @Deprecated
     @Operation(summary = "创建DisplayAttribute", description = "创建DisplayAttribute")
     @GetMapping("/load/mapFieldColumnCode/{mapFieldColumnCode}")
     public R loadByMapFieldColumnCode(@PathVariable String mapFieldColumnCode) {
@@ -99,6 +101,7 @@ public class DisplayAttributeController {
     }
 
 
+    
     @Operation(summary = "修改DisplayAttribute", description = "修改DisplayAttribute")
     @Parameters({
             @Parameter(name = "mapFieldColumnCode", description = "字段编码"),
@@ -111,7 +114,7 @@ public class DisplayAttributeController {
             @Parameter(name = "isQueryRequired", description = "是否是查询条件 Y,N"),
             @Parameter(name = "isLineNew", description = "是否换行"),
             @Parameter(name = "matchType", description = "匹配方式 =,!=,>=,<=,>,<,like,左like，右like,between,in"),
-            @Parameter(name = "displayType", description = "显示格式 自动完成 Autocomplete,级联选择 Cascader,日期选择框 DatePicker,时间选择 TimePicker,输入框 Input,数字输入框 InputNumber,提及 Mention,邮箱 Email，电话Phone，手机Mobile，备注说明 Summary，选择器 Select，单选 Radio，多选框 Checkbox,评分 Rate,加载展位图 Skeleton,滑动输入条 Silder，开关 Switch,穿梭框 Transfer,选择树 TreeSelect ,上传 Upload,头像 Avatar"),
+            @Parameter(name = "displayType", description = "显示格式 自动完成 Autocomplete,级联选择 Cascader,日期选择框 DatePicker,时间选择 TimePicker,输入框 Input,数字输入框 InputNumber,提及 Mention,邮箱 Email，电话Phone，手机Mobile，备注说明 Summary，选择器 Select，单选 Radio，多选框 Checkbox,评分 Rate,加载展位图 Skeleton,滑动输入条 Slider，开关 Switch,穿梭框 Transfer,选择树 TreeSelect ,上传 Upload,头像 Avatar"),
             @Parameter(name = "displayName", description = "显示列名称"),
             @Parameter(name = "displayNo", description = "显示顺序"),
             @Parameter(name = "fieldValidationMode", description = "字段验证方式"),
@@ -125,6 +128,7 @@ public class DisplayAttributeController {
         return R.success();
     }
 
+    
     @Operation(summary = "删除DisplayAttribute", description = "删除DisplayAttribute")
     @Parameters({
             @Parameter(name = "id", description = ""),

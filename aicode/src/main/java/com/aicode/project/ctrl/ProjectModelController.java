@@ -44,6 +44,8 @@ public class ProjectModelController {
      * @param id
      * @return BeanRet
      */
+    
+    @Deprecated
     @Operation(summary = "查询模块详情信息", description = "查询模块详情信息")
     @Parameters({
             @Parameter(name = "id", description = "")
@@ -64,6 +66,8 @@ public class ProjectModelController {
      * @param code 模块编码
      * @return BeanRet
      */
+    
+    @Deprecated
     @Operation(summary = "查询模块详情信息", description = "查询模块详情信息")
     @Parameters({
             @Parameter(name = "code", description = "模块编码")
@@ -85,6 +89,7 @@ public class ProjectModelController {
      *
      * @return R
      */
+    
     @Operation(summary = "创建ProjectModel", description = "创建ProjectModel")
     @Parameters({
             @Parameter(name = "id", description = "", required = true),
@@ -108,6 +113,7 @@ public class ProjectModelController {
      *
      * @return 分页对象
      */
+    
     @Operation(summary = "查询ProjectModel信息集合", description = "查询ProjectModel信息集合")
     @Parameters({
             @Parameter(name = "curPage", description = "当前页", required = true),
@@ -164,6 +170,7 @@ public class ProjectModelController {
      *
      * @return R
      */
+    
     @Operation(summary = "修改ProjectModel", description = "修改ProjectModel")
     @Parameters({
             @Parameter(name = "id", description = ""),
@@ -194,6 +201,7 @@ public class ProjectModelController {
      *
      * @return R
      */
+    
     @Operation(summary = "删除ProjectModel", description = "删除ProjectModel")
     @Parameters({
             @Parameter(name = "id", description = ""),

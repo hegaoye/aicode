@@ -45,6 +45,7 @@ public class ProjectRepositoryAccountController {
      * @param code 版本管理编码
      * @return BeanRet
      */
+    
     @Operation(summary = "查询一个详情信息", description = "查询一个详情信息")
     @Parameters({
             @Parameter(name = "code", description = "版本管理编码")
@@ -86,6 +87,7 @@ public class ProjectRepositoryAccountController {
      * @param code 版本管理编码
      * @return ProjectRepositoryAccountVO
      */
+    
     @Operation(summary = "创建ProjectRepositoryAccount", description = "创建ProjectRepositoryAccount")
     @GetMapping("/load/code/{code}")
     public ProjectRepositoryAccountVO loadByCode(@PathVariable String code) {
@@ -105,6 +107,7 @@ public class ProjectRepositoryAccountController {
      *
      * @return 分页对象
      */
+    
     @Operation(summary = "查询ProjectRepositoryAccount信息集合", description = "查询ProjectRepositoryAccount信息集合")
     @Parameters({
             @Parameter(name = "projectCode", description = "项目编码"),
@@ -134,6 +137,7 @@ public class ProjectRepositoryAccountController {
      *
      * @return R
      */
+    
     @Operation(summary = "修改ProjectRepositoryAccount", description = "修改ProjectRepositoryAccount")
     @Parameters({
             @Parameter(name = "code", description = "版本管理编码", required = true),
@@ -163,6 +167,8 @@ public class ProjectRepositoryAccountController {
      *
      * @return R
      */
+    
+    @Deprecated
     @Operation(summary = "删除ProjectRepositoryAccount", description = "删除ProjectRepositoryAccount")
     @Parameters({
             @Parameter(name = "code", description = "版本管理编码")

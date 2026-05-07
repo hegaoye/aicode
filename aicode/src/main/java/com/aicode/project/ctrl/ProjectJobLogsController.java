@@ -41,6 +41,8 @@ public class ProjectJobLogsController {
      *
      * @return R
      */
+    
+    @Deprecated
     @Operation(summary = "创建ProjectJobLogs", description = "创建ProjectJobLogs")
     @PostMapping("/build")
     public ProjectJobLogsSaveVO build(@RequestBody ProjectJobLogsSaveVO projectJobLogsSaveVO) {
@@ -64,6 +66,8 @@ public class ProjectJobLogsController {
      *
      * @return 分页对象
      */
+    
+    @Deprecated
     @Operation(summary = "查询ProjectJobLogs信息集合", description = "查询ProjectJobLogs信息集合")
     @Parameters({
             @Parameter(name = "code", description = "任务编码"),
@@ -99,6 +103,8 @@ public class ProjectJobLogsController {
      *
      * @return R
      */
+    
+    @Deprecated
     @Operation(summary = "修改ProjectJobLogs", description = "修改ProjectJobLogs")
     @PutMapping("/modify")
     public boolean modify(@RequestBody ProjectJobLogsVO projectJobLogsVO) {
@@ -115,6 +121,8 @@ public class ProjectJobLogsController {
      *
      * @return R
      */
+    
+    @Deprecated
     @Operation(summary = "删除ProjectJobLogs", description = "删除ProjectJobLogs")
     @Parameters({
             @Parameter(name = "id", description = "id")

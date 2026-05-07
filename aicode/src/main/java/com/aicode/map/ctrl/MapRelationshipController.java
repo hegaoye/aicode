@@ -55,6 +55,7 @@ public class MapRelationshipController {
     @Autowired
     private UidGenerator uidGenerator;
 
+    
     @Operation(summary = "创建MapRelationship", description = "创建MapRelationship")
     @Parameters({
             @Parameter(name = "mapClassTableCode", description = "关联编码", required = true),
@@ -111,6 +112,7 @@ public class MapRelationshipController {
     }
 
 
+    
     @Operation(summary = "创建MapRelationship", description = "创建MapRelationship")
     @GetMapping("/load/code/{code}")
     public MapRelationshipVO loadByCode(@PathVariable String code) {
@@ -126,6 +128,7 @@ public class MapRelationshipController {
     }
 
 
+    
     @Operation(summary = "查询MapRelationship信息集合", description = "查询MapRelationship信息集合")
     @Parameters({
             @Parameter(name = "classTableCode", description = "类表映射编码", required = true),
@@ -139,6 +142,7 @@ public class MapRelationshipController {
     }
 
 
+    
     @Operation(summary = "查询类表映射关系列表", description = "查询类表映射关系列表")
     @Parameters({
             @Parameter(name = "projectCode", description = "项目名", required = true)
@@ -162,6 +166,7 @@ public class MapRelationshipController {
     }
 
 
+    
     @Operation(summary = "查询模型关系列表", description = "查询模型关系列表")
     @Parameters({
             @Parameter(name = "classTableCode", description = "类表映射编码", required = true),
@@ -175,6 +180,7 @@ public class MapRelationshipController {
     }
 
 
+    
     @Operation(summary = "查询字段信息--设置表的关联关系时使用", description = "查询字段信息--设置表的关联关系时使用")
     @Parameters({
             @Parameter(name = "mapClassTableCode", description = "映射编码"),
@@ -204,6 +210,7 @@ public class MapRelationshipController {
     }
 
 
+    
     @Operation(summary = "修改MapRelationship", description = "修改MapRelationship")
     @PutMapping("/modify")
     public boolean modify(@RequestBody MapRelationshipVO mapRelationshipVO) {
@@ -215,6 +222,7 @@ public class MapRelationshipController {
     }
 
 
+    
     @Operation(summary = "删除MapRelationship", description = "删除MapRelationship")
     @Parameters({
             @Parameter(name = "codes", description = "编码，多个编码使用逗号隔开", required = true),

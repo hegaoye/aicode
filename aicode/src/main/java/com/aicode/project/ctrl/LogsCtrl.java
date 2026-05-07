@@ -41,6 +41,8 @@ public class LogsCtrl {
      *
      * @return BeanRet
      */
+    
+    @Deprecated
     @Operation(summary = "创建日志文件", description = "创建日志文件")
     @Parameters({
             @Parameter(name = "projectCode", description = "项目code", required = true),
@@ -56,6 +58,8 @@ public class LogsCtrl {
      *
      * @return BeanRet
      */
+    
+    @Deprecated
     @Operation(summary = "保存日志数据", description = "保存日志数据")
     @Parameters({
             @Parameter(name = "logs", description = "日志信息", required = true),
@@ -72,6 +76,8 @@ public class LogsCtrl {
      *
      * @return BeanRet
      */
+    
+    @Deprecated
     @Operation(summary = "查询请求路径", description = "查询请求路径")
     @Parameters({
             @Parameter(name = "projectCode", description = "项目code", required = true),

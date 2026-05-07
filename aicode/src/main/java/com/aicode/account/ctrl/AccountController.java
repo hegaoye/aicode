@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+
 /**
  * 账户
  *
@@ -44,6 +45,7 @@ public class AccountController {
     @Autowired
     private AccountService accountService;
 
+    
     @Operation(summary = "创建Account", description = "创建Account")
     @PostMapping("/build")
     public AccountSaveVO build(@RequestBody AccountSaveVO accountSaveVO) {
@@ -62,6 +64,8 @@ public class AccountController {
     }
 
 
+    
+    @Deprecated
     @Operation(summary = "创建Account", description = "创建Account")
     @GetMapping("/load/code/{code}")
     public AccountVO loadByCode(@PathVariable String code) {
@@ -76,6 +80,7 @@ public class AccountController {
         return _accountVO;
     }
 
+    
     @Operation(summary = "查询Account信息集合", description = "查询Account信息集合")
     @Parameters({
             @Parameter(name = "curPage", description = "当前页", required = true),
@@ -102,6 +107,7 @@ public class AccountController {
     }
 
 
+    
     @Operation(summary = "修改Account", description = "修改Account")
     @PutMapping("/modify")
     public boolean modify(@RequestBody AccountVO accountVO) {
@@ -113,6 +119,8 @@ public class AccountController {
     }
 
 
+    
+    @Deprecated
     @Operation(summary = "修改密码", description = "修改密码")
     @Parameters({
             @Parameter(name = "password", description = "密码", required = true)
@@ -130,6 +138,7 @@ public class AccountController {
     }
 
 
+    
     @Operation(summary = "删除Account", description = "删除Account")
     @Parameters({
             @Parameter(name = "id", description = ""),

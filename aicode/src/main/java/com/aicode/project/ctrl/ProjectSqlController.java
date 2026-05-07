@@ -52,6 +52,7 @@ public class ProjectSqlController {
      *
      * @return R
      */
+    @Deprecated
     @Operation(summary = "创建ProjectSql", description = "创建ProjectSql")
     @Parameters({
             @Parameter(name = "projectCode", description = "项目编码", required = true),
@@ -69,6 +70,7 @@ public class ProjectSqlController {
      *
      * @return BeanRet
      */
+    
     @Operation(summary = "查询一个详情信息", description = "查询一个详情信息")
     @Parameters({
             @Parameter(name = "code", description = "sql编码"),
@@ -92,6 +94,7 @@ public class ProjectSqlController {
      * @param projectCode 项目编码
      * @return ProjectSqlVO
      */
+    
     @Operation(summary = "创建ProjectSql", description = "创建ProjectSql")
     @GetMapping("/load/projectCode/{projectCode}")
     public ProjectSqlVO loadByProjectCode(@PathVariable String projectCode) {
@@ -111,6 +114,7 @@ public class ProjectSqlController {
      *
      * @return 分页对象
      */
+    
     @Operation(summary = "查询ProjectSql信息集合", description = "查询ProjectSql信息集合")
     @Parameters({
             @Parameter(name = "projectCode", description = "项目编码", required = true)
@@ -132,6 +136,7 @@ public class ProjectSqlController {
      *
      * @return R
      */
+    
     @Operation(summary = "修改ProjectSql", description = "修改ProjectSql")
     @Parameters({
             @Parameter(name = "code", description = "tsql编码", required = true),
@@ -158,6 +163,7 @@ public class ProjectSqlController {
      *
      * @return R
      */
+    
     @Operation(summary = "删除ProjectSql", description = "删除ProjectSql")
     @Parameters({
             @Parameter(name = "id", description = ""),

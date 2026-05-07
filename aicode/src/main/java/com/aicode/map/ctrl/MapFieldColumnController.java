@@ -39,6 +39,8 @@ public class MapFieldColumnController {
     private MapFieldColumnService mapFieldColumnService;
 
 
+    
+    @Deprecated
     @Operation(summary = "创建MapFieldColumn", description = "创建MapFieldColumn")
     @PostMapping("/build")
     public MapFieldColumnSaveVO build(@RequestBody MapFieldColumnSaveVO mapFieldColumnSaveVO) {
@@ -57,6 +59,8 @@ public class MapFieldColumnController {
     }
 
 
+    
+    @Deprecated
     @Operation(summary = "查询MapFieldColumn信息集合", description = "查询MapFieldColumn信息集合")
     @Parameters({
             @Parameter(name = "curPage", description = "当前页", required = true),
@@ -84,6 +88,8 @@ public class MapFieldColumnController {
     }
 
 
+    
+    @Deprecated
     @Operation(summary = "修改MapFieldColumn", description = "修改MapFieldColumn")
     @PutMapping("/modify")
     public boolean modify(@RequestBody MapFieldColumnVO mapFieldColumnVO) {
@@ -95,6 +101,8 @@ public class MapFieldColumnController {
     }
 
 
+    
+    @Deprecated
     @Operation(summary = "删除MapFieldColumn", description = "删除MapFieldColumn")
     @Parameters({
             @Parameter(name = "id", description = "id")

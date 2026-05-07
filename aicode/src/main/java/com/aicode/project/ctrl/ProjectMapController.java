@@ -43,6 +43,8 @@ public class ProjectMapController {
      *
      * @return R
      */
+    
+    @Deprecated
     @Operation(summary = "创建ProjectMap", description = "创建ProjectMap")
     @PostMapping("/build")
     public ProjectMapSaveVO build(@RequestBody ProjectMapSaveVO projectMapSaveVO) {
@@ -66,6 +68,8 @@ public class ProjectMapController {
      *
      * @return 分页对象
      */
+    
+    @Deprecated
     @Operation(summary = "查询ProjectMap信息集合", description = "查询ProjectMap信息集合")
     @Parameters({
             @Parameter(name = "curPage", description = "当前页", required = true),
@@ -96,6 +100,8 @@ public class ProjectMapController {
      *
      * @return R
      */
+    
+    @Deprecated
     @Operation(summary = "修改ProjectMap", description = "修改ProjectMap")
     @PutMapping("/modify")
     public boolean modify(@RequestBody ProjectMapVO projectMapVO) {
@@ -112,6 +118,8 @@ public class ProjectMapController {
      *
      * @return R
      */
+    
+    @Deprecated
     @Operation(summary = "删除ProjectMap", description = "删除ProjectMap")
     @Parameters({
             @Parameter(name = "id", description = "id")

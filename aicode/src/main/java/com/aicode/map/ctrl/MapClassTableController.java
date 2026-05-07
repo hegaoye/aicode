@@ -38,6 +38,8 @@ public class MapClassTableController {
     @Autowired
     private MapClassTableService mapClassTableService;
 
+    
+    @Deprecated
     @Operation(summary = "创建MapClassTable", description = "创建MapClassTable")
     @PostMapping("/build")
     public MapClassTableSaveVO build(@RequestBody MapClassTableSaveVO mapClassTableSaveVO) {
@@ -56,6 +58,8 @@ public class MapClassTableController {
     }
 
 
+    
+    @Deprecated
     @Operation(summary = "创建MapClassTable", description = "创建MapClassTable")
     @GetMapping("/load/code/{code}")
     public MapClassTableVO loadByCode(@PathVariable String code) {
@@ -71,6 +75,8 @@ public class MapClassTableController {
     }
 
 
+    
+    @Deprecated
     @Operation(summary = "查询MapClassTable信息集合", description = "查询MapClassTable信息集合")
     @Parameters({
             @Parameter(name = "curPage", description = "当前页", required = true),
@@ -97,6 +103,8 @@ public class MapClassTableController {
     }
 
 
+    
+    @Deprecated
     @Operation(summary = "修改MapClassTable", description = "修改MapClassTable")
     @PutMapping("/modify")
     public boolean modify(@RequestBody MapClassTableVO mapClassTableVO) {
@@ -108,6 +116,8 @@ public class MapClassTableController {
     }
 
 
+    
+    @Deprecated
     @Operation(summary = "删除MapClassTable", description = "删除MapClassTable")
     @Parameters({
             @Parameter(name = "id", description = "id"),

@@ -44,12 +44,13 @@ public class ProjectModelClassController {
      * @param id
      * @return BeanRet
      */
+    
+    @Deprecated
     @Operation(summary = "查询模块下的类详情信息", description = "查询模块下的类详情信息")
     @Parameters({
             @Parameter(name = "id", description = "")
     })
     @GetMapping(value = "/loadById/{id}")
-
     public R loadById(@PathVariable Long id) {
         if (id == null) {
             return R.failed(BaseException.BaseExceptionEnum.Empty_Param);
@@ -65,6 +66,7 @@ public class ProjectModelClassController {
      *
      * @return R
      */
+    
     @Operation(summary = "创建ProjectModelClass", description = "创建ProjectModelClass")
     @Parameters({
             @Parameter(name = "id", description = "", required = true),
@@ -86,12 +88,13 @@ public class ProjectModelClassController {
      * @param mapClassTableCode 类编码
      * @return BeanRet
      */
+    
+    @Deprecated
     @Operation(summary = "查询模块下的类详情信息", description = "查询模块下的类详情信息")
     @Parameters({
             @Parameter(name = "mapClassTableCode", description = "类编码")
     })
     @GetMapping(value = "/loadByMapClassTableCode")
-
     public R loadByMapClassTableCode(@PathVariable String mapClassTableCode) {
         if (StringUtils.isEmpty(mapClassTableCode)) {
             return R.failed(BaseException.BaseExceptionEnum.Empty_Param);
@@ -109,12 +112,13 @@ public class ProjectModelClassController {
      * @param projectModelCode 模块编码
      * @return BeanRet
      */
+    
+    @Deprecated
     @Operation(summary = "查询模块下的类详情信息", description = "查询模块下的类详情信息")
     @Parameters({
             @Parameter(name = "projectModelCode", description = "模块编码")
     })
     @GetMapping(value = "/loadByProjectModelCode")
-
     public R loadByProjectModelCode(@PathVariable String projectModelCode) {
         if (StringUtils.isEmpty(projectModelCode)) {
             return R.failed(BaseException.BaseExceptionEnum.Empty_Param);
@@ -176,6 +180,7 @@ public class ProjectModelClassController {
      *
      * @return R
      */
+    
     @Operation(summary = "修改ProjectModelClass", description = "修改ProjectModelClass")
     @Parameters({
             @Parameter(name = "id", description = ""),
@@ -194,6 +199,7 @@ public class ProjectModelClassController {
      *
      * @return R
      */
+    
     @Operation(summary = "删除ProjectModelClass", description = "删除ProjectModelClass")
     @Parameters({
             @Parameter(name = "id", description = ""),

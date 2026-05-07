@@ -39,6 +39,8 @@ public class FrameworksTemplateController {
     private FrameworksTemplateService frameworksTemplateService;
 
 
+    
+    @Deprecated
     @Operation(summary = "创建FrameworksTemplate", description = "创建FrameworksTemplate")
     @PostMapping("/build")
     public FrameworksTemplateSaveVO build(@RequestBody FrameworksTemplateSaveVO frameworksTemplateSaveVO) {
@@ -57,6 +59,8 @@ public class FrameworksTemplateController {
     }
 
 
+    
+    @Deprecated
     @Operation(summary = "查询FrameworksTemplate信息集合", description = "查询FrameworksTemplate信息集合")
     @Parameters({
             @Parameter(name = "curPage", description = "当前页", required = true),
@@ -85,6 +89,8 @@ public class FrameworksTemplateController {
     }
 
 
+    
+    @Deprecated
     @Operation(summary = "修改FrameworksTemplate", description = "修改FrameworksTemplate")
     @PutMapping("/modify")
     public boolean modify(@RequestBody FrameworksTemplateVO frameworksTemplateVO) {
@@ -96,6 +102,8 @@ public class FrameworksTemplateController {
     }
 
 
+    
+    @Deprecated
     @Operation(summary = "删除FrameworksTemplate", description = "删除FrameworksTemplate")
     @Parameters({
             @Parameter(name = "id", description = "")

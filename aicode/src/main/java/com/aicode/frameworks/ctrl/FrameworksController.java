@@ -39,6 +39,7 @@ public class FrameworksController {
     @Autowired
     private FrameworksService frameworksService;
 
+    
     @Operation(summary = "创建Frameworks", description = "创建Frameworks")
     @PostMapping("/build")
     public R build(@Parameter(hidden = true) Frameworks frameworks) {
@@ -47,6 +48,7 @@ public class FrameworksController {
     }
 
 
+    
     @Operation(summary = "创建Frameworks", description = "创建Frameworks")
     @GetMapping("/load")
     public R load(String code) {
@@ -60,6 +62,8 @@ public class FrameworksController {
     }
 
 
+    
+    
     @Operation(summary = "创建Frameworks", description = "创建Frameworks")
     @GetMapping("/load/code/{code}")
     public FrameworksVO loadByCode(@PathVariable String code) {
@@ -75,6 +79,8 @@ public class FrameworksController {
     }
 
 
+    
+    
     @Operation(summary = "查询Frameworks信息集合", description = "查询Frameworks信息集合")
     @Parameters({
             @Parameter(name = "curPage", description = "当前页", required = true),
@@ -102,13 +108,8 @@ public class FrameworksController {
         return R.success(pageVO);
     }
 
+    
     @Operation(summary = "修改Frameworks", description = "修改Frameworks")
-    @Parameters({
-            @Parameter(name = "code", description = "模板编码", required = true),
-            @Parameter(name = "name", description = "类型名"),
-            @Parameter(name = "description", description = "类型说明"),
-            @Parameter(name = "isPublic", description = "状态：停用[Disenable]，启用[Enable]")
-    })
     @RequestMapping(value = "/modify", method = {RequestMethod.PUT, RequestMethod.POST})
     public R modify(@Parameter(hidden = true) Frameworks frameworks) {
         frameworksService.update(frameworks, new LambdaQueryWrapper<Frameworks>()
@@ -116,6 +117,7 @@ public class FrameworksController {
         return R.success(frameworks);
     }
 
+    
     @Operation(summary = "修改状态", description = "修改状态")
     @Parameters({
             @Parameter(name = "code", description = "模板编码", required = true),
@@ -132,6 +134,8 @@ public class FrameworksController {
     }
 
 
+    
+    
     @Operation(summary = "删除Frameworks", description = "删除Frameworks")
     @Parameters({
             @Parameter(name = "code", description = "技术编码")

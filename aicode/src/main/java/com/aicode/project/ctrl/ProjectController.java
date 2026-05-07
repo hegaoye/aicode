@@ -78,6 +78,7 @@ public class ProjectController {
      *
      * @return BeanRet
      */
+    
     @Operation(summary = "执行脚本", description = "执行脚本")
     @Parameters({
             @Parameter(name = "code", description = "项目编码", required = true)
@@ -90,6 +91,8 @@ public class ProjectController {
     }
 
 
+    
+    @Deprecated
     @GetMapping("/download/{proejctName}")
     @Operation(summary = "下载项目源码", description = "下载项目源码")
     @Parameters({
@@ -130,6 +133,8 @@ public class ProjectController {
      *
      * @return index页面
      */
+    
+    @Deprecated
     @GetMapping(value = "/index")
     public String index() {
         return "/index";
@@ -203,9 +208,12 @@ public class ProjectController {
      * @param filePath 文件路径
      * @return BeanRet
      */
+    
+    
     @Operation(summary = "查询文件路径", description = "查询文件路径")
     @Parameters({
-            @Parameter(name = "code", description = "项目编码")
+            @Parameter(name = "code", description = "项目编码"),
+            @Parameter(name = "filePath", description = "文件路径")
     })
     @GetMapping(value = "/scan/path")
     public R scanPath(String code, String filePath) throws IOException {
@@ -243,6 +251,7 @@ public class ProjectController {
      *
      * @return R
      */
+    
     @Operation(summary = "创建Project", description = "创建Project")
     @Parameters({
             @Parameter(name = "name", description = "项目名 最长128个汉字", required = true),
@@ -281,6 +290,8 @@ public class ProjectController {
      * @param code 项目编码
      * @return ProjectVO
      */
+    
+    
     @Operation(summary = "创建Project", description = "创建Project")
     @GetMapping("/load/code/{code}")
     public ProjectVO loadByCode(@PathVariable String code) {
@@ -300,6 +311,8 @@ public class ProjectController {
      *
      * @return 分页对象
      */
+    
+    
     @Operation(summary = "查询Project信息集合", description = "查询Project信息集合")
     @Parameters({
             @Parameter(name = "curPage", description = "当前页", required = true),
@@ -328,6 +341,8 @@ public class ProjectController {
      *
      * @return R
      */
+    
+    
     @Operation(summary = "修改Project", description = "修改Project")
     @Parameters({
             @Parameter(name = "code", description = "项目编码", required = true),
@@ -368,6 +383,7 @@ public class ProjectController {
      *
      * @return R
      */
+    
     @Operation(summary = "删除Project", description = "删除Project")
     @Parameters({
             @Parameter(name = "code", description = "项目编码", required = true)

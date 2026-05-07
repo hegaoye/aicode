@@ -38,35 +38,6 @@ public class ProjectModelClassController {
     private ProjectModelClassService projectModelClassService;
 
 
-    /**
-     * 查询模块下的类详情信息
-     *
-     * @param id
-     * @return BeanRet
-     */
-    
-    @Deprecated
-    @Operation(summary = "查询模块下的类详情信息", description = "查询模块下的类详情信息")
-    @Parameters({
-            @Parameter(name = "id", description = "")
-    })
-    @GetMapping(value = "/loadById/{id}")
-    public R loadById(@PathVariable Long id) {
-        if (id == null) {
-            return R.failed(BaseException.BaseExceptionEnum.Empty_Param);
-        }
-
-        ProjectModelClass projectModelClass = projectModelClassService.getById(id);
-        log.info(JSON.toJSONString(projectModelClass));
-        return R.success(projectModelClass);
-    }
-
-    /**
-     * 创建 模块下的类
-     *
-     * @return R
-     */
-    
     @Operation(summary = "创建ProjectModelClass", description = "创建ProjectModelClass")
     @Parameters({
             @Parameter(name = "id", description = "", required = true),
@@ -82,59 +53,6 @@ public class ProjectModelClassController {
     }
 
 
-    /**
-     * 查询模块下的类详情信息
-     *
-     * @param mapClassTableCode 类编码
-     * @return BeanRet
-     */
-    
-    @Deprecated
-    @Operation(summary = "查询模块下的类详情信息", description = "查询模块下的类详情信息")
-    @Parameters({
-            @Parameter(name = "mapClassTableCode", description = "类编码")
-    })
-    @GetMapping(value = "/loadByMapClassTableCode")
-    public R loadByMapClassTableCode(@PathVariable String mapClassTableCode) {
-        if (StringUtils.isEmpty(mapClassTableCode)) {
-            return R.failed(BaseException.BaseExceptionEnum.Empty_Param);
-        }
-        ProjectModelClass projectModelClass = projectModelClassService.getOne(new LambdaQueryWrapper<ProjectModelClass>()
-                .eq(ProjectModelClass::getMapClassTableCode, mapClassTableCode));
-        log.info(JSON.toJSONString(projectModelClass));
-        return R.success(projectModelClass);
-    }
-
-
-    /**
-     * 查询模块下的类详情信息
-     *
-     * @param projectModelCode 模块编码
-     * @return BeanRet
-     */
-    
-    @Deprecated
-    @Operation(summary = "查询模块下的类详情信息", description = "查询模块下的类详情信息")
-    @Parameters({
-            @Parameter(name = "projectModelCode", description = "模块编码")
-    })
-    @GetMapping(value = "/loadByProjectModelCode")
-    public R loadByProjectModelCode(@PathVariable String projectModelCode) {
-        if (StringUtils.isEmpty(projectModelCode)) {
-            return R.failed(BaseException.BaseExceptionEnum.Empty_Param);
-        }
-
-        ProjectModelClass projectModelClass = projectModelClassService.getOne(new LambdaQueryWrapper<ProjectModelClass>()
-                .eq(ProjectModelClass::getProjectModelCode, projectModelCode));
-        log.info(JSON.toJSONString(projectModelClass));
-        return R.success(projectModelClass);
-    }
-
-    /**
-     * 查询模块下的类信息集合
-     *
-     * @return 分页对象
-     */
     @Operation(summary = "查询ProjectModelClass信息集合", description = "查询ProjectModelClass信息集合")
     @Parameters({
             @Parameter(name = "curPage", description = "当前页", required = true),
@@ -175,12 +93,6 @@ public class ProjectModelClassController {
     }
 
 
-    /**
-     * 修改 模块下的类
-     *
-     * @return R
-     */
-    
     @Operation(summary = "修改ProjectModelClass", description = "修改ProjectModelClass")
     @Parameters({
             @Parameter(name = "id", description = ""),
@@ -194,12 +106,6 @@ public class ProjectModelClassController {
     }
 
 
-    /**
-     * 删除 模块下的类
-     *
-     * @return R
-     */
-    
     @Operation(summary = "删除ProjectModelClass", description = "删除ProjectModelClass")
     @Parameters({
             @Parameter(name = "id", description = ""),

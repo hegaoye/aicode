@@ -42,13 +42,7 @@ public class ProjectModuleController {
     @Autowired
     private ProjectModuleService projectModuleService;
 
-    /**
-     * 查询一个详情信息
-     *
-     * @param projectCode 项目编码
-     * @param moudleCode  模块编码
-     * @return BeanRet
-     */
+
     @Operation(summary = "查询一个详情信息", description = "查询一个详情信息")
     @Parameters({
             @Parameter(name = "projectCode", description = "项目编码", required = true),
@@ -67,11 +61,7 @@ public class ProjectModuleController {
 
     }
 
-    /**
-     * 创建 项目选择模块
-     *
-     * @return R
-     */
+
     @Operation(summary = "创建ProjectModule", description = "创建ProjectModule")
     @Parameters({
             @Parameter(name = "projectCode", description = "项目编码", required = true),
@@ -86,11 +76,6 @@ public class ProjectModuleController {
     }
 
 
-    /**
-     * 查询项目选择模块信息集合
-     *
-     * @return 分页对象
-     */
     @Operation(summary = "查询ProjectModule信息集合", description = "查询ProjectModule信息集合")
     @Parameters({
             @Parameter(name = "projectCode", description = "项目编码", required = true),
@@ -113,43 +98,6 @@ public class ProjectModuleController {
             log.debug(JSON.toJSONString(page));
         }
         return R.success(pageVO);
-    }
-
-
-    /**
-     * 修改 项目选择模块
-     *
-     * @return R
-     */
-    @Deprecated
-    @Operation(summary = "修改ProjectModule", description = "修改ProjectModule")
-    @PutMapping("/modify")
-    public boolean modify(@RequestBody ProjectModuleVO projectModuleVO) {
-        ProjectModule newProjectModule = new ProjectModule();
-        BeanUtils.copyProperties(projectModuleVO, newProjectModule);
-        boolean isUpdated = projectModuleService.update(newProjectModule, new LambdaQueryWrapper<ProjectModule>()
-                .eq(ProjectModule::getId, projectModuleVO.getId()));
-        return isUpdated;
-    }
-
-
-    /**
-     * 删除 项目选择模块
-     *
-     * @return R
-     */
-    @Deprecated
-    @Operation(summary = "删除ProjectModule", description = "删除ProjectModule")
-    @Parameters({
-            @Parameter(name = "id", description = "id")
-    })
-    @DeleteMapping("/delete")
-    public R delete(@Parameter(hidden = true) ProjectModuleVO projectModuleVO) {
-        ProjectModule newProjectModule = new ProjectModule();
-        BeanUtils.copyProperties(projectModuleVO, newProjectModule);
-        projectModuleService.remove(new LambdaQueryWrapper<ProjectModule>()
-                .eq(ProjectModule::getId, projectModuleVO.getId()));
-        return R.success("删除成功");
     }
 
 }

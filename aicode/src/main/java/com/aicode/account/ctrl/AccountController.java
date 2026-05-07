@@ -63,24 +63,6 @@ public class AccountController {
         return accountSaveVO;
     }
 
-
-    
-    @Deprecated
-    @Operation(summary = "创建Account", description = "创建Account")
-    @GetMapping("/load/code/{code}")
-    public AccountVO loadByCode(@PathVariable String code) {
-        if (code == null) {
-            return null;
-        }
-        Account _account = accountService.getOne(new LambdaQueryWrapper<Account>()
-                .eq(Account::getCode, code));
-        AccountVO _accountVO = new AccountVO();
-        BeanUtils.copyProperties(_account, _accountVO);
-        log.debug(JSON.toJSONString(_accountVO));
-        return _accountVO;
-    }
-
-    
     @Operation(summary = "查询Account信息集合", description = "查询Account信息集合")
     @Parameters({
             @Parameter(name = "curPage", description = "当前页", required = true),
@@ -116,25 +98,6 @@ public class AccountController {
         boolean isUpdated = accountService.update(newAccount, new LambdaQueryWrapper<Account>()
                 .eq(Account::getId, accountVO.getId()));
         return isUpdated;
-    }
-
-
-    
-    @Deprecated
-    @Operation(summary = "修改密码", description = "修改密码")
-    @Parameters({
-            @Parameter(name = "password", description = "密码", required = true)
-    })
-    @PutMapping("/modify/password")
-    public R modifyPassword(String password, String token) {
-        Assert.hasText(password, BaseException.BaseExceptionEnum.Empty_Param.toString());
-        String accountCode = JwtToken.getTokenValue(token, Constants.AccountCode.val.toString());
-        Account accountLoad = accountService.getOne(new LambdaQueryWrapper<Account>()
-                .eq(Account::getCode, accountCode));
-        accountLoad.setPassword(Md5.md5(password));
-        accountService.updateById(accountLoad);
-        return R.success();
-
     }
 
 

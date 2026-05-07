@@ -47,11 +47,7 @@ public class ProjectSqlController {
     private ProjectSqlService projectSqlService;
 
 
-    /**
-     * 创建 项目sql脚本
-     *
-     * @return R
-     */
+
     @Operation(summary = "创建ProjectSql", description = "创建ProjectSql")
     @Parameters({
             @Parameter(name = "projectCode", description = "项目编码", required = true),
@@ -64,12 +60,6 @@ public class ProjectSqlController {
     }
 
 
-    /**
-     * 查询一个详情信息
-     *
-     * @return BeanRet
-     */
-    
     @Operation(summary = "查询一个详情信息", description = "查询一个详情信息")
     @Parameters({
             @Parameter(name = "code", description = "sql编码"),
@@ -87,13 +77,6 @@ public class ProjectSqlController {
     }
 
 
-    /**
-     * 根据条件projectCode查询项目sql脚本一个详情信息
-     *
-     * @param projectCode 项目编码
-     * @return ProjectSqlVO
-     */
-    
     @Operation(summary = "创建ProjectSql", description = "创建ProjectSql")
     @GetMapping("/load/projectCode/{projectCode}")
     public ProjectSqlVO loadByProjectCode(@PathVariable String projectCode) {
@@ -108,12 +91,6 @@ public class ProjectSqlController {
         return projectSqlVO;
     }
 
-    /**
-     * 查询项目sql脚本信息集合
-     *
-     * @return 分页对象
-     */
-    
     @Operation(summary = "查询ProjectSql信息集合", description = "查询ProjectSql信息集合")
     @Parameters({
             @Parameter(name = "projectCode", description = "项目编码", required = true)
@@ -130,12 +107,6 @@ public class ProjectSqlController {
     }
 
 
-    /**
-     * 修改 项目sql脚本
-     *
-     * @return R
-     */
-    
     @Operation(summary = "修改ProjectSql", description = "修改ProjectSql")
     @Parameters({
             @Parameter(name = "code", description = "tsql编码", required = true),
@@ -157,12 +128,6 @@ public class ProjectSqlController {
     }
 
 
-    /**
-     * 删除 项目sql脚本
-     *
-     * @return R
-     */
-    
     @Operation(summary = "删除ProjectSql", description = "删除ProjectSql")
     @Parameters({
             @Parameter(name = "id", description = ""),

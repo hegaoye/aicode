@@ -39,13 +39,6 @@ public class ProjectRepositoryAccountController {
     private ProjectRepositoryAccountService projectRepositoryAccountService;
 
 
-    /**
-     * 查询一个详情信息
-     *
-     * @param code 版本管理编码
-     * @return BeanRet
-     */
-    
     @Operation(summary = "查询一个详情信息", description = "查询一个详情信息")
     @Parameters({
             @Parameter(name = "code", description = "版本管理编码")
@@ -60,11 +53,6 @@ public class ProjectRepositoryAccountController {
 
     }
 
-    /**
-     * 创建 版本控制管理
-     *
-     * @return R
-     */
     @Operation(summary = "创建ProjectRepositoryAccount", description = "创建ProjectRepositoryAccount")
     @Parameters({
             @Parameter(name = "account", description = "帐户名 最长32个汉字", required = true),
@@ -81,13 +69,6 @@ public class ProjectRepositoryAccountController {
     }
 
 
-    /**
-     * 根据条件code查询版本控制管理一个详情信息
-     *
-     * @param code 版本管理编码
-     * @return ProjectRepositoryAccountVO
-     */
-    
     @Operation(summary = "创建ProjectRepositoryAccount", description = "创建ProjectRepositoryAccount")
     @GetMapping("/load/code/{code}")
     public ProjectRepositoryAccountVO loadByCode(@PathVariable String code) {
@@ -102,12 +83,7 @@ public class ProjectRepositoryAccountController {
         return projectRepositoryAccountVO;
     }
 
-    /**
-     * 查询版本控制管理信息集合
-     *
-     * @return 分页对象
-     */
-    
+
     @Operation(summary = "查询ProjectRepositoryAccount信息集合", description = "查询ProjectRepositoryAccount信息集合")
     @Parameters({
             @Parameter(name = "projectCode", description = "项目编码"),
@@ -132,12 +108,6 @@ public class ProjectRepositoryAccountController {
     }
 
 
-    /**
-     * 修改 版本控制管理
-     *
-     * @return R
-     */
-    
     @Operation(summary = "修改ProjectRepositoryAccount", description = "修改ProjectRepositoryAccount")
     @Parameters({
             @Parameter(name = "code", description = "版本管理编码", required = true),
@@ -159,27 +129,6 @@ public class ProjectRepositoryAccountController {
 
         }
         return R.success(projectRepositoryAccount);
-    }
-
-
-    /**
-     * 删除 版本控制管理
-     *
-     * @return R
-     */
-    
-    @Deprecated
-    @Operation(summary = "删除ProjectRepositoryAccount", description = "删除ProjectRepositoryAccount")
-    @Parameters({
-            @Parameter(name = "code", description = "版本管理编码")
-    })
-    @DeleteMapping("/delete")
-    public R delete(@Parameter(hidden = true) ProjectRepositoryAccountVO projectRepositoryAccountVO) {
-        ProjectRepositoryAccount newProjectRepositoryAccount = new ProjectRepositoryAccount();
-        BeanUtils.copyProperties(projectRepositoryAccountVO, newProjectRepositoryAccount);
-        projectRepositoryAccountService.remove(new LambdaQueryWrapper<ProjectRepositoryAccount>()
-                .eq(ProjectRepositoryAccount::getCode, projectRepositoryAccountVO.getCode()));
-        return R.success("删除成功");
     }
 
 }

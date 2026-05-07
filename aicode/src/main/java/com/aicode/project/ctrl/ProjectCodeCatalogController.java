@@ -38,12 +38,7 @@ public class ProjectCodeCatalogController {
     @Autowired
     private ProjectCodeCatalogService projectCodeCatalogService;
 
-    /**
-     * 创建 生成源码资料
-     *
-     * @return R
-     */
-    
+
     @Operation(summary = "创建ProjectCodeCatalog", description = "创建ProjectCodeCatalog")
     @PostMapping("/build")
     public ProjectCodeCatalogSaveVO build(@RequestBody ProjectCodeCatalogSaveVO projectCodeCatalogSaveVO) {
@@ -62,56 +57,7 @@ public class ProjectCodeCatalogController {
     }
 
 
-    /**
-     * 根据条件code查询生成源码资料一个详情信息
-     *
-     * @param code 编码
-     * @return ProjectCodeCatalogVO
-     */
-    
-    @Deprecated
-    @Operation(summary = "创建ProjectCodeCatalog", description = "创建ProjectCodeCatalog")
-    @GetMapping("/load/code/{code}")
-    public ProjectCodeCatalogVO loadByCode(@PathVariable String code) {
-        if (code == null) {
-            return null;
-        }
-        ProjectCodeCatalog projectCodeCatalog = projectCodeCatalogService.getOne(new LambdaQueryWrapper<ProjectCodeCatalog>()
-                .eq(ProjectCodeCatalog::getCode, code));
-        ProjectCodeCatalogVO projectCodeCatalogVO = new ProjectCodeCatalogVO();
-        BeanUtils.copyProperties(projectCodeCatalog, projectCodeCatalogVO);
-        log.debug(JSON.toJSONString(projectCodeCatalogVO));
-        return projectCodeCatalogVO;
-    }
 
-    /**
-     * 根据条件projectCode查询生成源码资料一个详情信息
-     *
-     * @param projectCode 项目编码
-     * @return ProjectCodeCatalogVO
-     */
-    
-    @Deprecated
-    @Operation(summary = "创建ProjectCodeCatalog", description = "创建ProjectCodeCatalog")
-    @GetMapping("/load/projectCode/{projectCode}")
-    public ProjectCodeCatalogVO loadByProjectCode(@PathVariable String projectCode) {
-        if (projectCode == null) {
-            return null;
-        }
-        ProjectCodeCatalog projectCodeCatalog = projectCodeCatalogService.getOne(new LambdaQueryWrapper<ProjectCodeCatalog>()
-                .eq(ProjectCodeCatalog::getProjectCode, projectCode));
-        ProjectCodeCatalogVO projectCodeCatalogVO = new ProjectCodeCatalogVO();
-        BeanUtils.copyProperties(projectCodeCatalog, projectCodeCatalogVO);
-        log.debug(JSON.toJSONString(projectCodeCatalogVO));
-        return projectCodeCatalogVO;
-    }
-
-    /**
-     * 查询生成源码资料信息集合
-     *
-     * @return 分页对象
-     */
-    
     @Operation(summary = "查询ProjectCodeCatalog信息集合", description = "查询ProjectCodeCatalog信息集合")
     @Parameters({
             @Parameter(name = "curPage", description = "当前页", required = true),
@@ -138,12 +84,6 @@ public class ProjectCodeCatalogController {
     }
 
 
-    /**
-     * 修改 生成源码资料
-     *
-     * @return R
-     */
-    
     @Operation(summary = "修改ProjectCodeCatalog", description = "修改ProjectCodeCatalog")
     @PutMapping("/modify")
     public boolean modify(@RequestBody ProjectCodeCatalogVO projectCodeCatalogVO) {
@@ -155,12 +95,6 @@ public class ProjectCodeCatalogController {
     }
 
 
-    /**
-     * 删除 生成源码资料
-     *
-     * @return R
-     */
-    
     @Operation(summary = "删除ProjectCodeCatalog", description = "删除ProjectCodeCatalog")
     @Parameters({
             @Parameter(name = "id", description = ""),

@@ -40,13 +40,6 @@ public class ProjectJobController {
     @Autowired
     private ProjectJobService projectJobService;
 
-    /**
-     * 查询任务详情信息
-     *
-     * @param code 任务编码
-     * @return BeanRet
-     */
-    
     @Operation(summary = "查询任务详情信息", description = "查询任务详情信息")
     @Parameters({
             @Parameter(name = "code", description = "任务编码")
@@ -61,12 +54,7 @@ public class ProjectJobController {
 
     }
 
-    /**
-     * 创建 任务
-     *
-     * @return R
-     */
-    
+
     @Operation(summary = "创建ProjectJob", description = "创建ProjectJob")
     @Parameters({
             @Parameter(name = "projectCode", description = "项目编码", required = true),
@@ -88,34 +76,6 @@ public class ProjectJobController {
     }
 
 
-    /**
-     * 根据条件code查询任务一个详情信息
-     *
-     * @param code 任务编码
-     * @return ProjectJobVO
-     */
-    
-    @Deprecated
-    @Operation(summary = "创建ProjectJob", description = "创建ProjectJob")
-    @GetMapping("/load/code/{code}")
-    public ProjectJobVO loadByCode(@PathVariable String code) {
-        if (code == null) {
-            return null;
-        }
-        ProjectJob projectJob = projectJobService.getOne(new LambdaQueryWrapper<ProjectJob>()
-                .eq(ProjectJob::getCode, code));
-        ProjectJobVO projectJobVO = new ProjectJobVO();
-        BeanUtils.copyProperties(projectJob, projectJobVO);
-        log.debug(JSON.toJSONString(projectJobVO));
-        return projectJobVO;
-    }
-
-    /**
-     * 查询任务信息集合
-     *
-     * @return 分页对象
-     */
-    
     @Operation(summary = "查询ProjectJob信息集合", description = "查询ProjectJob信息集合")
     @Parameters({
             @Parameter(name = "code", description = "项目编码"),
@@ -145,12 +105,6 @@ public class ProjectJobController {
     }
 
 
-    /**
-     * 修改 任务
-     *
-     * @return R
-     */
-    
     @Operation(summary = "修改ProjectJob", description = "修改ProjectJob")
     @Parameters({
             @Parameter(name = "code", description = "项目编码", required = true),
@@ -169,12 +123,6 @@ public class ProjectJobController {
     }
 
 
-    /**
-     * 删除 任务
-     *
-     * @return R
-     */
-    
     @Operation(summary = "删除ProjectJob", description = "删除ProjectJob")
     @Parameters({
             @Parameter(name = "code", description = "任务编码")
@@ -188,12 +136,7 @@ public class ProjectJobController {
         return R.success("删除成功");
     }
 
-    /**
-     * 构建任务
-     *
-     * @param code 项目编码
-     * @return BeanRet
-     */
+
     @Operation(summary = "执行任务", description = "执行任务")
     @Parameters({
             @Parameter(name = "code", description = "任务编码")

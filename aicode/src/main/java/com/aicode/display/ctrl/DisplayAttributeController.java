@@ -64,22 +64,6 @@ public class DisplayAttributeController {
     }
 
 
-    
-    @Deprecated
-    @Operation(summary = "创建DisplayAttribute", description = "创建DisplayAttribute")
-    @GetMapping("/load/mapFieldColumnCode/{mapFieldColumnCode}")
-    public R loadByMapFieldColumnCode(@PathVariable String mapFieldColumnCode) {
-        if (mapFieldColumnCode == null) {
-            return null;
-        }
-        DisplayAttribute displayAttribute = displayAttributeService.getOne(new LambdaQueryWrapper<DisplayAttribute>()
-                .eq(DisplayAttribute::getMapFieldColumnCode, mapFieldColumnCode));
-        DisplayAttributeVO displayAttributeVO = new DisplayAttributeVO();
-        BeanUtils.copyProperties(displayAttribute, displayAttributeVO);
-        log.debug(JSON.toJSONString(displayAttributeVO));
-        return R.success(displayAttributeVO);
-    }
-
     @Operation(summary = "查询DisplayAttribute信息集合", description = "查询DisplayAttribute信息集合")
     @Parameters({
             @Parameter(name = "mapClassTableCode", description = "映射编码"),

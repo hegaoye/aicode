@@ -41,14 +41,6 @@ public class ProjectFramworkController {
     @Autowired
     private ProjectFramworkService projectFramworkService;
 
-    /**
-     * 查询一个详情信息
-     *
-     * @param projectCode   项目编码
-     * @param frameworkCode 技术编码
-     * @return BeanRet
-     */
-    
     @Operation(summary = "查询一个详情信息", description = "查询一个详情信息")
     @Parameters({
             @Parameter(name = "projectCode", description = "项目编码", required = true),
@@ -68,11 +60,6 @@ public class ProjectFramworkController {
 
     }
 
-    /**
-     * 创建 项目应用技术
-     *
-     * @return R
-     */
     @Operation(summary = "创建ProjectFramwork", description = "创建ProjectFramwork")
     @Parameters({
             @Parameter(name = "projectStr", description = "项目技术json", required = true)
@@ -92,11 +79,6 @@ public class ProjectFramworkController {
     }
 
 
-    /**
-     * 查询项目应用技术信息集合
-     *
-     * @return 分页对象
-     */
     @Operation(summary = "查询ProjectFramwork信息集合", description = "查询ProjectFramwork信息集合")
     @Parameters({
             @Parameter(name = "projectCode", description = "项目编码", required = true),
@@ -125,12 +107,6 @@ public class ProjectFramworkController {
     }
 
 
-    /**
-     * 修改 项目应用技术
-     *
-     * @return R
-     */
-    
     @Operation(summary = "修改ProjectFramwork", description = "修改ProjectFramwork")
     @PutMapping("/modify")
     public boolean modify(@RequestBody ProjectFramworkVO projectFramworkVO) {
@@ -142,12 +118,6 @@ public class ProjectFramworkController {
     }
 
 
-    /**
-     * 删除 项目应用技术
-     *
-     * @return R
-     */
-    
     @Operation(summary = "删除ProjectFramwork", description = "删除ProjectFramwork")
     @Parameters({
             @Parameter(name = "projectCode", description = "项目编码", required = true),

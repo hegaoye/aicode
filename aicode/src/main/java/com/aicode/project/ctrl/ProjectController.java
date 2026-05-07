@@ -127,19 +127,6 @@ public class ProjectController {
 
 
     /**
-     * 进入首页
-     *
-     * @return index页面
-     */
-
-    @Deprecated
-    @GetMapping(value = "/index")
-    public String index() {
-        return "/index";
-    }
-
-
-    /**
      * 查询一个详情信息
      *
      * @param code 项目编码
@@ -199,15 +186,6 @@ public class ProjectController {
     }
 
 
-    /**
-     * 查询文件路径
-     *
-     * @param code     项目编码
-     * @param filePath 文件路径
-     * @return BeanRet
-     */
-
-
     @Operation(summary = "查询文件路径", description = "查询文件路径")
     @Parameters({
             @Parameter(name = "code", description = "项目编码"),
@@ -244,12 +222,6 @@ public class ProjectController {
     }
 
 
-    /**
-     * 创建 项目信息
-     *
-     * @return R
-     */
-
     @Operation(summary = "创建Project", description = "创建Project")
     @Parameters({
             @Parameter(name = "name", description = "项目名 最长128个汉字", required = true),
@@ -282,14 +254,6 @@ public class ProjectController {
     }
 
 
-    /**
-     * 根据条件code查询项目信息一个详情信息
-     *
-     * @param code 项目编码
-     * @return ProjectVO
-     */
-
-
     @Operation(summary = "创建Project", description = "创建Project")
     @GetMapping("/load/code/{code}")
     public ProjectVO loadByCode(@PathVariable String code) {
@@ -303,13 +267,6 @@ public class ProjectController {
         log.debug(JSON.toJSONString(projectVO));
         return projectVO;
     }
-
-    /**
-     * 查询项目信息信息集合
-     *
-     * @return 分页对象
-     */
-
 
     @Operation(summary = "查询Project信息集合", description = "查询Project信息集合")
     @Parameters({
@@ -335,13 +292,6 @@ public class ProjectController {
 
         return R.success(pageVO);
     }
-
-
-    /**
-     * 修改 项目信息
-     *
-     * @return R
-     */
 
 
     @Operation(summary = "修改Project", description = "修改Project")
@@ -377,13 +327,6 @@ public class ProjectController {
         }
         return R.success(project);
     }
-
-
-    /**
-     * 删除 项目信息
-     *
-     * @return R
-     */
 
     @Operation(summary = "删除Project", description = "删除Project")
     @Parameters({

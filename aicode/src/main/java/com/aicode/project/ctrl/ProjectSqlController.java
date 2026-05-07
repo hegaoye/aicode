@@ -52,7 +52,6 @@ public class ProjectSqlController {
      *
      * @return R
      */
-    @Deprecated
     @Operation(summary = "创建ProjectSql", description = "创建ProjectSql")
     @Parameters({
             @Parameter(name = "projectCode", description = "项目编码", required = true),

@@ -194,13 +194,11 @@ public class ProjectJobController {
      * @param code 项目编码
      * @return BeanRet
      */
-    @Deprecated
     @Operation(summary = "执行任务", description = "执行任务")
     @Parameters({
             @Parameter(name = "code", description = "任务编码")
     })
     @GetMapping(value = "/execute")
-
     public R execute(String code, HttpServletRequest request) {
         try {
             Assert.hasText(code, BaseException.BaseExceptionEnum.Empty_Param.toString());

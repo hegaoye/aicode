@@ -73,7 +73,6 @@ public class ProjectFramworkController {
      *
      * @return R
      */
-    @Deprecated
     @Operation(summary = "创建ProjectFramwork", description = "创建ProjectFramwork")
     @Parameters({
             @Parameter(name = "projectStr", description = "项目技术json", required = true)

@@ -78,7 +78,7 @@ public class ProjectController {
      *
      * @return BeanRet
      */
-    
+
     @Operation(summary = "执行脚本", description = "执行脚本")
     @Parameters({
             @Parameter(name = "code", description = "项目编码", required = true)
@@ -91,8 +91,6 @@ public class ProjectController {
     }
 
 
-    
-    @Deprecated
     @GetMapping("/download/{proejctName}")
     @Operation(summary = "下载项目源码", description = "下载项目源码")
     @Parameters({
@@ -133,7 +131,7 @@ public class ProjectController {
      *
      * @return index页面
      */
-    
+
     @Deprecated
     @GetMapping(value = "/index")
     public String index() {
@@ -208,8 +206,8 @@ public class ProjectController {
      * @param filePath 文件路径
      * @return BeanRet
      */
-    
-    
+
+
     @Operation(summary = "查询文件路径", description = "查询文件路径")
     @Parameters({
             @Parameter(name = "code", description = "项目编码"),
@@ -251,7 +249,7 @@ public class ProjectController {
      *
      * @return R
      */
-    
+
     @Operation(summary = "创建Project", description = "创建Project")
     @Parameters({
             @Parameter(name = "name", description = "项目名 最长128个汉字", required = true),
@@ -290,8 +288,8 @@ public class ProjectController {
      * @param code 项目编码
      * @return ProjectVO
      */
-    
-    
+
+
     @Operation(summary = "创建Project", description = "创建Project")
     @GetMapping("/load/code/{code}")
     public ProjectVO loadByCode(@PathVariable String code) {
@@ -311,8 +309,8 @@ public class ProjectController {
      *
      * @return 分页对象
      */
-    
-    
+
+
     @Operation(summary = "查询Project信息集合", description = "查询Project信息集合")
     @Parameters({
             @Parameter(name = "curPage", description = "当前页", required = true),
@@ -320,14 +318,17 @@ public class ProjectController {
     })
     @GetMapping(value = "/list")
     public R list(String token, Integer curPage, Integer pageSize) {
-        String accountCode = JwtToken.getTokenValue(token, Constants.AccountCode.val.toString());
+        com.aicode.core.Page pageVO = new com.aicode.core.Page();
+        if (StringUtils.isBlank(token) || "null".equals(token)) {
+            return R.success(pageVO);
+        }
 
+        String accountCode = JwtToken.getTokenValue(token, Constants.AccountCode.val.toString());
         List<Project> projectList = projectService.lambdaQuery()
                 .eq(Project::getAccountCode, accountCode)
                 .orderByDesc(Project::getCreateTime)
                 .list();
 
-        com.aicode.core.Page pageVO = new com.aicode.core.Page();
         pageVO.setTotalRow(projectList.size());
         pageVO.setVoList(projectList);
         log.debug(JSON.toJSONString(pageVO));
@@ -341,8 +342,8 @@ public class ProjectController {
      *
      * @return R
      */
-    
-    
+
+
     @Operation(summary = "修改Project", description = "修改Project")
     @Parameters({
             @Parameter(name = "code", description = "项目编码", required = true),
@@ -383,7 +384,7 @@ public class ProjectController {
      *
      * @return R
      */
-    
+
     @Operation(summary = "删除Project", description = "删除Project")
     @Parameters({
             @Parameter(name = "code", description = "项目编码", required = true)

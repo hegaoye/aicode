@@ -33,6 +33,7 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
     @Override
     public boolean save(Account entity) {
         entity.setId(uidGenerator.getUID());
+        entity.setCode(String.valueOf(entity.getId()));
 
         return super.save(entity);
     }

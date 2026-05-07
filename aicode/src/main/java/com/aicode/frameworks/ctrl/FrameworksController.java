@@ -134,13 +134,13 @@ public class FrameworksController {
     }
 
 
-    
+
     
     @Operation(summary = "删除Frameworks", description = "删除Frameworks")
     @Parameters({
             @Parameter(name = "code", description = "技术编码")
     })
-    @DeleteMapping("/delete")
+    @PostMapping("/delete")
     public R delete(@Parameter(hidden = true) FrameworksVO frameworksVO) {
         Frameworks newFrameworks = new Frameworks();
         BeanUtils.copyProperties(frameworksVO, newFrameworks);

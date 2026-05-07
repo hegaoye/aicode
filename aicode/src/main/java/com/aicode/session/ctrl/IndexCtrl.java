@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Tag(name = "登陆控制器", description = "登陆控制器")
 public class IndexCtrl {
 
-    @Deprecated
     @RequestMapping("/")
     public String index() {
         return "forward:index.html";

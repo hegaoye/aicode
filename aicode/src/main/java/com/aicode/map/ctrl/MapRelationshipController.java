@@ -55,7 +55,6 @@ public class MapRelationshipController {
     @Autowired
     private UidGenerator uidGenerator;
 
-    
     @Operation(summary = "创建MapRelationship", description = "创建MapRelationship")
     @Parameters({
             @Parameter(name = "mapClassTableCode", description = "关联编码", required = true),

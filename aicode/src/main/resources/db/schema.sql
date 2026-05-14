@@ -341,6 +341,6 @@ CREATE TABLE `WORKER_NODE`
     `TYPE`        int(11)      NOT NULL COMMENT 'node type: ACTUAL or CONTAINER',
     `LAUNCH_DATE` date         NOT NULL COMMENT 'launch date',
     `MODIFIED`    timestamp(0) NOT NULL COMMENT 'modified time',
-    `CREATED`     timestamp(0) NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT 'created time',
+    `CREATED`     timestamp(0) NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'created time',
     PRIMARY KEY (`ID`)
 );

@@ -91,17 +91,17 @@ public class ProjectController {
     }
 
 
-    @GetMapping("/download/{proejctName}")
+    @GetMapping("/download/{projectName}")
     @Operation(summary = "下载项目源码", description = "下载项目源码")
     @Parameters({
-            @Parameter(name = "proejctName", description = "项目名", required = true)
+            @Parameter(name = "projectName", description = "项目名", required = true)
     })
-    public void downloadFile(@PathVariable("proejctName") String proejctName, HttpServletResponse response) throws Exception {
-        if (StringUtils.isBlank(proejctName)) {
+    public void downloadFile(@PathVariable("projectName") String projectName, HttpServletResponse response) throws Exception {
+        if (StringUtils.isBlank(projectName)) {
             return;
         }
 
-        String fileName = proejctName + ".zip";// 设置文件名，根据业务需要替换成要下载的文件名
+        String fileName = projectName + ".zip";// 设置文件名，根据业务需要替换成要下载的文件名
         log.info("下载文件名-{}", fileName);
         if (StringUtils.isNotBlank(fileName)) {
             String repositoryPath = settingService.load(SettingKey.Repository_Path, String.class);

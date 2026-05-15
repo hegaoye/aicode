@@ -1,9 +1,13 @@
 # AI Code
 支持opencode，.opencode/skill 是对 aicode生成代码的流程化总结，具体参考截图使用说明；
 操作步骤：
+
 1-git clone 当前项目代码
+
 2-opencode /init 当前项目
+
 3-输入aicode,根据TUI的提示即可完成后续操作，简单实用；
+
 
 `java 21 版本`
 技术交流 qq 群：839360512

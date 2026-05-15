@@ -50,7 +50,7 @@ public class LogsSVImpl implements LogsSV {
      * 4.返回文件路径
      *
      * @param projectCode 项目编码
-     * @param date
+     * @param date        时间
      * @return String
      */
     @Override
@@ -58,18 +58,22 @@ public class LogsSVImpl implements LogsSV {
         String filePath = null;
         try {
             //1.根据项目编码查询出用户和项目信息
-            Project project = projectMapper.selectOne(new LambdaQueryWrapper<Project>()
-                    .eq(Project::getCode, projectCode));
+            Project project = projectMapper.selectOne(new LambdaQueryWrapper<Project>().eq(Project::getCode, projectCode));
+
+            log.info("项目编码查询,project:{}", project);
             if (project == null) {
                 return null;
             }
+
             String accountCode = project.getAccountCode();
             Account account = accountMapper.selectOne(new LambdaQueryWrapper<Account>().eq(Account::getCode, accountCode));
+            log.info("用户查询,account:{}", account);
             String accountName = account.getAccount();
             String name = project.getEnglishName();
             //2.用户名+项目名生成唯一的文件夹
             String fileName = accountName + "_" + name + "_logs";
             String workspace = settingService.load(SettingKey.Workspace);
+            log.info("workspace:{}", workspace);
             String path = workspace + fileName;
             FileUtil.createDir(path, null);
             //3.根据时间戳生成文件
@@ -78,9 +82,11 @@ public class LogsSVImpl implements LogsSV {
             FileUtil.createDir(path, logName);
             //文件路径
             filePath = fileName + "/" + logName;
+            log.info("filePath:{}", filePath);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("{}", e.getMessage(), e);
         }
+
         //4.返回文件路径
         return filePath;
     }
@@ -94,12 +100,16 @@ public class LogsSVImpl implements LogsSV {
      */
     @Override
     public boolean saveLogs(String logs, String path) {
+        log.info("logs:{} path:{}", logs, path);
+
         //参数为空判断
         if (StringTools.isEmpty(logs)) {
-            throw new BaseException(BaseException.BaseExceptionEnum.Empty_Param);
+            log.warn("logs is empty");
+            return false;
         }
         if (StringTools.isEmpty(path)) {
-            throw new BaseException(BaseException.BaseExceptionEnum.Empty_Param);
+            log.warn("path is empty");
+            return false;
         }
         String workspace = settingService.load(SettingKey.Workspace);
         path = workspace + path;

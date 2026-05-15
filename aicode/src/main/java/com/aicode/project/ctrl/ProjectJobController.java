@@ -139,19 +139,19 @@ public class ProjectJobController {
 
     @Operation(summary = "执行任务", description = "执行任务")
     @Parameters({
-            @Parameter(name = "code", description = "任务编码")
+            @Parameter(name = "code", description = "项目编码")
     })
     @GetMapping(value = "/execute")
-    public R execute(String code, HttpServletRequest request) {
+    public R execute(@RequestParam("code") String projectCode) {
         try {
-            Assert.hasText(code, BaseException.BaseExceptionEnum.Empty_Param.toString());
-            Session webSocketSession = WSClientManager.get();
-            if (webSocketSession != null) {
-                //生成代码
-                ProjectJob projectJob = projectJobService.execute(code);
-                return R.success(projectJob);
-            }
-            return R.failed(BaseException.BaseExceptionEnum.Result_Not_Exist);
+            log.info("执行任务 , projectCode:{}", projectCode);
+            Assert.hasText(projectCode, BaseException.BaseExceptionEnum.Empty_Param.toString());
+            //            Session webSocketSession = WSClientManager.get();
+            //            if (webSocketSession != null) {
+            //生成代码
+            ProjectJob projectJob = projectJobService.execute(projectCode);
+            return R.success(projectJob);
+            //            }
         } catch (Exception e) {
             e.printStackTrace();
             log.error(e.getMessage());

@@ -93,7 +93,9 @@ public class GeneratorSVImpl implements GenerateSV {
      */
     @Override
     public void aiCode(String projectCode, ProjectJob projectJob) {
+        log.info("根据项目码创建项目代码, projectCode: {} , projectJob: {}", projectCode, projectJob);
         String path = logsSV.createLogFiles(projectCode, projectJob.getCreateTime());
+        log.info("log path: {}", path);
 
         try {
             //1.创建项目
@@ -102,11 +104,12 @@ public class GeneratorSVImpl implements GenerateSV {
             logsSV.saveLogs(logText, path);
 
             Project project = projectMapper.selectOne(new LambdaQueryWrapper<Project>().eq(Project::getCode, projectCode));
+            log.info("project: {}", project);
             String projectPath = this.buildProject(project);
+            log.info("projectPath: {}", projectPath);
             projectMapper.update(Project.builder()
-                            .buildNumber(project.getBuildNumber() != null ? project.getBuildNumber() + 1 : 1)
-                            .build(),
-                    new LambdaQueryWrapper<Project>().eq(Project::getCode, projectCode));
+                    .buildNumber(project.getBuildNumber() != null ? project.getBuildNumber() + 1 : 1)
+                    .build(), new LambdaQueryWrapper<Project>().eq(Project::getCode, projectCode));
 
             logText = "已初始化项目 【 " + project.getName() + " ( " + project.getEnglishName() + " )】 工作空间";
             WSClientManager.sendMessage(logText);
@@ -121,6 +124,7 @@ public class GeneratorSVImpl implements GenerateSV {
             WSClientManager.sendMessage(logText);
             logsSV.saveLogs(logText, path);
             List<ProjectMap> projectMapList = projectMapMapper.selectList(new LambdaQueryWrapper<ProjectMap>().eq(ProjectMap::getProjectCode, projectCode));
+            log.info("projectMapList: {}", projectMapList);
             List<MapClassTable> mapClassTableList = new ArrayList<>();
             projectMapList.forEach(projectMap -> {
                 MapClassTable mapClassTable = mapClassTableMapper.selectOne(new LambdaQueryWrapper<MapClassTable>().eq(MapClassTable::getCode, projectMap.getMapClassTableCode()));
@@ -172,8 +176,8 @@ public class GeneratorSVImpl implements GenerateSV {
             projectFramworkList.forEach(projectFramwork -> {
                 WSClientManager.sendMessage("已获取项目 【" + projectFramwork.getFrameworks().getName() + "】 的模板");
                 logsSV.saveLogs("已获取项目 【" + projectFramwork.getFrameworks().getName() + "】 的模板", path);
-                List<FrameworksTemplate> frameworksTemplateList = frameworksTemplateMapper.selectList(new LambdaQueryWrapper<FrameworksTemplate>()
-                        .eq(FrameworksTemplate::getFrameworkCode, projectFramwork.getFrameworks().getCode()));
+                List<FrameworksTemplate> frameworksTemplateList = frameworksTemplateMapper.selectList(new LambdaQueryWrapper<FrameworksTemplate>().eq(FrameworksTemplate::getFrameworkCode, projectFramwork.getFrameworks()
+                        .getCode()));
 
                 Frameworks frameworks = projectFramwork.getFrameworks();
                 frameworksTemplateList.forEach(frameworksTemplate -> {
@@ -200,8 +204,7 @@ public class GeneratorSVImpl implements GenerateSV {
             //5.获取模块信息 TODO
 
             //6.获取版本控制管理信息
-            ProjectRepositoryAccount projectRepositoryAccount = projectRepositoryAccountMapper.selectOne(new LambdaQueryWrapper<ProjectRepositoryAccount>()
-                    .eq(ProjectRepositoryAccount::getProjectCode, project.getCode()));
+            ProjectRepositoryAccount projectRepositoryAccount = projectRepositoryAccountMapper.selectOne(new LambdaQueryWrapper<ProjectRepositoryAccount>().eq(ProjectRepositoryAccount::getProjectCode, project.getCode()));
 
             if (projectRepositoryAccount != null) {
                 String gitLog = "获取代码仓库信息: " + projectRepositoryAccount.getAccount();
@@ -221,8 +224,7 @@ public class GeneratorSVImpl implements GenerateSV {
             logsSV.saveLogs(endLog, path);
 
             projectJob.setState(ProjectJobState.Completed.name());
-            projectJobMapper.update(projectJob, new LambdaQueryWrapper<ProjectJob>()
-                    .eq(ProjectJob::getCode, projectJob.getCode()));
+            projectJobMapper.update(projectJob, new LambdaQueryWrapper<ProjectJob>().eq(ProjectJob::getCode, projectJob.getCode()));
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -231,11 +233,9 @@ public class GeneratorSVImpl implements GenerateSV {
             logsSV.saveLogs(e.getMessage(), path);
 
             projectJob.setState(ProjectJobState.Error.name());
-            projectJobMapper.update(projectJob, new LambdaQueryWrapper<ProjectJob>()
-                    .eq(ProjectJob::getCode, projectJob.getCode()));
+            projectJobMapper.update(projectJob, new LambdaQueryWrapper<ProjectJob>().eq(ProjectJob::getCode, projectJob.getCode()));
         } finally {
-            ProjectJob projectJobLoad = projectJobMapper.selectOne(new LambdaQueryWrapper<ProjectJob>()
-                    .eq(ProjectJob::getCode, projectJob.getCode()));
+            ProjectJob projectJobLoad = projectJobMapper.selectOne(new LambdaQueryWrapper<ProjectJob>().eq(ProjectJob::getCode, projectJob.getCode()));
 
             if (projectJobLoad.getState().equals(ProjectJobState.Completed.name())) {
                 WSClientManager.sendMessage("Finished: SUCCESS");
@@ -250,8 +250,7 @@ public class GeneratorSVImpl implements GenerateSV {
 
     //清理临时模板数据
     private void cleanTemplates(List<ProjectFramwork> projectFramworkList) {
-        frameworksTemplateMapper.delete(new LambdaQueryWrapper<FrameworksTemplate>()
-                .gt(FrameworksTemplate::getId, 0));
+        frameworksTemplateMapper.delete(new LambdaQueryWrapper<FrameworksTemplate>().gt(FrameworksTemplate::getId, 0));
 
         Setting setting = settingMapper.selectOne(new LambdaQueryWrapper<Setting>().eq(Setting::getK, SettingKey.Template_Path.name()));
         String template_Path = this.convertPath(setting.getV(), "", true);//获得默认仓库地址
@@ -352,18 +351,8 @@ public class GeneratorSVImpl implements GenerateSV {
 
     private String generateTsql(String projectPath, String projectEnglishName, String projectCode) {
         String tsql = "-- AI-Code 为您构建代码，享受智慧生活!\n";
-        String tsqlLast = "\nCREATE TABLE `worker_node` (\n" +
-                "  `ID` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'auto increment id',\n" +
-                "  `HOST_NAME` varchar(64) NOT NULL COMMENT 'host name',\n" +
-                "  `PORT` varchar(64) NOT NULL COMMENT 'port',\n" +
-                "  `TYPE` int(11) NOT NULL COMMENT 'node type: ACTUAL or CONTAINER',\n" +
-                "  `LAUNCH_DATE` date NOT NULL COMMENT 'launch date',\n" +
-                "  `MODIFIED` timestamp NOT NULL COMMENT 'modified time',\n" +
-                "  `CREATED` timestamp NOT NULL COMMENT 'created time',\n" +
-                "  PRIMARY KEY (`ID`)\n" +
-                ")COMMENT='分布式id注册表';\n";
-        ProjectSql projectSql = projectSqlMapper.selectOne(new LambdaQueryWrapper<ProjectSql>()
-                .eq(ProjectSql::getProjectCode, projectCode));
+        String tsqlLast = "\nCREATE TABLE `worker_node` (\n" + "  `ID` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'auto increment id',\n" + "  `HOST_NAME` varchar(64) NOT NULL COMMENT 'host name',\n" + "  `PORT` varchar(64) NOT NULL COMMENT 'port',\n" + "  `TYPE` int(11) NOT NULL COMMENT 'node type: ACTUAL or CONTAINER',\n" + "  `LAUNCH_DATE` date NOT NULL COMMENT 'launch date',\n" + "  `MODIFIED` timestamp NOT NULL COMMENT 'modified time',\n" + "  `CREATED` timestamp NOT NULL COMMENT 'created time',\n" + "  PRIMARY KEY (`ID`)\n" + ")COMMENT='分布式id注册表';\n";
+        ProjectSql projectSql = projectSqlMapper.selectOne(new LambdaQueryWrapper<ProjectSql>().eq(ProjectSql::getProjectCode, projectCode));
         try {
             tsql += projectSql.getTsql() + tsqlLast;
             FileUtils.writeByteArrayToFile(new File(projectPath + "/" + projectEnglishName + ".sql"), tsql.getBytes());
@@ -392,8 +381,7 @@ public class GeneratorSVImpl implements GenerateSV {
         }
 
         //3.代码仓库检出
-        ProjectRepositoryAccount projectRepositoryAccount = projectRepositoryAccountMapper.selectOne(new LambdaQueryWrapper<ProjectRepositoryAccount>()
-                .eq(ProjectRepositoryAccount::getProjectCode, project.getCode()));
+        ProjectRepositoryAccount projectRepositoryAccount = projectRepositoryAccountMapper.selectOne(new LambdaQueryWrapper<ProjectRepositoryAccount>().eq(ProjectRepositoryAccount::getProjectCode, project.getCode()));
         if (projectRepositoryAccount != null) {
             if (ProjectRepositoryTypeEnum.GIT == ProjectRepositoryTypeEnum.getEnum(projectRepositoryAccount.getType())) {
                 if (projectRepositoryAccount.getHome().endsWith(".git")) {
@@ -410,9 +398,7 @@ public class GeneratorSVImpl implements GenerateSV {
 
         if (file.exists()) {
             QueryWrapper<ProjectFramwork> queryWrapper = new QueryWrapper<>();
-            queryWrapper.lambda()
-                    .eq(ProjectFramwork::getProjectCode, project.getCode())
-                    .last("limit 100");
+            queryWrapper.lambda().eq(ProjectFramwork::getProjectCode, project.getCode()).last("limit 100");
             List<ProjectFramwork> frameworksList = projectFramworkMapper.selectList(queryWrapper);
             WSClientManager.sendMessage("判断是否是选择多技术项目....");
             if (CollectionUtils.isNotEmpty(frameworksList)) {
@@ -454,11 +440,10 @@ public class GeneratorSVImpl implements GenerateSV {
             } else {
                 mapFieldColumnNotPks.add(mapFieldColumn);
             }
-            if (!mapFieldColumn.getIsPrimaryKey().equals(YNEnum.Y.name())
-                    && !mapFieldColumn.getColumn().contains("updateTime")
-                    && !mapFieldColumn.getColumn().contains("summary")
-                    && !mapFieldColumn.getColumn().contains("marker")
-                    && !mapFieldColumn.getColumn().contains("vn")) {
+            if (!mapFieldColumn.getIsPrimaryKey().equals(YNEnum.Y.name()) && !mapFieldColumn.getColumn()
+                    .contains("updateTime") && !mapFieldColumn.getColumn()
+                    .contains("summary") && !mapFieldColumn.getColumn()
+                    .contains("marker") && !mapFieldColumn.getColumn().contains("vn")) {
                 mapFieldColumnTable.add(mapFieldColumn);
             }
             mapFieldColumnList.add(mapFieldColumn);
@@ -468,15 +453,13 @@ public class GeneratorSVImpl implements GenerateSV {
 
         //获取1对1,1对多关系集合
         mapClassTable.getMapRelationshipList().forEach(mapRelationship -> {
-            List<MapFieldColumn> associateClassColumns = mapFieldColumnMapper.selectList(new LambdaQueryWrapper<MapFieldColumn>()
-                    .eq(MapFieldColumn::getMapClassTableCode, mapRelationship.getAssociateClass().getCode()));
+            List<MapFieldColumn> associateClassColumns = mapFieldColumnMapper.selectList(new LambdaQueryWrapper<MapFieldColumn>().eq(MapFieldColumn::getMapClassTableCode, mapRelationship.getAssociateClass()
+                    .getCode()));
             if (YNEnum.getYN(mapRelationship.getIsOneToOne()) == YNEnum.Y) {
-                oneToOneList.add(new TemplateData(project, mapRelationship.getAssociateClass(), mapRelationship.getMainField(),
-                        mapRelationship.getJoinField(), associateClassColumns));
+                oneToOneList.add(new TemplateData(project, mapRelationship.getAssociateClass(), mapRelationship.getMainField(), mapRelationship.getJoinField(), associateClassColumns));
             }
             if (YNEnum.getYN(mapRelationship.getIsOneToMany()) == YNEnum.Y) {
-                oneToManyList.add(new TemplateData(project, mapRelationship.getAssociateClass(), mapRelationship.getMainField(),
-                        mapRelationship.getJoinField(), associateClassColumns));
+                oneToManyList.add(new TemplateData(project, mapRelationship.getAssociateClass(), mapRelationship.getMainField(), mapRelationship.getJoinField(), associateClassColumns));
             }
             log.debug(JSON.toJSONString(mapRelationship.getAssociateClass().getMapFieldColumnList()));
         });
@@ -504,9 +487,7 @@ public class GeneratorSVImpl implements GenerateSV {
         models.forEach(model -> {
             if (mapClassTableMap.containsKey(model)) {
                 List<MapClassTable> mapClassTables = mapClassTableMap.get(model);
-                modelDatas.add(ModelData.builder()
-                        .model(model)
-                        .classes(mapClassTables).build());
+                modelDatas.add(ModelData.builder().model(model).classes(mapClassTables).build());
             }
         });
         HashSet hashSet = new HashSet(modelDatas);
@@ -522,12 +503,10 @@ public class GeneratorSVImpl implements GenerateSV {
 
 
         //根据模块划分类集合信息
-        TemplateData templateData = new TemplateData(project, mapClassTable, mapClassTableList, mapFieldColumnList,
-                mapFieldColumnPks, mapFieldColumnNotPks, mapFieldColumnTable, modelClasses, modelDatas, oneToOneList, oneToManyList);
+        TemplateData templateData = new TemplateData(project, mapClassTable, mapClassTableList, mapFieldColumnList, mapFieldColumnPks, mapFieldColumnNotPks, mapFieldColumnTable, modelClasses, modelDatas, oneToOneList, oneToManyList);
         templateData.setDisplayAttributes(displayAttributes);
 
-        Setting settingTemplatePath = settingMapper.selectOne(new LambdaQueryWrapper<Setting>()
-                .eq(Setting::getK, SettingKey.Template_Path.name()));
+        Setting settingTemplatePath = settingMapper.selectOne(new LambdaQueryWrapper<Setting>().eq(Setting::getK, SettingKey.Template_Path.name()));
 
         //生成路径处理
         String frameworksTemplatePath = frameworksTemplate.getPath();
@@ -572,8 +551,7 @@ public class GeneratorSVImpl implements GenerateSV {
                 .replace("$module$", project.getEnglishName())
                 .replace("$model$", templateData.getModel());
 
-        String templatePath = "/" + settingTemplatePath.getV()
-                + "/" + frameworksTemplate.getPath();
+        String templatePath = "/" + settingTemplatePath.getV() + "/" + frameworksTemplate.getPath();
         templatePath = templatePath.replace("//", "/").replace("///", "/");
         log.debug("模板路径：" + templatePath);
         if (targetFilePath.contains("angular")) {
@@ -711,8 +689,7 @@ public class GeneratorSVImpl implements GenerateSV {
         }
         ZipTools.zip(destination, projectWorkspacePath);
         project.setDownloadUrl("/project/download/" + project.getEnglishName());
-        projectMapper.update(project, new LambdaQueryWrapper<Project>()
-                .eq(Project::getCode, project.getCode()));
+        projectMapper.update(project, new LambdaQueryWrapper<Project>().eq(Project::getCode, project.getCode()));
     }
 
     /**

@@ -115,7 +115,8 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
         String basePackage = project.getBasePackage();
         basePackage = basePackage.endsWith(".") ? basePackage.substring(0, basePackage.lastIndexOf(".")) : basePackage;
         project.setBasePackage(basePackage);
-        project.setCode(String.valueOf(uidGenerator.getUID()));
+        project.setId(uidGenerator.getUID());
+        project.setCode(String.valueOf(project.getId()));
         project.setState(ProjectState.Enable.name());
         if (StringUtils.isBlank(project.getIsIncrement())) {
             project.setIsIncrement(YNEnum.N.name());

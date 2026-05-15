@@ -60,7 +60,7 @@ AI: 👋 您好！我是 aicode 代码生成助手。
 ### 意图确认后自动登录
 
 ```
-用户: 是 / 好的 / 开始吧
+用户: 是 / 好的 / ok / 1 / 开始吧
 AI: ✅ 登录成功！接下来开始创建项目
 ```
 
@@ -174,7 +174,7 @@ AI: 好的，如有需要随时叫我！
 开始执行项目构建，系统会自动下载框架，通过Beetl、Freemarker等模板引擎完成代码生成。
 
 - **API**: `GET /project/job/execute`
-- **参数**: `code` - 任务编码（可通过 `POST /project/job/build` 创建任务获取）
+- **参数**: `code` - 项目编码（创建项目后获得）
 
 ### Step 8: 下载源码包或推送Git
 
@@ -299,17 +299,9 @@ AI: ✅ 登录成功！接下来开始创建项目
 ### Step 2: 创建项目
 
 ```
-AI: 请提供项目信息（复制模板填写后发送）：
-```json
-{
-  "name": "项目英文名（必填，必须为英文）",
-  "englishName": "项目英文名（默认与name一致）"
-}
-```
-其他使用默认配置：数据库类型=Mysql, 语言=Java, 包名=com.{englishName}
-
-用户: {"name": "demo", "englishName": "demo"}
-AI → 调用创建项目API
+AI: 请输入项目名称（英文）：
+用户: demo
+AI → 调用创建项目API (name=demo, englishName=demo)
 AI: ✅ 项目创建成功！项目编码: {code}
      接下来请导入SQL建表脚本
 ```
@@ -374,7 +366,7 @@ AI: ✅ Git仓库配置成功！
 ### Step 7: 执行代码生成
 
 ```
-AI → 调用执行任务API (/project/job/execute)
+AI → 调用执行任务API (/project/job/execute?code={projectCode})
 AI: 🔄 代码生成中，预计需要30-60秒...
 AI: ✅ 代码生成完成！正在推送Git仓库并生成下载链接...
 ```
@@ -384,7 +376,7 @@ AI: ✅ 代码生成完成！正在推送Git仓库并生成下载链接...
 ```
 AI: 🎉 项目创建完成！
 
-📦 源码包下载: GET /project/download/{englishName}
+📦 源码包下载: http://127.0.0.1:8080/project/download/{englishName}
 📤 Git推送状态: 已推送到 {home}
 
 如需查看构建日志，请说"查看构建日志"
@@ -399,7 +391,7 @@ AI: 🎉 项目创建完成！
 |------|---------|
 | 意图识别 | `👋 您好！我是 aicode 代码生成助手。我可以帮助您快速创建一个完整的 Java 项目框架，是否开始创建项目？` |
 | 自动登录成功 | `✅ 登录成功！接下来开始创建项目` |
-| 询问项目信息 | `请提供项目信息（复制模板填写后发送）：\n```json\n{"name": "项目英文名（必填，必须为英文）"}\n```\n其他使用默认配置` |
+| 询问项目信息 | `请输入项目名称（英文）：` |
 | 项目创建成功 | `✅ 项目创建成功！项目编码: {code}，接下来请导入SQL建表脚本` |
 | SQL导入成功 | `✅ SQL脚本已导入，正在初始化数据库并生成映射关系...` |
 | 初始化完成 | `✅ 数据库初始化完成！检测到 {n} 张表，映射关系已生成` |
@@ -408,9 +400,9 @@ AI: 🎉 项目创建完成！
 | 框架保存成功 | `✅ 已选择：{name}\n{features}\n接下来配置Git仓库` |
 | 询问Git信息 | `请提供Git仓库信息（直接回车使用默认值）：\n- 仓库地址（默认: https://google.com）\n- 用户名（默认: admin）\n- 密码（默认: 123456）` |
 | Git配置成功 | `✅ Git仓库配置成功！准备开始生成代码` |
-| 生成中 | `🔄 代码生成中，预计需要30-60秒...` |
+| 执行生成 | `🔄 代码生成中，预计需要30-60秒...` |
 | 生成完成 | `✅ 代码生成完成！正在推送Git仓库并生成下载链接...` |
-| 任务完成 | `🎉 项目创建完成！\n📦 下载: /project/download/{englishName}\n📤 Git: {home}` |
+| 任务完成 | `🎉 项目创建完成！\n📦 下载: http://127.0.0.1:8080/project/download/{englishName}\n📤 Git: {home}` |
 
 ---
 
@@ -419,16 +411,14 @@ AI: 🎉 项目创建完成！
 ```
 用户：帮我快速创建一个项目
 AI: ✅ 登录成功！
-AI: 请提供项目信息（复制模板填写后发送）：
-```json
-{"name": "demo"}
-```
-用户: {"name": "demo"}
-AI: 好的，请提供SQL建表脚本：
+AI: 请输入项目名称（英文）：
+用户: demo
+AI: ✅ 项目创建成功！
+AI: 请粘贴SQL建表脚本：
 用户: CREATE TABLE user (id BIGINT PRIMARY KEY, name VARCHAR(50));
 AI: ✅ 项目创建完成！
-     - 下载: /project/download/demo
-     - Git: https://google.com
+     📦 下载: http://127.0.0.1:8080/project/download/demo
+     📤 Git: https://google.com
 ```
 
 ### 异常处理对话

@@ -38,9 +38,17 @@ public class WSClientManager {
     }
 
     public static Session get() {
+        if (sessionMap.isEmpty()) {
+            log.warn("sessionMap is empty");
+            return null;
+        }
+
         if (sessionMap.containsKey(token)) {
+            log.info("get session by token: {}", token);
             return sessionMap.get(token);
         }
+
+        log.warn("sessionMap is empty");
         return null;
     }
 

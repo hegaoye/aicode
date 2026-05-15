@@ -78,12 +78,13 @@ public class ProjectJobServiceImpl extends ServiceImpl<ProjectJobMapper, Project
      * 5.获取模块信息
      * 6.获取版本控制管理信息
      *
-     * @param projectCode 任务编码
-     * @return
+     * @param projectCode 项目编码
+     * @return ProjectJob
      */
 
     @Override
     public ProjectJob execute(String projectCode) {
+        log.info("执行任务, projectCode:{}", projectCode);
         //创建任务追踪
         ProjectJob projectJob = new ProjectJob();
         projectJob.setId(uidGenerator.getUID());

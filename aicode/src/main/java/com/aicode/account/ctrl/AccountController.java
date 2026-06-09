@@ -37,10 +37,14 @@ import java.util.List;
  *
  * @author aicode
  */
+/**
+ * @deprecated 前端未调用, 待人工评估后删除 (JS 静态扫描未发现引用).
+ */
 @Slf4j
 @RestController
 @RequestMapping("/account")
 @Tag(name = "账户控制器", description = "账户控制器")
+@Deprecated
 public class AccountController {
     @Autowired
     private AccountService accountService;

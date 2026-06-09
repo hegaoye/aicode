@@ -30,10 +30,14 @@ import java.util.List;
  *
  * @author aicode
  */
+/**
+ * @deprecated 前端未调用, 待人工评估后删除 (JS 静态扫描未发现引用).
+ */
 @RestController
 @RequestMapping("/projectCodeCatalog")
 @Slf4j
 @Tag(name = "生成源码资料控制器", description = "生成源码资料控制器")
+@Deprecated
 public class ProjectCodeCatalogController {
     @Autowired
     private ProjectCodeCatalogService projectCodeCatalogService;

@@ -30,10 +30,14 @@ import org.springframework.web.bind.annotation.*;
  *
  * @author hegaoye
  */
+/**
+ * @deprecated 前端未调用, 待人工评估后删除 (JS 静态扫描未发现引用).
+ */
 @RestController
 @RequestMapping("/projectModel")
 @Slf4j
 @Tag(name = "模块控制器", description = "模块控制器")
+@Deprecated
 public class ProjectModelController {
     @Autowired
     private ProjectModelService projectModelService;

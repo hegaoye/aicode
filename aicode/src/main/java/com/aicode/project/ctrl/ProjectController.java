@@ -91,11 +91,15 @@ public class ProjectController {
     }
 
 
+    /**
+     * @deprecated 前端未调用, 待人工评估后删除 (JS 静态扫描未发现引用).
+     */
     @GetMapping("/download/{projectName}")
     @Operation(summary = "下载项目源码", description = "下载项目源码")
     @Parameters({
             @Parameter(name = "projectName", description = "项目名", required = true)
     })
+    @Deprecated
     public void downloadFile(@PathVariable("projectName") String projectName, HttpServletResponse response) throws Exception {
         if (StringUtils.isBlank(projectName)) {
             return;
@@ -254,8 +258,12 @@ public class ProjectController {
     }
 
 
+    /**
+     * @deprecated 前端未调用, 待人工评估后删除 (JS 静态扫描未发现引用).
+     */
     @Operation(summary = "创建Project", description = "创建Project")
     @GetMapping("/load/code/{code}")
+    @Deprecated
     public ProjectVO loadByCode(@PathVariable String code) {
         if (code == null) {
             return null;

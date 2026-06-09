@@ -64,8 +64,25 @@ public class ProjectFramworkController {
     @Parameters({
             @Parameter(name = "projectStr", description = "项目技术json", required = true)
     })
-    @PostMapping({"/build", "/add"})
+    @PostMapping("/add")
+    public R add(@Parameter(hidden = true) String projectStr) {
+        return doBuild(projectStr);
+    }
+
+    /**
+     * @deprecated 前端未调用, 待人工评估后删除 (JS 静态扫描未发现引用; 仅 /add 仍在使用).
+     */
+    @Operation(summary = "创建ProjectFramwork", description = "创建ProjectFramwork")
+    @Parameters({
+            @Parameter(name = "projectStr", description = "项目技术json", required = true)
+    })
+    @PostMapping("/build")
+    @Deprecated
     public R build(@Parameter(hidden = true) String projectStr) {
+        return doBuild(projectStr);
+    }
+
+    private R doBuild(String projectStr) {
         List<ProjectFramwork> projectFramwors = JSON.parseArray(projectStr, ProjectFramwork.class);
         if (CollectionUtils.isEmpty(projectFramwors)) {
             return R.failed(BaseException.BaseExceptionEnum.Empty_Param);

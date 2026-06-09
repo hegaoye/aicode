@@ -38,6 +38,7 @@ public class DisplayAttributeController {
     @Autowired
     private MapFieldColumnService mapFieldColumnService;
 
+
     @Operation(summary = "创建DisplayAttribute", description = "创建DisplayAttribute")
     @PostMapping("/save")
     public R build(@RequestBody List<DisplayAttribute> displayAttributes) {

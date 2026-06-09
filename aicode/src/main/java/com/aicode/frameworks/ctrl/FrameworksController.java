@@ -64,8 +64,12 @@ public class FrameworksController {
 
     
     
+    /**
+     * @deprecated 前端未调用, 待人工评估后删除 (JS 静态扫描未发现引用).
+     */
     @Operation(summary = "创建Frameworks", description = "创建Frameworks")
     @GetMapping("/load/code/{code}")
+    @Deprecated
     public FrameworksVO loadByCode(@PathVariable String code) {
         if (code == null) {
             return null;

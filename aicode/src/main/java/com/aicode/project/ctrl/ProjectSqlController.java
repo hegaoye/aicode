@@ -77,8 +77,12 @@ public class ProjectSqlController {
     }
 
 
+    /**
+     * @deprecated 前端未调用, 待人工评估后删除 (JS 静态扫描未发现引用).
+     */
     @Operation(summary = "创建ProjectSql", description = "创建ProjectSql")
     @GetMapping("/load/projectCode/{projectCode}")
+    @Deprecated
     public ProjectSqlVO loadByProjectCode(@PathVariable String projectCode) {
         if (projectCode == null) {
             return null;

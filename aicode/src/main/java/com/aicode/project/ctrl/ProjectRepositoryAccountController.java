@@ -69,8 +69,12 @@ public class ProjectRepositoryAccountController {
     }
 
 
+    /**
+     * @deprecated 前端未调用, 待人工评估后删除 (JS 静态扫描未发现引用).
+     */
     @Operation(summary = "创建ProjectRepositoryAccount", description = "创建ProjectRepositoryAccount")
     @GetMapping("/load/code/{code}")
+    @Deprecated
     public ProjectRepositoryAccountVO loadByCode(@PathVariable String code) {
         if (code == null) {
             return null;

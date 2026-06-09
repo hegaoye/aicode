@@ -112,8 +112,12 @@ public class MapRelationshipController {
 
 
     
+    /**
+     * @deprecated 前端未调用, 待人工评估后删除 (JS 静态扫描未发现引用).
+     */
     @Operation(summary = "创建MapRelationship", description = "创建MapRelationship")
     @GetMapping("/load/code/{code}")
+    @Deprecated
     public MapRelationshipVO loadByCode(@PathVariable String code) {
         if (code == null) {
             return null;
@@ -166,11 +170,15 @@ public class MapRelationshipController {
 
 
     
+    /**
+     * @deprecated 前端未调用, 待人工评估后删除 (JS 静态扫描未发现引用).
+     */
     @Operation(summary = "查询模型关系列表", description = "查询模型关系列表")
     @Parameters({
             @Parameter(name = "classTableCode", description = "类表映射编码", required = true),
     })
     @GetMapping(value = "/listByClassTableCode")
+    @Deprecated
     public R listByProjectCode(String classTableCode) {
         Assert.hasText(classTableCode, BaseException.BaseExceptionEnum.Empty_Param.toString());
         List<MapRelationship> relationships = mapRelationshipService.list(new LambdaQueryWrapper<MapRelationship>()

@@ -29,10 +29,14 @@ import org.springframework.web.bind.annotation.*;
  *
  * @author hegaoye
  */
+/**
+ * @deprecated 前端未调用, 待人工评估后删除 (JS 静态扫描未发现引用).
+ */
 @RestController
 @RequestMapping("/projectModelClass")
 @Slf4j
 @Tag(name = "模块下的类控制器", description = "模块下的类控制器")
+@Deprecated
 public class ProjectModelClassController {
     @Autowired
     private ProjectModelClassService projectModelClassService;

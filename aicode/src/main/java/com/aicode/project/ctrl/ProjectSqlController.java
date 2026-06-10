@@ -95,11 +95,15 @@ public class ProjectSqlController {
         return projectSqlVO;
     }
 
+    /**
+     * @deprecated 前端未调用, 待人工评估后删除 (JS 静态扫描未发现引用).
+     */
     @Operation(summary = "查询ProjectSql信息集合", description = "查询ProjectSql信息集合")
     @Parameters({
             @Parameter(name = "projectCode", description = "项目编码", required = true)
     })
     @GetMapping(value = "/list")
+    @Deprecated
     public R list(@Parameter(hidden = true) ProjectSqlPageVO projectSqlVO) {
         QueryWrapper<ProjectSql> queryWrapper = new QueryWrapper<>();
         if (projectSqlVO.getCode() != null) {
@@ -132,12 +136,16 @@ public class ProjectSqlController {
     }
 
 
+    /**
+     * @deprecated 前端未调用, 待人工评估后删除 (JS 静态扫描未发现引用).
+     */
     @Operation(summary = "删除ProjectSql", description = "删除ProjectSql")
     @Parameters({
             @Parameter(name = "id", description = ""),
             @Parameter(name = "projectCode", description = "项目编码")
     })
     @DeleteMapping("/delete")
+    @Deprecated
     public R delete(@Parameter(hidden = true) ProjectSqlVO projectSqlVO) {
         ProjectSql newProjectSql = new ProjectSql();
         BeanUtils.copyProperties(projectSqlVO, newProjectSql);

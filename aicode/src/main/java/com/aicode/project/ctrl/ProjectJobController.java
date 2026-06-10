@@ -40,11 +40,15 @@ public class ProjectJobController {
     @Autowired
     private ProjectJobService projectJobService;
 
+    /**
+     * @deprecated 前端未调用, 待人工评估后删除 (JS 静态扫描未发现引用).
+     */
     @Operation(summary = "查询任务详情信息", description = "查询任务详情信息")
     @Parameters({
             @Parameter(name = "code", description = "任务编码")
     })
     @GetMapping(value = "/load")
+    @Deprecated
     public R load(String code) {
         Assert.hasText(code, BaseException.BaseExceptionEnum.Empty_Param.toString());
         ProjectJob projectJob = projectJobService.getOne(new LambdaQueryWrapper<ProjectJob>()
@@ -55,6 +59,9 @@ public class ProjectJobController {
     }
 
 
+    /**
+     * @deprecated 前端未调用, 待人工评估后删除 (JS 静态扫描未发现引用).
+     */
     @Operation(summary = "创建ProjectJob", description = "创建ProjectJob")
     @Parameters({
             @Parameter(name = "projectCode", description = "项目编码", required = true),
@@ -62,6 +69,7 @@ public class ProjectJobController {
             @Parameter(name = "description", description = "任务描述", required = true)
     })
     @PostMapping("/build")
+    @Deprecated
     public R build(@Parameter(hidden = true) ProjectJob projectJob) {
 
         ProjectJob projectJobLoad = projectJobService.getOne(new LambdaQueryWrapper<ProjectJob>()
@@ -76,6 +84,9 @@ public class ProjectJobController {
     }
 
 
+    /**
+     * @deprecated 前端未调用, 待人工评估后删除 (JS 静态扫描未发现引用).
+     */
     @Operation(summary = "查询ProjectJob信息集合", description = "查询ProjectJob信息集合")
     @Parameters({
             @Parameter(name = "code", description = "项目编码"),
@@ -83,6 +94,7 @@ public class ProjectJobController {
             @Parameter(name = "pageSize", description = "分页大小", required = true)
     })
     @GetMapping(value = "/list")
+    @Deprecated
     public R list(@Parameter(hidden = true) ProjectJobPageVO projectJobVO, Integer curPage, Integer pageSize) {
 
         IPage<ProjectJob> page = new Page<>(curPage, pageSize);
@@ -105,6 +117,9 @@ public class ProjectJobController {
     }
 
 
+    /**
+     * @deprecated 前端未调用, 待人工评估后删除 (JS 静态扫描未发现引用).
+     */
     @Operation(summary = "修改ProjectJob", description = "修改ProjectJob")
     @Parameters({
             @Parameter(name = "code", description = "项目编码", required = true),
@@ -113,6 +128,7 @@ public class ProjectJobController {
             @Parameter(name = "description", description = "任务描述")
     })
     @PutMapping("/modify")
+    @Deprecated
     public R modify(@Parameter(hidden = true) ProjectJob projectJob) {
         if (com.baomidou.mybatisplus.core.toolkit.StringUtils.isEmpty(projectJob.getState())) {
             R.failed(BaseException.BaseExceptionEnum.Empty_Param);
@@ -123,11 +139,15 @@ public class ProjectJobController {
     }
 
 
+    /**
+     * @deprecated 前端未调用, 待人工评估后删除 (JS 静态扫描未发现引用).
+     */
     @Operation(summary = "删除ProjectJob", description = "删除ProjectJob")
     @Parameters({
             @Parameter(name = "code", description = "任务编码")
     })
     @DeleteMapping("/delete")
+    @Deprecated
     public R delete(@Parameter(hidden = true) ProjectJobVO projectJobVO) {
         ProjectJob newProjectJob = new ProjectJob();
         BeanUtils.copyProperties(projectJobVO, newProjectJob);

@@ -124,8 +124,12 @@ public class ProjectFramworkController {
     }
 
 
+    /**
+     * @deprecated 前端未调用, 待人工评估后删除 (JS 静态扫描未发现引用).
+     */
     @Operation(summary = "修改ProjectFramwork", description = "修改ProjectFramwork")
     @PutMapping("/modify")
+    @Deprecated
     public boolean modify(@RequestBody ProjectFramworkVO projectFramworkVO) {
         ProjectFramwork newProjectFramwork = new ProjectFramwork();
         BeanUtils.copyProperties(projectFramworkVO, newProjectFramwork);
@@ -135,12 +139,16 @@ public class ProjectFramworkController {
     }
 
 
+    /**
+     * @deprecated 前端未调用, 待人工评估后删除 (JS 静态扫描未发现引用).
+     */
     @Operation(summary = "删除ProjectFramwork", description = "删除ProjectFramwork")
     @Parameters({
             @Parameter(name = "projectCode", description = "项目编码", required = true),
             @Parameter(name = "frameworkCode", description = "添加项目技术", required = true)
     })
     @DeleteMapping("/delete")
+    @Deprecated
     public R delete(@Parameter(hidden = true) ProjectFramworkVO projectFramworkVO) {
         Assert.hasText(projectFramworkVO.getFrameworkCode(), BaseException.BaseExceptionEnum.Empty_Param.toString());
         Assert.hasText(projectFramworkVO.getProjectCode(), BaseException.BaseExceptionEnum.Empty_Param.toString());

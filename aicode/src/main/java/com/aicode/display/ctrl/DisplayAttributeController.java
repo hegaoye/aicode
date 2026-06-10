@@ -87,6 +87,9 @@ public class DisplayAttributeController {
 
 
     
+    /**
+     * @deprecated 前端未调用, 待人工评估后删除 (JS 静态扫描未发现引用).
+     */
     @Operation(summary = "修改DisplayAttribute", description = "修改DisplayAttribute")
     @Parameters({
             @Parameter(name = "mapFieldColumnCode", description = "字段编码"),
@@ -107,6 +110,7 @@ public class DisplayAttributeController {
             @Parameter(name = "displayCss", description = "显示css样式")
     })
     @PutMapping("/modify")
+    @Deprecated
     public R modify(@Parameter(hidden = true) DisplayAttribute displayAttribute) {
         displayAttributeService.update(displayAttribute, new LambdaQueryWrapper<DisplayAttribute>()
                 .eq(DisplayAttribute::getMapFieldColumnCode, displayAttribute.getMapFieldColumnCode()));
@@ -114,12 +118,16 @@ public class DisplayAttributeController {
     }
 
     
+    /**
+     * @deprecated 前端未调用, 待人工评估后删除 (JS 静态扫描未发现引用).
+     */
     @Operation(summary = "删除DisplayAttribute", description = "删除DisplayAttribute")
     @Parameters({
             @Parameter(name = "id", description = ""),
             @Parameter(name = "mapFieldColumnCode", description = "字段编码")
     })
     @DeleteMapping("/delete")
+    @Deprecated
     public R delete(@Parameter(hidden = true) DisplayAttributeVO displayAttributeVO) {
         DisplayAttribute newDisplayAttribute = new DisplayAttribute();
         BeanUtils.copyProperties(displayAttributeVO, newDisplayAttribute);

@@ -88,6 +88,9 @@ public class ProjectRepositoryAccountController {
     }
 
 
+    /**
+     * @deprecated 前端未调用, 待人工评估后删除 (JS 静态扫描未发现引用).
+     */
     @Operation(summary = "查询ProjectRepositoryAccount信息集合", description = "查询ProjectRepositoryAccount信息集合")
     @Parameters({
             @Parameter(name = "projectCode", description = "项目编码"),
@@ -95,6 +98,7 @@ public class ProjectRepositoryAccountController {
             @Parameter(name = "pageSize", description = "分页大小", required = true)
     })
     @GetMapping(value = "/list")
+    @Deprecated
     public R list(@Parameter(hidden = true) ProjectRepositoryAccountPageVO projectRepositoryAccountVO) {
         IPage<ProjectRepositoryAccount> page = new Page<>();
         QueryWrapper<ProjectRepositoryAccount> queryWrapper = new QueryWrapper<>();

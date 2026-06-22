@@ -6,7 +6,6 @@ package com.aicode.project.service;
 import com.aicode.core.BaseException;
 import com.aicode.core.enums.YNEnum;
 import com.aicode.core.tools.FileUtil;
-import com.aicode.core.tools.HandleFuncs;
 import com.aicode.core.tools.StringTools;
 import com.aicode.core.tools.core.typemapping.DatabaseDataTypesUtils;
 import com.aicode.database.dao.ColumnDAO;
@@ -211,7 +210,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
         //项目源码删除
         Setting settingWorkspace = settingMapper.selectOne(new LambdaQueryWrapper<Setting>()
                 .eq(Setting::getK, SettingKey.Workspace.name()));
-        String projectPath = new HandleFuncs().getCurrentClassPath() + settingWorkspace.getV() + "/" + project.getEnglishName();
+        String projectPath = settingWorkspace.getV() + "/" + project.getEnglishName();
         projectPath = projectPath.replace("//", "/");
         File file = new File(projectPath);
         if (file.exists()) {
@@ -220,7 +219,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
         //项目zip删除
         Setting settingRepositoryPath = settingMapper.selectOne(new LambdaQueryWrapper<Setting>()
                 .eq(Setting::getK, SettingKey.Repository_Path.name()));
-        String repositoryPath = new HandleFuncs().getCurrentClassPath() + settingRepositoryPath.getV() + "/" + project.getEnglishName() + ".zip";
+        String repositoryPath = settingRepositoryPath.getV() + "/" + project.getEnglishName() + ".zip";
         repositoryPath = repositoryPath.replace("//", "/");
         File repositoryFile = new File(repositoryPath);
         if (repositoryFile.exists()) {
@@ -238,29 +237,25 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
      */
     @Override
     public void execute(String code) {
-        //1.创建数据库
-        boolean flag = this.createDatabase(code);
+        //1.创建数据库（幂等：库已存在直接跳过建库）
+        this.createDatabase(code);
 
         //2.解析数据库信息
-        if (flag) {
-            flag = this.parse(code);
-            if (!flag) {
-                log.error(BaseException.BaseExceptionEnum.Server_Error.toString());
-                throw new ProjectException(BaseException.BaseExceptionEnum.Server_Error);
-            }
+        boolean flag = this.parse(code);
+        if (!flag) {
+            log.error(BaseException.BaseExceptionEnum.Server_Error.toString());
+            throw new ProjectException(BaseException.BaseExceptionEnum.Server_Error);
         }
     }
 
     /**
-     * 创建数据库
+     * 创建数据库（幂等）
      * 1.判断必要参数
-     * 2.创建数据库
-     * 3.记录任务日志
+     * 2.库不存在时建库并跑 SQL；库已存在则跳过（让 parse 覆盖旧映射）
      *
      * @param code 项目编码
-     * @return true/false
      */
-    private boolean createDatabase(String code) {
+    private void createDatabase(String code) {
         //1.判断必要参数
         if (code == null) {
             log.error(BaseException.BaseExceptionEnum.Empty_Param.toString());
@@ -280,23 +275,21 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
             throw new ProjectException(BaseException.BaseExceptionEnum.Empty_Param);
         }
 
-        //2.创建数据库
+        //2.建库：库已存在则跳过
         long i = databaseDAO.count(database);
-        if (i <= 0) {
-            Setting setting = settingMapper.selectOne(new LambdaQueryWrapper<Setting>()
-                    .eq(Setting::getK, SettingKey.DefaultDatabase.name()));
-
-            if (!projectSqls.isEmpty()) {
-                projectSqls.forEach(projectSql -> {
-                    if (projectSql.getState().equals(ProjectSqlState.Enable.name())) {
-                        databaseDAO.createDatabase(database, projectSql.getTsql(), setting.getV());
-                    }
-                });
-                return true;
-            }
+        if (i > 0) {
+            log.info("数据库已存在，跳过建库：{}", database);
+            return;
         }
 
-        return false;
+        Setting setting = settingMapper.selectOne(new LambdaQueryWrapper<Setting>()
+                .eq(Setting::getK, SettingKey.DefaultDatabase.name()));
+
+        projectSqls.forEach(projectSql -> {
+            if (projectSql.getState().equals(ProjectSqlState.Enable.name())) {
+                databaseDAO.createDatabase(database, projectSql.getTsql(), setting.getV());
+            }
+        });
     }
 
 
@@ -320,8 +313,8 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
         List<ProjectMap> projectMapList = projectMapMapper.selectList(new LambdaQueryWrapper<ProjectMap>().eq(ProjectMap::getProjectCode, code));
         for (ProjectMap projectMap : projectMapList) {
             mapClassTableMapper.delete(new LambdaQueryWrapper<MapClassTable>().eq(MapClassTable::getCode, projectMap.getMapClassTableCode()));
-            mapFieldColumnMapper.delete(new LambdaQueryWrapper<MapFieldColumn>().eq(MapFieldColumn::getCode, projectMap.getMapClassTableCode()));
-            mapRelationshipMapper.delete(new LambdaQueryWrapper<MapRelationship>().eq(MapRelationship::getCode, projectMap.getMapClassTableCode()));
+            mapFieldColumnMapper.delete(new LambdaQueryWrapper<MapFieldColumn>().eq(MapFieldColumn::getMapClassTableCode, projectMap.getMapClassTableCode()));
+            mapRelationshipMapper.delete(new LambdaQueryWrapper<MapRelationship>().eq(MapRelationship::getMapClassTableCode, projectMap.getMapClassTableCode()));
         }
 
         projectMapMapper.delete(new LambdaQueryWrapper<ProjectMap>().eq(ProjectMap::getProjectCode, code));

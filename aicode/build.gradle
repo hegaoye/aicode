@@ -89,7 +89,12 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
 
+}
+
+test {
+    useJUnitPlatform()
 }
 
 //dependencyManagement {

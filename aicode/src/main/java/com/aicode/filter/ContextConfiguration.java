@@ -38,10 +38,49 @@ public class ContextConfiguration implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        //全局拦截器
+        //全局链路追踪：注入 traceId 到 MDC
         registry.addInterceptor(contextInterceptor)
                 .addPathPatterns("/**");
-        //        registry.addInterceptor(loginInterceptor)
-        //                .addPathPatterns("/**");
+
+        //登录拦截：写操作 / 受保护资源要求 token
+        //token 兼容：URL ?token=xxx（兼容现有 .opencode skill 与老接口） + Authorization: Bearer xxx（推荐）
+        registry.addInterceptor(loginInterceptor)
+                .addPathPatterns("/**")
+                .excludePathPatterns(
+                        //登录
+                        "/login/signin",
+                        "/login/reg",
+                        //H2 控制台
+                        "/h2",
+                        "/h2/**",
+                        //Actuator
+                        "/actuator/**",
+                        //API 文档
+                        "/doc.html",
+                        "/webjars/**",
+                        "/v3/api-docs",
+                        "/v3/api-docs/**",
+                        "/swagger-resources/**",
+                        "/swagger-ui/**",
+                        //静态资源
+                        "/",
+                        "/index.html",
+                        "/favicon.ico",
+                        "/static/**",
+                        "/*.html",
+                        "/*.js",
+                        "/*.css",
+                        "/*.png",
+                        "/*.jpg",
+                        "/*.jpeg",
+                        "/*.gif",
+                        "/*.svg",
+                        "/*.ico",
+                        "/*.woff",
+                        "/*.woff2",
+                        "/*.ttf",
+                        //前端 SPA 路由
+                        "/main/**"
+                );
     }
 }

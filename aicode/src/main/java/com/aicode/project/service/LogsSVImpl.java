@@ -124,7 +124,7 @@ public class LogsSVImpl implements LogsSV {
             writer.newLine();
             writer.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("异常", e);
             return false;
         }
         return true;
@@ -183,11 +183,11 @@ public class LogsSVImpl implements LogsSV {
                     String fileStr = FileUtils.readFileToString(new File(path), "UTF-8");
                     return R.success(fileStr);
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    log.error("异常", e);
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("异常", e);
         }
 
         return R.success(filePath.replaceAll("/\\w*\\.jar", ""));

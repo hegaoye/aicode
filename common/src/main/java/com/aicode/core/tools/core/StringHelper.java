@@ -220,6 +220,9 @@ public class StringHelper {
     }
 
     public static String makeAllWordFirstLetterUpperCase(String sqlName) {
+        if (sqlName == null) {
+            return null;
+        }
         String[] strs = sqlName.toLowerCase().split("_");
         String result = "";
         String preStr = "";

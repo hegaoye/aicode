@@ -173,7 +173,7 @@ public class ProjectJobController {
             return R.success(projectJob);
             //            }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("异常", e);
             log.error(e.getMessage());
             return R.failed(BaseException.BaseExceptionEnum.Server_Error);
         }

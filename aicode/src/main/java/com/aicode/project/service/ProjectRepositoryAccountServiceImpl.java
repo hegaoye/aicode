@@ -4,6 +4,7 @@
 package com.aicode.project.service;
 
 import com.aicode.core.BaseException;
+import com.aicode.core.tools.PasswordCrypto;
 import com.aicode.exceptions.ProjectRepositoryAccountException;
 import com.aicode.project.dao.ProjectRepositoryAccountDAO;
 import com.aicode.project.dao.mapper.ProjectRepositoryAccountMapper;
@@ -49,6 +50,8 @@ public class ProjectRepositoryAccountServiceImpl extends ServiceImpl<ProjectRepo
         projectRepositoryAccount.setState(ProjectRepositoryAccountState.Enable.name());
         projectRepositoryAccount.setType(projectRepositoryAccount.getType()
                 .equalsIgnoreCase(ProjectRepositoryTypeEnum.GIT.name()) ? ProjectRepositoryTypeEnum.GIT.name() : ProjectRepositoryTypeEnum.SVN.name());
+        // 入库前加密产物仓库凭据
+        projectRepositoryAccount.setPassword(PasswordCrypto.encrypt(projectRepositoryAccount.getPassword()));
 
         return super.save(projectRepositoryAccount);
     }

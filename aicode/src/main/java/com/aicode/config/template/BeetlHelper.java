@@ -50,7 +50,7 @@ public class BeetlHelper implements TemplateHelper {
             Writer out = new OutputStreamWriter(new FileOutputStream(targetFilePath), Charset.forName("UTF-8"));
             template.renderTo(out);
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            log.error("异常", e);
             return e.getMessage();
         }
         return "success";

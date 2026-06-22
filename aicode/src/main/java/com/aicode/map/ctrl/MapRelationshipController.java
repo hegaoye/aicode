@@ -81,11 +81,19 @@ public class MapRelationshipController {
         mapRelationshipService.saveOrUpdate(mapRelationship);
 
         //反向建立关联关系
+        //A->B oneToMany 时，反向 B->A 应是 oneToOne（A 持有 B 的集合，B 仅持有一个 A）
+        //A->B oneToOne 时，反向 B->A 也应是 oneToOne
+        YNEnum reverseOneToOne = oneToOne;
+        YNEnum reverseOneToMany = YNEnum.N;
+        if (oneToMany == YNEnum.Y && oneToOne != YNEnum.Y) {
+            reverseOneToOne = YNEnum.Y;
+            reverseOneToMany = YNEnum.N;
+        }
         MapRelationship mapRelationshipFlag = this.load(associateCode, mapClassTableCode);
         mapRelationshipFlag.setMainField(joinField);
         mapRelationshipFlag.setJoinField(mainField);
-        mapRelationshipFlag.setIsOneToOne(YNEnum.Y.name());
-        mapRelationshipFlag.setIsOneToMany(YNEnum.N.name());
+        mapRelationshipFlag.setIsOneToOne(reverseOneToOne.name());
+        mapRelationshipFlag.setIsOneToMany(reverseOneToMany.name());
         mapRelationshipService.saveOrUpdate(mapRelationshipFlag);
 
         return R.success();

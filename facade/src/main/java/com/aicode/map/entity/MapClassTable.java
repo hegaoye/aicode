@@ -56,11 +56,15 @@ public class MapClassTable implements java.io.Serializable {
 
     public void toJava() {
         this.className = StringHelper.toJavaClassName(this.tableName);
+        //表名含下划线取首段作为模块名；与 generator() 的 model 分组保持一致
+        this.classModel = this.tableName != null && this.tableName.contains("_")
+                ? this.tableName.substring(0, this.tableName.indexOf("_"))
+                : this.tableName;
     }
 
 
     public String getClassModel() {
-        return this.classModel = tableName.contains("_") ? tableName.substring(0, tableName.indexOf("_")) : tableName;
+        return this.classModel;
     }
 
     public String getDashedCaseName() {

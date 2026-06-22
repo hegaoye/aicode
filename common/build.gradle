@@ -36,4 +36,12 @@ dependencies {
 
     compileOnly 'org.projectlombok:lombok:1.18.32'
     annotationProcessor 'org.projectlombok:lombok:1.18.32'
+
+    //----------- test  start--------------
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
+    //----------- test  end--------------
+}
+
+test {
+    useJUnitPlatform()
 }

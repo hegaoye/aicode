@@ -58,10 +58,10 @@ public class FreemarkerHelper implements TemplateHelper {
             param.put("package", templateData.getBasePackage());
             temp.process(param, out);
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("异常", e);
             return e.getMessage();
         } catch (TemplateException e) {
-            e.printStackTrace();
+            log.error("异常", e);
             return e.getMessage();
         }
         return "success";

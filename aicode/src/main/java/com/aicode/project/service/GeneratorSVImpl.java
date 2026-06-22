@@ -1,6 +1,5 @@
 package com.aicode.project.service;
 
-import com.aicode.config.template.Configuration;
 import com.aicode.config.template.TemplateData;
 import com.aicode.config.template.TemplateHelper;
 import com.aicode.config.websocket.WSClientManager;
@@ -22,8 +21,13 @@ import com.aicode.map.dao.mapper.MapRelationshipMapper;
 import com.aicode.map.entity.MapClassTable;
 import com.aicode.map.entity.MapFieldColumn;
 import com.aicode.map.entity.MapRelationship;
+import com.aicode.module.dao.mapper.ModuleMapper;
+import com.aicode.module.entity.Module;
 import com.aicode.project.dao.mapper.*;
 import com.aicode.project.entity.*;
+import com.aicode.project.service.generator.SqlEmitter;
+import com.aicode.project.service.generator.TemplateEngineAdapter;
+import com.aicode.project.service.generator.ZipPackager;
 import com.aicode.setting.dao.mapper.SettingMapper;
 import com.aicode.setting.entity.Setting;
 import com.aicode.setting.entity.SettingKey;
@@ -41,6 +45,7 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 用于代码生成业务
@@ -76,6 +81,10 @@ public class GeneratorSVImpl implements GenerateSV {
     @Autowired
     private MapRelationshipMapper mapRelationshipMapper;
     @Autowired
+    private ProjectModuleMapper projectModuleMapper;
+    @Autowired
+    private ModuleMapper moduleMapper;
+    @Autowired
     private UidGenerator uidGenerator;
     @Autowired
     private TemplateHelper freemarkerHelper;
@@ -83,6 +92,12 @@ public class GeneratorSVImpl implements GenerateSV {
     private TemplateHelper beetlHelper;
     @Autowired
     private LogsSV logsSV;
+    @Autowired
+    private TemplateEngineAdapter templateEngineAdapter;
+    @Autowired
+    private SqlEmitter sqlEmitter;
+    @Autowired
+    private ZipPackager zipPackager;
 
 
     /**
@@ -97,6 +112,8 @@ public class GeneratorSVImpl implements GenerateSV {
         String path = logsSV.createLogFiles(projectCode, projectJob.getCreateTime());
         log.info("log path: {}", path);
 
+        // 上提到 try 之外：用于 finally 块清理临时模板
+        List<ProjectFramwork> projectFramworkList = null;
         try {
             //1.创建项目
             String logText = "Start By AI-Code @Copyright <a href='http://www.aicode.io' target='_blank'>AI-Code</a>";
@@ -142,7 +159,7 @@ public class GeneratorSVImpl implements GenerateSV {
             logsSV.saveLogs("转化数据库结构与类模型成功！", path);
 
             //3.获取模板信息
-            List<ProjectFramwork> projectFramworkList = projectFramworkMapper.selectList(new LambdaQueryWrapper<ProjectFramwork>().eq(ProjectFramwork::getProjectCode, projectCode));
+            projectFramworkList = projectFramworkMapper.selectList(new LambdaQueryWrapper<ProjectFramwork>().eq(ProjectFramwork::getProjectCode, projectCode));
             project.setProjectFramworkList(projectFramworkList);
             //从git中检出技术模板库
             logText = ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>";
@@ -189,19 +206,32 @@ public class GeneratorSVImpl implements GenerateSV {
                 });
             });
 
-            //清理临时模板数据
-            this.cleanTemplates(projectFramworkList);
-
 
             //生成sql脚本到项目下
-            String sql = this.generateTsql(projectPath, project.getEnglishName(), projectCode);
+            String sql = sqlEmitter.emit(projectPath, project.getEnglishName(), projectCode);
             WSClientManager.sendMessage("分布式唯一算法sql " + sql);
             logsSV.saveLogs("分布式唯一算法sql " + sql, path);
             String sqllog = "【已经生成】 " + project.getEnglishName() + "Sql 脚本文件并追加系统配置";
             WSClientManager.sendMessage(sqllog);
             logsSV.saveLogs(sqllog, path);
 
-            //5.获取模块信息 TODO
+            //5.获取模块信息：从 project_module 关联取模块代码，再查 module 表拿名称/说明
+            List<ProjectModule> projectModules = projectModuleMapper.selectList(
+                    new LambdaQueryWrapper<ProjectModule>().eq(ProjectModule::getProjectCode, projectCode));
+            List<String> moduleNames = new ArrayList<>();
+            if (!projectModules.isEmpty()) {
+                List<String> moduleCodes = projectModules.stream()
+                        .map(ProjectModule::getModuleCode)
+                        .collect(Collectors.toList());
+                List<Module> modules = moduleMapper.selectList(
+                        new LambdaQueryWrapper<Module>().in(Module::getCode, moduleCodes));
+                moduleNames = modules.stream()
+                        .map(Module::getName)
+                        .collect(Collectors.toList());
+            }
+            String moduleLog = "项目模块: " + (moduleNames.isEmpty() ? "(未配置)" : String.join(", ", moduleNames));
+            WSClientManager.sendMessage(moduleLog);
+            logsSV.saveLogs(moduleLog, path);
 
             //6.获取版本控制管理信息
             ProjectRepositoryAccount projectRepositoryAccount = projectRepositoryAccountMapper.selectOne(new LambdaQueryWrapper<ProjectRepositoryAccount>().eq(ProjectRepositoryAccount::getProjectCode, project.getCode()));
@@ -211,14 +241,16 @@ public class GeneratorSVImpl implements GenerateSV {
                 WSClientManager.sendMessage(gitLog);
                 logsSV.saveLogs(gitLog, path);
 
-                GitTools.commitAndPush(new File(projectPath), projectRepositoryAccount.getAccount(), projectRepositoryAccount.getPassword(), "AI-Code 为您构建代码，享受智慧生活");
+                GitTools.commitAndPush(new File(projectPath), projectRepositoryAccount.getAccount(),
+                        com.aicode.core.tools.PasswordCrypto.decrypt(projectRepositoryAccount.getPassword()),
+                        "AI-Code 为您构建代码，享受智慧生活");
                 gitLog = "代码已经提交到 ⇛⇛⇛ <a style='text-decoration:underline;' href='" + projectRepositoryAccount.getHome() + "' target='_blank'>[" + projectRepositoryAccount.getHome() + "] </a>仓库";
                 WSClientManager.sendMessage(gitLog);
                 logsSV.saveLogs(gitLog, path);
             }
 
             //7.创建压缩文件
-            this.zipProject(project);
+            zipPackager.pack(project);
             String endLog = "代码已打包ZIP, ⇛⇛⇛  <a style='text-decoration:underline;' href='" + project.getDownloadUrl() + "' target='_blank'>[点击下载" + project.getEnglishName() + ".zip]</a>";
             WSClientManager.sendMessage(endLog);
             logsSV.saveLogs(endLog, path);
@@ -227,17 +259,23 @@ public class GeneratorSVImpl implements GenerateSV {
             projectJobMapper.update(projectJob, new LambdaQueryWrapper<ProjectJob>().eq(ProjectJob::getCode, projectJob.getCode()));
 
         } catch (Exception e) {
-            e.printStackTrace();
-            log.error(e.getMessage());
-            WSClientManager.sendMessage(e.getMessage());
-            logsSV.saveLogs(e.getMessage(), path);
+            log.error("项目构建异常, projectCode:{}, projectJobCode:{}", projectCode, projectJob.getCode(), e);
+            WSClientManager.sendMessage("构建失败，详见日志（projectJob=" + projectJob.getCode() + "）");
+            logsSV.saveLogs("构建失败: " + e.getClass().getSimpleName() + "（详见服务端日志）", path);
 
             projectJob.setState(ProjectJobState.Error.name());
             projectJobMapper.update(projectJob, new LambdaQueryWrapper<ProjectJob>().eq(ProjectJob::getCode, projectJob.getCode()));
         } finally {
+            // 不论成功失败都清理临时模板：保证下次构建看到的是干净的模板仓库与表
+            if (projectFramworkList != null) {
+                try {
+                    this.cleanTemplates(projectFramworkList);
+                } catch (Exception cleanEx) {
+                    log.error("清理临时模板失败, projectCode:{}", projectCode, cleanEx);
+                }
+            }
             ProjectJob projectJobLoad = projectJobMapper.selectOne(new LambdaQueryWrapper<ProjectJob>().eq(ProjectJob::getCode, projectJob.getCode()));
-
-            if (projectJobLoad.getState().equals(ProjectJobState.Completed.name())) {
+            if (projectJobLoad != null && ProjectJobState.Completed.name().equals(projectJobLoad.getState())) {
                 WSClientManager.sendMessage("Finished: SUCCESS");
                 logsSV.saveLogs("Finished: SUCCESS", path);
             } else {
@@ -253,10 +291,16 @@ public class GeneratorSVImpl implements GenerateSV {
         frameworksTemplateMapper.delete(new LambdaQueryWrapper<FrameworksTemplate>().gt(FrameworksTemplate::getId, 0));
 
         Setting setting = settingMapper.selectOne(new LambdaQueryWrapper<Setting>().eq(Setting::getK, SettingKey.Template_Path.name()));
+        if (setting == null || setting.getV() == null) {
+            log.warn("Setting(Template_Path) 未配置，跳过模板目录清理");
+            return;
+        }
         String template_Path = this.convertPath(setting.getV(), "", true);//获得默认仓库地址
 
         for (ProjectFramwork projectFramwork : projectFramworkList) {
             Frameworks frameworks = projectFramwork.getFrameworks();
+            // 用 frameworks.getName() 拼目录（与 prepareframeworksTemplateList 保持一致），
+            // 不再依赖 gitHome 拼写（现存种子数据中含 aicode-tamplate.git 等拼写错误行）
             if (frameworks.getGitHome() != null) {
                 String project_template_Path = template_Path + frameworks.getGitHome()
                         .substring(frameworks.getGitHome().lastIndexOf("/") + 1)
@@ -286,13 +330,20 @@ public class GeneratorSVImpl implements GenerateSV {
                 String project_template_Path = template_Path + frameworks.getGitHome()
                         .substring(frameworks.getGitHome().lastIndexOf("/") + 1)
                         .replace(".git", "");
-                //TODO 已经存在的进行清理 需要开发
+                // 克隆前清理已存在的模板目录（避免上次构建的脏文件残留；git clone 在非空目录上会失败）
+                File existing = new File(project_template_Path);
+                if (existing.exists()) {
+                    log.info("清理已存在的模板目录: {}", project_template_Path);
+                    FileUtils.deleteQuietly(existing);
+                }
                 WSClientManager.sendMessage("已连接到模板仓库，开始克隆已选技术[" + frameworks.getName() + "]的模板");
                 logsSV.saveLogs("已连接到模板仓库，开始克隆已选技术[" + frameworks.getName() + "]的模板", logsPath);
                 if (YNEnum.Y == YNEnum.getYN(frameworks.getIsPublic())) {
                     GitTools.cloneGit(frameworks.getGitHome(), project_template_Path);
                 } else {
-                    GitTools.cloneGit(frameworks.getGitHome(), project_template_Path, frameworks.getAccount(), frameworks.getPassword());
+                    GitTools.cloneGit(frameworks.getGitHome(), project_template_Path,
+                            frameworks.getAccount(),
+                            com.aicode.core.tools.PasswordCrypto.decrypt(frameworks.getPassword()));
                 }
 
                 String template_root_path = this.findPath(project_template_Path, frameworks.getName());
@@ -323,7 +374,7 @@ public class GeneratorSVImpl implements GenerateSV {
                     }
                     String path = this.convertPath("/", file.getAbsoluteFile().toString(), false).replace("//", "");
                     if (null == templateEngineEnum) {
-                        templateEngineEnum = this.adapterTemplateEngine(path);
+                        templateEngineEnum = templateEngineAdapter.detect(path);
                     }
                     path = path.substring(path.indexOf(template_Path) + template_Path.length());
                     FrameworksTemplate frameworksTemplate = new FrameworksTemplate();
@@ -349,19 +400,6 @@ public class GeneratorSVImpl implements GenerateSV {
     }
 
 
-    private String generateTsql(String projectPath, String projectEnglishName, String projectCode) {
-        String tsql = "-- AI-Code 为您构建代码，享受智慧生活!\n";
-        String tsqlLast = "\nCREATE TABLE `worker_node` (\n" + "  `ID` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'auto increment id',\n" + "  `HOST_NAME` varchar(64) NOT NULL COMMENT 'host name',\n" + "  `PORT` varchar(64) NOT NULL COMMENT 'port',\n" + "  `TYPE` int(11) NOT NULL COMMENT 'node type: ACTUAL or CONTAINER',\n" + "  `LAUNCH_DATE` date NOT NULL COMMENT 'launch date',\n" + "  `MODIFIED` timestamp NOT NULL COMMENT 'modified time',\n" + "  `CREATED` timestamp NOT NULL COMMENT 'created time',\n" + "  PRIMARY KEY (`ID`)\n" + ")COMMENT='分布式id注册表';\n";
-        ProjectSql projectSql = projectSqlMapper.selectOne(new LambdaQueryWrapper<ProjectSql>().eq(ProjectSql::getProjectCode, projectCode));
-        try {
-            tsql += projectSql.getTsql() + tsqlLast;
-            FileUtils.writeByteArrayToFile(new File(projectPath + "/" + projectEnglishName + ".sql"), tsql.getBytes());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return tsqlLast;
-    }
-
     /**
      * 1.检测项目工作工作空间是否存在
      * 2.创建项目工作空间
@@ -386,13 +424,21 @@ public class GeneratorSVImpl implements GenerateSV {
             if (ProjectRepositoryTypeEnum.GIT == ProjectRepositoryTypeEnum.getEnum(projectRepositoryAccount.getType())) {
                 if (projectRepositoryAccount.getHome().endsWith(".git")) {
                     WSClientManager.sendMessage("初始化设定git项目");
-                    GitTools.cloneGit(projectRepositoryAccount.getHome(), projectPath, projectRepositoryAccount.getAccount(), projectRepositoryAccount.getPassword());
+                    GitTools.cloneGit(projectRepositoryAccount.getHome(), projectPath,
+                            projectRepositoryAccount.getAccount(),
+                            com.aicode.core.tools.PasswordCrypto.decrypt(projectRepositoryAccount.getPassword()));
                     WSClientManager.sendMessage("初始化设定git项目完成");
                 } else {
                     WSClientManager.sendMessage("git 仓库地址不合法无法检出指定项目，请在生成后手动下载源码包！");
                 }
             } else if (ProjectRepositoryTypeEnum.SVN == ProjectRepositoryTypeEnum.getEnum(projectRepositoryAccount.getType())) {
-                //TODO SVN 仓库工具类9
+                // 明确报错而不是静默（spec settings-repository §4 / codegen §4.7）：
+                // SVN 工具类尚未实现；当前直接抛错让用户能感知，
+                // 而不是假装成功。
+                String msg = "SVN 仓库类型暂不支持（已配置 type=SVN 但 SVN 检出/推送工具未实现）。请改用 GIT 仓库或等待后续 PR。";
+                WSClientManager.sendMessage(msg);
+                log.error("项目 {} 配置了 SVN 仓库（{}），但 SVN 工具未实现", project.getEnglishName(), projectRepositoryAccount.getHome());
+                throw new com.aicode.core.BaseException(com.aicode.core.BaseException.BaseExceptionEnum.Server_Error);
             }
         }
 
@@ -558,138 +604,77 @@ public class GeneratorSVImpl implements GenerateSV {
             log.debug("目标文件路径" + targetFilePath);
         }
 
-        //增量状态判断
-        if (YNEnum.getYN(project.getIsIncrement()) == YNEnum.N) {
-            if (new File(templatePath).exists()) {
-                if (templatePath.contains(".jar") || templatePath.contains("gradlew")) {
-                    try {
-                        FileUtils.copyFileToDirectory(new File(templatePath), new File(targetFilePath.substring(0, targetFilePath.lastIndexOf("/"))));
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        WSClientManager.sendMessage(e.getMessage());
-                    }
-                } else {
-                    //适配模板引擎
-                    String msg = null;
+        //生成模式判断
+        // - isIncrement=N（全量）：生成所有模板，覆盖已有产物
+        // - isIncrement=Y（增量）：仅生成目标文件不存在的模板，跳过已存在的（保留手工改动）
+        boolean isFull = YNEnum.getYN(project.getIsIncrement()) == YNEnum.N;
+        boolean targetExists = new File(targetFilePath).exists();
+        if (!isFull && targetExists) {
+            // 增量模式且目标已存在 → 跳过
+            return;
+        }
 
-                    if (null == adapterTemplateEngine(templatePath)) {
-                        if (templatePath.contains("$classNameState$")) {
-                            List<MapStatus> mapStatusList = new ArrayList<>();
-                            for (MapFieldColumn mapFieldColumnNotPk : mapFieldColumnNotPks) {
-                                List<MapStatus> mapStatusList1 = templateData.genStatus(mapFieldColumnNotPk);
-                                if (CollectionUtils.isNotEmpty(mapStatusList1)) {
-                                    String statusClassName = mapClassTable.getClassName() + mapFieldColumnNotPk.getUpper();
-                                    String targetPath = targetFilePath.replace("$classNameState$", statusClassName);
-                                    mapStatusList.add(MapStatus.builder()
-                                            .statusName(statusClassName)
-                                            .targetFilePath(targetPath)
-                                            .notes(mapFieldColumnNotPk.getNotes())
-                                            .mapStatusList(mapStatusList1)
-                                            .build());
-                                }
-                            }
-
-                            if (CollectionUtils.isNotEmpty(mapStatusList)) {
-                                for (MapStatus mapStatus : mapStatusList) {
-                                    TemplateData templateDataStatus = JSON.parseObject(JSON.toJSONString(templateData), TemplateData.class);
-                                    templateDataStatus.setClassNameState(mapStatus.getStatusName());
-                                    templateDataStatus.setStates(mapStatus.getMapStatusList());
-                                    templateDataStatus.setNotes(mapStatus.getNotes());
-                                    if (TemplateEngineEnum.Freemarker == templateEngineEnum) {
-                                        msg = freemarkerHelper.generate(templateDataStatus, mapStatus.getTargetFilePath(), templatePath);
-                                    } else if (TemplateEngineEnum.Beetl == templateEngineEnum) {
-                                        msg = beetlHelper.generate(templateDataStatus, mapStatus.getTargetFilePath(), templatePath);
-                                    }
-                                }
-                            }
-                        } else {
-                            if (TemplateEngineEnum.Freemarker == templateEngineEnum) {
-                                msg = freemarkerHelper.generate(templateData, targetFilePath, templatePath);
-                            } else if (TemplateEngineEnum.Beetl == templateEngineEnum) {
-                                msg = beetlHelper.generate(templateData, targetFilePath, templatePath);
-                            }
-                        }
-                        if (null != msg) {
-                            if (!msg.equals("success")) {
-                                WSClientManager.sendMessage(msg);
-                            }
-                        }
-                    }
-
+        if (new File(templatePath).exists()) {
+            if (templatePath.contains(".jar") || templatePath.contains("gradlew")) {
+                try {
+                    FileUtils.copyFileToDirectory(new File(templatePath), new File(targetFilePath.substring(0, targetFilePath.lastIndexOf("/"))));
+                } catch (IOException e) {
+                    log.error("复制 jar/gradlew 文件失败: {}", templatePath, e);
+                    WSClientManager.sendMessage("复制文件失败，详见日志");
                 }
             } else {
-                log.error("文件不存在 ===> " + templatePath);
-            }
-        }
+                //适配模板引擎
+                String msg = null;
 
-    }
+                if (null == templateEngineAdapter.detect(templatePath)) {
+                    if (templatePath.contains("$classNameState$")) {
+                        List<MapStatus> mapStatusList = new ArrayList<>();
+                        for (MapFieldColumn mapFieldColumnNotPk : mapFieldColumnNotPks) {
+                            List<MapStatus> mapStatusList1 = templateData.genStatus(mapFieldColumnNotPk);
+                            if (CollectionUtils.isNotEmpty(mapStatusList1)) {
+                                String statusClassName = mapClassTable.getClassName() + mapFieldColumnNotPk.getUpper();
+                                String targetPath = targetFilePath.replace("$classNameState$", statusClassName);
+                                mapStatusList.add(MapStatus.builder()
+                                        .statusName(statusClassName)
+                                        .targetFilePath(targetPath)
+                                        .notes(mapFieldColumnNotPk.getNotes())
+                                        .mapStatusList(mapStatusList1)
+                                        .build());
+                            }
+                        }
 
-    /**
-     * 适配 模板引擎
-     *
-     * @param path 项目路径
-     * @return TemplateEngineEnum
-     */
-    private TemplateEngineEnum adapterTemplateEngine(String path) {
-        try {
-            //定义文件名默认 aicode.json  ，以及可能的错误名字进行兼容
-            File aicodeFile = null;
-            String[] fileNameArray = {"aicode.json", "aicode", "ai-code.json", "ai-code"};
-            List<String> fileNameList = Arrays.asList(fileNameArray);
-            for (String name : fileNameList) {
-                if (path.endsWith(name)) {
-                    aicodeFile = new File(path);
-                    if (aicodeFile != null && aicodeFile.exists()) {
-                        break;
+                        if (CollectionUtils.isNotEmpty(mapStatusList)) {
+                            for (MapStatus mapStatus : mapStatusList) {
+                                TemplateData templateDataStatus = JSON.parseObject(JSON.toJSONString(templateData), TemplateData.class);
+                                templateDataStatus.setClassNameState(mapStatus.getStatusName());
+                                templateDataStatus.setStates(mapStatus.getMapStatusList());
+                                templateDataStatus.setNotes(mapStatus.getNotes());
+                                if (TemplateEngineEnum.Freemarker == templateEngineEnum) {
+                                    msg = freemarkerHelper.generate(templateDataStatus, mapStatus.getTargetFilePath(), templatePath);
+                                } else if (TemplateEngineEnum.Beetl == templateEngineEnum) {
+                                    msg = beetlHelper.generate(templateDataStatus, mapStatus.getTargetFilePath(), templatePath);
+                                }
+                            }
+                        }
+                    } else {
+                        if (TemplateEngineEnum.Freemarker == templateEngineEnum) {
+                            msg = freemarkerHelper.generate(templateData, targetFilePath, templatePath);
+                        } else if (TemplateEngineEnum.Beetl == templateEngineEnum) {
+                            msg = beetlHelper.generate(templateData, targetFilePath, templatePath);
+                        }
+                    }
+                    if (null != msg) {
+                        if (!msg.equals("success")) {
+                            WSClientManager.sendMessage(msg);
+                        }
                     }
                 }
-            }
-            if (aicodeFile == null) {
-                return null;
-            }
 
-            String json = FileUtils.readFileToString(aicodeFile);
-            Configuration configuration = JSON.parseObject(json, Configuration.class);
-            TemplateEngineEnum templateEngineEnum = TemplateEngineEnum.getTemplate(configuration.getEngine());
-            return templateEngineEnum;
-        } catch (IOException e) {
-            e.printStackTrace();
+            }
+        } else {
+            log.error("文件不存在 ===> " + templatePath);
         }
-        //默认 freemarker
-        return TemplateEngineEnum.Freemarker;
-    }
 
-    /**
-     * 压缩文件
-     *
-     * @param project 项目信息
-     */
-    private void zipProject(Project project) {
-        Setting settingWorkspace = settingMapper.selectOne(new LambdaQueryWrapper<Setting>().eq(Setting::getK, SettingKey.Workspace.name()));
-        String projectWorkspacePath = this.convertPath(settingWorkspace.getV(), project.getEnglishName(), true);
-
-        Setting repositoryPathSetting = settingMapper.selectOne(new LambdaQueryWrapper<Setting>().eq(Setting::getK, (SettingKey.Repository_Path.name())));
-        String destination = repositoryPathSetting.getV() + "/" + project.getEnglishName();
-
-
-        //压缩文件
-        try {
-            File repositoryFile = new File(repositoryPathSetting.getV());
-            if (!repositoryFile.exists()) {
-                repositoryFile.mkdirs();
-            }
-
-            File zipFile = new File(destination + ".zip");
-            if (zipFile.exists()) {
-                zipFile.delete();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            log.error(e.getMessage());
-        }
-        ZipTools.zip(destination, projectWorkspacePath);
-        project.setDownloadUrl("/project/download/" + project.getEnglishName());
-        projectMapper.update(project, new LambdaQueryWrapper<Project>().eq(Project::getCode, project.getCode()));
     }
 
     /**

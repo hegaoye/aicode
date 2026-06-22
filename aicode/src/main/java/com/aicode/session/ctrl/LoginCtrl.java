@@ -61,7 +61,7 @@ public class LoginCtrl {
             log.info(JSON.toJSONString(accountObj));
             return R.success(token);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("异常", e);
             log.error(e.getMessage());
             return R.failed(BaseException.BaseExceptionEnum.Illegal_Param);
         }

@@ -1,5 +1,6 @@
 package com.aicode.config.template.config;
 
+import lombok.extern.slf4j.Slf4j;
 import org.beetl.core.Configuration;
 import org.beetl.core.GroupTemplate;
 import org.beetl.core.resource.StringTemplateResourceLoader;
@@ -11,6 +12,7 @@ import java.io.IOException;
  * 初始化 Beetl模板对象用于模板渲染使用
  * Created by lixin on 20/3/8.
  */
+@Slf4j
 @org.springframework.context.annotation.Configuration
 public class BeetlConfig {
 
@@ -26,7 +28,7 @@ public class BeetlConfig {
             cfg.setStatementStart("/***");
             cfg.setStatementEnd("***/");
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("异常", e);
         }
         GroupTemplate groupTemplate = new GroupTemplate(resourceLoader, cfg);
         return groupTemplate;

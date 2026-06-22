@@ -62,13 +62,13 @@ public class WSClientManager {
                 try {
                     session.getBasicRemote().sendText("# " + message);
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    log.error("异常", e);
                 }
             } else {
                 try {
                     session.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    log.error("异常", e);
                 }
             }
         }

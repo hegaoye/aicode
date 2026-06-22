@@ -1,0 +1,54 @@
+spring:
+  threads:
+    virtual:
+      enabled: true
+  datasource:
+    tidb:
+      name: h2-test-tidb
+      url: jdbc:h2:mem:aicode_test_tidb;MODE=MYSQL;DB_CLOSE_DELAY=-1
+      username: sa
+      password: sa
+      driver-class-name: org.h2.Driver
+      type: com.alibaba.druid.pool.DruidDataSource
+      initialSize: 2
+      maxActive: 10
+      minIdle: 1
+      maxWait: 10000
+      validationQuery: SELECT 1
+      testWhileIdle: true
+    uid:
+      name: h2-test-uid
+      url: jdbc:h2:mem:aicode_test_uid;MODE=MYSQL;DB_CLOSE_DELAY=-1
+      username: sa
+      password: sa
+      driver-class-name: org.h2.Driver
+      type: com.alibaba.druid.pool.DruidDataSource
+      initialSize: 2
+      maxActive: 10
+      minIdle: 1
+      maxWait: 10000
+      validationQuery: SELECT 1
+      testWhileIdle: true
+  sql:
+    init:
+      schema-locations: classpath:db/schema.sql
+      data-locations: classpath:db/data.sql
+      mode: always
+  h2:
+    console:
+      enabled: false
+
+management:
+  server:
+    port: -1
+  endpoints:
+    web:
+      exposure:
+        exclude: "*"
+
+logging:
+  level:
+    com.aicode: WARN
+    org.springframework: WARN
+    org.mybatis: WARN
+    com.zaxxer.hikari: ERROR

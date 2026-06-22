@@ -92,45 +92,6 @@ public class ProjectController {
 
 
     /**
-     * @deprecated 前端未调用, 待人工评估后删除 (JS 静态扫描未发现引用).
-     */
-    @GetMapping("/download/{projectName}")
-    @Operation(summary = "下载项目源码", description = "下载项目源码")
-    @Parameters({
-            @Parameter(name = "projectName", description = "项目名", required = true)
-    })
-    @Deprecated
-    public void downloadFile(@PathVariable("projectName") String projectName, HttpServletResponse response) throws Exception {
-        if (StringUtils.isBlank(projectName)) {
-            return;
-        }
-
-        String fileName = projectName + ".zip";// 设置文件名，根据业务需要替换成要下载的文件名
-        log.info("下载文件名-{}", fileName);
-        if (StringUtils.isNotBlank(fileName)) {
-            String repositoryPath = settingService.load(SettingKey.Repository_Path, String.class);
-            log.info("zip包在服务器的位置-{}", repositoryPath);
-            response.setContentType("application/force-download");// 设置强制下载不打开
-            fileName = new String(fileName.getBytes("UTF-8"), "iso-8859-1");
-            response.addHeader("Content-Disposition", "attachment;fileName=" + fileName);// 设置文件名
-            byte[] buffer = new byte[1024];
-            fileName = repositoryPath + fileName;
-            log.info("下载完整路径-{}", fileName);
-            FileInputStream fileInputStream = new FileInputStream(new File(fileName));
-            try (InputStream inputStream = fileInputStream;
-                 BufferedInputStream bis = new BufferedInputStream(inputStream)) {
-                OutputStream os = response.getOutputStream();
-                int i = bis.read(buffer);
-                while (i != -1) {
-                    os.write(buffer, 0, i);
-                    i = bis.read(buffer);
-                }
-            }
-        }
-    }
-
-
-    /**
      * 查询一个详情信息
      *
      * @param code 项目编码
@@ -258,23 +219,7 @@ public class ProjectController {
     }
 
 
-    /**
-     * @deprecated 前端未调用, 待人工评估后删除 (JS 静态扫描未发现引用).
-     */
-    @Operation(summary = "创建Project", description = "创建Project")
-    @GetMapping("/load/code/{code}")
-    @Deprecated
-    public ProjectVO loadByCode(@PathVariable String code) {
-        if (code == null) {
-            return null;
-        }
-        Project project = projectService.getOne(new LambdaQueryWrapper<Project>()
-                .eq(Project::getCode, code));
-        ProjectVO projectVO = new ProjectVO();
-        BeanUtils.copyProperties(project, projectVO);
-        log.debug(JSON.toJSONString(projectVO));
-        return projectVO;
-    }
+
 
     @Operation(summary = "查询Project信息集合", description = "查询Project信息集合")
     @Parameters({

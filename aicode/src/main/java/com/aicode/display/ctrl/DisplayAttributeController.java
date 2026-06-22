@@ -7,7 +7,6 @@ import com.aicode.core.BaseException;
 import com.aicode.core.R;
 import com.aicode.display.entity.DisplayAttribute;
 import com.aicode.display.service.DisplayAttributeService;
-import com.aicode.display.vo.DisplayAttributeVO;
 import com.aicode.map.entity.MapFieldColumn;
 import com.aicode.map.service.MapFieldColumnService;
 import com.alibaba.fastjson2.JSON;
@@ -17,7 +16,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -83,58 +81,6 @@ public class DisplayAttributeController {
             }
         }
         return R.success(mapFieldColumns);
-    }
-
-
-    
-    /**
-     * @deprecated 前端未调用, 待人工评估后删除 (JS 静态扫描未发现引用).
-     */
-    @Operation(summary = "修改DisplayAttribute", description = "修改DisplayAttribute")
-    @Parameters({
-            @Parameter(name = "mapFieldColumnCode", description = "字段编码"),
-            @Parameter(name = "isRequired", description = "是否必填 Y,N"),
-            @Parameter(name = "isInsert", description = "是否插入"),
-            @Parameter(name = "isDeleteCondition", description = "是否是删除条件"),
-            @Parameter(name = "isAllowUpdate", description = "是否允许修改 Y,N"),
-            @Parameter(name = "isListPageDisplay", description = "是否分页列表显示 Y,N"),
-            @Parameter(name = "isDetailPageDisplay", description = "是否详情页显示 Y,N"),
-            @Parameter(name = "isQueryRequired", description = "是否是查询条件 Y,N"),
-            @Parameter(name = "isLineNew", description = "是否换行"),
-            @Parameter(name = "matchType", description = "匹配方式 =,!=,>=,<=,>,<,like,左like，右like,between,in"),
-            @Parameter(name = "displayType", description = "显示格式 自动完成 Autocomplete,级联选择 Cascader,日期选择框 DatePicker,时间选择 TimePicker,输入框 Input,数字输入框 InputNumber,提及 Mention,邮箱 Email，电话Phone，手机Mobile，备注说明 Summary，选择器 Select，单选 Radio，多选框 Checkbox,评分 Rate,加载展位图 Skeleton,滑动输入条 Slider，开关 Switch,穿梭框 Transfer,选择树 TreeSelect ,上传 Upload,头像 Avatar"),
-            @Parameter(name = "displayName", description = "显示列名称"),
-            @Parameter(name = "displayNo", description = "显示顺序"),
-            @Parameter(name = "fieldValidationMode", description = "字段验证方式"),
-            @Parameter(name = "validateText", description = "验证提示语"),
-            @Parameter(name = "displayCss", description = "显示css样式")
-    })
-    @PutMapping("/modify")
-    @Deprecated
-    public R modify(@Parameter(hidden = true) DisplayAttribute displayAttribute) {
-        displayAttributeService.update(displayAttribute, new LambdaQueryWrapper<DisplayAttribute>()
-                .eq(DisplayAttribute::getMapFieldColumnCode, displayAttribute.getMapFieldColumnCode()));
-        return R.success();
-    }
-
-    
-    /**
-     * @deprecated 前端未调用, 待人工评估后删除 (JS 静态扫描未发现引用).
-     */
-    @Operation(summary = "删除DisplayAttribute", description = "删除DisplayAttribute")
-    @Parameters({
-            @Parameter(name = "id", description = ""),
-            @Parameter(name = "mapFieldColumnCode", description = "字段编码")
-    })
-    @DeleteMapping("/delete")
-    @Deprecated
-    public R delete(@Parameter(hidden = true) DisplayAttributeVO displayAttributeVO) {
-        DisplayAttribute newDisplayAttribute = new DisplayAttribute();
-        BeanUtils.copyProperties(displayAttributeVO, newDisplayAttribute);
-        displayAttributeService.remove(new LambdaQueryWrapper<DisplayAttribute>()
-                .eq(DisplayAttribute::getId, displayAttributeVO.getId())
-                .eq(DisplayAttribute::getMapFieldColumnCode, displayAttributeVO.getMapFieldColumnCode()));
-        return R.success("删除成功");
     }
 
 }

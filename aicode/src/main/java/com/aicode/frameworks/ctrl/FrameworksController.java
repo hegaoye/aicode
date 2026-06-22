@@ -61,28 +61,6 @@ public class FrameworksController {
         return R.success(frameworks);
     }
 
-
-    
-    
-    /**
-     * @deprecated 前端未调用, 待人工评估后删除 (JS 静态扫描未发现引用).
-     */
-    @Operation(summary = "创建Frameworks", description = "创建Frameworks")
-    @GetMapping("/load/code/{code}")
-    @Deprecated
-    public FrameworksVO loadByCode(@PathVariable String code) {
-        if (code == null) {
-            return null;
-        }
-        Frameworks frameworks = frameworksService.getOne(new LambdaQueryWrapper<Frameworks>()
-                .eq(Frameworks::getCode, code));
-        FrameworksVO frameworksVO = new FrameworksVO();
-        BeanUtils.copyProperties(frameworks, frameworksVO);
-        log.debug(JSON.toJSONString(frameworksVO));
-        return frameworksVO;
-    }
-
-
     
     
     @Operation(summary = "查询Frameworks信息集合", description = "查询Frameworks信息集合")

@@ -8,19 +8,13 @@ import com.aicode.core.BaseException;
 import com.aicode.core.R;
 import com.aicode.project.entity.ProjectRepositoryAccount;
 import com.aicode.project.service.ProjectRepositoryAccountService;
-import com.aicode.project.vo.ProjectRepositoryAccountPageVO;
-import com.aicode.project.vo.ProjectRepositoryAccountVO;
 import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
@@ -66,53 +60,6 @@ public class ProjectRepositoryAccountController {
     public R build(@Parameter(hidden = true) ProjectRepositoryAccount projectRepositoryAccount) {
         projectRepositoryAccountService.save(projectRepositoryAccount);
         return R.success(projectRepositoryAccount);
-    }
-
-
-    /**
-     * @deprecated 前端未调用, 待人工评估后删除 (JS 静态扫描未发现引用).
-     */
-    @Operation(summary = "创建ProjectRepositoryAccount", description = "创建ProjectRepositoryAccount")
-    @GetMapping("/load/code/{code}")
-    @Deprecated
-    public ProjectRepositoryAccountVO loadByCode(@PathVariable String code) {
-        if (code == null) {
-            return null;
-        }
-        ProjectRepositoryAccount projectRepositoryAccount = projectRepositoryAccountService.getOne(new LambdaQueryWrapper<ProjectRepositoryAccount>()
-                .eq(ProjectRepositoryAccount::getCode, code));
-        ProjectRepositoryAccountVO projectRepositoryAccountVO = new ProjectRepositoryAccountVO();
-        BeanUtils.copyProperties(projectRepositoryAccount, projectRepositoryAccountVO);
-        log.debug(JSON.toJSONString(projectRepositoryAccountVO));
-        return projectRepositoryAccountVO;
-    }
-
-
-    /**
-     * @deprecated 前端未调用, 待人工评估后删除 (JS 静态扫描未发现引用).
-     */
-    @Operation(summary = "查询ProjectRepositoryAccount信息集合", description = "查询ProjectRepositoryAccount信息集合")
-    @Parameters({
-            @Parameter(name = "projectCode", description = "项目编码"),
-            @Parameter(name = "curPage", description = "当前页", required = true),
-            @Parameter(name = "pageSize", description = "分页大小", required = true)
-    })
-    @GetMapping(value = "/list")
-    @Deprecated
-    public R list(@Parameter(hidden = true) ProjectRepositoryAccountPageVO projectRepositoryAccountVO) {
-        IPage<ProjectRepositoryAccount> page = new Page<>();
-        QueryWrapper<ProjectRepositoryAccount> queryWrapper = new QueryWrapper<>();
-        queryWrapper.lambda().eq(ProjectRepositoryAccount::getProjectCode, projectRepositoryAccountVO.getProjectCode());
-        com.aicode.core.Page pageVO = new com.aicode.core.Page();
-        long total = projectRepositoryAccountService.count(queryWrapper);
-        if (total > 0) {
-            IPage<ProjectRepositoryAccount> projectRepositoryAccountIPage = projectRepositoryAccountService.page(page, queryWrapper);
-
-
-            pageVO.setTotalRow(total);
-            pageVO.setVoList(projectRepositoryAccountIPage.getRecords());
-        }
-        return R.success(pageVO);
     }
 
 

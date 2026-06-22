@@ -77,44 +77,6 @@ public class ProjectSqlController {
     }
 
 
-    /**
-     * @deprecated 前端未调用, 待人工评估后删除 (JS 静态扫描未发现引用).
-     */
-    @Operation(summary = "创建ProjectSql", description = "创建ProjectSql")
-    @GetMapping("/load/projectCode/{projectCode}")
-    @Deprecated
-    public ProjectSqlVO loadByProjectCode(@PathVariable String projectCode) {
-        if (projectCode == null) {
-            return null;
-        }
-        ProjectSql projectSql = projectSqlService.getOne(new LambdaQueryWrapper<ProjectSql>()
-                .eq(ProjectSql::getProjectCode, projectCode));
-        ProjectSqlVO projectSqlVO = new ProjectSqlVO();
-        BeanUtils.copyProperties(projectSql, projectSqlVO);
-        log.debug(JSON.toJSONString(projectSqlVO));
-        return projectSqlVO;
-    }
-
-    /**
-     * @deprecated 前端未调用, 待人工评估后删除 (JS 静态扫描未发现引用).
-     */
-    @Operation(summary = "查询ProjectSql信息集合", description = "查询ProjectSql信息集合")
-    @Parameters({
-            @Parameter(name = "projectCode", description = "项目编码", required = true)
-    })
-    @GetMapping(value = "/list")
-    @Deprecated
-    public R list(@Parameter(hidden = true) ProjectSqlPageVO projectSqlVO) {
-        QueryWrapper<ProjectSql> queryWrapper = new QueryWrapper<>();
-        if (projectSqlVO.getCode() != null) {
-            queryWrapper.lambda().eq(ProjectSql::getProjectCode, projectSqlVO.getProjectCode());
-        }
-
-        List<ProjectSql> projectSqlList = projectSqlService.list(queryWrapper);
-        return R.success(projectSqlList);
-    }
-
-
     @Operation(summary = "修改ProjectSql", description = "修改ProjectSql")
     @Parameters({
             @Parameter(name = "code", description = "tsql编码", required = true),
@@ -133,25 +95,6 @@ public class ProjectSqlController {
         } else {
             return R.failed(BaseException.BaseExceptionEnum.Server_Error);
         }
-    }
-
-
-    /**
-     * @deprecated 前端未调用, 待人工评估后删除 (JS 静态扫描未发现引用).
-     */
-    @Operation(summary = "删除ProjectSql", description = "删除ProjectSql")
-    @Parameters({
-            @Parameter(name = "id", description = ""),
-            @Parameter(name = "projectCode", description = "项目编码")
-    })
-    @DeleteMapping("/delete")
-    @Deprecated
-    public R delete(@Parameter(hidden = true) ProjectSqlVO projectSqlVO) {
-        ProjectSql newProjectSql = new ProjectSql();
-        BeanUtils.copyProperties(projectSqlVO, newProjectSql);
-        projectSqlService.remove(new LambdaQueryWrapper<ProjectSql>()
-                .eq(ProjectSql::getId, projectSqlVO.getId()));
-        return R.success("删除成功");
     }
 
 }

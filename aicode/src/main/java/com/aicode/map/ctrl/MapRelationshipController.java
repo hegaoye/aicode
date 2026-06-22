@@ -120,26 +120,6 @@ public class MapRelationshipController {
 
 
     
-    /**
-     * @deprecated 前端未调用, 待人工评估后删除 (JS 静态扫描未发现引用).
-     */
-    @Operation(summary = "创建MapRelationship", description = "创建MapRelationship")
-    @GetMapping("/load/code/{code}")
-    @Deprecated
-    public MapRelationshipVO loadByCode(@PathVariable String code) {
-        if (code == null) {
-            return null;
-        }
-        MapRelationship mapRelationship = mapRelationshipService.getOne(new LambdaQueryWrapper<MapRelationship>()
-                .eq(MapRelationship::getCode, code));
-        MapRelationshipVO mapRelationshipVO = new MapRelationshipVO();
-        BeanUtils.copyProperties(mapRelationship, mapRelationshipVO);
-        log.debug(JSON.toJSONString(mapRelationshipVO));
-        return mapRelationshipVO;
-    }
-
-
-    
     @Operation(summary = "查询MapRelationship信息集合", description = "查询MapRelationship信息集合")
     @Parameters({
             @Parameter(name = "classTableCode", description = "类表映射编码", required = true),
@@ -174,24 +154,6 @@ public class MapRelationshipController {
         }
 
         return R.failed(BaseException.BaseExceptionEnum.Result_Not_Exist);
-    }
-
-
-    
-    /**
-     * @deprecated 前端未调用, 待人工评估后删除 (JS 静态扫描未发现引用).
-     */
-    @Operation(summary = "查询模型关系列表", description = "查询模型关系列表")
-    @Parameters({
-            @Parameter(name = "classTableCode", description = "类表映射编码", required = true),
-    })
-    @GetMapping(value = "/listByClassTableCode")
-    @Deprecated
-    public R listByProjectCode(String classTableCode) {
-        Assert.hasText(classTableCode, BaseException.BaseExceptionEnum.Empty_Param.toString());
-        List<MapRelationship> relationships = mapRelationshipService.list(new LambdaQueryWrapper<MapRelationship>()
-                .eq(MapRelationship::getMapClassTableCode, classTableCode));
-        return R.success(relationships);
     }
 
 

@@ -322,151 +322,39 @@
 | **⚠️ 路径不匹配** | 1个 (`/project/relationship/listByProjectCode`) |
 | **❌ 后端缺失** | 0个（所有前端调用的API都有对应后端） |
 
-## 四、未使用的后端API (对比第一节前端调用后筛出)
+## 四、未使用的后端API（清理状态）
 
-> 以下API在后端存在，但第一节"前端调用的API"中未出现，即前端未调用
-> ✅ 已标记 `@Deprecated`
+> 历史上本节列出前端未调用的 ~58 个 `@Deprecated` 端点。
+> 经 2026-06-22 的 `remove-deprecated-unused-apis` 变更（删除 controller 整体：`ModuleFile` / `ProjectModel` / `ProjectModelClass` / `ProjectCodeCatalog`；删除方法：`ProjectController` / `ProjectJobController` / `ProjectSqlController` / `ProjectRepositoryAccountController` / `ProjectFramworkController` / `MapRelationshipController` / `DisplayAttributeController` / `FrameworksController`），当前 **0 个未删除的 @Deprecated 端点** 保留在仓库。
+> 详见 openspec/changes/archive/remove-deprecated-unused-apis/。
 
-### AccountController
-| 方法 | 路径 | 说明 |
+### 仍保留（核心业务必须）
+
+| Controller | 端点 | 保留原因 |
 |------|------|------|
-| GET | /load/code/{code} | 根据code加载账户 |
-| PUT | /modify/password | 修改密码 |
+| `IndexCtrl` | `GET /` | Spring 启动视图解析（`setViewName("/index")`） |
+| `ProjectController` | `GET /load/{code}` | spec `project` 涵盖 |
+| `ProjectController` | `POST /build` | spec `project` 涵盖 |
+| `ProjectController` | `POST /init` | spec `project-init-endpoint` 涵盖 |
+| `ProjectController` | `GET /list` | spec `project` 涵盖 |
+| `ProjectController` | `POST /modify` | spec `project` 涵盖 |
+| `ProjectController` | `POST /delete` | spec `project` 涵盖 |
+| `ProjectController` | `GET /scan/path` | spec `project` 涵盖 |
+| `ProjectJobController` | `GET /execute` | spec `project-init-endpoint` 涵盖 |
+| `ProjectFramworkController` | `GET /load` / `GET /list` / `POST /add` | spec `frameworks-template` 涵盖 |
+| `ProjectSqlController` | `GET /load` / `POST /modify` | spec `sql-parse` 涵盖 |
+| `ProjectSqlController` | `POST /build` | spec `sql-parse` 涵盖 |
+| `ProjectRepositoryAccountController` | `GET /load` / `POST /build` / `POST /modify` | spec `settings-repository` 涵盖 |
+| `MapRelationshipController` | `GET /list` / `POST /build` / `GET /listMapClassTable` | spec `map-relationship-crud` 涵盖 |
+| `DisplayAttributeController` | `POST /save` / `GET /list` | spec `mapping-display` 涵盖 |
+| `FrameworksController` | `POST /build` / `GET /load` / `GET /list` / `POST /modify` / `POST /delete` | spec `frameworks-template` 涵盖 |
+| `AccountController` | `POST /build` / `GET /list` / `PUT /modify` / `DELETE /delete` | spec `auth-account` 涵盖（类标 @Deprecated 是历史遗留，方法体保留） |
+| `LogsCtrl` | `GET /load` / `POST /scanPath` | spec `auth-account` / `project` 涵盖（`/createLogFiles` / `/saveLogs` / `/loadFilePath` 实际无 @Deprecated 注解，仅未使用） |
 
-### DisplayAttributeController
-| 方法 | 路径 | 说明 |
-|------|------|------|
-| GET | /load/mapFieldColumnCode/{mapFieldColumnCode} | 根据字段编码加载 |
+### 后续策略
 
-### FrameworksTemplateController
-| 方法 | 路径 | 说明 |
-|------|------|------|
-| POST | /build | 创建框架模板 |
-| GET | /list | 查询框架模板列表 |
-| PUT | /modify | 修改框架模板 |
-| DELETE | /delete | 删除框架模板 |
-
-### IndexCtrl
-| 方法 | 路径 | 说明 |
-|------|------|------|
-| GET | / | 页面路由(index.html) |
-
-### LogsCtrl
-| 方法 | 路径 | 说明 |
-|------|------|------|
-| POST | /createLogFiles | 创建日志文件 |
-| POST | /saveLogs | 保存日志 |
-| GET | /loadFilePath | 加载文件路径 |
-
-### MapClassTableController
-| 方法 | 路径 | 说明 |
-|------|------|------|
-| POST | /build | 创建类表映射 |
-| GET | /load/code/{code} | 根据code加载 |
-| GET | /list | 查询类表映射列表 |
-| PUT | /modify | 修改类表映射 |
-| DELETE | /delete | 删除类表映射 |
-
-### MapFieldColumnController
-| 方法 | 路径 | 说明 |
-|------|------|------|
-| POST | /build | 创建字段映射 |
-| GET | /list | 查询字段映射列表 |
-| PUT | /modify | 修改字段映射 |
-| DELETE | /delete | 删除字段映射 |
-
-### ModuleController
-| 方法 | 路径 | 说明 |
-|------|------|------|
-| PUT | /modify | 修改模块 |
-| DELETE | /delete | 删除模块 |
-
-### ModuleFileController
-| 方法 | 路径 | 说明 |
-|------|------|------|
-| POST | /build | 创建模块文件 |
-| GET | /list | 查询模块文件列表 |
-| PUT | /modify | 修改模块文件 |
-| DELETE | /delete | 删除模块文件 |
-
-### ProjectCodeCatalogController
-| 方法 | 路径 | 说明 |
-|------|------|------|
-| GET | /load/code/{code} | 根据code加载 |
-| GET | /load/projectCode/{projectCode} | 根据项目编码加载 |
-
-### ProjectController
-| 方法 | 路径 | 说明 |
-|------|------|------|
-| GET | /download/{proejctName} | 下载项目源码 |
-| GET | /index | 首页 |
-
-### ProjectFramworkController
-| 方法 | 路径 | 说明 |
-|------|------|------|
-| POST | /build | 创建项目框架 |
-
-### ProjectJobController
-| 方法 | 路径 | 说明 |
-|------|------|------|
-| GET | /load/code/{code} | 根据code加载任务 |
-| GET | /execute | 执行任务 |
-
-### ProjectJobLogsController
-| 方法 | 路径 | 说明 |
-|------|------|------|
-| POST | /build | 创建任务日志 |
-| GET | /list | 查询任务日志列表 |
-| PUT | /modify | 修改任务日志 |
-| DELETE | /delete | 删除任务日志 |
-
-### ProjectMapController
-| 方法 | 路径 | 说明 |
-|------|------|------|
-| POST | /build | 创建项目数据表 |
-| GET | /list | 查询项目数据表列表 |
-| PUT | /modify | 修改项目数据表 |
-| DELETE | /delete | 删除项目数据表 |
-
-### ProjectModelClassController
-| 方法 | 路径 | 说明 |
-|------|------|------|
-| GET | /loadById/{id} | 根据ID加载 |
-| GET | /loadByMapClassTableCode | 根据类表编码加载 |
-| GET | /loadByProjectModelCode | 根据模块编码加载 |
-
-### ProjectModelController
-| 方法 | 路径 | 说明 |
-|------|------|------|
-| GET | /loadById/{id} | 根据ID加载 |
-| GET | /loadByCode/{code} | 根据code加载 |
-
-### ProjectModuleController
-| 方法 | 路径 | 说明 |
-|------|------|------|
-| PUT | /modify | 修改模块 |
-| DELETE | /delete | 删除模块 |
-
-### ProjectRepositoryAccountController
-| 方法 | 路径 | 说明 |
-|------|------|------|
-| DELETE | /delete | 删除仓库 |
-
-### ProjectSqlController
-| 方法 | 路径 | 说明 |
-|------|------|------|
-| POST | /build | 创建SQL脚本 |
-
-### SettingController
-| 方法 | 路径 | 说明 |
-|------|------|------|
-| POST | /build | 创建设置 |
-| GET | /load | 加载设置 |
-| GET | /list | 查询设置列表 |
-| PUT | /modify | 修改设置 |
-| DELETE | /delete | 删除设置 |
-
----
-
-**统计**: 共19个Controller包含未使用API，总计约58个端点
-**状态**: ✅ 已全部标记 `@Deprecated`
+新发现的 `@Deprecated` 端点应：
+1. 标记后观察 ≥30 天
+2. `grep -rn <端点路径> aicode/src common/src facade/src` 二次确认无引用
+3. `openspec propose` 创建 `remove-deprecated-unused-apis-v2` 或类似 change 删除
+4. 遵循 `openspec/specs/api-deprecation-policy/spec.md` 流程

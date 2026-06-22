@@ -8,7 +8,6 @@ import com.aicode.core.R;
 import com.aicode.project.entity.ProjectFramwork;
 import com.aicode.project.service.ProjectFramworkService;
 import com.aicode.project.vo.ProjectFramworkPageVO;
-import com.aicode.project.vo.ProjectFramworkVO;
 import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -20,7 +19,6 @@ import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
@@ -69,19 +67,6 @@ public class ProjectFramworkController {
         return doBuild(projectStr);
     }
 
-    /**
-     * @deprecated 前端未调用, 待人工评估后删除 (JS 静态扫描未发现引用; 仅 /add 仍在使用).
-     */
-    @Operation(summary = "创建ProjectFramwork", description = "创建ProjectFramwork")
-    @Parameters({
-            @Parameter(name = "projectStr", description = "项目技术json", required = true)
-    })
-    @PostMapping("/build")
-    @Deprecated
-    public R build(@Parameter(hidden = true) String projectStr) {
-        return doBuild(projectStr);
-    }
-
     private R doBuild(String projectStr) {
         List<ProjectFramwork> projectFramwors = JSON.parseArray(projectStr, ProjectFramwork.class);
         if (CollectionUtils.isEmpty(projectFramwors)) {
@@ -123,42 +108,5 @@ public class ProjectFramworkController {
         return R.success(pageVO);
     }
 
-
-    /**
-     * @deprecated 前端未调用, 待人工评估后删除 (JS 静态扫描未发现引用).
-     */
-    @Operation(summary = "修改ProjectFramwork", description = "修改ProjectFramwork")
-    @PutMapping("/modify")
-    @Deprecated
-    public boolean modify(@RequestBody ProjectFramworkVO projectFramworkVO) {
-        ProjectFramwork newProjectFramwork = new ProjectFramwork();
-        BeanUtils.copyProperties(projectFramworkVO, newProjectFramwork);
-        boolean isUpdated = projectFramworkService.update(newProjectFramwork, new LambdaQueryWrapper<ProjectFramwork>()
-                .eq(ProjectFramwork::getId, projectFramworkVO.getId()));
-        return isUpdated;
-    }
-
-
-    /**
-     * @deprecated 前端未调用, 待人工评估后删除 (JS 静态扫描未发现引用).
-     */
-    @Operation(summary = "删除ProjectFramwork", description = "删除ProjectFramwork")
-    @Parameters({
-            @Parameter(name = "projectCode", description = "项目编码", required = true),
-            @Parameter(name = "frameworkCode", description = "添加项目技术", required = true)
-    })
-    @DeleteMapping("/delete")
-    @Deprecated
-    public R delete(@Parameter(hidden = true) ProjectFramworkVO projectFramworkVO) {
-        Assert.hasText(projectFramworkVO.getFrameworkCode(), BaseException.BaseExceptionEnum.Empty_Param.toString());
-        Assert.hasText(projectFramworkVO.getProjectCode(), BaseException.BaseExceptionEnum.Empty_Param.toString());
-
-        ProjectFramwork newProjectFramwork = new ProjectFramwork();
-        BeanUtils.copyProperties(projectFramworkVO, newProjectFramwork);
-        projectFramworkService.remove(new LambdaQueryWrapper<ProjectFramwork>()
-                .eq(ProjectFramwork::getProjectCode, projectFramworkVO.getProjectCode())
-                .eq(ProjectFramwork::getFrameworkCode, projectFramworkVO.getFrameworkCode()));
-        return R.success("删除成功");
-    }
 
 }

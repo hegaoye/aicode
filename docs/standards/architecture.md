@@ -9,8 +9,8 @@
 - 运行环境：Java 21、Spring Boot 3.3.9
 
 > 📑 配套规范（从本文第 5、7、9 章拆分扩充）：
-> - [code-style.md](./code-style.md) —— 编码风格与约定（命名、分层、响应、模板、安全红线）
-> - [testing.md](./testing.md) —— 测试策略与编写约定
+> - [code-style.md](code-style.md) —— 编码风格与约定（命名、分层、响应、模板、安全红线）
+> - [testing.md](testing.md) —— 测试策略与编写约定
 
 ---
 
@@ -212,7 +212,7 @@ Schema 共约 **22 张表**（`db/schema.sql`），默认 H2 文件库（MySQL �
 
 ## 5. 技术规范分析
 
-> 📤 本章内容（包与命名、分层职责、数据对象分型、统一响应 `R`、异常处理、持久层、横切关注点、Lombok、日志、模板、构建与安全红线等编码规范）已拆分至独立文档：**[code-style.md](./code-style.md)**。
+> 📤 本章内容（包与命名、分层职责、数据对象分型、统一响应 `R`、异常处理、持久层、横切关注点、Lombok、日志、模板、构建与安全红线等编码规范）已拆分至独立文档：**[code-style.md](code-style.md)**。
 >
 > 此处不再重复，请直接参阅该文档。
 
@@ -308,7 +308,7 @@ Schema 共约 **22 张表**（`db/schema.sql`），默认 H2 文件库（MySQL �
 | 数据库版本 | H2 锁定 1.4.200（旧版）| 评估升级，关注 H2 历史安全公告 |
 | 统一包装 | `GlobalResponseBodyAdvice` 注释关闭 | 评估启用以减少各 Controller 重复 `R.*` |
 
-> 📤 关于「测试缺失」的现状、测试策略与优先补齐清单，已拆分至独立文档：**[testing.md](./testing.md)**。
+> 📤 关于「测试缺失」的现状、测试策略与优先补齐清单，已拆分至独立文档：**[testing.md](testing.md)**。
 
 ---
 

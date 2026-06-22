@@ -1,7 +1,7 @@
 # AI-Code 编码规范（Code Style）
 
 > 本文是 AI-Code 工程的**编码风格与约定基准**。
-> 配套文档：[architecture.md](./architecture.md)（架构）、[testing.md](./testing.md)（测试）。
+> 配套文档：[architecture.md](architecture.md)（架构）、[testing.md](testing.md)（测试）。
 
 - 文档版本：v1.0
 - 适用分支：`dev`

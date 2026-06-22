@@ -1,7 +1,7 @@
 # AI-Code 测试规范（Testing）
 
 > 本文定义 AI-Code 的**测试策略、组织方式与编写约定**。
-> 配套文档：[architecture.md](./architecture.md)（架构）、[code-style.md](./code-style.md)（编码规范）。
+> 配套文档：[architecture.md](architecture.md)（架构）、[code-style.md](code-style.md)（编码规范）。
 
 - 文档版本：v1.0
 - 适用分支：`dev`

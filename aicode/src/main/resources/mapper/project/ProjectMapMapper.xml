@@ -9,7 +9,8 @@
 
 
     <sql id="columns">
-    id,projectCode,mapClassTableCode
+        id
+        ,projectCode,mapClassTableCode
     </sql>
 
     <sql id="where">

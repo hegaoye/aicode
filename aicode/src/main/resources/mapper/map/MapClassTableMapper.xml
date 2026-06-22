@@ -11,7 +11,8 @@
 
 
     <sql id="columns">
-    id,code,tableName,className,notes
+        id
+        ,code,tableName,className,notes
     </sql>
 
     <sql id="where">

@@ -19,6 +19,6 @@ workspace/{project}/{module}/src/main/webapp/{xxxxx}
 
 #gradle配置文件
 workspace/{project}/build.gradle
-workspace/{project}/settings.gradle 
+workspace/{project}/settings.gradle
 workspace/{project}/gradle.properties 
  

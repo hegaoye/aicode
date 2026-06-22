@@ -18,7 +18,8 @@
     </resultMap>
 
     <sql id="columns">
-    id,code,mapClassTableCode,associateCode,isOneToOne,isOneToMany,mainField,joinField
+        id
+        ,code,mapClassTableCode,associateCode,isOneToOne,isOneToMany,mainField,joinField
     </sql>
 
     <sql id="where">
@@ -58,8 +59,10 @@
 
     <select id="countByProjectCode" resultType="int">
         SELECT count(mr.id)
-        FROM project_map pm,map_relationship mr
-        WHERE pm.mapClassTableCode = mr.mapClassTableCode AND pm.projectCode = #{projectCode}
+        FROM project_map pm,
+             map_relationship mr
+        WHERE pm.mapClassTableCode = mr.mapClassTableCode
+          AND pm.projectCode = #{projectCode}
     </select>
 
 </mapper>

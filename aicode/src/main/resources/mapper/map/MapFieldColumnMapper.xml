@@ -18,7 +18,8 @@
 
 
     <sql id="columns">
-    id,mapClassTableCode,code,`column`,field,sqlType,fieldType,notes,defaultValue,isPrimaryKey,isDate,isState
+        id
+        ,mapClassTableCode,code,`column`,field,sqlType,fieldType,notes,defaultValue,isPrimaryKey,isDate,isState
     </sql>
 
     <sql id="where">

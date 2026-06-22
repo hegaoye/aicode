@@ -9,7 +9,6 @@ import com.aicode.display.entity.DisplayAttribute;
 import com.aicode.display.service.DisplayAttributeService;
 import com.aicode.map.entity.MapFieldColumn;
 import com.aicode.map.service.MapFieldColumnService;
-import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

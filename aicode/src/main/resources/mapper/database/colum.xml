@@ -4,10 +4,10 @@
 
 
     <select id="list" resultType="com.aicode.database.entity.Column">
-       select COLUMN_NAME,COLUMN_DEFAULT,IS_NULLABLE,TYPE_NAME,REMARKS
-       from INFORMATION_SCHEMA.COLUMNS
-       where TABLE_SCHEMA=#{database}
-       and TABLE_NAME=#{tableName}
+        select COLUMN_NAME, COLUMN_DEFAULT, IS_NULLABLE, TYPE_NAME, REMARKS
+        from INFORMATION_SCHEMA.COLUMNS
+        where TABLE_SCHEMA = #{database}
+          and TABLE_NAME = #{tableName}
     </select>
 
 

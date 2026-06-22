@@ -19,7 +19,9 @@ import java.io.IOException;
 @Component
 public class SqlEmitter {
 
-    /** worker_node 建表 DDL（百度 UidGenerator worker 注册表） */
+    /**
+     * worker_node 建表 DDL（百度 UidGenerator worker 注册表）
+     */
     static final String WORKER_NODE_DDL = "\nCREATE TABLE `worker_node` (\n"
             + "  `ID` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'auto increment id',\n"
             + "  `HOST_NAME` varchar(64) NOT NULL COMMENT 'host name',\n"

@@ -1,11 +1,10 @@
 package com.aicode.config;
 
 import com.aicode.core.tools.PasswordCrypto;
+import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
-
-import jakarta.annotation.PostConstruct;
 
 /**
  * 凭据加密密钥引导。

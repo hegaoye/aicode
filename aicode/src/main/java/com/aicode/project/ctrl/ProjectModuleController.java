@@ -9,7 +9,6 @@ import com.aicode.core.R;
 import com.aicode.project.entity.ProjectModule;
 import com.aicode.project.service.ProjectModuleService;
 import com.aicode.project.vo.ProjectModulePageVO;
-import com.aicode.project.vo.ProjectModuleVO;
 import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -20,10 +19,12 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * 项目选择模块
@@ -34,6 +35,7 @@ import org.springframework.web.bind.annotation.*;
  *
  * @author hegaoye
  */
+
 /**
  * @deprecated 前端未调用, 待人工评估后删除 (JS 静态扫描未发现引用).
  */

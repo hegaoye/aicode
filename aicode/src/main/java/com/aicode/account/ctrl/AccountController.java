@@ -8,12 +8,8 @@ import com.aicode.account.service.AccountService;
 import com.aicode.account.vo.AccountPageVO;
 import com.aicode.account.vo.AccountSaveVO;
 import com.aicode.account.vo.AccountVO;
-import com.aicode.core.BaseException;
 import com.aicode.core.PageVO;
 import com.aicode.core.R;
-import com.aicode.core.enums.Constants;
-import com.aicode.core.tools.JwtToken;
-import com.aicode.core.tools.Md5;
 import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -26,7 +22,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -37,6 +32,7 @@ import java.util.List;
  *
  * @author aicode
  */
+
 /**
  * @deprecated 前端未调用, 待人工评估后删除 (JS 静态扫描未发现引用).
  */
@@ -49,7 +45,7 @@ public class AccountController {
     @Autowired
     private AccountService accountService;
 
-    
+
     @Operation(summary = "创建Account", description = "创建Account")
     @PostMapping("/build")
     public AccountSaveVO build(@RequestBody AccountSaveVO accountSaveVO) {
@@ -93,7 +89,6 @@ public class AccountController {
     }
 
 
-    
     @Operation(summary = "修改Account", description = "修改Account")
     @PutMapping("/modify")
     public boolean modify(@RequestBody AccountVO accountVO) {
@@ -105,7 +100,6 @@ public class AccountController {
     }
 
 
-    
     @Operation(summary = "删除Account", description = "删除Account")
     @Parameters({
             @Parameter(name = "id", description = ""),

@@ -11,7 +11,8 @@
 
 
     <sql id="columns">
-    id,projectCode,code,tsql,state
+        id
+        ,projectCode,code,tsql,state
     </sql>
 
     <sql id="where">

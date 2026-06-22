@@ -15,7 +15,6 @@ import com.aicode.map.service.MapRelationshipService;
 import com.aicode.map.vo.MapRelationshipVO;
 import com.aicode.project.entity.ProjectMap;
 import com.aicode.project.service.ProjectMapService;
-import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.baidu.fsg.uid.UidGenerator;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -119,7 +118,6 @@ public class MapRelationshipController {
     }
 
 
-    
     @Operation(summary = "查询MapRelationship信息集合", description = "查询MapRelationship信息集合")
     @Parameters({
             @Parameter(name = "classTableCode", description = "类表映射编码", required = true),
@@ -133,7 +131,6 @@ public class MapRelationshipController {
     }
 
 
-    
     @Operation(summary = "查询类表映射关系列表", description = "查询类表映射关系列表")
     @Parameters({
             @Parameter(name = "projectCode", description = "项目名", required = true)
@@ -157,7 +154,6 @@ public class MapRelationshipController {
     }
 
 
-    
     @Operation(summary = "查询字段信息--设置表的关联关系时使用", description = "查询字段信息--设置表的关联关系时使用")
     @Parameters({
             @Parameter(name = "mapClassTableCode", description = "映射编码"),
@@ -187,7 +183,6 @@ public class MapRelationshipController {
     }
 
 
-    
     @Operation(summary = "修改MapRelationship", description = "修改MapRelationship")
     @PutMapping("/modify")
     public boolean modify(@RequestBody MapRelationshipVO mapRelationshipVO) {
@@ -199,7 +194,6 @@ public class MapRelationshipController {
     }
 
 
-    
     @Operation(summary = "删除MapRelationship", description = "删除MapRelationship")
     @Parameters({
             @Parameter(name = "codes", description = "编码，多个编码使用逗号隔开", required = true),

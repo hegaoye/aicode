@@ -24,7 +24,8 @@
 
 
     <sql id="columns">
-    id,mapClassTableCode,mapFieldColumnCode,isRequired,isInsert,isDeleteCondition,isAllowUpdate,isListPageDisplay,isDetailPageDisplay,isQueryRequired,isLineNew,matchType,displayType,displayName,displayNo,fieldValidationMode,validateText,displayCss
+        id
+        ,mapClassTableCode,mapFieldColumnCode,isRequired,isInsert,isDeleteCondition,isAllowUpdate,isListPageDisplay,isDetailPageDisplay,isQueryRequired,isLineNew,matchType,displayType,displayName,displayNo,fieldValidationMode,validateText,displayCss
     </sql>
 
     <sql id="where">
@@ -117,9 +118,11 @@
 
 
     <select id="countByProjectCode" resultType="java.lang.Integer">
-       SELECT count(mr.id)
-        FROM project_map pm, map_relationship mr
-        WHERE pm.mapClassTableCode = mr.mapClassTableCode AND pm.projectCode = #{code}
+        SELECT count(mr.id)
+        FROM project_map pm,
+             map_relationship mr
+        WHERE pm.mapClassTableCode = mr.mapClassTableCode
+          AND pm.projectCode = #{code}
     </select>
 
 </mapper>

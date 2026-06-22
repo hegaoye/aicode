@@ -3,8 +3,8 @@
 <mapper namespace="com.aicode.database.dao.mapper.DatabaseMapper">
     <delete id="dropDatabase">
         drop
-        SCHEMA
-        ${database}
+            SCHEMA
+            ${database}
     </delete>
 
 
@@ -40,7 +40,8 @@
     </select>
     <!--切换数据库-->
     <select id="useDatabase">
-        USE ${database}
+        USE
+        ${database}
     </select>
 
 

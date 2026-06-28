@@ -541,7 +541,9 @@ public class GeneratorSVImpl implements GenerateSV {
 
 
         mapClassTableList.forEach(mapClassTableObj -> {
-            if (mapClassTable.getClassModel().equals(mapClassTableObj.getClassModel())) {
+            // 用 Objects.equals 防御 DB 脏数据（classModel 为 null）时 .equals() 抛 NPE
+            // 即使方案 A 已让 getClassModel() 自愈，保留 null-safe 守卫防止未来回归
+            if (Objects.equals(mapClassTable.getClassModel(), mapClassTableObj.getClassModel())) {
                 modelClasses.add(mapClassTableObj);
             }
         });

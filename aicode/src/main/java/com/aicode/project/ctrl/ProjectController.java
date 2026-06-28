@@ -20,23 +20,28 @@ import com.aicode.setting.entity.SettingKey;
 import com.aicode.setting.service.SettingService;
 import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.List;
 import java.util.Map;
 
@@ -88,6 +93,47 @@ public class ProjectController {
         Assert.hasText(code, BaseException.BaseExceptionEnum.Empty_Param.toString());
         projectService.execute(code);
         return R.success();
+    }
+
+
+    /**
+     * 下载项目源码（生产环境核心端点——用户构建后必须能下载生成的 zip 包）。
+     * <p>@deprecated 前端未直接调用；保留作为兜底（dev 分支亦保留此端点）。
+     * 如未来确认无引用，可通过 {@code openspec} change 流程删除。</p>
+     */
+    @GetMapping("/download/{projectName}")
+    @Operation(summary = "下载项目源码", description = "下载项目源码")
+    @Parameters({
+            @Parameter(name = "projectName", description = "项目名", required = true)
+    })
+    @Deprecated
+    public void downloadFile(@PathVariable("projectName") String projectName, HttpServletResponse response) throws Exception {
+        if (org.apache.commons.lang3.StringUtils.isBlank(projectName)) {
+            return;
+        }
+
+        String fileName = projectName + ".zip";
+        log.info("下载文件名-{}", fileName);
+        if (org.apache.commons.lang3.StringUtils.isNotBlank(fileName)) {
+            String repositoryPath = settingService.load(SettingKey.Repository_Path, String.class);
+            log.info("zip包在服务器的位置-{}", repositoryPath);
+            response.setContentType("application/force-download");
+            fileName = new String(fileName.getBytes("UTF-8"), "iso-8859-1");
+            response.addHeader("Content-Disposition", "attachment;fileName=" + fileName);
+            byte[] buffer = new byte[1024];
+            fileName = repositoryPath + fileName;
+            log.info("下载完整路径-{}", fileName);
+            FileInputStream fileInputStream = new FileInputStream(new File(fileName));
+            try (InputStream inputStream = fileInputStream;
+                 BufferedInputStream bis = new BufferedInputStream(inputStream)) {
+                OutputStream os = response.getOutputStream();
+                int i = bis.read(buffer);
+                while (i != -1) {
+                    os.write(buffer, 0, i);
+                    i = bis.read(buffer);
+                }
+            }
+        }
     }
 
 
@@ -242,6 +288,25 @@ public class ProjectController {
         log.debug(JSON.toJSONString(pageVO));
 
         return R.success(pageVO);
+    }
+
+
+    /**
+     * 按 code 加载项目（dev 分支保留的 @Deprecated 端点；前端未直接调用，保留作兜底）。
+     */
+    @Operation(summary = "创建Project", description = "创建Project")
+    @GetMapping("/load/code/{code}")
+    @Deprecated
+    public ProjectVO loadByCode(@PathVariable String code) {
+        if (code == null) {
+            return null;
+        }
+        Project project = projectService.getOne(new LambdaQueryWrapper<Project>()
+                .eq(Project::getCode, code));
+        ProjectVO projectVO = new ProjectVO();
+        BeanUtils.copyProperties(project, projectVO);
+        log.debug(JSON.toJSONString(projectVO));
+        return projectVO;
     }
 
 

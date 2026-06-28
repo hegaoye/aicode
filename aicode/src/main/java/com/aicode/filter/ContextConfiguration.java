@@ -47,9 +47,8 @@ public class ContextConfiguration implements WebMvcConfigurer {
         registry.addInterceptor(loginInterceptor)
                 .addPathPatterns("/**")
                 .excludePathPatterns(
-                        //登录
-                        "/login/signin",
-                        "/login/reg",
+                        //登录（包括 signin.shtml / signin.html 等后缀形式，避免前端 .shtml 调用被拦截）
+                        "/login/**",
                         //H2 控制台
                         "/h2",
                         "/h2/**",
@@ -67,6 +66,9 @@ public class ContextConfiguration implements WebMvcConfigurer {
                         "/index.html",
                         "/favicon.ico",
                         "/static/**",
+                        "/assets/**",         // Angular 资源（icons/img/css/js/i18n/fonts/monaco 等多段子目录）
+                        "/*",                 // 根目录其他文件（3rdpartylicenses.txt 等）
+                        "/**/*",              // 任意深度任意文件
                         "/*.html",
                         "/*.js",
                         "/*.css",
@@ -79,8 +81,25 @@ public class ContextConfiguration implements WebMvcConfigurer {
                         "/*.woff",
                         "/*.woff2",
                         "/*.ttf",
+                        "/**/*.html",
+                        "/**/*.js",
+                        "/**/*.css",
+                        "/**/*.png",
+                        "/**/*.jpg",
+                        "/**/*.jpeg",
+                        "/**/*.gif",
+                        "/**/*.svg",
+                        "/**/*.ico",
+                        "/**/*.woff",
+                        "/**/*.woff2",
+                        "/**/*.ttf",
                         //前端 SPA 路由
-                        "/main/**"
+                        "/main/**",
+                        //项目源码下载（保留的 @Deprecated 端点，避免 token 空时
+                        //RequestMapping 兜底走 static resource handler 抛 NoResourceFoundException）
+                        "/project/download/**",
+                        //按 code 加载项目（同上）
+                        "/project/load/code/**"
                 );
     }
 }

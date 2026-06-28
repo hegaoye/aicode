@@ -64,6 +64,13 @@ public class MapClassTable implements java.io.Serializable {
 
 
     public String getClassModel() {
+        // 自愈：DB 脏数据场景（classModel 列 NULL 或直接 SQL 写入的记录）
+        // 按 tableName 懒计算并缓存（与 toJava() 同样的推导规则）。
+        if (this.classModel == null && this.tableName != null) {
+            this.classModel = this.tableName.contains("_")
+                    ? this.tableName.substring(0, this.tableName.indexOf("_"))
+                    : this.tableName;
+        }
         return this.classModel;
     }
 

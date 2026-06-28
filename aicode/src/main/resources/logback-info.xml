@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration debug="false">
-    <!--    <property name="LOG_HOME" value="/test/log"/>-->
+    <!-- LOG_HOME 默认值：环境变量未设置时落 /tmp/aicode-logs。Spring 启动后
+         EnvironmentPostProcessor（com.aicode.config.LogHomeEnvironmentPostProcessor）
+         会再次注入。 -->
+    <property name="LOG_HOME" value="/tmp/aicode-logs"/>
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">

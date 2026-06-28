@@ -108,18 +108,29 @@ test {
 //    }
 //}
 
-//bootBuildImage {
-//    imageName = "18.163.5.234/white-label/aicode:20250908"
-//    publish = true
-//    docker {
-//        host = "unix:///var/run/docker.sock"
-////        host = "tcp://192.168.8.125:2375"
-//        publishRegistry {
-//            tlsVerify = false
-//            username = "admin"
-//            password = "X0m72urncru2ugyazMfn"
-//            url = "https://18.163.5.234" //harbor 地址 https://ip:port
-//            email = "robot@gamil.com"
-//        }
-//    }
-//}
+// 镜像构建（CNB / Paketo）。harbor 接入留作 enable-harbor-publish change。
+// 默认 publish=false：仅本地 docker images。凭据以 ${ENV} 占位，未设环境变量时不启用发布。
+bootBuildImage {
+    imageName = "aicode:${project.version}"
+    docker {
+        host = "unix:///var/run/docker.sock"
+    }
+    publish = false
+    builder = "paketobuildpacks/builder-jammy-java-tiny:latest"
+    buildpacks = ["paketo-buildpacks/java"]
+    environment = [
+        'BP_JVM_VERSION'             : '21',
+        'BP_JVM_TYPE'                : 'JDK',
+        'BP_JVM_CDS_ENABLED'         : 'true',
+        'BP_JVM_HEAP_OOM_PERCENTAGE' : '80',
+        'JAVA_TOOL_OPTIONS'          : '-XX:MaxRAMPercentage=75.0 -XX:+ExitOnOutOfMemoryError -Dfile.encoding=UTF-8 -Xlog:cds=info'
+    ]
+    // harbor 接入（默认未启用；启用前需 export HARBOR_USER/HARBOR_PASS/HARBOR_URL）
+    // publish = true
+    // publishRegistry {
+    //     tlsVerify = false
+    //     username  = "${HARBOR_USER}"
+    //     password  = "${HARBOR_PASS}"
+    //     url       = "${HARBOR_URL}"
+    // }
+}

@@ -30,6 +30,7 @@ public class TemplateEngineAdapter {
      * 返回声明的引擎；否则返回 {@code null}（调用方需回退 Freemarker）。
      */
     public TemplateEngineEnum detect(String filePath) {
+        log.info("检查 aicode.json 路径 : {}", filePath);
         if (filePath == null) {
             return null;
         }
@@ -48,6 +49,7 @@ public class TemplateEngineAdapter {
         }
         try {
             String json = FileUtils.readFileToString(candidate);
+            log.info("读取模板引擎声明文件内容 : {}", json);
             Configuration configuration = JSON.parseObject(json, Configuration.class);
             return TemplateEngineEnum.getTemplate(configuration.getEngine());
         } catch (IOException e) {

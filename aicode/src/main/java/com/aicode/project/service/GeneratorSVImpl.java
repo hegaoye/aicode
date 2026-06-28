@@ -287,6 +287,7 @@ public class GeneratorSVImpl implements GenerateSV {
 
     //清理临时模板数据
     private void cleanTemplates(List<ProjectFramwork> projectFramworkList) {
+        log.info("清理临时模板数据");
         frameworksTemplateMapper.delete(new LambdaQueryWrapper<FrameworksTemplate>().gt(FrameworksTemplate::getId, 0));
 
         Setting setting = settingMapper.selectOne(new LambdaQueryWrapper<Setting>().eq(Setting::getK, SettingKey.Template_Path.name()));
@@ -374,6 +375,7 @@ public class GeneratorSVImpl implements GenerateSV {
                     String path = this.convertPath("/", file.getAbsoluteFile().toString(), false).replace("//", "");
                     if (null == templateEngineEnum) {
                         templateEngineEnum = templateEngineAdapter.detect(path);
+                        log.info("模板引擎确认为 : {}", templateEngineEnum);
                     }
                     path = path.substring(path.indexOf(template_Path) + template_Path.length());
                     FrameworksTemplate frameworksTemplate = new FrameworksTemplate();
@@ -392,7 +394,8 @@ public class GeneratorSVImpl implements GenerateSV {
         }
 
         if (null == templateEngineEnum) {
-            templateEngineEnum = TemplateEngineEnum.Freemarker;
+            templateEngineEnum = TemplateEngineEnum.Beetl;
+            //            templateEngineEnum = TemplateEngineEnum.Freemarker;
         }
 
         return templateEngineEnum;

@@ -1,5 +1,5 @@
 # 镜像如果不可用时 请更换
-FROM openjdk:21-oracle
+FROM amazoncorretto:21.0.11-alpine3.23
 VOLUME /tmp
 ADD aicode/build/libs/*.jar app.jar
 RUN sh -c 'touch /app.jar'

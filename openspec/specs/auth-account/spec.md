@@ -3,9 +3,7 @@
 ## Purpose
 
 提供单用户模式的账户认证与账户维护能力：登录签发 JWT token，注册写入新账户，账户 CRUD 接口（已标 `@Deprecated`，保留以兼容）。系统默认账户 `admin / 888888`，所有 token 走 URL query 参数（`?token=...`），密码在库内以 MD5 形式存储。
-
 ## Requirements
-
 ### Requirement: 登录
 The system SHALL sign in a user via `GET /login/signin` and return a JWT token in the `R.data` field on success.
 
@@ -53,6 +51,27 @@ The system SHALL identify the calling account by a JWT claim keyed by `Constants
 #### Scenario: token verification
 - **WHEN** a caller invokes a protected endpoint with `?token=<jwt>` in the URL
 - **THEN** `JwtToken.verifier(token)` returns a `DecodedJWT` whose `accountCode` claim is the caller's account code
+
+### Requirement: 登录入口兼容 .shtml 后缀
+The system SHALL treat any URL under `/login/**` as a public login entry, including paths with suffixes such as `.shtml` (e.g. `/login/signin.shtml`), even when the request carries no token. The LoginInterceptor MUST NOT return false for these requests.
+
+#### Scenario: 前端以 .shtml 后缀调用登录入口
+- **WHEN** a GET request hits `GET /login/signin.shtml?account=admin&password=888888&token=`
+- **THEN** the LoginInterceptor MUST return true (skip the interceptor chain)
+- **AND** the LoginController.signin method is invoked
+- **AND** the response is `R` with `code=0000` on success
+
+### Requirement: 静态资源白名单覆盖多段路径
+The system SHALL treat any URL under `/assets/**` as a public static resource path, including multi-segment asset paths used by the Angular frontend (e.g. `/assets/monaco/vs/editor/editor.main.js`). The LoginInterceptor MUST NOT return false for these requests.
+
+#### Scenario: Angular 子目录静态资源加载
+- **WHEN** a GET request hits `GET /assets/img/logo.png` or `GET /assets/monaco/vs/editor/editor.main.js`
+- **THEN** the LoginInterceptor MUST return true
+- **AND** the ResourceHttpRequestHandler serves the file with correct Content-Type and Content-Length matching the actual file size
+
+#### Scenario: 多段后缀静态资源
+- **WHEN** a GET request hits any URL matching `/**/*.png`, `/**/*.svg`, `/**/*.woff`, `/**/*.css`, etc.
+- **THEN** the LoginInterceptor MUST return true and the static resource is served
 
 ## Notes
 

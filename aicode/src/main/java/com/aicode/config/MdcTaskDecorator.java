@@ -3,10 +3,12 @@ package com.aicode.config;
 import com.aicode.core.http.HttpHeaders;
 import org.slf4j.MDC;
 import org.springframework.core.task.TaskDecorator;
+import org.springframework.stereotype.Component;
 
 import java.util.Map;
 import java.util.UUID;
 
+@Component
 public class MdcTaskDecorator implements TaskDecorator {
 
 

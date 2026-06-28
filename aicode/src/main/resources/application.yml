@@ -97,6 +97,8 @@ management:
       exposure:
         include: "*"
   metrics:
+    enable:
+      threads: true    # 暴露 jvm.threads.* 指标，便于验证虚拟线程在用
     tags:
       application: ${spring.application.name}
   health:

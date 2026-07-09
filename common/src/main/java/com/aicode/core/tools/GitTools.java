@@ -9,7 +9,9 @@ import org.eclipse.jgit.internal.storage.file.FileRepository;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
+import org.eclipse.jgit.transport.HttpTransport;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
+import org.eclipse.jgit.transport.http.apache.HttpClientConnectionFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,6 +23,29 @@ import java.util.Set;
  */
 @Slf4j
 public class GitTools {
+
+    /**
+     * CDS 兼容：将 JGit 默认的 {@code JDKHttpConnectionFactory}（基于
+     * {@code sun.net.www.protocol.*} 的 {@code HttpURLConnection}）切换为
+     * {@code HttpClientConnectionFactory}（基于 Apache HttpClient 4.x）。
+     *
+     * <p>JGit core 默认的 {@code JDKHttpConnectionFactory} 在 CDS archive 加载时，
+     * 因 sun.* 类的 {@code <clinit>} 静态初始化器未执行，会导致 HTTP 连接异常关闭
+     * （clone 只下载 1 个文件）。改用 http.apache 子模块的 {@code HttpClientConnectionFactory}，
+     * 该实现基于 Apache HttpClient 4.x，不依赖 sun.*，CDS 友好。</p>
+     *
+     * <p>在 {@code GitTools} 类首次被加载时执行，保证任何 cloneGit / pullGit /
+     * commitAndPush 调用前 transport 已切换。</p>
+     */
+    static {
+        try {
+            HttpTransport.setConnectionFactory(new HttpClientConnectionFactory());
+            log.info("JGit HTTP transport switched to Apache HttpClient 4.x (CDS-compatible)");
+        } catch (Throwable t) {
+            log.warn("Failed to switch JGit transport to Apache HttpClient 4.x; falling back to default. Reason: {}",
+                    t.getMessage());
+        }
+    }
 
     /**
      * 创建仓库

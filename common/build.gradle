@@ -54,7 +54,9 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
 
     //----------- test  start--------------
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
+    // 本模块未引入 spring-boot-starter-test，故显式声明 junit-jupiter；
+    // 版本由 Spring Boot BOM 管理（见本文件 dependencyManagement 块的 BOM import）
+    testImplementation 'org.junit.jupiter:junit-jupiter'
     //----------- test  end--------------
 }
 

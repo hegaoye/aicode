@@ -18,7 +18,8 @@ spring:
   datasource:
     tidb:
       name: h2-data
-      url: jdbc:h2:file:${database:/tmp/aicode};DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;MODE=MYSQL;DATABASE_TO_UPPER=false;AUTO_SERVER=TRUE
+      # H2 2.x 明确拒绝 AUTO_SERVER=TRUE 与 DB_CLOSE_ON_EXIT=FALSE 共存（Feature not supported）
+      url: jdbc:h2:file:${database:/tmp/aicode};DB_CLOSE_DELAY=-1;MODE=MYSQL;DATABASE_TO_UPPER=false;AUTO_SERVER=TRUE
       username: ${username:sa}
       password: ${password:sa}
       driver-class-name: org.h2.Driver
@@ -63,24 +64,31 @@ spring:
 #访问地址 http://127.0.0.1:8088/actuator
 management:
   endpoint:
+    # Boot 4 把端点的 *.enabled 开关拆成 *.access（读写分离），旧的 enabled 键静默失效。
+    # Boot 4 中 metrics / env / prometheus 等端点的默认 access 是 none —— 即使
+    # endpoints.web.exposure 包含 "*"，未设 access 的端点仍返回 400，必须逐个开放。
     env:
-      enabled: true
+      access: unrestricted
     shutdown:
-      enabled: true
-  endpoints:
+      access: unrestricted
+    metrics:
+      access: unrestricted
+    prometheus:
+      access: unrestricted
     health:
+      # Boot 4：management.endpoints.health.show-details → management.endpoint.health.show-details
+      # 存活/就绪探针默认已启用，此处显式开启以便自建部署使用
       show-details: always
+      probes:
+        enabled: true
+  # Boot 4：管理端点的 Web 暴露范围用 management.endpoints.web.exposure（保持原样）
+  endpoints:
     web:
       exposure:
         include: "*"
   metrics:
-    enable:
-      threads: true    # 暴露 jvm.threads.* 指标，便于验证虚拟线程在用
     tags:
       application: ${spring.application.name}
-  health:
-    probes:
-      enabled: true
   #自定义管理端口
   server:
     port: 8088

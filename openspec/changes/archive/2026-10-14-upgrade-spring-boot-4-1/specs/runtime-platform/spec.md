@@ -14,6 +14,11 @@
 - **WHEN** 检查编译任务配置
 - **THEN** Java 语言级别 SHALL 通过工具链机制声明
 
+#### Scenario: 使用本地已安装的 JDK
+
+- **WHEN** 开发者在未设置 `JAVA_HOME` 的情况下执行构建
+- **THEN** 构建工具 SHALL 自动选用满足要求的本地 JDK，SHALL NOT 要求额外安装步骤
+
 #### Scenario: 运行时满足框架最低要求
 
 - **WHEN** 应用启动

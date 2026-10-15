@@ -7,36 +7,45 @@
 
 ### Requirement: 标识符以 JSON 字符串形式序列化
 
-系统 SHALL 将所有 `Long` / `long` 类型的字段（尤其是主键 `id` 与业务编码 `code`）序列化为 JSON **字符串**，SHALL NOT 输出为 JSON 数字。原因：即使主键已改为数据库自增，业务编码仍为长数字串，且历史数据中的主键仍为 19 位雪花值，两种形态在过渡期内共存，统一字符串化可保证任何取值都不会因 JSON 数字精度问题被客户端截断。
+系统 SHALL 将所有 `Long` / `long` 类型的字段（尤其是主键 `id` 与业务编码 `code`）序列化为 JSON **字符串**，SHALL NOT 输出为 JSON 数字。原因：业务编码为 19 位雪花值，且历史数据中的主键同样为 19 位，二者在过渡期内共存；统一字符串化可保证任何取值都不会被客户端的 `JSON.parse` 截断。
+
+序列化层的实现 SHALL 使用当前运行时的默认 JSON 库提供的扩展点来注册转换规则，SHALL NOT 通过构造一个与默认序列化链路无关的独立映射实例来实现——后者会导致注册静默失效。
 
 #### Scenario: 列表接口的 id 为字符串
 
 - **WHEN** 客户端请求任意列表接口并读取 `data.records[]` 中每一项的 `id`
 - **THEN** 每个 `id` 的 JSON 类型 SHALL 为字符串，SHALL NOT 为数字
 
-#### Scenario: 新生成的自增主键同样是字符串
-
-- **WHEN** 系统新增一条记录（主键为自增小整数）后返回该记录
-- **THEN** 其主键的 JSON 类型 SHALL 仍为字符串
-
 #### Scenario: 标识符精度不被截断
 
-- **WHEN** 系统返回一个 19 位数字的标识符（存量数据）
+- **WHEN** 系统返回一个 19 位数字的标识符
 - **THEN** 返回的字符串 SHALL 与数据库中的原值逐字符相同，SHALL NOT 出现末位被改写为 `0` 的情况
 
 #### Scenario: 标识符形态为纯数字
 
 - **WHEN** 系统生成业务编码 `code`
-- **THEN** 该值 SHALL 匹配正则 `^\d{1,19}$`，与历史数据同构
+- **THEN** 该值 SHALL 匹配正则 `^\d{1,19}$`
 
 #### Scenario: 装箱与基本类型均被覆盖
 
 - **WHEN** 某字段声明为 `Long`（装箱类型）或 `long`（基本类型）
 - **THEN** 两种声明 SHALL 均被序列化为字符串
 
+#### Scenario: 新生成的自增主键同样是字符串
+
+- **WHEN** 系统新增一条记录（主键为自增小整数）后返回该记录
+- **THEN** 其主键的 JSON 类型 SHALL 仍为字符串
+
+#### Scenario: 转换规则确实作用于默认序列化链路
+
+- **WHEN** 运行时切换到新的默认 JSON 库
+- **THEN** 已注册的字符串化规则 SHALL 仍然生效，SHALL NOT 出现「注册成功但响应中仍为数字」的静默失效
+
 ### Requirement: 路径后缀兼容能力
 
-系统 SHALL 支持前端使用的 `.shtml` 路径后缀。前端的全局请求过滤器会无条件为每个 API 请求 URL 追加 `.shtml`，WebSocket 端点亦如此。因此带后缀路径与无后缀路径 SHALL 指向同一处理逻辑。
+系统 SHALL 支持前端使用的 `.shtml` 路径后缀。带后缀路径与无后缀路径 SHALL 指向同一处理逻辑。该能力 SHALL 由平台自身提供的兼容层实现，SHALL NOT 依赖框架的默认路由匹配行为——后者在框架版本间已发生变更。
+
+兼容层 SHALL 只作用于平台已注册的 API 路径前缀，SHALL NOT 改写静态资源的解析路径。
 
 #### Scenario: 带后缀路径可达
 
@@ -63,6 +72,11 @@
 - **WHEN** 客户端以 `ws://<host>/websocket.shtml` 建立 WebSocket 连接
 - **THEN** 连接 SHALL 成功建立
 
+#### Scenario: 兼容层不引入前缀外副作用
+
+- **WHEN** 客户端请求一个既不在已注册 API 前缀内、也不是静态资源的路径
+- **THEN** 该请求 SHALL 保持原有处理方式，SHALL NOT 被后缀兼容逻辑改写
+
 ### Requirement: 统一响应结构
 
 系统 SHALL 始终使用统一响应包装结构返回结果，包含 `code`（业务错误码）、`info`（提示信息）、`data`（业务数据）、`success`（布尔标记）四个键。`data` 为空时 SHALL 以 `null` 呈现，SHALL NOT 省略该键。
@@ -84,7 +98,7 @@
 
 ### Requirement: 日期格式与时区
 
-系统 SHALL 以 `yyyy-MM-dd HH:mm:ss` 格式序列化日期时间字段，时区固定为 GMT+8。
+系统 SHALL 以 `yyyy-MM-dd HH:mm:ss` 格式序列化日期时间字段，时区固定为 GMT+8。该语义 SHALL 在默认 JSON 库发生换代后仍被显式保证，SHALL NOT 依赖库的默认行为。
 
 #### Scenario: 日期字段格式
 
@@ -114,6 +128,11 @@
 
 - **WHEN** 接口成功但业务数据为空
 - **THEN** 响应体 SHALL 包含 `"data": null`
+
+#### Scenario: 默认序列化库换代后语义不变
+
+- **WHEN** 运行时切换到新的默认 JSON 库
+- **THEN** null 字段的保留行为 SHALL 与切换前一致
 
 ### Requirement: 契约测试在升级前先行落地
 

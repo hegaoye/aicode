@@ -5,6 +5,7 @@ import com.aicode.config.websocket.WebSocketConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import com.aicode.filter.ShtmlSuffixRewriteFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -51,6 +52,14 @@ class LoginCtrlShtmlPathTest {
     @Autowired
     private WebApplicationContext wac;
 
+    /**
+     * Spring Framework 7 移除了 {@code setUseSuffixPatternMatch}，{@code .shtml} 兼容
+     * 改由 {@link ShtmlSuffixRewriteFilter} 提供。MockMvc 不会自动注册 Bean 形态的
+     * {@code Filter}，故必须手动 {@code addFilters(...)}，与真实容器行为保持等价。
+     */
+    @Autowired
+    private ShtmlSuffixRewriteFilter shtmlSuffixRewriteFilter;
+
     @MockitoBean private AccountService accountService;
     @MockitoBean private WebSocketConfig webSocketConfig;
     @MockitoBean private org.springframework.web.socket.server.standard.ServerEndpointExporter serverEndpointExporter;
@@ -61,7 +70,9 @@ class LoginCtrlShtmlPathTest {
     void setup() {
         // 模拟"未匹配到账户"——LoginCtrl 走 R.success() 空 data 分支，返回 code="0000"
         when(accountService.getOne(any())).thenReturn(null);
-        mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
+        mockMvc = MockMvcBuilders.webAppContextSetup(wac)
+                .addFilters(shtmlSuffixRewriteFilter)
+                .build();
     }
 
     @Test

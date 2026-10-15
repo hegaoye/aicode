@@ -6,7 +6,7 @@ package com.aicode.map.service;
 import com.aicode.map.dao.MapRelationshipDAO;
 import com.aicode.map.dao.mapper.MapRelationshipMapper;
 import com.aicode.map.entity.MapRelationship;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.baomidou.mybatisplus.spring.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

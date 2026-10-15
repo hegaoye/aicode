@@ -4,7 +4,7 @@
 package com.aicode.map.service;
 
 import com.aicode.map.entity.MapFieldColumn;
-import com.baomidou.mybatisplus.extension.service.IService;
+import com.baomidou.mybatisplus.spring.service.IService;
 
 /**
  * 字段属性映射信息

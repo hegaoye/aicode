@@ -6,7 +6,7 @@ package com.aicode.project.service;
 import com.aicode.project.dao.ProjectFramworkDAO;
 import com.aicode.project.dao.mapper.ProjectFramworkMapper;
 import com.aicode.project.entity.ProjectFramwork;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.baomidou.mybatisplus.spring.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

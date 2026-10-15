@@ -7,7 +7,7 @@ import com.aicode.core.tools.PasswordCrypto;
 import com.aicode.frameworks.dao.FrameworksDAO;
 import com.aicode.frameworks.dao.mapper.FrameworksMapper;
 import com.aicode.frameworks.entity.Frameworks;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.baomidou.mybatisplus.spring.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

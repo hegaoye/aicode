@@ -4,7 +4,7 @@
 package com.aicode.map.service;
 
 import com.aicode.map.entity.MapRelationship;
-import com.baomidou.mybatisplus.extension.service.IService;
+import com.baomidou.mybatisplus.spring.service.IService;
 
 /**
  * 模型关系

@@ -6,7 +6,7 @@ package com.aicode.account.service;
 import com.aicode.account.dao.AccountDAO;
 import com.aicode.account.dao.mapper.AccountMapper;
 import com.aicode.account.entity.Account;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.baomidou.mybatisplus.spring.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

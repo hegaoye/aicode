@@ -4,7 +4,7 @@
 package com.aicode.map.service;
 
 import com.aicode.map.entity.MapClassTable;
-import com.baomidou.mybatisplus.extension.service.IService;
+import com.baomidou.mybatisplus.spring.service.IService;
 
 /**
  * 类表映射信息

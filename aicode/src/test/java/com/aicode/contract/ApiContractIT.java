@@ -64,6 +64,19 @@ class ApiContractIT {
     private WebApplicationContext wac;
 
     /**
+     * Spring Framework 7 移除了 {@code PathMatchConfigurer#setUseSuffixPatternMatch}，
+     * {@code .shtml} 兼容改由 {@link com.aicode.filter.ShtmlSuffixRewriteFilter} 提供。
+     *
+     * <p><b>必须显式注册</b>：{@code MockMvcBuilders.webAppContextSetup(wac)} 只装配
+     * {@code DispatcherServlet}，不会把 Spring Bean 形态的 {@link jakarta.servlet.Filter}
+     * 加入 MockFilterChain —— 真实运行时由嵌入式容器自动注册，MockMvc 下需手动
+     * {@code addFilters(...)}，否则 {@code .shtml} 请求会落到静态资源处理器并报
+     * {@code NoResourceFoundException}。</p>
+     */
+    @Autowired
+    private com.aicode.filter.ShtmlSuffixRewriteFilter shtmlSuffixRewriteFilter;
+
+    /**
      * MOCK 环境（{@code WebEnvironment.MOCK}）无嵌入式容器，不存在
      * {@code jakarta.websocket.server.ServerContainer}，导致
      * {@code WebSocketConfig#serverEndpointExporter} 创建失败 —— 应用上下文直接起不来。
@@ -88,7 +101,9 @@ class ApiContractIT {
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
+        mockMvc = MockMvcBuilders.webAppContextSetup(wac)
+                .addFilters(shtmlSuffixRewriteFilter)   // 见上方字段注释：MockMvc 不会自动注册 Bean 形态的 Filter
+                .build();
         // 走真实鉴权链路：不 mock LoginInterceptor，而是签发一个合法 JWT
         token = JwtToken.createToken(Constants.AccountCode.val.toString(), "contract-test");
     }

@@ -2,7 +2,10 @@ package com.aicode.filter;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.web.servlet.config.annotation.*;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
  * Created by  on 2018/6/23.
@@ -17,19 +20,15 @@ public class ContextConfiguration implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("doc.html")
-                .addResourceLocations("classpath:/META-INF/resources/");
-        registry.addResourceHandler("/webjars/**")
-                .addResourceLocations("classpath:/META-INF/resources/webjars/");
         registry.addResourceHandler("/**")
                 .addResourceLocations("classpath:/static/");
     }
 
-    @Override
-    public void configurePathMatch(PathMatchConfigurer configurer) {
-        configurer.setUseSuffixPatternMatch(true)
-                .setUseTrailingSlashMatch(true);
-    }
+    // 注意：Spring Framework 7 已移除 PathMatchConfigurer#setUseSuffixPatternMatch
+    // 与 setUseTrailingSlashMatch。前端（Angular 7 + jQuery 打包产物）会为每个 API 请求
+    // URL 追加 ".shtml" 后缀，该兼容能力现由 ShtmlSuffixRewriteFilter 提供 ——
+    // 它在 DispatcherServlet 之前把 /project/list.shtml 重写为 /project/list，
+    // 因此下方 45 个端点的 @RequestMapping 无需任何改动。
 
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
@@ -55,11 +54,8 @@ public class ContextConfiguration implements WebMvcConfigurer {
                         //Actuator
                         "/actuator/**",
                         //API 文档
-                        "/doc.html",
-                        "/webjars/**",
                         "/v3/api-docs",
                         "/v3/api-docs/**",
-                        "/swagger-resources/**",
                         "/swagger-ui/**",
                         //静态资源
                         "/",

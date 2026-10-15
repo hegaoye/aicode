@@ -5,7 +5,7 @@ package com.aicode.project.service;
 
 import com.aicode.project.entity.ProjectModule;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.extension.service.IService;
+import com.baomidou.mybatisplus.spring.service.IService;
 
 import java.util.List;
 

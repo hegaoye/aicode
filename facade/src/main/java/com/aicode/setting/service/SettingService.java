@@ -6,7 +6,7 @@ package com.aicode.setting.service;
 import com.aicode.setting.entity.Setting;
 import com.aicode.setting.entity.SettingKey;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.extension.service.IService;
+import com.baomidou.mybatisplus.spring.service.IService;
 
 import java.util.List;
 

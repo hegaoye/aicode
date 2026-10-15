@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.5.16'
+    id 'org.springframework.boot' version '4.1.1'
     id 'io.spring.dependency-management' version '1.1.7'
 }
 
@@ -36,7 +36,7 @@ tasks.withType(Jar.class).configureEach {
 
 dependencies {
     //----------- springCloud start--------------
-    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-webmvc'
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
@@ -45,24 +45,30 @@ dependencies {
     //----------- mybatis mysql druid start--------------
 //    implementation 'mysql:mysql-connector-java:8.0.33'
 //    implementation 'com.h2database:h2:2.2.220'
-    implementation 'com.h2database:h2:1.4.200'
+    implementation 'com.h2database:h2'
+    // Boot 4 把 H2 控制台拆为独立模块（无对应 starter），不加则 spring.h2.console.* 不生效
+    implementation 'org.springframework.boot:spring-boot-h2console'
     implementation 'com.alibaba:druid:1.2.22'
-    implementation 'com.alibaba:druid-spring-boot-starter:1.2.22'
-    implementation 'com.baomidou:mybatis-plus-spring-boot3-starter:3.5.7'
+    implementation 'com.alibaba:druid-spring-boot-4-starter:1.2.28'
+    implementation 'com.baomidou:mybatis-plus-spring-boot4-starter:3.5.17'
+    // MyBatis-Plus 自 3.5.9 起把分页插件（PaginationInnerInterceptor，依赖 JSqlParser）
+    // 拆为独立的 mybatis-plus-jsqlparser 模块，不再由 starter 传递引入。
+    implementation 'com.baomidou:mybatis-plus-jsqlparser:3.5.17'
     //-----------mybatis mysql druid end--------------
 
-    //prometheus 对接接口（版本交由 Spring Boot BOM 管理）
+    // prometheus 对接接口（版本交由 Spring Boot BOM 管理）
+    // 注意：Micrometer ≥1.13 起 prometheus registry 使用 Prometheus Java client 1.x，
+    // 包名由 io.micrometer.prometheus 迁到 io.micrometer.prometheusmetrics，
+    // Spring Boot 4 的 PrometheusMetricsExportAutoConfiguration 只匹配新包名。
     implementation 'io.micrometer:micrometer-registry-prometheus'
-
     //-----------springdoc-openapi start--------------
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.17'
-    implementation 'com.github.xiaoymin:knife4j-springdoc-ui:3.0.3'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:3.1.1'
     //-----------springdoc-openapi end--------------
 
     // Freemarker 模板引擎（版本交由 Spring Boot BOM 管理，2.1.2.RELEASE 的显式锁版已移除）
     implementation 'org.springframework.boot:spring-boot-starter-freemarker'
     implementation 'com.ibeetl:beetl:3.15.12.RELEASE'
-    implementation 'org.springframework.boot:spring-boot-starter-aop'
+    implementation 'org.springframework.boot:spring-boot-starter-aspectj'
 
     implementation 'commons-io:commons-io:2.4'
     implementation 'org.apache.commons:commons-lang3:3.18.0'

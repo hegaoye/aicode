@@ -10,13 +10,18 @@ import java.util.Map;
  */
 public class DatabaseDataTypesUtils {
 
-    public static void main(String[] args) {
-        System.out.println(getPreferredJavaType("varchar", 0, 0));
-    }
+    // 五个 isXxx 判定方法均对 null 入参返回 false。
+    // 背景：H2 2.x 移除了 INFORMATION_SCHEMA.COLUMNS.TYPE_NAME，colum.xml 改用 DATA_TYPE；
+    // 若查询未用 AS 显式指定别名，Column.typeName 会静默为 null，原实现直接调用
+    // javaType.endsWith(...) 抛 NPE —— 把 SQL 层的错误伪装成空指针，极难定位。
+    // 回归守护见 aicode 的 TableMapperIT。
 
     private final static Map<String, String> _preferredJavaTypeForSqlType = new HashMap<>();
 
-    public static boolean isFloatNumber(String javaType) {
+        public static boolean isFloatNumber(String javaType) {
+        if (javaType == null) {
+            return false;
+        }
         if (javaType.endsWith("Float") || javaType.endsWith("Double") || javaType.endsWith("BigDecimal") || javaType.endsWith("BigInteger")) {
             return true;
         }
@@ -26,7 +31,10 @@ public class DatabaseDataTypesUtils {
         return false;
     }
 
-    public static boolean isIntegerNumber(String javaType) {
+        public static boolean isIntegerNumber(String javaType) {
+        if (javaType == null) {
+            return false;
+        }
         if (javaType.endsWith("Long") || javaType.endsWith("Integer") || javaType.endsWith("Short") || javaType.endsWith("Byte")) {
             return true;
         }
@@ -36,7 +44,10 @@ public class DatabaseDataTypesUtils {
         return false;
     }
 
-    public static boolean isPrimaryKey(String javaType) {
+        public static boolean isPrimaryKey(String javaType) {
+        if (javaType == null) {
+            return false;
+        }
         if (javaType.contains("PRI")
                 || javaType.endsWith("pri")
                 || javaType.equalsIgnoreCase("PRI")
@@ -47,7 +58,10 @@ public class DatabaseDataTypesUtils {
         return false;
     }
 
-    public static boolean isDate(String javaType) {
+        public static boolean isDate(String javaType) {
+        if (javaType == null) {
+            return false;
+        }
         if (javaType.endsWith("Date") || javaType.endsWith("Timestamp") || javaType.endsWith("Time")) {
             return true;
         }
@@ -60,7 +74,10 @@ public class DatabaseDataTypesUtils {
         return false;
     }
 
-    public static boolean isStateOrType(String javaType) {
+        public static boolean isStateOrType(String javaType) {
+        if (javaType == null) {
+            return false;
+        }
         if (javaType.contains("state") || javaType.contains("State")) {
             return true;
         }
@@ -70,48 +87,6 @@ public class DatabaseDataTypesUtils {
         return false;
     }
 
-
-    public static boolean isString(String javaType) {
-        if (javaType.endsWith("String")) {
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * sqlType 转成java类型
-     *
-     * @param sqlType       sql类型
-     * @param size          大小
-     * @param decimalDigits 几位数字
-     * @return String
-     */
-    public static String getPreferredJavaType(String sqlType, int size,
-                                              int decimalDigits) {
-        if ((sqlType.equalsIgnoreCase("decimal") || sqlType.equalsIgnoreCase("numeric"))
-                && decimalDigits == 0) {
-            if (size == 1) {
-                // https://sourceforge.net/tracker/?func=detail&atid=415993&aid=662953&group_id=36044
-                return "java.lang.Boolean";
-            } else if (size < 3) {
-                return "java.lang.Byte";
-            } else if (size < 5) {
-                return "java.lang.Short";
-            } else if (size < 10) {
-                return "java.lang.Integer";
-            } else if (size < 19) {
-                return "java.lang.Long";
-            } else {
-                return "java.math.BigDecimal";
-            }
-        }
-        String result = _preferredJavaTypeForSqlType.get(sqlType);
-        if (result == null) {
-            result = "java.lang.Object";
-        }
-        return result;
-    }
-
     /**
      * sqlType 转成java类型
      *
@@ -119,6 +94,9 @@ public class DatabaseDataTypesUtils {
      * @return String
      */
     public static String getPreferredJavaType(String sqlType) {
+        if (sqlType == null) {
+            return "java.lang.Object";
+        }
         String result = _preferredJavaTypeForSqlType.get(sqlType.toLowerCase());
         if (result == null) {
             result = "java.lang.Object";

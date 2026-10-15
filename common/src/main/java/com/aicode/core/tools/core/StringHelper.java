@@ -11,19 +11,6 @@ import java.util.regex.Pattern;
  */
 public class StringHelper {
 
-
-    public static void main(String[] args) {
-        System.out.println(toJavaClassName("he_gao_ye"));
-        System.out.println(toJavaVariableName("JavaMethod_param_Pp"));
-    }
-
-    public static String removeCrlf(String str) {
-        if (str == null) {
-            return null;
-        }
-        return StringHelper.join(StringHelper.tokenizeToStringArray(str, "\t\n\r\f"), " ");
-    }
-
     private static final Map<String, String> XML = new HashMap<String, String>();
 
     static {
@@ -32,17 +19,6 @@ public class StringHelper {
         XML.put("amp", "&");
         XML.put("lt", "<");
         XML.put("gt", ">");
-    }
-
-    public static String unescapeXml(String str) {
-        if (str == null) {
-            return null;
-        }
-        for (String key : XML.keySet()) {
-            String value = XML.get(key);
-            str = StringHelper.replace(str, "&" + key + ";", value);
-        }
-        return str;
     }
 
     public static String escapeXml(String str) {
@@ -118,75 +94,12 @@ public class StringHelper {
         return str;
     }
 
-    public static boolean isBlank(String str) {
-        return str == null || str.trim().length() == 0;
-    }
-
-    public static boolean isNotBlank(String str) {
-        return !isBlank(str);
-    }
-
     public static boolean isEmpty(String str) {
         return str == null || str.length() == 0;
     }
 
     public static boolean isNotEmpty(String str) {
         return !isEmpty(str);
-    }
-
-    public static String getExtension(String str) {
-        if (str == null) {
-            return null;
-        }
-        int i = str.lastIndexOf('.');
-        if (i >= 0) {
-            return str.substring(i + 1);
-        }
-        return null;
-    }
-
-    public static String insertBefore(String content, String compareToken, String insertString) {
-        if (content.indexOf(insertString) >= 0) {
-            return content;
-        }
-        int index = content.indexOf(compareToken);
-        if (index >= 0) {
-            return new StringBuffer(content).insert(index, insertString).toString();
-        } else {
-            throw new IllegalArgumentException("not found insert location by compareToken:" + compareToken + " content:" + content);
-        }
-    }
-
-    public static String insertAfter(String content, String compareToken, String insertString) {
-        if (content.indexOf(insertString) >= 0) {
-            return content;
-        }
-        int index = content.indexOf(compareToken);
-        if (index >= 0) {
-            return new StringBuffer(content).insert(index + compareToken.length(), insertString).toString();
-        } else {
-            throw new IllegalArgumentException("not found insert location by compareToken:" + compareToken + " content:" + content);
-        }
-    }
-
-    /**
-     * Count the occurrences of the substring in string s.
-     *
-     * @param str string to search in. Return 0 if this is null.
-     * @param sub string to search for. Return 0 if this is null.
-     */
-    public static int countOccurrencesOf(String str, String sub) {
-        if (str == null || sub == null || str.length() == 0 || sub.length() == 0) {
-            return 0;
-        }
-        int count = 0;
-        int pos = 0;
-        int idx;
-        while ((idx = str.indexOf(sub, pos)) != -1) {
-            ++count;
-            pos = idx + sub.length();
-        }
-        return count;
     }
 
     public static boolean contains(String str, String... keywords) {
@@ -203,20 +116,6 @@ public class StringHelper {
             }
         }
         return false;
-    }
-
-    public static String defaultString(Object value) {
-        if (value == null) {
-            return "";
-        }
-        return value.toString();
-    }
-
-    public static String defaultIfEmpty(Object value, String defaultValue) {
-        if (value == null || "".equals(value)) {
-            return defaultValue;
-        }
-        return value.toString();
     }
 
     public static String makeAllWordFirstLetterUpperCase(String sqlName) {
@@ -237,15 +136,6 @@ public class StringHelper {
         return result;
     }
 
-    public static int indexOfByRegex(String input, String regex) {
-        Pattern p = Pattern.compile(regex);
-        Matcher m = p.matcher(input);
-        if (m.find()) {
-            return m.start();
-        }
-        return -1;
-    }
-
     public static String toJavaVariableName(String str) {
         return uncapitalize(toJavaClassName(str));
     }
@@ -258,31 +148,6 @@ public class StringHelper {
      */
     public static String toJavaClassName(String str) {
         return makeAllWordFirstLetterUpperCase(StringHelper.toUnderscoreName(str));
-    }
-
-    public static String getJavaClassSimpleName(String clazz) {
-        if (clazz == null) {
-            return null;
-        }
-        if (clazz.lastIndexOf(".") >= 0) {
-            return clazz.substring(clazz.lastIndexOf(".") + 1);
-        }
-        return clazz;
-    }
-
-    public static String removeMany(String inString, String... keywords) {
-        if (inString == null) {
-            return null;
-        }
-        for (String k : keywords) {
-            inString = replace(inString, k, "");
-        }
-        return inString;
-    }
-
-    public static void appendReplacement(Matcher m, StringBuffer sb, String replacement) {
-        replacement = StringHelper.replace(replacement, "$", "\\$");
-        m.appendReplacement(sb, replacement);
     }
 
     public static String replace(String inString, String oldPattern, String newPattern) {
@@ -335,10 +200,6 @@ public class StringHelper {
     }
 
     private static final Random RANDOM = new Random();
-
-    public static String randomNumeric(int count) {
-        return random(count, false, true);
-    }
 
     public static String random(int count, boolean letters, boolean numbers) {
         return random(count, 0, 0, letters, numbers);
@@ -453,53 +314,11 @@ public class StringHelper {
         return result.toString();
     }
 
-    public static String removeEndWiths(String inputString, String... endWiths) {
-        for (String endWith : endWiths) {
-            if (inputString.endsWith(endWith)) {
-                return inputString.substring(0, inputString.length() - endWith.length());
-            }
-        }
-        return inputString;
-    }
-
     /**
      * 将string转换为List<ColumnEnum> 格式为: "enumAlias(enumKey,enumDesc)"
      */
     static Pattern three = Pattern.compile("(.*)\\((.*),(.*)\\)");
     static Pattern two = Pattern.compile("(.*)\\((.*)\\)");
-
-
-    /**
-     * Test whether the given string matches the given substring
-     * at the given index.
-     *
-     * @param str       the original string (or StringBuilder)
-     * @param index     the index in the original string to start matching against
-     * @param substring the substring to match at the given index
-     */
-    public static boolean substringMatch(CharSequence str, int index, CharSequence substring) {
-        for (int j = 0; j < substring.length(); j++) {
-            int i = index + j;
-            if (i >= str.length() || str.charAt(i) != substring.charAt(j)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    public static String[] tokenizeToStringArray(String str, String seperators) {
-        if (str == null) {
-            return new String[0];
-        }
-        StringTokenizer tokenlizer = new StringTokenizer(str, seperators);
-        List result = new ArrayList();
-
-        while (tokenlizer.hasMoreElements()) {
-            Object s = tokenlizer.nextElement();
-            result.add(s);
-        }
-        return (String[]) result.toArray(new String[result.size()]);
-    }
 
     public static String join(List list, String seperator) {
         return join(list.toArray(new Object[0]), seperator);
@@ -525,22 +344,6 @@ public class StringHelper {
         return result.toString();
     }
 
-    public static int containsCount(String string, String keyword) {
-        if (string == null) {
-            return 0;
-        }
-        int count = 0;
-        for (int i = 0; i < string.length(); i++) {
-            int indexOf = string.indexOf(keyword, i);
-            if (indexOf < 0) {
-                break;
-            }
-            count++;
-            i = indexOf;
-        }
-        return count;
-    }
-
     public static String getByRegex(String str, String regex) {
         return getByRegex(str, regex, 0);
     }
@@ -561,16 +364,5 @@ public class StringHelper {
             return m.group(group);
         }
         return null;
-    }
-
-    public static String removeIbatisOrderBy(String sql) {
-        String orderByRemovedSql = sql.replaceAll("(?si)<\\w+[^>]*?>\\s*order\\s+by\\s+[^<]+?</\\w+>", "")
-                .replaceAll("(?i)<\\w+[\\w\\s='\"]+prepend[\\w\\s='\"]*?order\\s+by\\s*['\"][^>]*?>[^<]+</\\w+>", "")
-                .replaceAll("(?i)\\s*order\\s+by\\s+.*", "");
-        return removeXmlTagIfBodyEmpty(removeXmlTagIfBodyEmpty(removeXmlTagIfBodyEmpty(removeXmlTagIfBodyEmpty(orderByRemovedSql))));
-    }
-
-    public static String removeXmlTagIfBodyEmpty(String sql) {
-        return sql.replaceAll("<\\w+[^>]*?>\\s+</\\w+>", "");
     }
 }

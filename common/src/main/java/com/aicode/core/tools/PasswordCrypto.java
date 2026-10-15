@@ -139,7 +139,14 @@ public class PasswordCrypto {
         return value != null && value.startsWith(CIPHER_PREFIX);
     }
 
-    public static String getKey() {
+    /**
+     * 读取当前密钥。
+     *
+     * <p><b>包私有是有意为之</b>：密钥 SHALL NOT 暴露给调用方。仅同包的
+     * {@code PasswordCryptoTest} 需要读取以验证「改密钥后旧密文解不开」，跨模块一律禁止。
+     * 如需轮换密钥请走 {@link #setKey(String)}。
+     */
+    static String getKey() {
         return key;
     }
 }

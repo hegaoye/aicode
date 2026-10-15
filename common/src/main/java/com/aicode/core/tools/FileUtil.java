@@ -22,25 +22,6 @@ import java.util.Map;
 public class FileUtil {
 
     /**
-     * @param path
-     * @return
-     * @Enclosing_Method : filtPath
-     * @Written by : czq
-     * @Creation Date : Sep 20, 2010 9:37:33 PM
-     * @version : v1.00
-     * @Description : 过滤路径，把路径过滤成形如“/aa/bb”的形式
-     */
-    public static String filtPath(String path) {
-        path = path.replace("\\", "/");
-        path = path.replace("//", "/");
-
-        if (path.lastIndexOf("/") == path.length()) {
-            path = path.substring(path.length() - 1, path.length());
-        }
-        return path;
-    }
-
-    /**
      * @param sourceFileName 源文件名
      * @param targetFileName 目标文件名
      * @throws IOException
@@ -181,32 +162,6 @@ public class FileUtil {
 
 
     /**
-     * 把字节数组保存为一个文件
-     */
-    public static File getFileFromBytes(byte[] b, String outputFile) {
-        BufferedOutputStream stream = null;
-        File file = null;
-        try {
-            file = new File(outputFile);
-            FileOutputStream fstream = new FileOutputStream(file);
-            stream = new BufferedOutputStream(fstream);
-            stream.write(b);
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            if (stream != null) {
-                try {
-                    stream.close();
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
-            }
-        }
-        return file;
-    }
-
-
-    /**
      * @param sourceDir 源目录
      * @param targetDir 目标目录
      * @throws IOException
@@ -255,7 +210,7 @@ public class FileUtil {
             File myFilePath = new File(filePath);
             myFilePath.delete(); //删除空文件夹
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("文件操作失败", e);
         }
     }
 
@@ -294,24 +249,6 @@ public class FileUtil {
     }
 
     /**
-     * 删除文件
-     *
-     * @param path
-     * @return
-     */
-    public static boolean delFile(String path) {
-        boolean flag = false;
-        if (StringUtils.isNotBlank(path)) {
-            File temp = new File(path);
-            if (temp.exists() && temp.isFile()) {
-                temp.delete();
-                flag = true;
-            }
-        }
-        return flag;
-    }
-
-    /**
      * 下载文件
      *
      * @param remoteFilePath 远端文件路径
@@ -338,13 +275,13 @@ public class FileUtil {
             bis.close();
             httpUrl.disconnect();
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("文件操作失败", e);
         } finally {
             try {
                 bis.close();
                 bos.close();
             } catch (IOException e) {
-                e.printStackTrace();
+            log.error("文件操作失败", e);
             }
         }
     }
@@ -406,26 +343,6 @@ public class FileUtil {
         return fileList;
     }
 
-    /**
-     * 获取文件路径
-     *
-     * @param dirPath 目录
-     * @return 路径集合
-     */
-    public static List<String> getDirFilesPath(String dirPath) {
-        List<File> list = getDirFiles(dirPath);
-        List<String> pathList = new ArrayList<>();
-        for (int i = 0; i < list.size(); i++) {
-            String path = list.get(i).getAbsoluteFile().toString().replace("\\", "/");
-            if (!path.contains(".git") && !path.contains("git")) {
-                if (new File(path).isFile()) {
-                    pathList.add(path);
-                }
-            }
-        }
-        return pathList;
-    }
-
 
     public static void createDir(String filePath, String fileName) {
         File folder = new File(filePath);
@@ -444,44 +361,10 @@ public class FileUtil {
                 try {
                     file.createNewFile();
                 } catch (IOException e) {
-                    e.printStackTrace();
+            log.error("文件操作失败", e);
                 }
             }
         }
-    }
-
-
-    public static void main(String[] args) {
-
-        File file = new File("C:\\workspaces\\AI-Code\\AI\\src\\main\\webapp\\templates");
-        File[] list1 = file.listFiles();
-        for (File file1 : list1) {
-            log.info(file1.getName());
-        }
-
-        GitTools.cloneGit("https://gitee.com/helixin/aicode_template.git", "C:\\workspaces\\AI-Code\\AI\\build\\libs\\exploded\\AI.war\\templates\\aicode_template");
-        GitTools.deleteGitRepository("C:\\workspaces\\AI-Code\\AI\\build\\libs\\exploded\\AI.war\\templates\\aicode_template\\.git");
-
-
-        List<File> list = getDirFiles("C:\\workspaces\\AI-Code\\AI\\src\\main\\webapp\\templates\\spring-cloud-redis-lombok-sentry");
-        for (int i = 0; i < list.size(); i++) {
-            String path = list.get(i)
-                    .getAbsoluteFile()
-                    .toString()
-                    .replace("C:\\workspaces\\AI-Code\\AI\\src\\main\\webapp\\templates", "")
-                    .replace("\\", "/");
-            String sql = "INSERT into frameworks_template(code,frameworkCode,path) values('" + (888888 + i) + "','888888','" + path + "');";
-            log.info(sql);
-        }
-
-        //        List<Map<String, String>> mapList = sanDirFiles("C:\\workspaces\\AI-Code\\AI\\src\\main\\webapp\\templates\\spring-cloud-redis-lombok-sentry", "announce");
-        //        log.info(JSON.toJSONString(mapList));
-        //        try {
-        //            String fileStr = FileUtils.readFileToString(new File("C:\\workspaces\\AI-Code\\AI\\build\\libs\\exploded\\AI.war\\workspace\\announce\\cycle\\src\\main\\java\\com\\cycle\\admin\\ctrl\\AdminCtrl.java"));
-        //            log.info(fileStr);
-        //        } catch (IOException e) {
-        //            e.printStackTrace();
-        //        }
     }
 
 }

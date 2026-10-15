@@ -254,7 +254,10 @@ Project 是聚合根：包含 `ProjectSql`、`ProjectFramwork`、`ProjectMap`、
 | `service` 实现 | 业务编排、事务边界、组装 VO | 处理 HTTP 细节（request/response） |
 | `dao` / `mapper` | 数据访问、条件构造 | 含业务规则 |
 
-- Controller 入参校验：`spring-boot-starter-validation`（`@Valid` + DTO 上的约束注解）或显式断言；空值/非法参数返标准错误码（见 §6.6）。
+- Controller 入参校验：**当前为显式断言**（service 层判空 + 返回标准错误码，见 §6.6）。空值/非法参数返标准错误码。
+  - **Bean Validation 未启用**：实测全仓（含测试代码）的 `@Valid` / `@NotNull` / `@NotBlank` / `@Size` 等注解命中数为 **0**，`spring-boot-starter-validation` 已于 2026-10-15 移除。
+  - ⚠️ **重新启用的前置条件**：该 starter **已不在依赖树中**。只往 DTO 上加 `@Valid` 等约束注解会**编译通过但完全不生效**（无处理器，注解被静默忽略）—— 这是最难排查的一类失败。使用声明式校验前**必须先在 `aicode/build.gradle` 加回 `spring-boot-starter-validation`**。
+  - 注意：`hibernate-validator` 目前仍在运行期类路径中，但来自 `springdoc-openapi-starter-common` 的传递依赖（用于 OpenAPI 模型），**不构成 Bean Validation 可用的保证**。
 - 跨域调用通过 `facade` 的 `*Service` 接口，**禁** `new` 实现类或跨域引用 `*ServiceImpl`。
 - 三分层依赖方向**单向、无环**，新增代码必须遵守：`controller → service → dao`。
 
@@ -270,7 +273,9 @@ Project 是聚合根：包含 `ProjectSql`、`ProjectFramwork`、`ProjectMap`、
 
 - 新增用 `*SaveDTO`，修改用 `*ModifyDTO`，分页用 `*PageDTO`，避免单一大对象。
 - VO 继承 `BaseVO`；分页响应统一用 `PageVO`（`records / totalRow / totalPage / curPage / pageSize`）。
-- Entity ↔ DTO/VO 转换：`BeanUtils.copyProperties` 或 `StringTools.convertObject/convertList`（fastjson2 round-trip）；转换逻辑放 service 层。
+- Entity ↔ DTO/VO 转换：`org.springframework.beans.BeanUtils.copyProperties`（**当前唯一推荐**，实测 5 处使用：`TemplateData` / `ProjectController` / `MapRelationshipController` / `AccountController` / `FrameworksController`）；转换逻辑放 service 层。
+  - ⚠️ `StringTools.convertObject` / `StringTools.convertList` **已于 2026-10-15 随死代码删除**（实测零调用）。曾被本节列为推荐写法属规范与代码脱节，已更正。
+  - 模板数据展开（`FreemarkerHelper` / `BeetlHelper`）已改用 hutool `BeanUtil.beanToMap`，**不是** JSON round-trip —— 注意 fastjson2 默认省略 null 字段而 `beanToMap` 默认保留，替换时须显式对齐该语义。
 - **实体不要直接暴露给前端**；Controller 返回 VO。
 
 ### 6.6 接口与统一响应
@@ -311,6 +316,7 @@ Project 是聚合根：包含 `ProjectSql`、`ProjectFramwork`、`ProjectMap`、
 - **单数据源**：所有 Mapper 归 `tidbDataSource`（`MybatisPlusConfigTidb` 扫 `com.aicode.*.dao.mapper`）。新增 Mapper 无需考虑数据源归属。
 - **主键**：`id` 由数据库自增赋值。**禁止省略** `MybatisPlusConfigTidb` 中的 `globalConfig.setDbConfig(new GlobalConfig.DbConfig().setIdType(IdType.AUTO))` —— MyBatis-Plus 默认是 `ASSIGN_ID`（雪花），一旦漏配就会静默回退为雪花，且不报任何错。
 - **业务编码**：`code` 用 Hutool 雪花 `IdUtil.getSnowflakeNextIdStr()` 生成，产出为 19 位纯数字（与历史百度 UID 编码同构）。**它不是主键派生值**，禁写成 `String.valueOf(id)`。
+- **实体 ↔ 列映射由集成测试守护**：本项目数据库列名多为 **camelCase**（`mapClassTableCode` / `sqlType` / `isDate`…），与 MyBatis-Plus 默认的 snake_case 命名策略**不一致**，因此这些字段 SHALL 带显式 `@TableField("...")`；派生字段 SHALL 带 `@TableField(exist = false)`。**新增或修改实体字段时 SHALL 同步复核注解，并运行 `aicode/src/test/java/com/aicode/map/dao/mapper/MapFieldColumnMapperIT.java`** —— 它用真实 schema + 真实 Mapper 执行 SQL，是唯一能捕获此类错误的测试（打桩 mapper 的测试不能）。
 
 ### 6.9 横切关注点
 
@@ -322,8 +328,9 @@ Project 是聚合根：包含 `ProjectSql`、`ProjectFramwork`、`ProjectMap`、
 ### 6.10 Lombok 与样板代码
 
 - 实体/DTO/VO 用 `@Data`；需要构造器链式构建用 `@Builder`（现有 `Project.builder()...build()` 风格）。
+- ⚠️ **实体的持久化映射注解（`@TableField` 等）SHALL NOT 随字段搬迁而丢失。** Java 中字段注解只能声明在定义该字段的类上，子类无法为父类字段补注解 —— 因此**把已有映射的字段移入父类或拆基类必然丢失注解**。2026-10-15 曾尝试把 `MapFieldColumn` 的字段抽到基类 `AbstractField`，导致 12 个 `@TableField` 全部丢失，MyBatis-Plus 回退到 snake_case 命名策略，代码生成主链路立即不可用（`Column "map_class_table_code" not found`）。该抽取已回退。详见 `openspec/changes/archive/fix-map-field-column-tablefield-regression/`。
 - 日志用 `@Slf4j`，禁手写 `LoggerFactory.getLogger`。
-- Lombok 仅作 `compileOnly + annotationProcessor`（均为 1.18.32），不传递到运行期。
+- Lombok 仅作 `compileOnly + annotationProcessor`，**不写版本号**（由 Spring Boot BOM 管理，实测解析为 1.18.46），不传递到运行期。显式锁版会覆盖 BOM 提供的受支持版本，见 §10。
 - 禁为 Lombok 已生成的 getter / setter 再手写重复代码。
 
 ### 6.11 日志
@@ -362,15 +369,19 @@ Project 是聚合根：包含 `ProjectSql`、`ProjectFramwork`、`ProjectMap`、
 
 ### 7.1 现状
 
-诚实说明：三模块测试覆盖**极不均衡**，实测（2026-10-14）：
+诚实说明：三模块测试覆盖**极不均衡**，实测（2026-10-15，`dead-code-and-dependency-hygiene` 变更后）：
 
 | 模块 | 测试类数 | 测试依赖 | 覆盖内容 |
 |------|---------|---------|---------|
-| `aicode` | **10** | `spring-boot-starter-test` | Controller 切片（`MockMvc`）、Service 并发、生成主链路、模板引擎适配、SQL 逆解析 |
-| `common` | **8** | `junit-jupiter` | 纯函数单测（`StringTools` / `JwtToken` / `Md5` / `PasswordCrypto`）、枚举转换、JGit 克隆完整性 |
+| `aicode` | **16** | `spring-boot-starter-test` + `archunit-junit5` | 接口契约回归、Controller 切片（`MockMvc`）、Service 并发、生成主链路、模板引擎适配、SQL 逆解析、架构断言、模板变量键集守护、**实体列映射（真实 SQL）** |
+| `common` | **9** | `junit-jupiter` + `junit-platform-launcher` | 纯函数单测（`StringTools` / `StringHelper` / `JwtToken` / `Md5` / `PasswordCrypto` / `DatabaseDataTypesUtils`）、枚举转换、JGit 克隆完整性 |
 | `facade` | **0** | `junit-jupiter`（已声明但无测试） | — |
 
-合计 **18 个测试类**。空白点：`facade` 无任何测试；Mapper 层缺少 `@SpringBootTest` + H2 真实 SQL 验证；`aicode` 的 DAO 层缺单测。
+合计 **25 个测试类、218 个用例**（0 失败，2 例按预期跳过）。空白点：`facade` 无任何测试；Mapper 层缺 DAO 单测以外的覆盖率仍偏薄。
+
+> **架构断言**（`aicode/src/test/java/com/aicode/architecture/VendoredDeadCodeIsolationTest.java`）：禁止重新引用 `common` 中已删除的 vendored 死代码区域 `com.aicode.core.tools.core..`。豁免集为该区域内仍被生产代码引用的 3 个类 —— `StringHelper` / `Field` / `typemapping.DatabaseDataTypesUtils`（豁免同时覆盖 Lombok 生成的 `$` 嵌套类）。**注意其能力边界：仅覆盖编译期类型引用**，反射、注解、MyBatis XML 与资源文件中的引用不在覆盖范围内 —— 断言通过不等于不存在运行时引用。
+
+> **实体列映射事故（2026-10-15，已修复）**：`MapFieldColumn` 的字段被抽到基类导致 12 个 `@TableField` 丢失，MyBatis-Plus 回退到 snake_case 命名策略，代码生成主链路报 `Column "map_class_table_code" not found` 而**全部 215 个测试皆绿**。根因是**没有任何测试让该实体真正生成并执行 SQL**（业务层纯内存装配、生成链路测试打桩 mapper）。修复方式是回退基类抽取 + 新增 `MapFieldColumnMapperIT`（真实 schema + 真实 Mapper）。教训：**「测试全绿」不等于「被改动的属性被测过」**。
 
 本节为 **to-be 规范**：约定后续测试应如何组织与编写，并在 §7.10 给出优先补齐清单。**新增功能应同步补测试**，逐步建立安全网。
 
@@ -485,7 +496,8 @@ Project 是聚合根：包含 `ProjectSql`、`ProjectFramwork`、`ProjectMap`、
 4. `TemplateHelper` 渲染单测（§7.7.2，Freemarker + Beetl 各一）。
 5. Controller 切片测试（`MockMvc`）：登录、建项目、导 SQL、init 的响应体与错误码。
 6. 生成主链路端到端集成测试（§7.7.3，mock Git / 模板）。
-7. Mapper 层 `@SpringBootTest` + H2 真实 SQL 验证（**当前完全缺失**，§7.1 已列为空白点）。
+7. Mapper 层 `@SpringBootTest` + H2 真实 SQL 验证：`TableMapperIT`（元数据）与 `MapFieldColumnMapperIT`（实体列映射）已落地，**其余实体仍缺**。新增实体时 SHALL 参照 `MapFieldColumnMapperIT` 补一条 —— 打桩 mapper 的测试不算覆盖。
+8. **代码生成主链路的端到端回归**：当前无测试覆盖「登录 → 建项目 → 导 SQL → init → 构建」全链路（§7.7.3）。2026-10-15 的列映射事故之所以能全绿通过，正是因为这条链路只被 mock 覆盖。
 
 ---
 
@@ -557,8 +569,12 @@ opsx 入口（功能等价，运行时暴露哪个就用哪个）：
 - **`spring.sql.init` 在测试环境不生效**：本项目自定义了名为 `tidbDataSource` 的 DataSource Bean，而 Boot 的自动初始化依赖 `DataSourceProperties` 的 `name`（`h2-test-tidb`），二者不一致。test profile 因此设 `mode: never`，改由 `TestDatabaseInitializer` 显式执行 `schema.sql` + `data.sql`。新增测试表或改初始化脚本时**改这个类**，改 `application-test.yml` 的 `sql.init` 不起作用。
 - **H2 元数据的列名与取值随版本变化**：升级 H2 时必须复核 `mapper/database/table.xml` 与 `mapper/database/colum.xml`。已知两处破坏性变更：① `INFORMATION_SCHEMA.TABLES.TABLE_TYPE` 由 `'TABLE'` 变为 SQL 标准值 `'BASE TABLE'`（H2 2.x）；② `INFORMATION_SCHEMA.COLUMNS.TYPE_NAME` 被移除，改用 `DATA_TYPE`。第二处还有一层陷阱 —— `Column` 实体的属性名是 `typeName`，与 `DATA_TYPE` 并非驼峰对应，SHALL 用 `AS` 显式指定别名，否则 `typeName` 静默为 `null` 并在 `DatabaseDataTypesUtils.isDate()` 抛 NPE，把 SQL 层错误伪装成空指针。回归测试见 `TableMapperIT`。
 - **`toolchain` 只管编译，不管运行**：三个模块用 `toolchain(25)` 编译出 major 69 字节码，但 `./gradlew test` 与 `bootRun` 用的仍是 `JAVA_HOME` 指向的 JDK。要在 Java 25 运行时下验证，先 `export JAVA_HOME=$(/usr/libexec/java_home -v 25)`。
+- **`common` / `facade` 必须显式声明 `junit-platform-launcher`**：Gradle 9 要求 JUnit Platform Launcher 出现在测试运行期类路径。只声明 `junit-jupiter` 会让 `:common:test` 以 `Could not start Gradle Test Executor` **整体失败**，而非报单个用例错 —— 极易被误读为「没有测试」而忽略。`aicode` 因经 `spring-boot-starter-test` 传递带入而不受影响。该故障曾导致 `common` 的 8 个测试类在 Gradle 9 下**从未真正执行**，2026-10-15 已修复。
+- **`junit-platform-launcher` 缺失时看不到任何用例结果**：症状是测试进程启动失败，报告目录里没有 XML。排查时先看构建输出是 `> Task :common:test` 还是 FAILED，再看 `build/test-results/test/`。
 - **插件版本要在 `settings.gradle` 声明**：`common` / `facade` 用 `apply plugin: 'io.spring.dependency-management'` 引插件时，版本必须写在根 `settings.gradle` 的 `plugins {}` 块（`apply false`）里 —— `pluginManagement.plugins` 只对 `plugins {}` DSL 生效，不支持 `apply plugin:` 写法。
-- `common` / `facade` 通过 `dependencyManagement { imports { mavenBom 'org.springframework.boot:spring-boot-dependencies:4.1.1' } }` 引入 BOM，因此这两个模块能使用无版本声明的依赖（如 lombok、junit-jupiter）。BOM 版本需与 `aicode` 模块的 Boot 版本保持一致。
+- `common` / `facade` 通过 `dependencyManagement { imports { mavenBom 'org.springframework.boot:spring-boot-dependencies:4.1.1' } }` 引入 BOM，因此这两个模块能使用无版本声明的依赖（如 lombok、junit-jupiter）。**三模块 BOM 版本已于 2026-10-15 统一为 4.1.1**（此前 `common`/`facade` 仍是 3.5.16，导致 JUnit 5.12.2 vs 6.0.3、Spring Framework 6.2.19 vs 7.0.9 的分裂）。升级框架时**三个模块须同步修改**。
+- **`commons-io` 必须显式写版本**：Spring Boot 4.1.1 BOM **不管理** `commons-io`，故 `aicode/build.gradle` 中显式声明 `2.20.0`。若删掉该版本号，它会随其他依赖的传递版本无声漂移到未经测试的版本。（原为 2.4 / 2012 年发布 / 有已知 CVE，2026-10-15 升级。）
+- **核实依赖实际生效版本要用 `resolvedArtifacts`，不要只看 `dependencies` 图**：Gradle 的 `dependencies` 报告受依赖管理规则影响，可能显示的是「请求版本」而非实际落地的 artifact。核实命令见 `design.md - D7`。
 - **`.shtml` 后缀由 `ShtmlSuffixRewriteFilter` 提供**：Spring Framework 7 移除了 `PathMatchConfigurer#setUseSuffixPatternMatch`，后缀匹配不再是框架默认行为。前端（Angular 7 + jQuery 打包产物）会为每个 API 请求 URL 追加 `.shtml`，因此**新增 API 前缀时必须同步维护 `ShtmlSuffixRewriteFilter.API_PREFIXES`**。
 - **MockMvc 不会自动注册 Bean 形态的 Filter**：`MockMvcBuilders.webAppContextSetup(wac)` 只装配 `DispatcherServlet`，`.shtml` 相关的测试必须显式 `.addFilters(shtmlSuffixRewriteFilter)`，否则请求会落到静态资源处理器并报 `NoResourceFoundException`。真实运行时由嵌入式容器自动注册，不受影响。
 - **Boot 4 的 Actuator 端点默认 `access=none`**：即使 `management.endpoints.web.exposure.include="*"`，未设 `management.endpoint.<name>.access` 的端点仍返回 **400**。当前已开放 `env` / `shutdown` / `metrics` / `prometheus`。新增端点时记得同步。
@@ -587,14 +603,17 @@ opsx 入口（功能等价，运行时暴露哪个就用哪个）：
 
 ### 11.3 测试演进
 
-- **已落地 18 个测试类**（详见 §7.1 的分布表）。按层覆盖情况：
+- **已落地 25 个测试类、218 个用例**（详见 §7.1 的分布表）。按层覆盖情况：
   - Controller 层（`MockMvc`）：`LoginCtrlShtmlPathTest`（`.shtml` 路由回归）、`MapRelationshipControllerTest`、`ProjectControllerDownloadTest`、`ProjectInitEndpointTest` —— 均为 `@SpringBootTest(MOCK)` + `@MockitoBean` 打桩业务层，加载真实 `WebMvcConfigurer`
   - Service 层：`ProjectJobServiceImplConcurrencyTest`（并发）、`SqlReverseParseTest`（SQL 逆解析）
   - 生成主链路：`CodeGenPipelineTest`（占位符风格）、`TemplateEngineAdapterTest`（`aicode.json` 引擎探测）、`MapClassTableTest`（类名/模块名推导）
-  - 工具层：`StringToolsTest` / `StringHelperTest` / `JwtTokenTest` / `Md5Test` / `PasswordCryptoTest`
+  - 工具层：`StringToolsTest` / `StringHelperTest` / `JwtTokenTest` / `Md5Test` / `PasswordCryptoTest` / `DatabaseDataTypesUtilsTest`
   - 枚举：`TemplateEngineEnumTest` / `YNEnumTest`
+  - 架构断言：`VendoredDeadCodeIsolationTest` —— 禁止重新引用已删除的 vendored 死代码区域；**仅覆盖编译期类型引用**，能力边界见 §7.1 的说明
+  - 实体映射：`MapFieldColumnMapperIT` —— `@SpringBootTest` + 真实 `schema.sql` + 真实 Mapper，守护 `@TableField` 列映射与 `exist = false`。**打桩 mapper 的测试无法覆盖此属性**（见 §7.1 事故记录）
+  - 契约守护：`TemplateDataExpansionTest` —— 固化「模板变量展开必须用 fastjson2 往返而非 hutool `BeanUtil.beanToMap`」（getter 名 vs 字段名键集差异）
   - 外部依赖：`GitToolsCloneCompletenessTest` —— 需网络访问 GitHub，由 `@EnabledIfSystemProperty(named = "network.tests")` 守卫，默认**不执行**；离线 CI 需显式加 `-Dnetwork.tests=true`
-- **仍有空白**（详见 §7.10）：`facade` 零测试；Mapper 层缺 `@SpringBootTest` + H2 真实 SQL 验证；`aicode` 的 DAO 层缺单测。
+- **仍有空白**（详见 §7.10）：`facade` 零测试；Mapper 层 DAO 单测覆盖仍偏薄。
 - **已完成**：接口契约回归测试 `ApiContractIT`（59 用例，见 §7.10 第 0 项），已作为 Java 25 / Spring Boot 4.1 升级全程的验收金标准，并在 Boot 4.1.1 上全绿。
 - 性能基线：把 `measurement/startup-time.sh` 的输出接入 CI，**冷启动回归超过阈值**则 fail。
 

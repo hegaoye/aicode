@@ -39,7 +39,11 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-webmvc'
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    // 注：spring-boot-starter-validation 已于 2026-10-15 移除。
+    // 实测全仓（含测试代码）的 Bean Validation 注解命中数为 0，移除后 fat jar
+    // 减少约 1.4 MB（hibernate-validator + jakarta.validation-api + spring-boot-validation）。
+    // 需要声明式入参校验时必须先加回本 starter，否则 @Valid 等注解会编译通过但静默失效。
+    // 详见 AGENTS.md §6.4。
     //----------- springCloud end--------------
 
     //----------- mybatis mysql druid start--------------
@@ -48,7 +52,9 @@ dependencies {
     implementation 'com.h2database:h2'
     // Boot 4 把 H2 控制台拆为独立模块（无对应 starter），不加则 spring.h2.console.* 不生效
     implementation 'org.springframework.boot:spring-boot-h2console'
-    implementation 'com.alibaba:druid:1.2.22'
+    // 注：显式的 com.alibaba:druid:1.2.22 已移除。druid-spring-boot-4-starter:1.2.28
+    // 的自动配置类按 druid 1.2.28 API 编译；显式锁 1.2.22 会造成 core 与 starter 版本错配，
+    // 一旦被 BOM / force 覆盖即 NoSuchMethodError，而编译与测试全绿。
     implementation 'com.alibaba:druid-spring-boot-4-starter:1.2.28'
     implementation 'com.baomidou:mybatis-plus-spring-boot4-starter:3.5.17'
     // MyBatis-Plus 自 3.5.9 起把分页插件（PaginationInnerInterceptor，依赖 JSqlParser）
@@ -70,10 +76,16 @@ dependencies {
     implementation 'com.ibeetl:beetl:3.15.12.RELEASE'
     implementation 'org.springframework.boot:spring-boot-starter-aspectj'
 
-    implementation 'commons-io:commons-io:2.4'
+    // 2.4（2012 年发布，存在已知 CVE）已升级。Boot 4.1.1 BOM 不管理 commons-io，
+    // 故必须显式声明版本，否则会随其他依赖的传递版本无声漂移。
+    // 实测依据见 openspec/changes/dead-code-and-dependency-hygiene/design.md - D7。
+    implementation 'commons-io:commons-io:2.20.0'
     implementation 'org.apache.commons:commons-lang3:3.18.0'
     implementation 'com.alibaba.fastjson2:fastjson2:2.0.49'
-    implementation 'cn.hutool:hutool-all:5.8.40'
+    // hutool-all 替换为 hutool-core：本模块实际只用 IdUtil / DateUtil / FileUtil，
+    // 三者均属 hutool-core；其余 18 个子包（json/crypto/jwt/poi/http/db/socket/
+    // script/captcha/aop/cache/cron/bloomfilter/system/setting/log/extra/ai）零调用。
+    implementation 'cn.hutool:hutool-core:5.8.40'
 
     // Lombok 交由 Spring Boot BOM 管理（Java 25 需要 >= 1.18.40）
     compileOnly 'org.projectlombok:lombok'
@@ -86,7 +98,11 @@ dependencies {
 
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
+    // 注：显式的 junit-jupiter:5.10.2 已移除。spring-boot-starter-test 已传递 junit-jupiter，
+    // 且 5.10.2 低于 Boot 4.1.1 BOM 的 junit-bom（6.0.3），属无效死锁版。
+    // 架构断言：禁止 facade / aicode 重新引用 common 中的 vendored 死代码区域。
+    // 依赖 ASM 读取 class 文件，版本须支持 Java 25 的 class 文件版本（major 69）。
+    testImplementation 'com.tngtech.archunit:archunit-junit5:1.5.1'
 
 }
 

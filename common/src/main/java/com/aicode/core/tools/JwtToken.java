@@ -1,6 +1,8 @@
 
 package com.aicode.core.tools;
 
+import lombok.extern.slf4j.Slf4j;
+
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTCreator;
 import com.auth0.jwt.JWTVerifier;
@@ -16,20 +18,11 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by lixin on 2017/9/13.
  */
+@Slf4j
 public class JwtToken {
 
     private static long expireMinutes = 60L;//60分钟
     private static String secret = "ShenzhenXiDeKeJi20180828@pi-top.com";//临时同步秘钥的设定，正常情况下应该设置到setting中可以随时进行更改
-
-    public static void main(String[] args) {
-        String token = createToken("client_id", "c5f04615-7739-4267-877c-bedd9ab7fed3");
-        boolean flag = verifier(token);
-        System.out.println(flag);
-
-        String token2 = createToken("c5f04615-7739-4267-877c-bedd9ab7fed3", 1);
-        System.out.println(token2);
-        System.out.println(verifier(token2, "c5f04615-7739-4267-877c-bedd9ab7fed3"));
-    }
 
 
     /**
@@ -50,7 +43,7 @@ public class JwtToken {
                 return false;
             }
         } catch (JWTVerificationException exception) {
-            exception.printStackTrace();
+            log.error("JWT 处理失败", exception);
         }
         return false;
     }
@@ -75,7 +68,7 @@ public class JwtToken {
                 return false;
             }
         } catch (JWTVerificationException exception) {
-            exception.printStackTrace();
+            log.error("JWT 处理失败", exception);
         }
         return false;
     }
@@ -98,7 +91,7 @@ public class JwtToken {
             String value = claim.asString();
             return value;
         } catch (JWTVerificationException exception) {
-            exception.printStackTrace();
+            log.error("JWT 处理失败", exception);
         }
         return null;
     }
@@ -121,7 +114,7 @@ public class JwtToken {
             String value = claim.asString();
             return value;
         } catch (JWTVerificationException exception) {
-            exception.printStackTrace();
+            log.error("JWT 处理失败", exception);
         }
         return null;
     }
@@ -144,20 +137,9 @@ public class JwtToken {
                     .sign(algorithm);
             return token;
         } catch (JWTCreationException exception) {
-            exception.printStackTrace();
+            log.error("JWT 处理失败", exception);
         }
         return null;
-    }
-
-
-    /**
-     * 创建 Builder
-     *
-     * @return Builder
-     */
-    public static JWTCreator.Builder create() {
-        JWTCreator.Builder builder = JWT.create();
-        return builder;
     }
 
     /**
@@ -178,7 +160,7 @@ public class JwtToken {
                     .sign(algorithm);
             return token;
         } catch (JWTCreationException exception) {
-            exception.printStackTrace();
+            log.error("JWT 处理失败", exception);
         }
         return null;
     }
@@ -204,7 +186,7 @@ public class JwtToken {
                     .sign(algorithm);
             return token;
         } catch (JWTCreationException exception) {
-            exception.printStackTrace();
+            log.error("JWT 处理失败", exception);
         }
         return null;
     }
@@ -227,7 +209,7 @@ public class JwtToken {
                     .sign(algorithm);
             return token;
         } catch (JWTCreationException exception) {
-            exception.printStackTrace();
+            log.error("JWT 处理失败", exception);
         }
         return null;
     }

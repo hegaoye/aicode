@@ -12,7 +12,11 @@ import com.aicode.project.dao.mapper.ProjectSqlMapper;
 import com.aicode.project.entity.Project;
 import com.aicode.project.entity.ProjectSql;
 import com.aicode.project.entity.ProjectSqlState;
-import com.alibaba.druid.util.StringUtils;
+// 原为 com.alibaba.druid.util.StringUtils：与 commons-lang3 同名但语义不同，且随 Druid 消失
+// 会导致编译失败。此处改用 commons-lang3，并按语义等价关系 isEmpty -> isBlank：
+// druid 的 isEmpty 把「仅空白字符」也视作空，commons-lang3 的 isEmpty 不视作空。
+// 改用 isBlank 才能保持原有校验强度（whitespace-only 的 projectCode 仍被判为空）。
+import org.apache.commons.lang3.StringUtils;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.spring.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
@@ -36,7 +40,7 @@ public class ProjectSqlServiceImpl extends ServiceImpl<ProjectSqlMapper, Project
     private ProjectMapper projectMapper;
     @Override
     public boolean save(ProjectSql entity) {
-        if (entity == null || StringUtils.isEmpty(entity.getProjectCode()) || StringUtils.isEmpty(entity.getTsql())) {
+        if (entity == null || StringUtils.isBlank(entity.getProjectCode()) || StringUtils.isBlank(entity.getTsql())) {
             log.error(BaseException.BaseExceptionEnum.Empty_Param.toString());
             throw new ProjectException(BaseException.BaseExceptionEnum.Empty_Param);
         }

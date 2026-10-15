@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 /**
  * 项目 SQL 发射器：把用户提供的建表 SQL 写入产物目录下的 {@code <englishName>.sql}。
@@ -41,7 +42,10 @@ public class SqlEmitter {
         String tsql = header
                 + (projectSql != null && projectSql.getTsql() != null ? projectSql.getTsql() : "");
         try {
-            FileUtils.writeByteArrayToFile(new File(projectPath + "/" + englishName + ".sql"), tsql.getBytes());
+            // 显式指定 UTF-8：原实现用 tsql.getBytes()（平台默认编码），
+            // 在非 UTF-8 的平台上会把生成 SQL 里的中文注释写成乱码。
+            FileUtils.writeByteArrayToFile(new File(projectPath + "/" + englishName + ".sql"),
+                    tsql.getBytes(StandardCharsets.UTF_8));
         } catch (IOException e) {
             log.error("写入 SQL 脚本失败: {}/{}.sql", projectPath, englishName, e);
         }

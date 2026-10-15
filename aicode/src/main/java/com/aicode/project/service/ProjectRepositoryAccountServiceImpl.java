@@ -11,7 +11,11 @@ import com.aicode.project.dao.mapper.ProjectRepositoryAccountMapper;
 import com.aicode.project.entity.ProjectRepositoryAccount;
 import com.aicode.project.entity.ProjectRepositoryAccountState;
 import com.aicode.project.entity.ProjectRepositoryTypeEnum;
-import com.alibaba.druid.util.StringUtils;
+// 原为 com.alibaba.druid.util.StringUtils：与 commons-lang3 同名但语义不同，且随 Druid 消失
+// 会导致编译失败。此处改用 commons-lang3，并按语义等价关系 isEmpty -> isBlank：
+// druid 的 isEmpty 把「仅空白字符」也视作空，commons-lang3 的 isEmpty 不视作空。
+// 改用 isBlank 才能保持原有校验强度（whitespace-only 的 projectCode 仍被判为空）。
+import org.apache.commons.lang3.StringUtils;
 import com.baomidou.mybatisplus.spring.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,11 +37,11 @@ public class ProjectRepositoryAccountServiceImpl extends ServiceImpl<ProjectRepo
     @Override
     public boolean save(ProjectRepositoryAccount projectRepositoryAccount) {
         if (projectRepositoryAccount == null
-                || StringUtils.isEmpty(projectRepositoryAccount.getAccount())
-                || StringUtils.isEmpty(projectRepositoryAccount.getDescription())
-                || StringUtils.isEmpty(projectRepositoryAccount.getHome())
-                || StringUtils.isEmpty(projectRepositoryAccount.getPassword())
-                || StringUtils.isEmpty(projectRepositoryAccount.getType())) {
+                || StringUtils.isBlank(projectRepositoryAccount.getAccount())
+                || StringUtils.isBlank(projectRepositoryAccount.getDescription())
+                || StringUtils.isBlank(projectRepositoryAccount.getHome())
+                || StringUtils.isBlank(projectRepositoryAccount.getPassword())
+                || StringUtils.isBlank(projectRepositoryAccount.getType())) {
             log.error(BaseException.BaseExceptionEnum.Empty_Param.toString());
             throw new ProjectRepositoryAccountException(BaseException.BaseExceptionEnum.Empty_Param);
         }

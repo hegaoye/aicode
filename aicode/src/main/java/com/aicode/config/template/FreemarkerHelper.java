@@ -1,6 +1,5 @@
 package com.aicode.config.template;
 
-import com.alibaba.fastjson2.JSON;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -11,21 +10,11 @@ import java.io.*;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
+import com.alibaba.fastjson2.JSON;
 
 @Slf4j
 @Service
 public class FreemarkerHelper implements TemplateHelper {
-    public static void main(String[] args) throws IOException, TemplateException {
-        Map<String, Object> map = new HashMap<>();
-        map.put("fileName", "Hegaoye");
-        map.put("className", "public\tclass\t" + map.get("fileName") + "\t");
-        map.put("extends", "extends\tPage\timplements\tSerializable\t");
-        map.put("basePackage", "package\tcom.szh.test.ctrl;");
-        map.put("import", "import\tcom.aixin.core.entity.Page;\nimport\torg.apache.commons.lang.builder.ToStringBuilder;\nimport\torg.apache.commons.lang.builder.ToStringStyle;\nimport\tjava.io.Serializable;");
-        String targetFilePath = "C:\\worspaces\\template\\src\\main\\webapp\\workspace\\szh\\sv\\src\\main\\java\\com\\szh\\test\\ctrl\\" + map.get("fileName")
-                .toString() + ".java";
-        new FreemarkerHelper().generate(null, targetFilePath, "C:\\worspaces\\template\\AI\\src\\main\\webapp\\templates\\Test.java");
-    }
 
 
     /**
@@ -54,6 +43,11 @@ public class FreemarkerHelper implements TemplateHelper {
             configuration.setDirectoryForTemplateLoading(new File(templatePath));
             Template temp = configuration.getTemplate(templateFileName);
             out = new OutputStreamWriter(new FileOutputStream(targetFilePath), Charset.forName("UTF-8"));
+            // 保留 fastjson2 的 bean -> String -> Map 往返，SHALL NOT 换成 hutool BeanUtil.beanToMap：
+            // fastjson2 按 **getter** 命名产出键（basePackage / className / dashedCaseName），
+            // 而 hutool 按 **字段** 产出键（base_package / classname ...），两者键集不一致，
+            // 换过去会让所有外部模板仓的 ${className} 等变量取不到值 —— 生成产物静默改变。
+            // 回归守护见 TemplateDataExpansionTest。
             Map<String, Object> param = JSON.parseObject(JSON.toJSONString(templateData), Map.class);
             param.put("package", templateData.getBasePackage());
             temp.process(param, out);

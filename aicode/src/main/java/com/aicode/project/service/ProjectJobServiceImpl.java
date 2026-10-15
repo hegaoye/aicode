@@ -8,7 +8,11 @@ import com.aicode.exceptions.ProjectJobException;
 import com.aicode.project.dao.mapper.ProjectJobMapper;
 import com.aicode.project.entity.ProjectJob;
 import com.aicode.project.entity.ProjectJobState;
-import com.alibaba.druid.util.StringUtils;
+// 原为 com.alibaba.druid.util.StringUtils：与 commons-lang3 同名但语义不同，且随 Druid 消失
+// 会导致编译失败。此处改用 commons-lang3，并按语义等价关系 isEmpty -> isBlank：
+// druid 的 isEmpty 把「仅空白字符」也视作空，commons-lang3 的 isEmpty 不视作空。
+// 改用 isBlank 才能保持原有校验强度（whitespace-only 的 projectCode 仍被判为空）。
+import org.apache.commons.lang3.StringUtils;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import cn.hutool.core.util.IdUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -38,7 +42,7 @@ public class ProjectJobServiceImpl extends ServiceImpl<ProjectJobMapper, Project
     @Override
     public boolean save(ProjectJob entity) {
         //1.验证参数
-        if (StringUtils.isEmpty(entity.getProjectCode())) {
+        if (StringUtils.isBlank(entity.getProjectCode())) {
             log.error(BaseException.BaseExceptionEnum.Empty_Param.toString());
             throw new ProjectJobException(BaseException.BaseExceptionEnum.Empty_Param);
         }

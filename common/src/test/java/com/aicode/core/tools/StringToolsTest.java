@@ -61,4 +61,36 @@ class StringToolsTest {
         // 实际行为：可能仍匹配到数字，断言不抛错即可
         assertNotNull(result);
     }
+
+    // ============================================================
+    // 「生成产物命名契约」快照，SHALL NOT 在无等价验证下变更。
+    // humpToLine 的输出是生成工程的**前端文件名**（MapClassTable.dashedCaseName → 模板
+    // ${dashedCaseName}）。hutool NamingCase.toKebabCase 具备缩写感知，会把 URL 视作一个
+    // 缩写词给出 "url"；本实现逐个大写字母前插 "-"，给出 "u-r-l"。替换会改变全部历史
+    // 生成工程的前端文件名，并与外部模板仓脱节。
+    // 依据：openspec/changes/dead-code-and-dependency-hygiene/design.md - D2
+    // ============================================================
+
+    @Test
+    @DisplayName("契约快照·humpToLine 逐个大写字母前插连字符（URL → u-r-l，与 hutool 的 url 不同）")
+    void contract_humpToLine_insertsDashBeforeEveryUpperCase() {
+        assertEquals("u-r-l", StringTools.humpToLine("URL"));
+        assertEquals("a-b-c", StringTools.humpToLine("ABC"));
+    }
+
+    @Test
+    @DisplayName("契约快照·humpToLine 小写驼峰与已带连字符输入")
+    void contract_humpToLine_lowercaseCamelAndAlreadyKebab() {
+        assertEquals("user-order", StringTools.humpToLine("userOrder"));
+        assertEquals("user-order", StringTools.humpToLine("user-order"));
+        assertEquals("user_order", StringTools.humpToLine("user_order"));
+    }
+
+    @Test
+    @DisplayName("契约快照·humpToLine 大写首字母不产生前导连字符")
+    void contract_humpToLine_noLeadingDash() {
+        // 实现会剥掉前导 "-"，故 "Order" → "order" 而非 "-order"
+        assertEquals("order", StringTools.humpToLine("Order"));
+        assertFalse(StringTools.humpToLine("Order").startsWith("-"));
+    }
 }

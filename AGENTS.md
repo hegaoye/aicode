@@ -341,7 +341,15 @@ Project 是聚合根：包含 `ProjectSql`、`ProjectFramwork`、`ProjectMap`、
 
 ### 7.1 现状
 
-诚实说明：**当前仓库三模块均无 `src/test` 实现**；`aicode` 模块仅声明了 `testImplementation 'org.springframework.boot:spring-boot-starter-test'`，`common` / `facade` 未引入测试依赖。
+诚实说明：三模块测试覆盖**极不均衡**，实测（2026-10-14）：
+
+| 模块 | 测试类数 | 测试依赖 | 覆盖内容 |
+|------|---------|---------|---------|
+| `aicode` | **10** | `spring-boot-starter-test` | Controller 切片（`MockMvc`）、Service 并发、生成主链路、模板引擎适配、SQL 逆解析 |
+| `common` | **8** | `junit-jupiter` | 纯函数单测（`StringTools` / `JwtToken` / `Md5` / `PasswordCrypto`）、枚举转换、JGit 克隆完整性 |
+| `facade` | **0** | `junit-jupiter`（已声明但无测试） | — |
+
+合计 **18 个测试类**。空白点：`facade` 无任何测试；Mapper 层缺少 `@SpringBootTest` + H2 真实 SQL 验证；`aicode` 的 DAO 层缺单测。
 
 本节为 **to-be 规范**：约定后续测试应如何组织与编写，并在 §7.10 给出优先补齐清单。**新增功能应同步补测试**，逐步建立安全网。
 
@@ -470,7 +478,11 @@ opsx 入口（功能等价，运行时暴露哪个就用哪个）：
 
 仓库**已遵循** OpenSpec 流程：新增功能前先看 `openspec/specs/` 与 `changes/archive/`；若已有相关能力，请在原能力下创建 delta spec，**不要**直接改代码。
 
-废弃 API 治理流程（见 `openspec/specs/api-deprecation-policy/spec.md`）：**标记 → 30 天观察 → 内部 grep 二次核查 → 删除**；删除时同步更新 `aicode/README.md §四`。
+> **动手前必做查重**：先执行 `openspec list --specs` 拿到当前能力清单，再执行 `openspec show "<能力id>" --type spec` 通读该能力的完整需求与场景（含 Scenario）。命中已有能力时，用它的**准确路径**在提案的 `Modified Capabilities` 中声明，SHALL NOT 另起近似名字的能力，也 SHALL NOT 凭空编造需求只为通过校验。
+>
+> 跨变更的依赖顺序：若 B 变更用 `MODIFIED` 修改了 A 变更才创建的 capability，**A 必须先归档**（capability 在归档时才物化到 `openspec/specs/`），否则 `openspec archive` 会以 `target spec does not exist` 拒绝。
+
+废弃 API 治理流程（见 `openspec/specs/api-deprecation-policy/spec.md`）：**标记 → 30 天观察 → 内部 grep 二次核查 → 删除**；删除时同步更新 `aicode/README.md §四`。注意「内部核查」的范围 SHALL 包含 `src/main/resources/static/` 下的前端打包产物——后端 grep 找不到 `.shtml` 调用点。
 
 ---
 
@@ -516,11 +528,15 @@ opsx 入口（功能等价，运行时暴露哪个就用哪个）：
 
 ### 11.3 测试演进
 
-- 当前只有 `SmokeTest` 占位。**已建立** OpenSpec 业务测试变更模板（`2026-06-22-add-core-business-tests`），后续按包逐步补齐（详见 §7.10）：
-  - Controller 层：`MockMvc` 覆盖主要接口
-  - Service 层：Mockito 单测，验证业务分支
-  - Mapper 层：`@SpringBootTest` + H2 真实 SQL 验证
-  - 模板渲染层：freemarker / beetl 渲染结果快照测试
+- **已落地 18 个测试类**（详见 §7.1 的分布表）。按层覆盖情况：
+  - Controller 层（`MockMvc`）：`LoginCtrlShtmlPathTest`（`.shtml` 路由回归）、`MapRelationshipControllerTest`、`ProjectControllerDownloadTest`、`ProjectInitEndpointTest` —— 均为 `@SpringBootTest(MOCK)` + `@MockBean` 打桩业务层，加载真实 `WebMvcConfigurer`
+  - Service 层：`ProjectJobServiceImplConcurrencyTest`（并发）、`SqlReverseParseTest`（SQL 逆解析）
+  - 生成主链路：`CodeGenPipelineTest`（占位符风格）、`TemplateEngineAdapterTest`（`aicode.json` 引擎探测）、`MapClassTableTest`（类名/模块名推导）
+  - 工具层：`StringToolsTest` / `StringHelperTest` / `JwtTokenTest` / `Md5Test` / `PasswordCryptoTest`
+  - 枚举：`TemplateEngineEnumTest` / `YNEnumTest`
+  - 外部依赖：`GitToolsCloneCompletenessTest` —— 需网络访问 GitHub，由 `@EnabledIfSystemProperty(named = "network.tests")` 守卫，默认**不执行**；离线 CI 需显式加 `-Dnetwork.tests=true`
+- **仍有空白**（详见 §7.10）：`facade` 零测试；Mapper 层缺 `@SpringBootTest` + H2 真实 SQL 验证；`aicode` 的 DAO 层缺单测。
+- **下一步**：接口契约回归测试（`openspec/changes/2026-10-14-add-api-contract-tests/`），作为 Java 25 / Spring Boot 4 升级系列的验收金标准。
 - 性能基线：把 `measurement/startup-time.sh` 的输出接入 CI，**冷启动回归超过阈值**则 fail。
 
 ### 11.4 CI / CD

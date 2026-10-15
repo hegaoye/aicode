@@ -36,7 +36,7 @@ CDS（Class Data Sharing）的运维操作与实测数据见 §9。
 
 ## 1. 项目概述
 
-`aicode` 是一个基于 **Spring Boot 3.3.9 / Java 21** 的**代码生成平台**：
+`aicode` 是一个基于 **Spring Boot 4.1.1 / Java 25** 的**代码生成平台**：
 
 - **架构风格**：单体分层 + 模块化（Modular Monolith）+ 门面隔离（Facade Pattern）+ 模板方法 / 数据驱动。
 - **能力**：接收 SQL 脚本与 freemarker/beetl 模板，逆向生成完整的 CRUD 工程（DAO → Service → Ctrl → 前端），并可推送到 Git / SVN 仓库。
@@ -50,11 +50,11 @@ CDS（Class Data Sharing）的运维操作与实测数据见 §9。
 
 | 模块 | 角色 | 备注 |
 |------|------|------|
-| `:aicode`  | Spring Boot 应用 — 控制器、服务、Mapper、静态前端 | **唯一可运行且有测试的模块**。入口 `com.aicode.Application`。 |
-| `:facade`  | 与下游生成工程共享的 DTO / facade 类型 | 依赖 `:common`。无 main，无测试。 |
-| `:common` | 共享工具：JGit、hutool、JWT、pinyin4j、zip4j | 被 `:facade` 与 `:aicode` 同时依赖。**禁**引入 spring-web（详见 §6.2）。 |
+| `:aicode`  | Spring Boot 应用 — 控制器、服务、Mapper、静态前端 | **唯一可运行的模块**；唯一持有接口层的模块。入口 `com.aicode.Application` |
+| `:facade`  | 与下游生成工程共享的 DTO / facade 类型 | 依赖 `:common`。无 main，**无测试** |
+| `:common` | 共享工具：JGit、hutool、JWT、pinyin4j、zip4j | 被 `:facade` 与 `:aicode` 同时依赖。**禁**引入 spring-web（详见 §6.2）。有 8 个工具层单测 |
 
-依赖方向**单向、无环**（详见 §6.2、architecture.md:73-98）：
+依赖方向**单向、无环**（详见 §6.2）：
 
 ```
 aicode (Spring Boot 应用)  ──→  facade (契约)  ──→  common (基础工具)
@@ -92,12 +92,14 @@ export JAVA_HOME=$(/usr/libexec/java_home -v 25)
 ## 4. 运行时事实
 
 - 应用端口：`http://127.0.0.1:8080`；actuator：`http://127.0.0.1:8088`；H2 控制台：`http://127.0.0.1:8080/h2`（sa/sa，生产应关闭，见 §6.13）。
-- 默认账户：`admin / 888888`。**单用户模式**，token 通过 URL 参数 `?token=xxx` 传递（**无 Header 鉴权**，改进路径见 §6.13）。
+- 默认账户：`admin / 888888`。**单用户模式**，token 通过 URL 参数 `?token=xxx` 传递（**无 Header 鉴权**，改进路径见 §6.13）。该行为的正式契约见 `openspec/specs/auth-account/spec.md`。
 - K8s 与 aicode 技能共用的存活探针：`GET /actuator/health/liveness`，技能要求 **3 秒内**返回 `UP`。
 - 数据库为 **H2（MySQL 兼容模式）**：`jdbc:h2:file:/tmp/aicode;...MODE=MYSQL;AUTO_SERVER=TRUE`。`spring.sql.init.mode=always` 会在每次启动重跑 `classpath:db/schema.sql` 与 `data.sql` —— 状态会被重置，除非用 `database` 环境变量指向其他文件路径。
 - 单个 DataSource Bean（`tidb-data`，`@Primary`）。历史上的第二个 `uid-data` 数据源已随百度 UID 组件一并移除（详见 §5.6 与 §6.8）。
 - Spring 虚拟线程已启用（`spring.threads.virtual.enabled: true`），测试与阻塞 JDBC 调用需按 VTH 假设编写。
-- H2 版本**锁死 1.4.200**（新版会破坏 Spring Boot 3 的 H2 console 路由）。
+- H2 已升至 **2.4.240**（由 Spring Boot BOM 管理）。此前「锁死 1.4.200」的红线针对的是 Boot 3 的 H2 console 路由，Boot 4 已把 console 拆成独立模块 `spring-boot-h2console`，该约束随之失效。
+- ⚠️ **存量库文件不兼容**：1.4.200 格式的 `/tmp/aicode.mv.db` 无法被 2.x 打开，升级后**必须删除**让应用重建（H2 是嵌入式开发库，无数据迁移需求）。
+- ⚠️ H2 2.x **拒绝** `AUTO_SERVER=TRUE` 与 `DB_CLOSE_ON_EXIT=FALSE` 共存（`Feature not supported`），JDBC URL 中该参数已移除。
 
 ---
 
@@ -107,13 +109,13 @@ export JAVA_HOME=$(/usr/libexec/java_home -v 25)
 
 ### 5.1 架构风格
 
-- **单体分层 + 模块化（Modular Monolith）**：Gradle 多模块单体，逻辑上严格分层（详见 architecture.md:67-71）。
+- **单体分层 + 模块化（Modular Monolith）**：Gradle 多模块单体，逻辑上严格分层。
 - **门面隔离（Facade Pattern）**：`facade` 模块只放契约（实体/DTO/VO/Service 接口/异常），实现下沉到 `aicode`，实现「接口与实现分离」。
 - **模板方法 + 数据驱动**：生成逻辑固定，输出由「模板 + 模型数据（`TemplateData`）」决定，是典型的**数据驱动代码生成**。
 
 ### 5.2 模块依赖（单向无环，禁反向）
 
-参见 §2 的依赖图，详见 architecture.md:73-98 与 code-style.md:42-59。**红线**：
+参见 §2 的依赖图。**红线**：
 
 - `common` 不得引入 `spring-boot-starter-web`。
 - 业务接口 `*Service` 声明在 `facade`，实现 `*ServiceImpl` 放在 `aicode`。
@@ -121,7 +123,7 @@ export JAVA_HOME=$(/usr/libexec/java_home -v 25)
 
 ### 5.3 分层架构（aicode 主应用内部）
 
-按业务域（**package-by-feature**）分包，域内再分层（详见 architecture.md:100-119）：
+按业务域（**package-by-feature**）分包，域内再分层：
 
 ```
 HTTP / WebSocket
@@ -142,7 +144,7 @@ HTTP / WebSocket
 
 ### 5.4 核心实体与「三层映射」（本框架的灵魂）
 
-Project 是聚合根：包含 `ProjectSql`、`ProjectFramwork`、`ProjectMap`、`ProjectModule`、`ProjectModel`、`ProjectRepositoryAccount`、`ProjectJob` 等（详见 architecture.md:172-191）。
+Project 是聚合根：包含 `ProjectSql`、`ProjectFramwork`、`ProjectMap`、`ProjectModule`、`ProjectModel`、`ProjectRepositoryAccount`、`ProjectJob` 等。
 
 **三层映射**声明式描述「DB 世界 → Code 世界」的翻译：
 
@@ -156,7 +158,7 @@ Project 是聚合根：包含 `ProjectSql`、`ProjectFramwork`、`ProjectMap`、
 
 ### 5.5 代码生成主链路（七步编排）
 
-入口：`GET /project/job/execute?code={projectCode}` → 建 `ProjectJob`（状态 `Executing`）→ `@Async` 虚拟线程执行 → `GeneratorSVImpl.aiCode()`（详见 architecture.md:151-167）：
+入口：`GET /project/job/execute?code={projectCode}` → 建 `ProjectJob`（状态 `Executing`）→ `@Async` 虚拟线程执行 → `GeneratorSVImpl.aiCode()`：
 
 1. **创建工作空间**（`buildProject`）：清理旧目录；若配置 Git 则 `clone` 检出；多技术栈时为每个框架建子目录；`buildNumber++`。
 2. **转换模型**：按 `projectCode` 加载 `ProjectMap → MapClassTable`，装配 `MapFieldColumn` 与 `MapRelationship`。
@@ -178,11 +180,11 @@ Project 是聚合根：包含 `ProjectSql`、`ProjectFramwork`、`ProjectMap`、
 |------|------|------|
 | 单一数据源 | `tidbDataSource`（业务，`@Primary`），MyBatis-Plus 由 `MybatisPlusConfigTidb` 扫 `com.aicode.*.dao.mapper`。历史上的第二数据源专为百度 UID 的 `worker_node` 表而设，组件移除后随之删除 | 见 §6.8 |
 | 主键与业务编码分离 | 主键 `id` 由**数据库自增**赋值（`MybatisPlusConfigTidb` 中显式设 `IdType.AUTO`，不可省略）；业务编码 `code` 由 **Hutool 雪花** `IdUtil.getSnowflakeNextIdStr()` 生成，**与主键相互独立** | `openspec/specs/identifier-generation/spec.md`（归档后） |
-| 可插拔模板引擎（策略模式） | `TemplateHelper` 接口 + `FreemarkerHelper` / `BeetlHelper` 两实现；运行期由模板内 `aicode.json` 的 `engine` 字段动态选择 | architecture.md:246、code-style.md:211-219 |
-| 外部 Git 模板仓库 | 技术栈即「模板仓库」，与代码解耦。新增/升级框架（如 SpringBoot 2.x→3.x、新增 RocketMQ）只改模板、不改生成器（`gitee.com/helixin/aicode_template`） | architecture.md:247 |
+| 可插拔模板引擎（策略模式） | `TemplateHelper` 接口 + `FreemarkerHelper` / `BeetlHelper` 两实现；运行期由模板内 `aicode.json` 的 `engine` 字段动态选择 | 本文件 §6.12 |
+| 外部 Git 模板仓库 | 技术栈即「模板仓库」，与代码解耦。新增/升级框架（如 SpringBoot 2.x→3.x、新增 RocketMQ）只改模板、不改生成器（`gitee.com/helixin/aicode_template`） | 本文件 §5.6 |
 | 虚拟线程异步 | `TaskExecutorConfig` 用 `SimpleAsyncTaskExecutor.setVirtualThreads(true)` 承载 `@Async` 构建任务，构建是 IO 密集（git clone / 文件读写） | 本文件 §6.9 |
 | 统一工具链语言级别 | 三个模块共用 `java { toolchain { languageVersion = JavaLanguageVersion.of(25) } }`，而非各自声明 `sourceCompatibility` —— 语言级别**不可能**在三模块间漂移 | 本文件 §3 |
-| 「模块」两重含义（勿混） | 工程模块：common/facade/aicode（见 §2）；业务模块：`Module` / `ProjectModule` / `ModuleEnum`，用于**项目管理与目录分离**，不参与 Java 包定义；`GeneratorSVImpl` 第 5 步「获取模块信息」标 `TODO` | architecture.md:265-267 |
+| 「模块」两重含义（勿混） | 工程模块：common/facade/aicode（见 §2）；业务模块：`Module` / `ProjectModule` / `ModuleEnum`，用于**项目管理与目录分离**，不参与 Java 包定义；`GeneratorSVImpl` 第 5 步「获取模块信息」标 `TODO` | 本文件 §2 |
 
 ### 5.7 部署架构
 
@@ -199,7 +201,7 @@ Project 是聚合根：包含 `ProjectSql`、`ProjectFramwork`、`ProjectMap`、
 
 ### 6.1 通用约定
 
-- **语言/编译**：Java 21，UTF-8（各模块 `build.gradle` 已配 `options.encoding = 'UTF-8'`）。
+- **语言/编译**：Java 25（三模块统一 `toolchain(25)`），UTF-8（各模块 `build.gradle` 已配 `options.encoding = 'UTF-8'`）。
 - **构建**：Gradle 多模块；新增第三方依赖统一加在对应模块的 `build.gradle`，显式写版本号，不依赖隐式传递。
 - **缩进**：4 空格，**禁 Tab**。
 - **行尾/文件**：LF，文件以空行结尾。
@@ -208,7 +210,7 @@ Project 是聚合根：包含 `ProjectSql`、`ProjectFramwork`、`ProjectMap`、
 
 ### 6.2 模块依赖（红线圈）
 
-三模块单向无环：`aicode → facade → common`（详见 §5.2、code-style.md:42-59）。红线：
+三模块单向无环：`aicode → facade → common`（详见 §5.2）。红线：
 
 - `common` **禁**引入 `spring-boot-starter-web`。
 - 业务接口（`*Service`）声明在 `facade`，实现（`*ServiceImpl`）放在 `aicode`，**接口与实现物理分离**。
@@ -290,7 +292,8 @@ Project 是聚合根：包含 `ProjectSql`、`ProjectFramwork`、`ProjectMap`、
 
 - 成功 `R.success()` / `R.success(data)`；失败 `R.failed(...)`；**禁**裸返实体或字符串。
 - `GlobalResponseBodyAdvice` 当前**注释关闭**，各 Controller 须**显式**包装 `R`；若后续启用统一包装，须全局移除手动包装，避免双重包裹。
-- **REST 约定**：路径以业务域为前缀（`/project/...`、`/framework/...`、`/project/relationship/...`）；用 SpringDoc OpenAPI 3 注解（`@Tag`/`@Operation`/`@Schema`）描述接口，配合 Knife4j UI。
+- `code` / `info` / `data` / `success` 四键结构，以及「`data` 为 null 时该键 SHALL NOT 被省略」，由 `openspec/specs/api-contract/spec.md` 定义并由 `ApiContractIT` 守护。
+- **REST 约定**：路径以业务域为前缀（`/project/...`、`/framework/...`、`/project/relationship/...`）；用 SpringDoc OpenAPI 3 注解（`@Tag`/`@Operation`/`@Schema`）描述接口。**API 文档 UI 用 springdoc 自带的 Swagger UI**（`/swagger-ui.html`），入口 `/v3/api-docs`；Knife4j 已于 2026-10-15 移除（其最后版本 2021 年停更，不支持 Spring Boot 4）。
 
 ### 6.7 异常处理
 
@@ -313,7 +316,7 @@ Project 是聚合根：包含 `ProjectSql`、`ProjectFramwork`、`ProjectMap`、
 
 - **链路追踪**：所有请求经 `ContextInterceptor` 注入 traceId 到 MDC；异步任务须用 `MdcTaskDecorator` 传递 MDC，保证日志链路连续。
 - **事务**：由 `TransactionalAopConfig` 的 AOP 切面统一管理，按约定切入 service 方法；避免在一个事务里做 git clone、文件 IO 等长耗时操作。
-- **异步**：耗时构建用 `@Async`，由 `TaskExecutorConfig`（Java 21 虚拟线程）承载；`@Async` 方法**须 public** 且**经 Spring 代理调用**（禁类内自调）。
+- **异步**：耗时构建用 `@Async`，由 `TaskExecutorConfig`（虚拟线程，`SimpleAsyncTaskExecutor.setVirtualThreads(true)`）承载；`@Async` 方法**须 public** 且**经 Spring 代理调用**（禁类内自调）。
 - **实时日志**：构建过程进度统一经 `WSClientManager.sendMessage()` 推送，并 `logsSV.saveLogs()` 落盘，**二者成对出现**。
 
 ### 6.10 Lombok 与样板代码
@@ -377,8 +380,8 @@ Project 是聚合根：包含 `ProjectSql`、`ProjectFramwork`、`ProjectMap`、
 |------|------|------|
 | 测试框架 | JUnit 5（Jupiter） | 随 `spring-boot-starter-test` 引入 |
 | 断言 | AssertJ / JUnit 5 Assertions | **优先 AssertJ** 链式断言，可读性好 |
-| Mock | Mockito | 随 starter 引入，隔离依赖 |
-| Spring 测试 | `@SpringBootTest` / `@MockBean` | 集成测试上下文 |
+| Mock | Mockito（**`@MockitoBean`**） | 随 starter 引入。**注意**：Spring Boot 4.0 已移除 `@MockBean` / `@SpyBean`，须用 `@MockitoBean` / `@MockitoSpyBean`；后者不允许标注在 `@Configuration` 类上，只能作为测试类字段 |
+| Spring 测试 | `@SpringBootTest` / `@MockitoBean` | 集成测试上下文 |
 | Web 测试 | `MockMvc`（`@AutoConfigureMockMvc`）/ `WebTestClient` | Controller 层 |
 | 数据库 | H2（MySQL 兼容模式） | 与运行时一致，天然适合做测试库 |
 
@@ -413,7 +416,7 @@ Project 是聚合根：包含 `ProjectSql`、`ProjectFramwork`、`ProjectMap`、
 
 ### 7.5 单元测试规范
 
-- **隔离**：被测类的外部依赖（Mapper、`GitTools`、`TemplateHelper`、文件系统）一律 `@Mock` / `@MockBean`，不触网、不落盘。
+- **隔离**：被测类的外部依赖（Mapper、`GitTools`、`TemplateHelper`、文件系统）一律 `@Mock` / `@MockitoBean`，不触网、不落盘。
 - **三段式**：Arrange–Act–Assert（准备—执行—断言），一个测试只验证一个行为点。
 - **断言具体**：断言到具体值/结构，不要只断言「非空」。
 - **不依赖顺序**：测试间相互独立，**禁**共享可变静态状态。
@@ -515,15 +518,17 @@ opsx 入口（功能等价，运行时暴露哪个就用哪个）：
 - Dockerfile：`aicode/Dockerfile`，基础镜像 `amazoncorretto:25`，端口 8080，`JAVA_OPTS="-Xms128m -Xmx512m"`。云构建包对应 `BP_JVM_VERSION=25`。
 - K8s 清单与 nginx upstream 示例：`devops/k8s/`、`README.md` §本地部署 nginx。
 - 性能基线脚本：`measurement/startup-time.sh`（冷启动到 `/actuator/health/liveness` 200 的 wall-clock）、`measurement/metaspace-after-up.sh`（Metaspace 用量）—— 输出 JSON，便于 CI 比对。
-- **CDS 启用**：CNB/Paketo `BP_JVM_CDS_ENABLED=true`，见 `aicode/build.gradle` 的 `bootBuildImage` 环境变量块。
+- **CDS 启用**：CNB/Paketo `BP_JVM_CDS_ENABLED=true`，见 `aicode/build.gradle` 的 `bootBuildImage` 环境变量块。实测数据见本节末尾的性能基线表。
 - **性能基线（2026-10-15 在 Java 21 → Java 25 上实测，Corretto，samples=3 取中位数）**：
 
-  | 指标 | Java 21.0.12.1 | Java 25.0.4.1 | 变化 |
-  |------|--------------|--------------|------|
-  | 冷启动到 liveness 200 | 7,209 ms | 7,244 ms | +0.49%（持平） |
-  | 非堆（metaspace 区域）used | 91,863,560 B | 84,627,464 B | **−7.88%** |
-  | 非堆 committed | 95,420,416 B | 88,670,208 B | −7.07% |
-  | 容器内 Spring 启动耗时 | — | 1.821 s | 满足 3s 探针要求 |
+  | 阶段 | 冷启动到 liveness 200 | 非堆（metaspace 区域）used | 非堆 committed |
+  |------|----------------------|--------------------------|-----------------|
+  | Boot 3.5.16 + JDK 21 | 7,209 ms | 91,863,560 B | 95,420,416 B |
+  | Boot 3.5.16 + JDK 25 | 7,244 ms | 84,627,464 B | 88,670,208 B |
+  | **Boot 4.1.1 + JDK 25** | **4,164 ms** | 92,587,912 B | 96,600,064 B |
+
+  **结论**：JDK 21→25 使非堆降 7.88%、冷启动持平；再叠加 Boot 3.5→4.1，冷启动进一步降 **42.5%**，
+  代价是非堆回升 9.4%（新自动配置模块）。相对起点（Boot 3.5.16 + JDK 21）：**冷启动 −42.3%、非堆仅 +0.8%**。
 
   > **口径说明**：
   > - 冷启动耗时**包含 Gradle 启动与依赖装配**，反映开发者实际等待时间，非 JVM 微观性能。
@@ -551,7 +556,11 @@ opsx 入口（功能等价，运行时暴露哪个就用哪个）：
 - **`spring.sql.init` 在测试环境不生效**：本项目自定义了名为 `tidbDataSource` 的 DataSource Bean，而 Boot 的自动初始化依赖 `DataSourceProperties` 的 `name`（`h2-test-tidb`），二者不一致。test profile 因此设 `mode: never`，改由 `TestDatabaseInitializer` 显式执行 `schema.sql` + `data.sql`。新增测试表或改初始化脚本时**改这个类**，改 `application-test.yml` 的 `sql.init` 不起作用。
 - **`toolchain` 只管编译，不管运行**：三个模块用 `toolchain(25)` 编译出 major 69 字节码，但 `./gradlew test` 与 `bootRun` 用的仍是 `JAVA_HOME` 指向的 JDK。要在 Java 25 运行时下验证，先 `export JAVA_HOME=$(/usr/libexec/java_home -v 25)`。
 - **插件版本要在 `settings.gradle` 声明**：`common` / `facade` 用 `apply plugin: 'io.spring.dependency-management'` 引插件时，版本必须写在根 `settings.gradle` 的 `plugins {}` 块（`apply false`）里 —— `pluginManagement.plugins` 只对 `plugins {}` DSL 生效，不支持 `apply plugin:` 写法。
-- `common` / `facade` 通过 `dependencyManagement { imports { mavenBom 'org.springframework.boot:spring-boot-dependencies:3.5.16' } }` 引入 BOM，因此这两个模块能使用无版本声明的依赖（如 lombok、junit-jupiter）。BOM 版本需与 `aicode` 模块的 Boot 版本保持一致。
+- `common` / `facade` 通过 `dependencyManagement { imports { mavenBom 'org.springframework.boot:spring-boot-dependencies:4.1.1' } }` 引入 BOM，因此这两个模块能使用无版本声明的依赖（如 lombok、junit-jupiter）。BOM 版本需与 `aicode` 模块的 Boot 版本保持一致。
+- **`.shtml` 后缀由 `ShtmlSuffixRewriteFilter` 提供**：Spring Framework 7 移除了 `PathMatchConfigurer#setUseSuffixPatternMatch`，后缀匹配不再是框架默认行为。前端（Angular 7 + jQuery 打包产物）会为每个 API 请求 URL 追加 `.shtml`，因此**新增 API 前缀时必须同步维护 `ShtmlSuffixRewriteFilter.API_PREFIXES`**。
+- **MockMvc 不会自动注册 Bean 形态的 Filter**：`MockMvcBuilders.webAppContextSetup(wac)` 只装配 `DispatcherServlet`，`.shtml` 相关的测试必须显式 `.addFilters(shtmlSuffixRewriteFilter)`，否则请求会落到静态资源处理器并报 `NoResourceFoundException`。真实运行时由嵌入式容器自动注册，不受影响。
+- **Boot 4 的 Actuator 端点默认 `access=none`**：即使 `management.endpoints.web.exposure.include="*"`，未设 `management.endpoint.<name>.access` 的端点仍返回 **400**。当前已开放 `env` / `shutdown` / `metrics` / `prometheus`。新增端点时记得同步。
+- **Micrometer ≥1.13 换用 Prometheus client 1.x**：包名由 `io.micrometer.prometheus` 迁到 `io.micrometer.prometheusmetrics`。沿用旧 client 会让 `/actuator/prometheus` 静默失效。
 
 ---
 
@@ -571,20 +580,20 @@ opsx 入口（功能等价，运行时暴露哪个就用哪个）：
 
 - **前后端分离**：当前前端以 Angular 构建产物形式放在 `aicode/src/main/resources/static/`。后续可考虑独立前端仓库 + 独立 CI，前端走 nginx 静态托管。
 - **服务拆分**：单体应用可拆为「元数据服务 / 模板服务 / 代码生成服务 / 任务调度服务」四个微服务，对应 K8s 部署。
-- **持久化升级**：H2 适合单机开发与演示，生产场景应切到 MySQL / PostgreSQL；schema 兼容 MySQL 模式但需要严格回归。
+- **持久化升级**：H2 适合单机开发与演示，生产场景应切到 MySQL / PostgreSQL；schema 兼容 MySQL 模式但需要严格回归。当前 H2 为 2.4.240（Boot BOM 管理），升级后**必须删除存量 `.mv.db` 让其重建**。
 - **缓存层**：Druid 已配置，可考虑引入 Redis 缓存「模板元数据 / 项目配置 / 解析结果」。
 
 ### 11.3 测试演进
 
 - **已落地 18 个测试类**（详见 §7.1 的分布表）。按层覆盖情况：
-  - Controller 层（`MockMvc`）：`LoginCtrlShtmlPathTest`（`.shtml` 路由回归）、`MapRelationshipControllerTest`、`ProjectControllerDownloadTest`、`ProjectInitEndpointTest` —— 均为 `@SpringBootTest(MOCK)` + `@MockBean` 打桩业务层，加载真实 `WebMvcConfigurer`
+  - Controller 层（`MockMvc`）：`LoginCtrlShtmlPathTest`（`.shtml` 路由回归）、`MapRelationshipControllerTest`、`ProjectControllerDownloadTest`、`ProjectInitEndpointTest` —— 均为 `@SpringBootTest(MOCK)` + `@MockitoBean` 打桩业务层，加载真实 `WebMvcConfigurer`
   - Service 层：`ProjectJobServiceImplConcurrencyTest`（并发）、`SqlReverseParseTest`（SQL 逆解析）
   - 生成主链路：`CodeGenPipelineTest`（占位符风格）、`TemplateEngineAdapterTest`（`aicode.json` 引擎探测）、`MapClassTableTest`（类名/模块名推导）
   - 工具层：`StringToolsTest` / `StringHelperTest` / `JwtTokenTest` / `Md5Test` / `PasswordCryptoTest`
   - 枚举：`TemplateEngineEnumTest` / `YNEnumTest`
   - 外部依赖：`GitToolsCloneCompletenessTest` —— 需网络访问 GitHub，由 `@EnabledIfSystemProperty(named = "network.tests")` 守卫，默认**不执行**；离线 CI 需显式加 `-Dnetwork.tests=true`
 - **仍有空白**（详见 §7.10）：`facade` 零测试；Mapper 层缺 `@SpringBootTest` + H2 真实 SQL 验证；`aicode` 的 DAO 层缺单测。
-- **下一步**：接口契约回归测试（`openspec/changes/2026-10-14-add-api-contract-tests/`），作为 Java 25 / Spring Boot 4 升级系列的验收金标准。
+- **已完成**：接口契约回归测试 `ApiContractIT`（59 用例，见 §7.10 第 0 项），已作为 Java 25 / Spring Boot 4.1 升级全程的验收金标准，并在 Boot 4.1.1 上全绿。
 - 性能基线：把 `measurement/startup-time.sh` 的输出接入 CI，**冷启动回归超过阈值**则 fail。
 
 ### 11.4 CI / CD
@@ -598,7 +607,7 @@ opsx 入口（功能等价，运行时暴露哪个就用哪个）：
 
 ### 11.5 可观测性
 
-- 已有 actuator + Prometheus 指标（`micrometer-registry-prometheus`）。
+- 已有 actuator + Prometheus 指标（`micrometer-registry-prometheus`，Prometheus client 1.x）。注意 Boot 4 中相关端点默认 `access=none`，需显式开放（见 §10）。
 - 后续可接入 ELK / Loki 做日志聚合，引入 OpenTelemetry 做链路追踪。
 - WebSocket 构建日志（README 提及）目前**未结构化**，应统一接入 traceId。
 
@@ -627,11 +636,11 @@ opsx 入口（功能等价，运行时暴露哪个就用哪个）：
 
 ### 11.10 升级路径
 
-- **Spring Boot 3.3.9 → 3.5.16：已完成**（`upgrade-spring-boot-3-5`）。下一步 3.5 → 4.1.1 见 `upgrade-spring-boot-4-1`，注意 Jakarta EE 11 / Jackson 3 两大断裂面。
-- **Java 21 → Java 25 LTS：已完成**（`upgrade-gradle-9-jdk-25`，2026-10-15）。实测：冷启动持平（+0.49%）、非堆占用 −7.88%、容器内 Spring 启动 1.821s。三个模块已统一到 `toolchain(25)`。
+- **Spring Boot 3.3.9 → 4.1.1：已完成**（经 `3.5.16` 台阶，`upgrade-spring-boot-3-5` → `upgrade-spring-boot-4-1`）。已跨过 Jakarta EE 11 / Jackson 3 两大断裂面。
+- **Java 21 → 25 LTS：已完成**（2026-10-15）。单独看 JDK 升级：非堆占用 −7.88%、冷启动持平（+0.49%）。叠加 Boot 4 后冷启动再降 42.5%（见 §9 性能基线表）。三个模块已统一到 `toolchain(25)`。
 - **Gradle 8.5 → 9.8.1：已完成**。注意 Gradle 10 将移除一批 API，建议在下个升级窗口前评估。
-- H2 1.4.200 锁死 → 待 Boot 4.1 变更一并升级到 2.4.240（console 已拆为独立 `spring-boot-h2console` 模块，旧约束失效）。
-- MyBatis-Plus 3.5.7 → 待 Boot 4 变更切换到 `mybatis-plus-spring-boot4-starter:3.5.17`；4.x 评估。
+- **H2 1.4.200 → 2.4.240：已完成**（`upgrade-spring-boot-4-1`）。升级后必须删除存量 `.mv.db`。
+- **MyBatis-Plus 3.5.7 → 3.5.17：已完成**，切换到 `mybatis-plus-spring-boot4-starter`。注意 3.5.9+ 把 `IService`/`ServiceImpl` 迁到 `com.baomidou.mybatisplus.spring.service`、把分页插件拆到独立的 `mybatis-plus-jsqlparser` 模块。4.x 仍待评估。
 
 ---
 

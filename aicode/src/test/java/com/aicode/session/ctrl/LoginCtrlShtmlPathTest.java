@@ -29,6 +29,20 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  *
  * <p>本测试使用 @SpringBootTest + webAppContextSetup 加载完整 Spring 上下文
  * （含 LoginInterceptor 排除规则），验证 .shtml 路径能调到 LoginCtrl。</p>
+ *
+ * <p><b>与接口契约测试的关系</b>：本测试关注的是「登录端点自身」的后缀可达性；
+ * 而 {@code com.aicode.contract.ApiContractIT} 场景②以参数化方式覆盖了全部 44 个
+ * 前端端点的后缀双路径可达性，两者互补。契约由
+ * {@code openspec/specs/api-contract}（归档后）定义。</p>
+ *
+ * <p><b>⚠️ 相关已知行为</b>：{@code ContextConfiguration#addInterceptors} 的
+ * {@code excludePathPatterns} 中有一条「双星 + 斜杠 + 星」的通配规则（另有
+ * {@code "/*.html"}、{@code "/*.js"}、{@code "/*.css"} 等同族规则），它们同样匹配
+ * 带后缀的 API 路径，使 {@code LoginInterceptor} 对非登录端点的 {@code .shtml}
+ * 请求也不校验 token。该行为由 {@code ApiContractIT} 记录，并<b>经评估确认不修复</b>
+ * （收紧排除规则属独立的安全加固工作）。详见
+ * {@code openspec/specs/api-contract/spec.md} 与该测试中
+ * {@code unauthorized_returns9007AsJson} 的 Javadoc。</p>
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 @ActiveProfiles("test")

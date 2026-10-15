@@ -31,8 +31,31 @@ spring:
       testWhileIdle: true
   sql:
     init:
-      schema-locations: classpath:db/schema.sql
-      data-locations: classpath:db/data.sql
+      # 【生产 vs 测试的差异根源】
+      #
+      # 生产 application.yml：tidb 与 uid 两个数据源**指向同一个 H2 文件**
+      #   jdbc:h2:file:${database:/tmp/aicode};...
+      # 因此 Boot 把初始化器绑到哪个库都无所谓 —— 建一次表，两个库都可见。
+      #
+      # 测试 application-test.yml：两个数据源指向**两个不同的内存库**
+      #   tidb → jdbc:h2:mem:aicode_test_tidb
+      #   uid  → jdbc:h2:mem:aicode_test_uid
+      # 于是 Boot 的 SqlInitializationAutoConfiguration 只把
+      # SqlDataSourceScriptDatabaseInitializer 绑到「@Primary 的 uidDataSource」，
+      # 业务库（frameworks / project / map_* …）永远不会被初始化，
+      # 表现为 "Table FRAMEWORKS not found"。
+      #
+      # 因此测试环境分两条路径初始化：
+      #   - uid 库：保持 always，交给 Boot（脚本用 uid_schema.sql）。
+      #     BaiduUidConfig 的 uidGenerator 在 Bean 构造期就 SELECT worker_node，
+      #     该表必须先于任何业务 Bean 存在，故此处不能用 never。
+      #   - tidb 库：由 TestDatabaseInitializer 显式执行 schema.sql + data.sql
+      #     （见 src/test/java/com/aicode/support/TestDatabaseInitializer.java）。
+      #
+      # 注：uid_schema.sql 与 schema.sql 的建表内容完全一致，仅空格对齐不同。
+      #     指向 uid_schema.sql 是为了让意图自解释 —— 它服务于 uid 库。
+      schema-locations: classpath:db/uid_schema.sql
+      data-locations: ""
       mode: always
   h2:
     console:

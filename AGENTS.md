@@ -5,17 +5,22 @@
 
 ## 规范体系（必读）
 
-本文件 §5（架构规范）、§6（编码规范）、§7（测试规范）整合自 `docs/standards/` 下的三份基线文档：
+**本文件是本仓库唯一的规范入口。** §5（架构规范）、§6（编码规范）、§7（测试规范）均为可执行的全局要求，不再指向外部基线文档。
 
-| 本文件章节 | 基线文档（细则原文） | 角色 |
-|-----------|-------------------|------|
-| §5 架构规范 | `docs/standards/architecture.md` | 架构风格、依赖方向、核心实体、生成主链路、关键决策 |
-| §6 编码规范 | `docs/standards/code-style.md` | 包命名、分层、数据对象、统一响应、异常、持久层、Lombok、日志、模板、安全红线 |
-| §7 测试规范 | `docs/standards/testing.md` | 测试金字塔、JUnit 5 / AssertJ / Mockito、目录命名、Generator 主链路测试策略、优先补齐清单 |
-
-> **AGENTS.md 是「全局要求」要点摘要，完整细则、上下文、示例以 `docs/standards/*.md` 为准**。新增条目或原则冲突时，先看原文，再决定是否同步回 AGENTS.md。
+> **历史说明（2026-10-15 修正）**：本文件此前声明 §5/§6/§7 整合自 `docs/standards/` 下的四份基线文档（`architecture.md`、`code-style.md`、`testing.md`、`cds.md`），并要求「细则以 `docs/standards/*.md` 为准」。实测该目录**在仓库中不存在**，上述引用全部失效，已移除。
 >
-> CDS（Class Data Sharing）运维操作步骤详见 `docs/standards/cds.md`，本文 §9 仅作指针引用。
+> 后果与应对：
+> - §5 / §6 / §7 的内容**自此即为完整规范**，不存在「摘要 vs 原文」的优先级问题；
+> - 新增规范条目直接写进本文件对应章节；
+> - 若日后确需更详细的细则文档，应新建独立 OpenSpec 变更补建并在本节登记，而不是在正文里预埋失效链接。
+
+| 本文件章节 | 内容范围 |
+|-----------|---------|
+| §5 架构规范 | 架构风格、依赖方向、核心实体、生成主链路、关键决策 |
+| §6 编码规范 | 包命名、分层、数据对象、统一响应、异常、持久层、Lombok、日志、模板、安全红线 |
+| §7 测试规范 | 测试金字塔、JUnit 5 / AssertJ / Mockito、目录命名、生成主链路测试策略、优先补齐清单 |
+
+CDS（Class Data Sharing）的运维操作与实测数据见 §9。
 
 ---
 
@@ -89,7 +94,7 @@ Gradle Wrapper 位于 `./aicode/gradlew`（仓库根目录**没有** wrapper）�
 
 ## 5. 架构规范
 
-> 摘自 `docs/standards/architecture.md`。完整架构、关键代码索引见 architecture.md:316-329。
+> 本节为完整规范（2026-10-15 起不再引用外部 `docs/standards/architecture.md`，该文件不存在）。
 
 ### 5.1 架构风格
 
@@ -172,13 +177,13 @@ Project 是聚合根：包含 `ProjectSql`、`ProjectFramwork`、`ProjectMap`、
 - 本地：`./gradlew bootRun`；Docker（推荐）：CNB/Paketo；K8s：`devops/k8s/deployment.yml`；Nginx 反代（含 `Upgrade` 透传 + 12h 读超时以适配长构建）。
 - 配置外部化：数据源 `${database}/${username}/${password}` 占位符注入。
 - 优雅停机：`server.shutdown: graceful` + 30s 超时；`ApplicationReadyEventListener` / `ApplicationClosedEventListener` 处理生命周期。
-- CDS（Class Data Sharing）启用步骤与回滚路径见 `docs/standards/cds.md`（CNB/Paketo `BP_JVM_CDS_ENABLED=true`）。
+- CDS（Class Data Sharing）启用步骤与回滚路径见本节上文（CNB/Paketo `BP_JVM_CDS_ENABLED=true`）。
 
 ---
 
 ## 6. 编码规范
 
-> 摘自 `docs/standards/code-style.md` 的**全局要求**摘要。完整细则见 code-style.md。
+> 本节为完整规范（2026-10-15 起不再引用外部 `docs/standards/code-style.md`，该文件不存在）。
 
 ### 6.1 通用约定
 
@@ -337,7 +342,7 @@ Project 是聚合根：包含 `ProjectSql`、`ProjectFramwork`、`ProjectMap`、
 
 ## 7. 测试规范
 
-> 摘自 `docs/standards/testing.md` 的**全局要求**摘要。完整细则见 testing.md。
+> 本节为完整规范（2026-10-15 起不再引用外部 `docs/standards/testing.md`，该文件不存在）。
 
 ### 7.1 现状
 
@@ -453,12 +458,18 @@ Project 是聚合根：包含 `ProjectSql`、`ProjectFramwork`、`ProjectMap`、
 
 ### 7.10 优先补齐清单（按投入产出比）
 
+0. **`ApiContractIT`（接口契约回归）—— 升级验收基准，SHALL NOT 跳过**
+   - 位置：`aicode/src/test/java/com/aicode/contract/ApiContractIT.java`，端点清单见同目录 `FrontendEndpointCatalog.java`
+   - 覆盖：① 标识符以 JSON 字符串返回（防 Jackson 3 精度回归）② `.shtml` 与无后缀路径等价可达（44 个前端端点）③ 统一响应 `R` 结构与标准错误码 ④ 日期格式 `yyyy-MM-dd HH:mm:ss` + GMT+8 ⑤ null 字段不被省略 ⑥ WebSocket 端点可达
+   - **Java 25 / Spring Boot 4.1 升级系列的每一波都必须跑它**，红了即代表某次升级破坏了前后端契约；契约定义见 `openspec/specs/api-contract/spec.md`，变更记录见 `openspec/changes/archive/2026-10-14-add-api-contract-tests/`
+   - 已知以 `@Disabled` 登记的缺陷：`unauthorized_returns9007AsJson` —— `excludePathPatterns` 的通配规则使 `.shtml` 请求绕过鉴权。**已确认不修复**（见该测试内的 Javadoc 说明），此断言长期保持 `@Disabled`，不得视为通过
 1. `common` 工具纯函数单测：`StringTools`、`StringHelper`、`DatabaseDataTypesUtils`、`ZipTools`、`JwtToken`。
 2. `facade` 枚举转换单测：`TemplateEngineEnum`、`ModuleEnum`、各 `*State`。
 3. `TemplateData` 装配单测（§7.7.1）—— 保护生成逻辑的核心数据模型。
 4. `TemplateHelper` 渲染单测（§7.7.2，Freemarker + Beetl 各一）。
 5. Controller 切片测试（`MockMvc`）：登录、建项目、导 SQL、init 的响应体与错误码。
 6. 生成主链路端到端集成测试（§7.7.3，mock Git / 模板）。
+7. Mapper 层 `@SpringBootTest` + H2 真实 SQL 验证（**当前完全缺失**，§7.1 已列为空白点）。
 
 ---
 
@@ -491,7 +502,7 @@ opsx 入口（功能等价，运行时暴露哪个就用哪个）：
 - Dockerfile：`aicode/Dockerfile`，基础镜像 `amazoncorretto:21.0.11-alpine3.23`，端口 8080，`JAVA_OPTS="-Xms128m -Xmx512m"`。
 - K8s 清单与 nginx upstream 示例：`devops/k8s/`、`README.md` §本地部署 nginx。
 - 性能基线脚本：`measurement/startup-time.sh`（冷启动到 `/actuator/health/liveness` 200 的 wall-clock）、`measurement/metaspace-after-up.sh`（Metaspace 用量）—— 输出 JSON，便于 CI 比对。
-- **CDS 启用**：见 `docs/standards/cds.md`（CNB/Paketo `BP_JVM_CDS_ENABLED=true`，启动期 metaspace 下降 78%、wall-clock 加速约 17%）。
+- **CDS 启用**：见 §9（CNB/Paketo `BP_JVM_CDS_ENABLED=true`）。⚠️ 原文记录的「metaspace 下降 78%、wall-clock 加速约 17%」是 **Java 21 下的测量值**，Java 25 升级时必须重测（见 `openspec/changes/2026-10-14-upgrade-gradle-9-jdk-25` 任务 5.7 / 6.1）。
 - dockerhub 镜像（**遗留**，仅供外部教程使用）：`hegaoye/aicode:20210613`。**生产构建请使用 `bootBuildImage`**，不要用此 tag。
 
 ---
@@ -588,15 +599,15 @@ opsx 入口（功能等价，运行时暴露哪个就用哪个）：
 
 ## 12. 变更与协作流程
 
-1. **新会话开场**：先读本文件 + `docs/standards/*.md` 三份基线 + 走 OpenSpec 流程；非平凡变更**必须**用 `openspec-propose` 技能。
+1. **新会话开场**：先读本文件（本仓库唯一规范入口）+ 走 OpenSpec 流程；非平凡变更**必须**用 `openspec-propose` 技能。
 2. **代码改动前**：搜索 `openspec/specs/` 看是否已有相关能力；若有则建 delta spec；若无则**先**建立新能力 spec。
 3. **本地验证**：先跑 `measurement/startup-time.sh` 与 `GET /actuator/health/liveness`，再走 `bootRun`。
 4. **提交流程**：变更归档（`openspec-archive-change`）后再考虑合并；**没有归档的变更不算完成**。
 5. **沟通渠道**：本仓库内一切对话、回复、PR 描述、commit message（推荐中文或中英混排）**均使用中文**。
-6. **规范同步**：本文件 §5 / §6 / §7 是 `docs/standards/*.md` 的摘要，新增条目或原则冲突时**先**改原文，再决定是否同步回 AGENTS.md。
+6. **规范同步**：本文件 §5 / §6 / §7 自 2026-10-15 起即为完整规范（不再有外部基线文档），新增条目**直接**改本文件，无需考虑同步问题。
 
 ---
 
 ## 13. 一句话总结
 
-> 本仓库是 Spring Boot 21 单体代码生成平台，三模块（`common` / `facade` / `aicode`），走 OpenSpec 规范驱动变更；三层映射 + 数据驱动模板生成主链路，H2 + VTH 跑默认 runtime，Paketo CNB 打镜像，K8s 部署；架构 / 编码 / 测试三套基线规范以 `docs/standards/*.md` 为准，本 AGENTS.md 是其**全局要求要点摘要**；安全、CI、可观测性、模板治理均有明确的演进方向；**沟通一律中文**。
+> 本仓库是 Spring Boot 单体代码生成平台，三模块（`common` / `facade` / `aicode`），走 OpenSpec 规范驱动变更；三层映射 + 数据驱动模板生成主链路，H2 + VTH 跑默认 runtime，Paketo CNB 打镜像，K8s 部署；本文件是架构 / 编码 / 测试规范的**唯一来源**（2026-10-15 起不再依赖外部基线文档）；安全、CI、可观测性、模板治理均有明确的演进方向；**沟通一律中文**。

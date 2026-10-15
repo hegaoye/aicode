@@ -1,10 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+  ⚠️ 本文件所有列名与 H2 版本绑定，升级 H2 时必须复核。
+
+  背景：H2 的 INFORMATION_SCHEMA.COLUMNS 列名随版本变化：
+    - H2 1.4.200             → TYPE_NAME
+    - H2 2.x（本项目当前 2.4.240）→ DATA_TYPE   ← TYPE_NAME 已被移除
+
+  历史事故：Spring Boot 4.1 升级把 H2 从 1.4.200 升到 2.4.240，本文件仍查
+  TYPE_NAME，导致列探测必然抛
+    BadSqlGrammarException: Column "TYPE_NAME" not found
+  即「导入 SQL → 解析数据库」全链路失效。
+
+  ┌─ 第二层陷阱（比改名更容易被忽略）──────────────────────────────┐
+  │ 即使把列名改对，也 SHALII 直接以 DATA_TYPE 作为返回列名。        │
+  │ MyBatis 的 resultType 自动映射是按「列标签 → 属性名」匹配的，    │
+  │ Column 实体的属性叫 typeName（由 @TableField 指定），           │
+  │ 而 DATA_TYPE 与 typeName 并非驼峰对应关系 —— 不加别名时          │
+  │ typeName 会静默为 null，进而在 DatabaseDataTypesUtils.isDate()  │
+  │ 触发 NPE（"Cannot invoke String.endsWith because javaType is   │
+  │ null"），把一个 SQL 层的错误伪装成空指针。                       │
+  │ 因此这里用 AS 显式指定别名，而非依赖自动映射。                  │
+  └────────────────────────────────────────────────────────────────┘
+
+  同批次的另一处变更在 mapper/database/table.xml（TABLE_TYPE），两处 SHALL 一并复核。
+
+  回归测试：aicode/src/test/java/com/aicode/database/dao/mapper/TableMapperIT.java
+  若将来切换到 MySQL / PostgreSQL（见 AGENTS.md §11.2），需重新评估列名差异。
+-->
 <mapper namespace="com.aicode.database.dao.mapper.ColumMapper">
 
 
     <select id="list" resultType="com.aicode.database.entity.Column">
-        select COLUMN_NAME, COLUMN_DEFAULT, IS_NULLABLE, TYPE_NAME, REMARKS
+        select COLUMN_NAME           as columnName,
+               COLUMN_DEFAULT        as columnDefault,
+               IS_NULLABLE           as isNullable,
+               DATA_TYPE             as typeName,
+               REMARKS               as remarks
         from INFORMATION_SCHEMA.COLUMNS
         where TABLE_SCHEMA = #{database}
           and TABLE_NAME = #{tableName}

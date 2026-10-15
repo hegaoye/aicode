@@ -1,5 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+  ⚠️ TABLE_TYPE 字面量与 H2 版本绑定，升级 H2 时必须复核本文件。
+
+  背景：H2 的 INFORMATION_SCHEMA.TABLES.TABLE_TYPE 取值随版本变化：
+    - H2 1.4.200        → 'TABLE'
+    - H2 2.x（本项目当前 2.4.240）→ 'BASE TABLE'   ← SQL 标准值
+
+  历史事故：Spring Boot 4.1 升级把 H2 从 1.4.200 升到 2.4.240，本文件仍写着
+  'TABLE'，导致三处查询恒定匹配 0 行。故障表现极具迷惑性 —— 建表照常成功，
+  但 /project/init 的元数据探测返回空，抛 9006「查询结果不存在」，
+  且日志中没有任何错误线索。
+
+  详见 openspec/changes/archive/2026-10-15-fix-h2-tables-metadata-query/
+  回归测试：aicode/src/test/java/com/aicode/database/mapper/TableMapperIT.java
+
+  若将来切换到 MySQL / PostgreSQL（见 AGENTS.md §11.2），需重新评估：
+  三者对 TABLE_TYPE 的取值形式不同，届时应改用跨库方案
+  （例如去掉 TABLE_TYPE 条件后另加条件排除视图）。
+-->
 <mapper namespace="com.aicode.database.dao.mapper.TableMapper">
 
     <!--查询指定数据库下指定表的信息-->
@@ -8,7 +27,7 @@
         FROM INFORMATION_SCHEMA.TABLES
         where TABLE_SCHEMA = #{database}
           AND TABLE_NAME = #{tableName}
-          and TABLE_TYPE = 'TABLE'
+          and TABLE_TYPE = 'BASE TABLE'
     </select>
 
     <!--统计数据库下有多少个表-->
@@ -16,7 +35,7 @@
         select count(1)
         from INFORMATION_SCHEMA.TABLES
         where TABLE_SCHEMA = #{database}
-          and TABLE_TYPE = 'TABLE'
+          and TABLE_TYPE = 'BASE TABLE'
     </select>
 
     <!--查询数据库下所有表信息-->
@@ -24,7 +43,7 @@
         select TABLE_NAME, REMARKS
         from INFORMATION_SCHEMA.TABLES
         where TABLE_SCHEMA = #{database}
-          and TABLE_TYPE = 'TABLE'
+          and TABLE_TYPE = 'BASE TABLE'
     </select>
 
 

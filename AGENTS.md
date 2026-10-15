@@ -518,6 +518,7 @@ opsx 入口（功能等价，运行时暴露哪个就用哪个）：
 - Dockerfile：`aicode/Dockerfile`，基础镜像 `amazoncorretto:25`，端口 8080，`JAVA_OPTS="-Xms128m -Xmx512m"`。云构建包对应 `BP_JVM_VERSION=25`。
 - K8s 清单与 nginx upstream 示例：`devops/k8s/`、`README.md` §本地部署 nginx。
 - 性能基线脚本：`measurement/startup-time.sh`（冷启动到 `/actuator/health/liveness` 200 的 wall-clock）、`measurement/metaspace-after-up.sh`（Metaspace 用量）—— 输出 JSON，便于 CI 比对。
+> **本地库的脏数据说明**：H2 库 `/tmp/aicode` 中若存在 `java25_demo` / `java25_demo_2` / `fixdemo` / `it_metadisc_*` 等 schema，它们是历史测试与缺陷复现（`fix-h2-tables-metadata-query`）的产物，**SHALL NOT 被当作正常业务数据**。`project` / `project_sql` 表因 `spring.sql.init.mode=always` 每次启动重跑 `schema.sql` 而被清空，但这些 schema 与其中的表会保留 —— 出现「项目列表为空、schema 却还在」属预期现象。
 - **CDS 启用**：CNB/Paketo `BP_JVM_CDS_ENABLED=true`，见 `aicode/build.gradle` 的 `bootBuildImage` 环境变量块。实测数据见本节末尾的性能基线表。
 - **性能基线（2026-10-15 在 Java 21 → Java 25 上实测，Corretto，samples=3 取中位数）**：
 
@@ -554,6 +555,7 @@ opsx 入口（功能等价，运行时暴露哪个就用哪个）：
 - **主键策略不可省略**：`MybatisPlusConfigTidb` 中必须显式设置 `IdType.AUTO`。MyBatis-Plus 的 `GlobalConfig.DbConfig` 默认是 `ASSIGN_ID`（雪花），而本项目所有实体都没有 `@TableId` 注解 —— 一旦漏配，insert 时会由框架补一个雪花值、`AUTO_INCREMENT` 永不触发，**编译与测试全绿但策略已悄悄回退**。
 - **Hutool 雪花默认从 MAC 地址 + PID 派生 workerId**，当前单实例部署无碰撞风险。**扩到多副本（如 K8s replicas > 1、Pod 重建后 MAC 变化）前**，必须改为显式 `IdUtil.getSnowflake(workerId, datacenterId)`，否则会撞号。
 - **`spring.sql.init` 在测试环境不生效**：本项目自定义了名为 `tidbDataSource` 的 DataSource Bean，而 Boot 的自动初始化依赖 `DataSourceProperties` 的 `name`（`h2-test-tidb`），二者不一致。test profile 因此设 `mode: never`，改由 `TestDatabaseInitializer` 显式执行 `schema.sql` + `data.sql`。新增测试表或改初始化脚本时**改这个类**，改 `application-test.yml` 的 `sql.init` 不起作用。
+- **H2 元数据的列名与取值随版本变化**：升级 H2 时必须复核 `mapper/database/table.xml` 与 `mapper/database/colum.xml`。已知两处破坏性变更：① `INFORMATION_SCHEMA.TABLES.TABLE_TYPE` 由 `'TABLE'` 变为 SQL 标准值 `'BASE TABLE'`（H2 2.x）；② `INFORMATION_SCHEMA.COLUMNS.TYPE_NAME` 被移除，改用 `DATA_TYPE`。第二处还有一层陷阱 —— `Column` 实体的属性名是 `typeName`，与 `DATA_TYPE` 并非驼峰对应，SHALL 用 `AS` 显式指定别名，否则 `typeName` 静默为 `null` 并在 `DatabaseDataTypesUtils.isDate()` 抛 NPE，把 SQL 层错误伪装成空指针。回归测试见 `TableMapperIT`。
 - **`toolchain` 只管编译，不管运行**：三个模块用 `toolchain(25)` 编译出 major 69 字节码，但 `./gradlew test` 与 `bootRun` 用的仍是 `JAVA_HOME` 指向的 JDK。要在 Java 25 运行时下验证，先 `export JAVA_HOME=$(/usr/libexec/java_home -v 25)`。
 - **插件版本要在 `settings.gradle` 声明**：`common` / `facade` 用 `apply plugin: 'io.spring.dependency-management'` 引插件时，版本必须写在根 `settings.gradle` 的 `plugins {}` 块（`apply false`）里 —— `pluginManagement.plugins` 只对 `plugins {}` DSL 生效，不支持 `apply plugin:` 写法。
 - `common` / `facade` 通过 `dependencyManagement { imports { mavenBom 'org.springframework.boot:spring-boot-dependencies:4.1.1' } }` 引入 BOM，因此这两个模块能使用无版本声明的依赖（如 lombok、junit-jupiter）。BOM 版本需与 `aicode` 模块的 Boot 版本保持一致。

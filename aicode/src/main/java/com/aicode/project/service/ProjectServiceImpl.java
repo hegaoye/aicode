@@ -13,6 +13,7 @@ import com.aicode.database.dao.DatabaseDAO;
 import com.aicode.database.dao.TableDAO;
 import com.aicode.database.entity.Column;
 import com.aicode.database.entity.Table;
+import com.aicode.exceptions.DatabaseException;
 import com.aicode.exceptions.ProjectException;
 import com.aicode.map.dao.mapper.MapClassTableMapper;
 import com.aicode.map.dao.mapper.MapFieldColumnMapper;
@@ -273,11 +274,21 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
             throw new ProjectException(BaseException.BaseExceptionEnum.Empty_Param);
         }
 
-        //2.建库：库已存在则跳过
+        //2.建库
+        // 已存在时 SHALL 校验其中是否真的有表，而不是盲目跳过 ——
+        // 空 schema（上次建表失败遗留、或被手工删空）若直接放行，
+        // 会在 parse() 阶段报出与「建表失败」完全相同的 9006，无法区分成因。
         long i = databaseDAO.count(database);
         if (i > 0) {
-            log.info("数据库已存在，跳过建库：{}", database);
-            return;
+            List<Table> existing = tableDAO.list(database);
+            if (!existing.isEmpty()) {
+                log.info("数据库已存在且包含 {} 张表，跳过建库：{}", existing.size(), database);
+                return;
+            }
+            log.error("数据库已存在但不含任何表：{}", database);
+            // message 必须是合法 JSON —— ExceptionHandle 直接对它做 parseObject
+            throw DatabaseException.of(BaseException.BaseExceptionEnum.Result_Not_Exist.code,
+                    "数据库[" + database + "]已存在但为空表，请清理该 schema 或更换项目英文名", null);
         }
 
         Setting setting = settingMapper.selectOne(new LambdaQueryWrapper<Setting>()

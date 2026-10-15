@@ -31,6 +31,15 @@ public class ApplicationClosedEventListener {
         public void onApplicationEvent(ContextClosedEvent event) {
             log.warn("\n\n！！！---服务开始关闭---！！！\n\n");
 
+            // connector 仅在 TomcatConnectorCustomizer#customize 中赋值。
+            // 在 @SpringBootTest(MOCK) 等无嵌入式容器的场景下该回调不触发，
+            // 此处若不判空会抛 NPE 并污染 context close 阶段的日志。
+            // 判空后直接返回：此时本就没有连接器可关闭，不属于异常路径。
+            if (this.connector == null) {
+                log.debug("无嵌入式 Tomcat 连接器，跳过优雅停机处理（可能处于 MOCK 测试环境）");
+                return;
+            }
+
             this.connector.pause();
             Executor executor = this.connector.getProtocolHandler().getExecutor();
             if (executor instanceof ThreadPoolExecutor) {

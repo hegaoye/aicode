@@ -15,7 +15,7 @@ import com.aicode.setting.service.SettingService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.lang.reflect.Method;
@@ -41,20 +41,20 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @ActiveProfiles("test")
 class ProjectControllerDownloadTest {
 
-    @MockBean private ProjectService projectService;
-    @MockBean private SettingService settingService;
-    @MockBean private ProjectFramworkService projectFramworkService;
-    @MockBean private ProjectMapService projectMapService;
-    @MockBean private ProjectModuleService projectModuleService;
-    @MockBean private ProjectJobService projectJobService;
-    @MockBean private FrameworksService frameworksService;
-    @MockBean private ProjectSqlService projectSqlService;
-    @MockBean private ProjectRepositoryAccountService projectRepositoryAccountService;
-    @MockBean private DisplayAttributeService displayAttributeService;
-    @MockBean private MapRelationshipService mapRelationshipService;
-    @MockBean private AccountService accountService;
-    @MockBean private com.aicode.config.websocket.WebSocketConfig webSocketConfig;
-    @MockBean private org.springframework.web.socket.server.standard.ServerEndpointExporter serverEndpointExporter;
+    @MockitoBean private ProjectService projectService;
+    @MockitoBean private SettingService settingService;
+    @MockitoBean private ProjectFramworkService projectFramworkService;
+    @MockitoBean private ProjectMapService projectMapService;
+    @MockitoBean private ProjectModuleService projectModuleService;
+    @MockitoBean private ProjectJobService projectJobService;
+    @MockitoBean private FrameworksService frameworksService;
+    @MockitoBean private ProjectSqlService projectSqlService;
+    @MockitoBean private ProjectRepositoryAccountService projectRepositoryAccountService;
+    @MockitoBean private DisplayAttributeService displayAttributeService;
+    @MockitoBean private MapRelationshipService mapRelationshipService;
+    @MockitoBean private AccountService accountService;
+    @MockitoBean private com.aicode.config.websocket.WebSocketConfig webSocketConfig;
+    @MockitoBean private org.springframework.web.socket.server.standard.ServerEndpointExporter serverEndpointExporter;
 
     private Method findMethod(String name, Class<?>... paramTypes) {
         try {

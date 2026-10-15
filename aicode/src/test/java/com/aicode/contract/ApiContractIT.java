@@ -14,7 +14,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -72,13 +72,11 @@ class ApiContractIT {
      * 它依赖真实容器，而契约断言关注的是 REST 路由与序列化，两者在 MOCK 下本就不可兼得。
      * 场景⑥ 改用「路径未被静态资源处理器吞掉」来间接验证 WebSocket 端点的存在。</p>
      *
-     * <p><b>注意</b>：此处 SHALL 使用 {@code @MockBean} 而非 {@code @MockitoBean} ——
-     * 后者由 Spring Framework 6.2 引入，本变更执行时项目仍在 6.1.16。
-     * 本文件 SHALL 在 {@code openspec/changes/2026-10-14-upgrade-spring-boot-3-5}
-     * 执行任务 3.1–3.6 时与其他 5 个测试类一并迁移为 {@code @MockitoBean}
-     * （Boot 4.0 已移除 {@code @MockBean}，迁移是强制项）。</p>
+     * <p>本文件已随 {@code openspec/changes/2026-10-14-upgrade-spring-boot-3-5}
+     * 迁移到 {@code @MockitoBean}（Spring Framework 6.2 引入；Boot 4.0 起
+     * {@code @MockBean} 已被移除，迁移是强制项）。</p>
      */
-    @MockBean
+    @MockitoBean
     private org.springframework.web.socket.server.standard.ServerEndpointExporter serverEndpointExporter;
 
     /**

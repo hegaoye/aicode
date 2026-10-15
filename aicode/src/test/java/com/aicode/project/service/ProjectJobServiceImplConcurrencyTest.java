@@ -10,7 +10,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -34,9 +34,9 @@ class ProjectJobServiceImplConcurrencyTest {
     @Autowired
     private ProjectJobServiceImpl projectJobService;
 
-    @MockBean private ProjectJobMapper projectJobMapper;
-    @MockBean private ProjectJobExecutor projectJobExecutor;
-    @MockBean private org.springframework.web.socket.server.standard.ServerEndpointExporter serverEndpointExporter;
+    @MockitoBean private ProjectJobMapper projectJobMapper;
+    @MockitoBean private ProjectJobExecutor projectJobExecutor;
+    @MockitoBean private org.springframework.web.socket.server.standard.ServerEndpointExporter serverEndpointExporter;
 
     @BeforeEach
     void setup() {

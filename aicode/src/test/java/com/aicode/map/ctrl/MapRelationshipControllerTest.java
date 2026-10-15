@@ -12,7 +12,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.ActiveProfiles;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -36,12 +36,12 @@ class MapRelationshipControllerTest {
     @Autowired
     private MapRelationshipController controller;
 
-    @MockBean private MapRelationshipService mapRelationshipService;
-    @MockBean private ProjectMapService projectMapService;
-    @MockBean private MapClassTableService mapClassTableService;
-    @MockBean private MapFieldColumnService mapFieldColumnService;
-    @MockBean private com.baidu.fsg.uid.UidGenerator uidGenerator;
-    @MockBean private org.springframework.web.socket.server.standard.ServerEndpointExporter serverEndpointExporter;
+    @MockitoBean private MapRelationshipService mapRelationshipService;
+    @MockitoBean private ProjectMapService projectMapService;
+    @MockitoBean private MapClassTableService mapClassTableService;
+    @MockitoBean private MapFieldColumnService mapFieldColumnService;
+    @MockitoBean private com.baidu.fsg.uid.UidGenerator uidGenerator;
+    @MockitoBean private org.springframework.web.socket.server.standard.ServerEndpointExporter serverEndpointExporter;
 
     @BeforeEach
     void setup() {

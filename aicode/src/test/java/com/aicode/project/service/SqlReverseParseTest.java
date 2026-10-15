@@ -29,7 +29,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -64,23 +64,23 @@ class SqlReverseParseTest {
     @Autowired
     private ProjectServiceImpl projectService;
 
-    @MockBean private ProjectSqlMapper projectSqlMapper;
-    @MockBean private DatabaseDAO databaseDAO;
-    @MockBean private TableDAO tableDAO;
-    @MockBean private ColumnDAO columnDAO;
-    @MockBean private com.aicode.project.dao.mapper.ProjectMapper projectMapper;
-    @MockBean private SettingMapper settingMapper;
-    @MockBean private ProjectModuleMapper projectModuleMapper;
-    @MockBean private ProjectJobLogsMapper projectJobLogsMapper;
-    @MockBean private MapClassTableMapper mapClassTableMapper;
-    @MockBean private MapFieldColumnMapper mapFieldColumnMapper;
-    @MockBean private MapRelationshipMapper mapRelationshipMapper;
-    @MockBean private ProjectMapMapper projectMapMapper;
-    @MockBean private ProjectRepositoryAccountMapper projectRepositoryAccountMapper;
-    @MockBean private ProjectFramworkMapper projectFramworkMapper;
-    @MockBean private ProjectJobMapper projectJobMapper;
+    @MockitoBean private ProjectSqlMapper projectSqlMapper;
+    @MockitoBean private DatabaseDAO databaseDAO;
+    @MockitoBean private TableDAO tableDAO;
+    @MockitoBean private ColumnDAO columnDAO;
+    @MockitoBean private com.aicode.project.dao.mapper.ProjectMapper projectMapper;
+    @MockitoBean private SettingMapper settingMapper;
+    @MockitoBean private ProjectModuleMapper projectModuleMapper;
+    @MockitoBean private ProjectJobLogsMapper projectJobLogsMapper;
+    @MockitoBean private MapClassTableMapper mapClassTableMapper;
+    @MockitoBean private MapFieldColumnMapper mapFieldColumnMapper;
+    @MockitoBean private MapRelationshipMapper mapRelationshipMapper;
+    @MockitoBean private ProjectMapMapper projectMapMapper;
+    @MockitoBean private ProjectRepositoryAccountMapper projectRepositoryAccountMapper;
+    @MockitoBean private ProjectFramworkMapper projectFramworkMapper;
+    @MockitoBean private ProjectJobMapper projectJobMapper;
     // WebSocket 在非 web 容器环境不可用；Mock 掉避免 ApplicationContext 启动失败
-    @MockBean private org.springframework.web.socket.server.standard.ServerEndpointExporter serverEndpointExporter;
+    @MockitoBean private org.springframework.web.socket.server.standard.ServerEndpointExporter serverEndpointExporter;
 
     @BeforeEach
     void wireUidGenerator() {

@@ -8,9 +8,9 @@ java {
 [compileJava, compileTestJava, javadoc]*.options*.encoding = 'UTF-8'
 
 repositories {
-    maven { url 'https://plugins.gradle.org/m2/' }
-    maven { url 'https://repo.spring.io/milestone' }
-    maven { url 'https://maven.jahia.org/maven2' }
+    maven { url = uri("https://plugins.gradle.org/m2/") }
+    maven { url = uri("https://repo.spring.io/milestone") }
+    maven { url = uri("https://maven.jahia.org/maven2") }
     mavenCentral()
 }
 
@@ -22,7 +22,6 @@ dependencies {
 
     //----------- commons  start--------------
     implementation 'org.apache.commons:commons-lang3:3.18.0'
-    implementation 'commons-lang:commons-lang:20030203.000129'
     //-----------commons   end--------------
 
     implementation 'cn.hutool:hutool-all:5.8.40'

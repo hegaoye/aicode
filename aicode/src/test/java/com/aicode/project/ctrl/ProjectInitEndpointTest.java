@@ -6,7 +6,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
@@ -35,18 +35,18 @@ class ProjectInitEndpointTest {
     @Autowired
     private ProjectController projectController;
 
-    @MockBean private ProjectService projectService;
-    @MockBean private com.aicode.setting.service.SettingService settingService;
-    @MockBean private com.aicode.project.service.ProjectFramworkService projectFramworkService;
-    @MockBean private com.aicode.project.service.ProjectMapService projectMapService;
-    @MockBean private com.aicode.project.service.ProjectModuleService projectModuleService;
-    @MockBean private com.aicode.project.service.ProjectJobService projectJobService;
-    @MockBean private com.aicode.frameworks.service.FrameworksService frameworksService;
-    @MockBean private com.aicode.project.service.ProjectSqlService projectSqlService;
-    @MockBean private com.aicode.project.service.ProjectRepositoryAccountService projectRepositoryAccountService;
-    @MockBean private com.aicode.display.service.DisplayAttributeService displayAttributeService;
-    @MockBean private com.aicode.map.service.MapRelationshipService mapRelationshipService;
-    @MockBean private org.springframework.web.socket.server.standard.ServerEndpointExporter serverEndpointExporter;
+    @MockitoBean private ProjectService projectService;
+    @MockitoBean private com.aicode.setting.service.SettingService settingService;
+    @MockitoBean private com.aicode.project.service.ProjectFramworkService projectFramworkService;
+    @MockitoBean private com.aicode.project.service.ProjectMapService projectMapService;
+    @MockitoBean private com.aicode.project.service.ProjectModuleService projectModuleService;
+    @MockitoBean private com.aicode.project.service.ProjectJobService projectJobService;
+    @MockitoBean private com.aicode.frameworks.service.FrameworksService frameworksService;
+    @MockitoBean private com.aicode.project.service.ProjectSqlService projectSqlService;
+    @MockitoBean private com.aicode.project.service.ProjectRepositoryAccountService projectRepositoryAccountService;
+    @MockitoBean private com.aicode.display.service.DisplayAttributeService displayAttributeService;
+    @MockitoBean private com.aicode.map.service.MapRelationshipService mapRelationshipService;
+    @MockitoBean private org.springframework.web.socket.server.standard.ServerEndpointExporter serverEndpointExporter;
 
     private MockMvc mockMvc;
 

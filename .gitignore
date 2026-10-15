@@ -25,3 +25,7 @@ logs/
 
 # OS metadata
 Thumbs.db
+
+# AI 工具的本地配置与生成物（不入库，各机器形态不同）
+.agents/
+.claude/

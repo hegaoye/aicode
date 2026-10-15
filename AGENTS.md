@@ -66,13 +66,23 @@ Gradle Wrapper 位于 `./aicode/gradlew`（仓库根目录**没有** wrapper）�
 
 ## 3. 构建 / 开发命令
 
-要求 **Java 21**（Dockerfile 锁定 amazoncorretto:21.0.11-alpine3.23）。
+要求 **Java 25**（Dockerfile 基础镜像 `amazoncorretto:25`）。
+
+三个模块通过 `java { toolchain { languageVersion = JavaLanguageVersion.of(25) } }` 声明语言级别，
+**因此本地需安装 JDK 25**（Gradle toolchain 会自动探测本机已安装的 JDK）。
+注意：`toolchain` 只影响「用哪个 JDK 编译」，**运行测试与启动应用用的仍是 `JAVA_HOME` 指向的 JDK**。
+若需在 Java 25 运行时下验证，先设 `JAVA_HOME`：
+
+```
+export JAVA_HOME=$(/usr/libexec/java_home -v 25)
+```
 
 ```
 ./aicode/gradlew :aicode:bootRun        # 启动应用，:8080（业务）/ :8088（actuator）
 ./aicode/gradlew test                    # 运行所有模块的 JUnit 5 测试
 ./aicode/gradlew :aicode:bootBuildImage  # Paketo CNB 构建镜像（默认 publish=false）
 ./aicode/gradlew build                   # 完整构建
+./aicode/gradlew -q javaToolchains       # 查看 Gradle 探测到的可用 JDK
 ```
 
 镜像默认仅产出到本地。推送到 Harbor：设置 `HARBOR_USER` / `HARBOR_PASS` / `HARBOR_URL` 环境变量，并启用 `aicode/build.gradle` 中 `bootBuildImage { ... }` 内被注释的 `publish = true` 块。
@@ -170,7 +180,8 @@ Project 是聚合根：包含 `ProjectSql`、`ProjectFramwork`、`ProjectMap`、
 | 主键与业务编码分离 | 主键 `id` 由**数据库自增**赋值（`MybatisPlusConfigTidb` 中显式设 `IdType.AUTO`，不可省略）；业务编码 `code` 由 **Hutool 雪花** `IdUtil.getSnowflakeNextIdStr()` 生成，**与主键相互独立** | `openspec/specs/identifier-generation/spec.md`（归档后） |
 | 可插拔模板引擎（策略模式） | `TemplateHelper` 接口 + `FreemarkerHelper` / `BeetlHelper` 两实现；运行期由模板内 `aicode.json` 的 `engine` 字段动态选择 | architecture.md:246、code-style.md:211-219 |
 | 外部 Git 模板仓库 | 技术栈即「模板仓库」，与代码解耦。新增/升级框架（如 SpringBoot 2.x→3.x、新增 RocketMQ）只改模板、不改生成器（`gitee.com/helixin/aicode_template`） | architecture.md:247 |
-| 虚拟线程异步 | `TaskExecutorConfig` 用 `Thread.startVirtualThread` 承载 `@Async` 构建任务，构建是 IO 密集（git clone / 文件读写） | architecture.md:248 |
+| 虚拟线程异步 | `TaskExecutorConfig` 用 `SimpleAsyncTaskExecutor.setVirtualThreads(true)` 承载 `@Async` 构建任务，构建是 IO 密集（git clone / 文件读写） | 本文件 §6.9 |
+| 统一工具链语言级别 | 三个模块共用 `java { toolchain { languageVersion = JavaLanguageVersion.of(25) } }`，而非各自声明 `sourceCompatibility` —— 语言级别**不可能**在三模块间漂移 | 本文件 §3 |
 | 「模块」两重含义（勿混） | 工程模块：common/facade/aicode（见 §2）；业务模块：`Module` / `ProjectModule` / `ModuleEnum`，用于**项目管理与目录分离**，不参与 Java 包定义；`GeneratorSVImpl` 第 5 步「获取模块信息」标 `TODO` | architecture.md:265-267 |
 
 ### 5.7 部署架构
@@ -501,10 +512,29 @@ opsx 入口（功能等价，运行时暴露哪个就用哪个）：
 
 ## 9. 容器 / 部署
 
-- Dockerfile：`aicode/Dockerfile`，基础镜像 `amazoncorretto:21.0.11-alpine3.23`，端口 8080，`JAVA_OPTS="-Xms128m -Xmx512m"`。
+- Dockerfile：`aicode/Dockerfile`，基础镜像 `amazoncorretto:25`，端口 8080，`JAVA_OPTS="-Xms128m -Xmx512m"`。云构建包对应 `BP_JVM_VERSION=25`。
 - K8s 清单与 nginx upstream 示例：`devops/k8s/`、`README.md` §本地部署 nginx。
 - 性能基线脚本：`measurement/startup-time.sh`（冷启动到 `/actuator/health/liveness` 200 的 wall-clock）、`measurement/metaspace-after-up.sh`（Metaspace 用量）—— 输出 JSON，便于 CI 比对。
-- **CDS 启用**：见 §9（CNB/Paketo `BP_JVM_CDS_ENABLED=true`）。⚠️ 原文记录的「metaspace 下降 78%、wall-clock 加速约 17%」是 **Java 21 下的测量值**，Java 25 升级时必须重测（见 `openspec/changes/2026-10-14-upgrade-gradle-9-jdk-25` 任务 5.7 / 6.1）。
+- **CDS 启用**：CNB/Paketo `BP_JVM_CDS_ENABLED=true`，见 `aicode/build.gradle` 的 `bootBuildImage` 环境变量块。
+- **性能基线（2026-10-15 在 Java 21 → Java 25 上实测，Corretto，samples=3 取中位数）**：
+
+  | 指标 | Java 21.0.12.1 | Java 25.0.4.1 | 变化 |
+  |------|--------------|--------------|------|
+  | 冷启动到 liveness 200 | 7,209 ms | 7,244 ms | +0.49%（持平） |
+  | 非堆（metaspace 区域）used | 91,863,560 B | 84,627,464 B | **−7.88%** |
+  | 非堆 committed | 95,420,416 B | 88,670,208 B | −7.07% |
+  | 容器内 Spring 启动耗时 | — | 1.821 s | 满足 3s 探针要求 |
+
+  > **口径说明**：
+  > - 冷启动耗时**包含 Gradle 启动与依赖装配**，反映开发者实际等待时间，非 JVM 微观性能。
+  > - 非堆指标来自 `jvm.memory.used?tag=area:nonheap`。Micrometer ≥1.13 废弃了
+  >   `jvm.memory.metaspace.*` 系列改为按 `area` 聚合，该值含 code cache 等，**与旧的 metaspace.used 不完全等价**。
+  > - **堆用量（`heapUsedBytes`）不可跨版本比较**：实测样本在 72MB–114MB 间剧烈波动（由 GC 时机决定），
+  >   本表因此不列出该项。
+  > - 基线原始数据见 `measurement/baseline/java2{1,5}-{startup,metaspace}.json`，采集方法见 `measurement/README.md`。
+
+  > ⚠️ 此前 AGENTS.md 记载的「metaspace 下降 78%、wall-clock 加速约 17%」是 Java 21 时代相对早期 JDK 的对比值，
+  > **已作废**，SHALL NOT 再被引用。
 - dockerhub 镜像（**遗留**，仅供外部教程使用）：`hegaoye/aicode:20210613`。**生产构建请使用 `bootBuildImage`**，不要用此 tag。
 
 ---
@@ -519,7 +549,9 @@ opsx 入口（功能等价，运行时暴露哪个就用哪个）：
 - **主键策略不可省略**：`MybatisPlusConfigTidb` 中必须显式设置 `IdType.AUTO`。MyBatis-Plus 的 `GlobalConfig.DbConfig` 默认是 `ASSIGN_ID`（雪花），而本项目所有实体都没有 `@TableId` 注解 —— 一旦漏配，insert 时会由框架补一个雪花值、`AUTO_INCREMENT` 永不触发，**编译与测试全绿但策略已悄悄回退**。
 - **Hutool 雪花默认从 MAC 地址 + PID 派生 workerId**，当前单实例部署无碰撞风险。**扩到多副本（如 K8s replicas > 1、Pod 重建后 MAC 变化）前**，必须改为显式 `IdUtil.getSnowflake(workerId, datacenterId)`，否则会撞号。
 - **`spring.sql.init` 在测试环境不生效**：本项目自定义了名为 `tidbDataSource` 的 DataSource Bean，而 Boot 的自动初始化依赖 `DataSourceProperties` 的 `name`（`h2-test-tidb`），二者不一致。test profile 因此设 `mode: never`，改由 `TestDatabaseInitializer` 显式执行 `schema.sql` + `data.sql`。新增测试表或改初始化脚本时**改这个类**，改 `application-test.yml` 的 `sql.init` 不起作用。
-- **`measurement/` 目录不存在**：`AGENTS.md` 曾引用的 `startup-time.sh` / `metaspace-after-up.sh` 在仓库中没有。测冷启动需手工启动应用并轮询 `/actuator/health/liveness`。
+- **`toolchain` 只管编译，不管运行**：三个模块用 `toolchain(25)` 编译出 major 69 字节码，但 `./gradlew test` 与 `bootRun` 用的仍是 `JAVA_HOME` 指向的 JDK。要在 Java 25 运行时下验证，先 `export JAVA_HOME=$(/usr/libexec/java_home -v 25)`。
+- **插件版本要在 `settings.gradle` 声明**：`common` / `facade` 用 `apply plugin: 'io.spring.dependency-management'` 引插件时，版本必须写在根 `settings.gradle` 的 `plugins {}` 块（`apply false`）里 —— `pluginManagement.plugins` 只对 `plugins {}` DSL 生效，不支持 `apply plugin:` 写法。
+- `common` / `facade` 通过 `dependencyManagement { imports { mavenBom 'org.springframework.boot:spring-boot-dependencies:3.5.16' } }` 引入 BOM，因此这两个模块能使用无版本声明的依赖（如 lombok、junit-jupiter）。BOM 版本需与 `aicode` 模块的 Boot 版本保持一致。
 
 ---
 
@@ -595,10 +627,11 @@ opsx 入口（功能等价，运行时暴露哪个就用哪个）：
 
 ### 11.10 升级路径
 
-- Spring Boot 3.3.9 → 后续 minor 升级注意 Jakarta EE 10 兼容性。
-- Java 21 LTS → 关注 25 LTS 升级窗口。
-- H2 1.4.200 锁死 → 需找 Spring Boot 3 兼容窗口再升（console 路由是核心阻塞点）。
-- MyBatis-Plus 3.5.7 → 3.5.x 新版；评估是否升级到 4.x。
+- **Spring Boot 3.3.9 → 3.5.16：已完成**（`upgrade-spring-boot-3-5`）。下一步 3.5 → 4.1.1 见 `upgrade-spring-boot-4-1`，注意 Jakarta EE 11 / Jackson 3 两大断裂面。
+- **Java 21 → Java 25 LTS：已完成**（`upgrade-gradle-9-jdk-25`，2026-10-15）。实测：冷启动持平（+0.49%）、非堆占用 −7.88%、容器内 Spring 启动 1.821s。三个模块已统一到 `toolchain(25)`。
+- **Gradle 8.5 → 9.8.1：已完成**。注意 Gradle 10 将移除一批 API，建议在下个升级窗口前评估。
+- H2 1.4.200 锁死 → 待 Boot 4.1 变更一并升级到 2.4.240（console 已拆为独立 `spring-boot-h2console` 模块，旧约束失效）。
+- MyBatis-Plus 3.5.7 → 待 Boot 4 变更切换到 `mybatis-plus-spring-boot4-starter:3.5.17`；4.x 评估。
 
 ---
 

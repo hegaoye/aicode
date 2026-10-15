@@ -1,3 +1,10 @@
+// 插件版本统一在此声明，供各子模块用 `apply plugin: '...'` 方式应用时解析。
+// AGENTS.md §10 提示「编辑根 build.gradle 无效」—— 那条针对 repositories / dependencies，
+// 但 plugins 的版本解析必须在这里声明，否则子模块的 apply plugin 找不到插件。
+plugins {
+    id 'io.spring.dependency-management' version '1.1.7' apply false
+}
+
 include 'common'
 include 'facade'
 

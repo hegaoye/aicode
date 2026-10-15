@@ -1,0 +1,17 @@
+{
+  "javaVersion": "25.0.4.1",
+  "javaVendor": "Amazon.com Inc.",
+  "buildId": "93a1b09",
+  "measuredAt": "2026-10-15T06:14:46Z",
+  "metaspace": {
+    "usedBytes": 84627464,
+    "committedBytes": 88670208,
+    "maxBytes": null,
+    "metricNameUsed": "jvm.memory.metaspace.used 或 jvm.memory.used?tag=area:nonheap（自动回退）",
+    "heapUsedBytes": 105367248,
+    "settleSec": 10,
+    "metricsUrl": "http://127.0.0.1:8088/actuator/metrics",
+    "samples": 3,
+    "statistic": "median"
+  }
+}

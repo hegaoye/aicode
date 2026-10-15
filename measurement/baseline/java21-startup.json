@@ -1,0 +1,15 @@
+{
+  "javaVersion": "21.0.12.1",
+  "javaVendor": "Amazon.com Inc.",
+  "buildId": "93a1b09",
+  "measuredAt": "2026-10-15T06:06:23Z",
+  "startup": {
+    "livenessReadyMs": 7209,
+    "livenessReadyMsMin": 7209,
+    "livenessReadyMsMax": 7213,
+    "livenessUrl": "http://127.0.0.1:8088/actuator/health/liveness",
+    "readyTimeoutSec": 120,
+    "samples": 3,
+    "statistic": "median"
+  }
+}

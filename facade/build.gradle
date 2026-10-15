@@ -1,8 +1,21 @@
 apply plugin: 'java'
 apply plugin: 'idea'
+apply plugin: 'io.spring.dependency-management'
+
+// 引入 Spring Boot BOM，使本模块能解析无版本声明的依赖（如 lombok、junit-jupiter）。
+// aicode 模块通过 Spring Boot Gradle 插件自带该能力，此处需显式应用。
+dependencyManagement {
+    imports {
+        mavenBom 'org.springframework.boot:spring-boot-dependencies:3.5.16'
+    }
+}
 
 java {
-    sourceCompatibility = '21'
+    // 三个模块共用同一 toolchain，语言级别不可能漂移。
+    // （此前各模块独立声明 sourceCompatibility，理论上可以不一致。）
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
 }
 
 [compileJava, compileTestJava, javadoc]*.options*.encoding = "UTF-8"
@@ -22,8 +35,8 @@ dependencies {
     implementation project(path: ":common")
     implementation 'com.baomidou:mybatis-plus-extension:3.5.7'
 
-    compileOnly 'org.projectlombok:lombok:1.18.32'
-    annotationProcessor 'org.projectlombok:lombok:1.18.32'
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
 
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
 }

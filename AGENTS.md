@@ -85,10 +85,9 @@ Gradle Wrapper 位于 `./aicode/gradlew`（仓库根目录**没有** wrapper）�
 - 默认账户：`admin / 888888`。**单用户模式**，token 通过 URL 参数 `?token=xxx` 传递（**无 Header 鉴权**，改进路径见 §6.13）。
 - K8s 与 aicode 技能共用的存活探针：`GET /actuator/health/liveness`，技能要求 **3 秒内**返回 `UP`。
 - 数据库为 **H2（MySQL 兼容模式）**：`jdbc:h2:file:/tmp/aicode;...MODE=MYSQL;AUTO_SERVER=TRUE`。`spring.sql.init.mode=always` 会在每次启动重跑 `classpath:db/schema.sql` 与 `data.sql` —— 状态会被重置，除非用 `database` 环境变量指向其他文件路径。
-- 存在**两个 DataSource Bean**（`tidb-data` 与 `uid-data`），默认指向同一 H2 文件。**不要**"顺手"去重，**需先理解下游生成工程的依赖**（详见 §6.8）。
+- 单个 DataSource Bean（`tidb-data`，`@Primary`）。历史上的第二个 `uid-data` 数据源已随百度 UID 组件一并移除（详见 §5.6 与 §6.8）。
 - Spring 虚拟线程已启用（`spring.threads.virtual.enabled: true`），测试与阻塞 JDBC 调用需按 VTH 假设编写。
 - H2 版本**锁死 1.4.200**（新版会破坏 Spring Boot 3 的 H2 console 路由）。
-- `aicode/libs/*.jar` 是 vendored jar，由 `fileTree(dir: 'libs')` 引入；**不要**用 Maven 重新解析这些依赖。
 
 ---
 
@@ -124,7 +123,7 @@ HTTP / WebSocket
 ├────────────────────────────────────────────────────┤
 │ dao   数据访问层    *DAO + mapper/*Mapper (MyBatis-Plus)│
 ├────────────────────────────────────────────────────┤
-│ DB   H2 / MySQL 兼容 (Druid 连接池, 双数据源)          │
+│ DB   H2 / MySQL 兼容 (Druid 连接池, 单数据源)          │
 └────────────────────────────────────────────────────┘
 横切关注点: filter(拦截器) · config(配置) · config/template(模板引擎) · config/websocket
 ```
@@ -156,7 +155,8 @@ Project 是聚合根：包含 `ProjectSql`、`ProjectFramwork`、`ProjectMap`、
    - 拆分主键/非主键/表格字段，装配 1:1、1:N 与显示属性，构造 `TemplateData`（模板唯一数据源）。
    - 解析目标路径：`${basepackage}`/`${className}`/`${module}`/`${model}` 等占位符（同时兼容 Beetl 的 `$xxx$` 风格）。
    - 调用 `TemplateHelper.generate(templateData, targetFilePath, templatePath)` 渲染落盘；支持状态枚举类（`$classNameState$`）的衍生生成。
-5. **生成附加 SQL**（`generateTsql`）：把项目 SQL + 分布式 ID 注册表 `worker_node` 写入产物目录。
+5. **生成附加 SQL**（`SqlEmitter.emit`）：把用户导入的项目 SQL 写入产物目录的 `<englishName>.sql`。
+   > 历史：此处曾追加百度 UID 的 `worker_node` 建表 DDL。该表是 aicode **平台自身**的 ID 分配器所需，生成出来的项目并不需要，已随组件移除（见 §5.6）。
 6. **版本控制**：若配置仓库账号，`GitTools.commitAndPush` 自动提交并推送。
 7. **打包交付**（`zipProject`）：ZIP 打包到仓库目录，回填 `downloadUrl`；更新 `ProjectJob` 状态为 `Completed` / `Error`。
 
@@ -166,7 +166,8 @@ Project 是聚合根：包含 `ProjectSql`、`ProjectFramwork`、`ProjectMap`、
 
 | 决策 | 内容 | 详见 |
 |------|------|------|
-| 双数据源 | `tidbDataSource`（业务，`@Primary`）+ `uidDataSource`（`worker_node`）。MyBatis-Plus 配置隔离：`MybatisPlusConfigTidb` 扫 `com.aicode.*.dao.mapper`，`MybatisPlusConfigUid` 扫 `com.baidu.fsg.uid.worker.dao` | architecture.md:243-246 |
+| 单一数据源 | `tidbDataSource`（业务，`@Primary`），MyBatis-Plus 由 `MybatisPlusConfigTidb` 扫 `com.aicode.*.dao.mapper`。历史上的第二数据源专为百度 UID 的 `worker_node` 表而设，组件移除后随之删除 | 见 §6.8 |
+| 主键与业务编码分离 | 主键 `id` 由**数据库自增**赋值（`MybatisPlusConfigTidb` 中显式设 `IdType.AUTO`，不可省略）；业务编码 `code` 由 **Hutool 雪花** `IdUtil.getSnowflakeNextIdStr()` 生成，**与主键相互独立** | `openspec/specs/identifier-generation/spec.md`（归档后） |
 | 可插拔模板引擎（策略模式） | `TemplateHelper` 接口 + `FreemarkerHelper` / `BeetlHelper` 两实现；运行期由模板内 `aicode.json` 的 `engine` 字段动态选择 | architecture.md:246、code-style.md:211-219 |
 | 外部 Git 模板仓库 | 技术栈即「模板仓库」，与代码解耦。新增/升级框架（如 SpringBoot 2.x→3.x、新增 RocketMQ）只改模板、不改生成器（`gitee.com/helixin/aicode_template`） | architecture.md:247 |
 | 虚拟线程异步 | `TaskExecutorConfig` 用 `Thread.startVirtualThread` 承载 `@Async` 构建任务，构建是 IO 密集（git clone / 文件读写） | architecture.md:248 |
@@ -293,8 +294,9 @@ Project 是聚合根：包含 `ProjectSql`、`ProjectFramwork`、`ProjectMap`、
 - 复杂 SQL 写 `resources/mapper/<domain>/*.xml`，与 Mapper 接口对应。
 - 分页用 MyBatis-Plus 分页插件（`MybatisPlusInterceptor`），**禁**手写 limit 拼接。
 - 创建/更新时间由 `MybatisPlusMetaObjectHandler` 自动填充，**禁**业务手动 set。
-- **双数据源**：业务 Mapper 归 `tidbDataSource`（`MybatisPlusConfigTidb` 扫 `com.aicode.*.dao.mapper`）；分布式 ID 的 `worker_node` 归 `uidDataSource`。**新增业务 Mapper 默认进 tidb**，禁误放到 uid 数据源扫描路径。
-- 主键/分布式 ID 用 `UidGenerator.getUID()`（百度 UID），禁自造序列。
+- **单数据源**：所有 Mapper 归 `tidbDataSource`（`MybatisPlusConfigTidb` 扫 `com.aicode.*.dao.mapper`）。新增 Mapper 无需考虑数据源归属。
+- **主键**：`id` 由数据库自增赋值。**禁止省略** `MybatisPlusConfigTidb` 中的 `globalConfig.setDbConfig(new GlobalConfig.DbConfig().setIdType(IdType.AUTO))` —— MyBatis-Plus 默认是 `ASSIGN_ID`（雪花），一旦漏配就会静默回退为雪花，且不报任何错。
+- **业务编码**：`code` 用 Hutool 雪花 `IdUtil.getSnowflakeNextIdStr()` 生成，产出为 19 位纯数字（与历史百度 UID 编码同构）。**它不是主键派生值**，禁写成 `String.valueOf(id)`。
 
 ### 6.9 横切关注点
 
@@ -511,10 +513,13 @@ opsx 入口（功能等价，运行时暴露哪个就用哪个）：
 
 - 编辑**根** `build.gradle` **无效** —— 文件为空。所有 Gradle 配置都在各子项目的 `build.gradle` 里。
 - `LOG_HOME_IS_UNDEFINED/` 目录会出现在 `aicode/` 与仓库根下 —— 这是 logback 在 `LOG_HOME` 环境变量未设置时的日志输出，属预期行为且被 `.gitignore` 忽略。
-- `commons-lang3` 在 `aicode/build.gradle` 中被声明了**两次**（3.4 与 3.18.0），**不要**顺手清理 —— 旧版 API 表面可能被代码依赖；若要清理请走专门的 OpenSpec 变更。
 - 技能关键字 `aicode` 与项目名 `aicode` **同名**，回复前先确认用户问的是哪个。
 - 模板仓库与 `aicode_template` 仓的兼容性由模板侧负责，不要把模板代码提交到本仓库。
 - JWT 默认 60 分钟过期，密钥硬编码在 `JwtToken` 中；当前没有刷新 token 机制，**安全审计要清楚这一点**。
+- **主键策略不可省略**：`MybatisPlusConfigTidb` 中必须显式设置 `IdType.AUTO`。MyBatis-Plus 的 `GlobalConfig.DbConfig` 默认是 `ASSIGN_ID`（雪花），而本项目所有实体都没有 `@TableId` 注解 —— 一旦漏配，insert 时会由框架补一个雪花值、`AUTO_INCREMENT` 永不触发，**编译与测试全绿但策略已悄悄回退**。
+- **Hutool 雪花默认从 MAC 地址 + PID 派生 workerId**，当前单实例部署无碰撞风险。**扩到多副本（如 K8s replicas > 1、Pod 重建后 MAC 变化）前**，必须改为显式 `IdUtil.getSnowflake(workerId, datacenterId)`，否则会撞号。
+- **`spring.sql.init` 在测试环境不生效**：本项目自定义了名为 `tidbDataSource` 的 DataSource Bean，而 Boot 的自动初始化依赖 `DataSourceProperties` 的 `name`（`h2-test-tidb`），二者不一致。test profile 因此设 `mode: never`，改由 `TestDatabaseInitializer` 显式执行 `schema.sql` + `data.sql`。新增测试表或改初始化脚本时**改这个类**，改 `application-test.yml` 的 `sql.init` 不起作用。
+- **`measurement/` 目录不存在**：`AGENTS.md` 曾引用的 `startup-time.sh` / `metaspace-after-up.sh` 在仓库中没有。测冷启动需手工启动应用并轮询 `/actuator/health/liveness`。
 
 ---
 

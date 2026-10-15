@@ -6,7 +6,6 @@ package com.aicode.display.service;
 import com.aicode.display.dao.DisplayAttributeDAO;
 import com.aicode.display.dao.mapper.DisplayAttributeMapper;
 import com.aicode.display.entity.DisplayAttribute;
-import com.baidu.fsg.uid.UidGenerator;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,14 +24,9 @@ public class DisplayAttributeServiceImpl extends ServiceImpl<DisplayAttributeMap
 
     @Autowired
     private DisplayAttributeDAO displayAttributeDAO;
-
-    @Autowired
-    private UidGenerator uidGenerator;
-
     @Transactional
     @Override
     public boolean save(DisplayAttribute entity) {
-        entity.setId(uidGenerator.getUID());
         return super.save(entity);
     }
 

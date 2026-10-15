@@ -7,7 +7,6 @@ import com.aicode.setting.dao.SettingDAO;
 import com.aicode.setting.dao.mapper.SettingMapper;
 import com.aicode.setting.entity.Setting;
 import com.aicode.setting.entity.SettingKey;
-import com.baidu.fsg.uid.UidGenerator;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
@@ -26,13 +25,8 @@ public class SettingServiceImpl extends ServiceImpl<SettingMapper, Setting> impl
 
     @Autowired
     private SettingDAO settingDAO;
-
-    @Autowired
-    private UidGenerator uidGenerator;
-
     @Override
     public boolean save(Setting entity) {
-        entity.setId(uidGenerator.getUID());
         return super.save(entity);
     }
 

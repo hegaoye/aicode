@@ -16,7 +16,6 @@ import com.aicode.map.vo.MapRelationshipVO;
 import com.aicode.project.entity.ProjectMap;
 import com.aicode.project.service.ProjectMapService;
 import com.alibaba.fastjson2.JSONObject;
-import com.baidu.fsg.uid.UidGenerator;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import io.swagger.v3.oas.annotations.Operation;
@@ -32,6 +31,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import cn.hutool.core.util.IdUtil;
 
 /**
  * 模型关系
@@ -51,9 +51,6 @@ public class MapRelationshipController {
     private MapClassTableService mapClassTableService;
     @Autowired
     private MapFieldColumnService mapFieldColumnService;
-    @Autowired
-    private UidGenerator uidGenerator;
-
     @Operation(summary = "创建MapRelationship", description = "创建MapRelationship")
     @Parameters({
             @Parameter(name = "mapClassTableCode", description = "关联编码", required = true),
@@ -111,7 +108,8 @@ public class MapRelationshipController {
         }
 
         mapRelationship = new MapRelationship();
-        mapRelationship.setCode(String.valueOf(uidGenerator.getUID()));
+        // code 是业务编码，不是主键派生值（主键由数据库自增赋值）
+        mapRelationship.setCode(IdUtil.getSnowflakeNextIdStr());
         mapRelationship.setMapClassTableCode(mapClassTableCode);
         mapRelationship.setAssociateCode(associateCode);
         return mapRelationship;

@@ -1,5 +1,6 @@
 package com.aicode.config;
 
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.core.MybatisConfiguration;
 import com.baomidou.mybatisplus.core.MybatisXMLLanguageDriver;
 import com.baomidou.mybatisplus.core.config.GlobalConfig;
@@ -47,6 +48,13 @@ public class MybatisPlusConfigTidb {
 
         GlobalConfig globalConfig = new GlobalConfig();
         globalConfig.setMetaObjectHandler(mybatisPlusMetaObjectHandler);
+        // 主键策略显式改为数据库自增。
+        // MyBatis-Plus 的 GlobalConfig.DbConfig 默认是 IdType.ASSIGN_ID（雪花），
+        // 而本项目所有实体都没有 @TableId 注解 —— 若不显式设置，MyBatis-Plus 会在
+        // insert 时自动补一个雪花值，schema.sql 中的 AUTO_INCREMENT 根本不会触发，
+        // 雪花逻辑只是从百度 UID 组件搬到了 MyBatis-Plus 内部，且全程无报错。
+        // 参见 openspec/specs/identifier-generation/spec.md
+        globalConfig.setDbConfig(new GlobalConfig.DbConfig().setIdType(IdType.AUTO));
         sqlSessionFactory.setGlobalConfig(globalConfig.setBanner(false));
         return sqlSessionFactory.getObject();
     }

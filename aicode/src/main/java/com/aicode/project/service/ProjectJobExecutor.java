@@ -2,7 +2,6 @@ package com.aicode.project.service;
 
 import com.aicode.config.websocket.WSClientManager;
 import com.aicode.project.entity.ProjectJob;
-import com.baidu.fsg.uid.UidGenerator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
@@ -21,10 +20,6 @@ public class ProjectJobExecutor {
 
     @Autowired
     private GenerateSV generateSV;
-
-    @Autowired
-    private UidGenerator uidGenerator;
-
     @Async
     public void execute(String projectCode, ProjectJob projectJob) {
         log.info("异步执行构建, projectCode:{}, projectJobCode:{}", projectCode, projectJob.getCode());

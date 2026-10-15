@@ -6,7 +6,6 @@ package com.aicode.map.service;
 import com.aicode.map.dao.MapFieldColumnDAO;
 import com.aicode.map.dao.mapper.MapFieldColumnMapper;
 import com.aicode.map.entity.MapFieldColumn;
-import com.baidu.fsg.uid.UidGenerator;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,14 +24,9 @@ public class MapFieldColumnServiceImpl extends ServiceImpl<MapFieldColumnMapper,
 
     @Autowired
     private MapFieldColumnDAO mapFieldColumnDAO;
-
-    @Autowired
-    private UidGenerator uidGenerator;
-
     @Transactional
     @Override
     public boolean save(MapFieldColumn entity) {
-        entity.setId(uidGenerator.getUID());
         return super.save(entity);
     }
 

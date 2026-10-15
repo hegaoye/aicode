@@ -31,7 +31,6 @@ import com.aicode.setting.dao.mapper.SettingMapper;
 import com.aicode.setting.entity.Setting;
 import com.aicode.setting.entity.SettingKey;
 import com.alibaba.fastjson2.JSON;
-import com.baidu.fsg.uid.UidGenerator;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
@@ -45,6 +44,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
+import cn.hutool.core.util.IdUtil;
 
 /**
  * 用于代码生成业务
@@ -83,8 +83,6 @@ public class GeneratorSVImpl implements GenerateSV {
     private ProjectModuleMapper projectModuleMapper;
     @Autowired
     private ModuleMapper moduleMapper;
-    @Autowired
-    private UidGenerator uidGenerator;
     @Autowired
     private TemplateHelper freemarkerHelper;
     @Autowired
@@ -208,9 +206,9 @@ public class GeneratorSVImpl implements GenerateSV {
 
             //生成sql脚本到项目下
             String sql = sqlEmitter.emit(projectPath, project.getEnglishName(), projectCode);
-            WSClientManager.sendMessage("分布式唯一算法sql " + sql);
-            logsSV.saveLogs("分布式唯一算法sql " + sql, path);
-            String sqllog = "【已经生成】 " + project.getEnglishName() + "Sql 脚本文件并追加系统配置";
+            WSClientManager.sendMessage("项目 SQL 脚本 " + sql);
+            logsSV.saveLogs("项目 SQL 脚本 " + sql, path);
+            String sqllog = "【已经生成】 " + project.getEnglishName() + " Sql 脚本文件";
             WSClientManager.sendMessage(sqllog);
             logsSV.saveLogs(sqllog, path);
 
@@ -379,7 +377,7 @@ public class GeneratorSVImpl implements GenerateSV {
                     }
                     path = path.substring(path.indexOf(template_Path) + template_Path.length());
                     FrameworksTemplate frameworksTemplate = new FrameworksTemplate();
-                    frameworksTemplate.setCode(String.valueOf(uidGenerator.getUID()));
+                    frameworksTemplate.setCode(IdUtil.getSnowflakeNextIdStr());
                     frameworksTemplate.setPath(path);
                     frameworksTemplate.setFrameworkCode(frameworks.getCode());
                     frameworksTemplateMapper.insert(frameworksTemplate);

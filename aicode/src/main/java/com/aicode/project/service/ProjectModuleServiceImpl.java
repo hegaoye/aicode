@@ -6,7 +6,6 @@ package com.aicode.project.service;
 import com.aicode.project.dao.ProjectModuleDAO;
 import com.aicode.project.dao.mapper.ProjectModuleMapper;
 import com.aicode.project.entity.ProjectModule;
-import com.baidu.fsg.uid.UidGenerator;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,10 +23,6 @@ public class ProjectModuleServiceImpl extends ServiceImpl<ProjectModuleMapper, P
 
     @Autowired
     private ProjectModuleDAO projectModuleDAO;
-
-    @Autowired
-    private UidGenerator uidGenerator;
-
     @Override
     public boolean save(ProjectModule entity) {
         return super.save(entity);

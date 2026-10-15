@@ -13,12 +13,12 @@ import com.aicode.project.entity.Project;
 import com.aicode.project.entity.ProjectSql;
 import com.aicode.project.entity.ProjectSqlState;
 import com.alibaba.druid.util.StringUtils;
-import com.baidu.fsg.uid.UidGenerator;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import cn.hutool.core.util.IdUtil;
 
 
 /**
@@ -34,17 +34,14 @@ public class ProjectSqlServiceImpl extends ServiceImpl<ProjectSqlMapper, Project
     private ProjectSqlDAO projectSqlDAO;
     @Autowired
     private ProjectMapper projectMapper;
-
-    @Autowired
-    private UidGenerator uidGenerator;
-
     @Override
     public boolean save(ProjectSql entity) {
         if (entity == null || StringUtils.isEmpty(entity.getProjectCode()) || StringUtils.isEmpty(entity.getTsql())) {
             log.error(BaseException.BaseExceptionEnum.Empty_Param.toString());
             throw new ProjectException(BaseException.BaseExceptionEnum.Empty_Param);
         }
-        entity.setCode(String.valueOf(uidGenerator.getUID()));
+        // code 是业务编码，不是主键派生值（主键由数据库自增赋值，见 MybatisPlusConfigTidb 的 IdType.AUTO）
+        entity.setCode(IdUtil.getSnowflakeNextIdStr());
         entity.setState(ProjectSqlState.Enable.name());
         String tsql = entity.getTsql();
         Project project = projectMapper.selectOne(new LambdaQueryWrapper<Project>()

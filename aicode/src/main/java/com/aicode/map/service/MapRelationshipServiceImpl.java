@@ -6,7 +6,6 @@ package com.aicode.map.service;
 import com.aicode.map.dao.MapRelationshipDAO;
 import com.aicode.map.dao.mapper.MapRelationshipMapper;
 import com.aicode.map.entity.MapRelationship;
-import com.baidu.fsg.uid.UidGenerator;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,14 +24,9 @@ public class MapRelationshipServiceImpl extends ServiceImpl<MapRelationshipMappe
 
     @Autowired
     private MapRelationshipDAO mapRelationshipDAO;
-
-    @Autowired
-    private UidGenerator uidGenerator;
-
     @Transactional
     @Override
     public boolean save(MapRelationship entity) {
-        entity.setId(uidGenerator.getUID());
         return super.save(entity);
     }
 

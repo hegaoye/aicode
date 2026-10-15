@@ -9,8 +9,8 @@ import com.aicode.project.dao.mapper.ProjectJobMapper;
 import com.aicode.project.entity.ProjectJob;
 import com.aicode.project.entity.ProjectJobState;
 import com.alibaba.druid.util.StringUtils;
-import com.baidu.fsg.uid.UidGenerator;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import cn.hutool.core.util.IdUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
@@ -32,10 +32,6 @@ public class ProjectJobServiceImpl extends ServiceImpl<ProjectJobMapper, Project
 
     @Autowired
     private ProjectJobMapper projectJobMapper;
-
-    @Autowired
-    private UidGenerator uidGenerator;
-
     @Autowired
     private ProjectJobExecutor projectJobExecutor;
 
@@ -47,9 +43,8 @@ public class ProjectJobServiceImpl extends ServiceImpl<ProjectJobMapper, Project
             throw new ProjectJobException(BaseException.BaseExceptionEnum.Empty_Param);
         }
         //2.设置默认属性
-        long id = uidGenerator.getUID();
-        entity.setId(id);
-        entity.setCode(String.valueOf(id));
+        // id 由数据库自增赋值；code 是业务编码，与 id 相互独立
+        entity.setCode(IdUtil.getSnowflakeNextIdStr());
         entity.setNumber(0);
         entity.setState(ProjectJobState.Create.name());
         entity.setCreateTime(new Date());
@@ -97,9 +92,7 @@ public class ProjectJobServiceImpl extends ServiceImpl<ProjectJobMapper, Project
 
         //创建任务追踪
         ProjectJob projectJob = new ProjectJob();
-        long id = uidGenerator.getUID();
-        projectJob.setId(id);
-        projectJob.setCode(String.valueOf(id));
+        projectJob.setCode(IdUtil.getSnowflakeNextIdStr());
         projectJob.setProjectCode(projectCode);
         projectJob.setState(ProjectJobState.Executing.name());
         projectJob.setNumber(1);

@@ -40,7 +40,7 @@ import static org.mockito.Mockito.when;
  * - Freemarker / Beetl 双风格路径占位符替换
  * - 全量 / 增量生成三模式
  * - $classNameState$ 状态枚举类衍生
- * - SqlEmitter 用户 SQL + worker_node 合并
+ * - SqlEmitter 写出用户 SQL
  * - ZipPackager 路径与 downloadUrl 回填
  */
 @ExtendWith(MockitoExtension.class)
@@ -80,8 +80,8 @@ class CodeGenPipelineTest {
     // ---------- 1. SqlEmitter ----------
 
     @Test
-    @DisplayName("SqlEmitter：完整 emit 写出 user SQL + worker_node DDL")
-    void sqlEmitter_writesUserSqlAndWorkerNode(@TempDir Path temp) throws Exception {
+    @DisplayName("SqlEmitter：完整 emit 写出 user SQL，且不再追加 worker_node")
+    void sqlEmitter_writesUserSqlWithoutWorkerNode(@TempDir Path temp) throws Exception {
         ProjectSql sql = new ProjectSql();
         sql.setTsql("CREATE TABLE user (id BIGINT PRIMARY KEY, name VARCHAR(64));");
         sql.setState(ProjectSqlState.Enable.name());
@@ -93,20 +93,22 @@ class CodeGenPipelineTest {
         assertTrue(out.exists(), "SQL 文件必须存在");
         String content = Files.readString(out.toPath());
         assertTrue(content.contains("CREATE TABLE user"), "应包含用户 DDL");
-        assertTrue(content.contains("CREATE TABLE `worker_node`"), "应包含 worker_node DDL");
-        assertEquals(SqlEmitter.WORKER_NODE_DDL, returned, "返回值应为 worker_node DDL 片段");
+        assertFalse(content.contains("worker_node"),
+                "百度 UID 组件已移除，产物 SHALL NOT 再携带 worker_node 表");
+        assertEquals(content, returned, "返回值 SHALL 与写入文件的内容一致");
     }
 
     @Test
-    @DisplayName("SqlEmitter：ProjectSql 缺失时只写 worker_node，不抛错")
-    void sqlEmitter_missingProjectSql_degradesToWorkerNodeOnly(@TempDir Path temp) {
+    @DisplayName("SqlEmitter：ProjectSql 缺失时只写文件头，不抛错")
+    void sqlEmitter_missingProjectSql_writesHeaderOnly(@TempDir Path temp) {
         when(projectSqlMapper.selectOne(any(LambdaQueryWrapper.class))).thenReturn(null);
 
         String returned = sqlEmitter.emit(temp.toString(), "demo", "123");
 
         File out = temp.resolve("demo.sql").toFile();
-        assertTrue(out.exists());
-        assertTrue(returned.contains("worker_node"));
+        assertTrue(out.exists(), "文件仍 SHALL 被创建");
+        assertTrue(returned.contains("AI-Code"), "SHALL 至少包含文件头");
+        assertFalse(returned.contains("worker_node"), "SHALL NOT 包含 worker_node");
     }
 
     // ---------- 2. 路径占位符替换（与 generator() 内部一致的子集）----------
@@ -260,7 +262,7 @@ class CodeGenPipelineTest {
         try {
             // 不抛错即为通过
             String returned = sqlEmitter.emit(readOnlyDir.toString(), "demo", "123");
-            assertNotNull(returned, "即使写文件失败也应返回 worker_node DDL 片段");
+            assertNotNull(returned, "即使写文件失败也应返回将要写入的 SQL 内容");
         } finally {
             readOnlyDir.toFile().setWritable(true);
         }

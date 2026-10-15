@@ -31,7 +31,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -81,19 +80,11 @@ class SqlReverseParseTest {
     @MockitoBean private ProjectJobMapper projectJobMapper;
     // WebSocket 在非 web 容器环境不可用；Mock 掉避免 ApplicationContext 启动失败
     @MockitoBean private org.springframework.web.socket.server.standard.ServerEndpointExporter serverEndpointExporter;
-
-    @BeforeEach
-    void wireUidGenerator() {
-        // ProjectServiceImpl 内部用 uidGenerator.getUID() 设 id/code；测试用递增序列
-        if (ReflectionTestUtils.getField(projectService, "uidGenerator") == null) {
-            com.baidu.fsg.uid.UidGenerator fake = new com.baidu.fsg.uid.UidGenerator() {
-                private long seq = 100L;
-                @Override public long getUID() { return ++seq; }
-                @Override public String parseUID(long uid) { return String.valueOf(uid); }
-            };
-            ReflectionTestUtils.setField(projectService, "uidGenerator", fake);
-        }
-    }
+    /**
+     * 历史说明：此前此处会通过反射注入一个假的 UidGenerator（因为 ProjectServiceImpl
+     * 依赖它生成 id/code）。该组件已随 {@code replace-baidu-uid-generator} 变更移除，
+     * 主键改由数据库自增、业务编码改由 Hutool 雪花生成，因此不再需要任何桩。
+     */
 
     private Project sampleProject(String englishName) {
         return Project.builder()

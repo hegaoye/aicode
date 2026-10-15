@@ -40,12 +40,10 @@ class MapRelationshipControllerTest {
     @MockitoBean private ProjectMapService projectMapService;
     @MockitoBean private MapClassTableService mapClassTableService;
     @MockitoBean private MapFieldColumnService mapFieldColumnService;
-    @MockitoBean private com.baidu.fsg.uid.UidGenerator uidGenerator;
     @MockitoBean private org.springframework.web.socket.server.standard.ServerEndpointExporter serverEndpointExporter;
 
     @BeforeEach
     void setup() {
-        when(uidGenerator.getUID()).thenReturn(100L);
         when(mapRelationshipService.getOne(any())).thenReturn(null);
         when(mapRelationshipService.saveOrUpdate(any(MapRelationship.class))).thenReturn(true);
     }

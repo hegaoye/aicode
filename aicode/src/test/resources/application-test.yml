@@ -16,47 +16,24 @@ spring:
       maxWait: 10000
       validationQuery: SELECT 1
       testWhileIdle: true
-    uid:
-      name: h2-test-uid
-      url: jdbc:h2:mem:aicode_test_uid;MODE=MYSQL;DB_CLOSE_DELAY=-1
-      username: sa
-      password: sa
-      driver-class-name: org.h2.Driver
-      type: com.alibaba.druid.pool.DruidDataSource
-      initialSize: 2
-      maxActive: 10
-      minIdle: 1
-      maxWait: 10000
-      validationQuery: SELECT 1
-      testWhileIdle: true
   sql:
     init:
-      # 【生产 vs 测试的差异根源】
+      # 说明：schema/data 初始化由 TestDatabaseInitializer 显式执行
+      # （见 src/test/java/com/aicode/support/TestDatabaseInitializer.java），
+      # 因此这里设为 never。
       #
-      # 生产 application.yml：tidb 与 uid 两个数据源**指向同一个 H2 文件**
-      #   jdbc:h2:file:${database:/tmp/aicode};...
-      # 因此 Boot 把初始化器绑到哪个库都无所谓 —— 建一次表，两个库都可见。
+      # 为什么不用 Boot 自动初始化：本类自定义了名为 tidbDataSource 的 DataSource Bean，
+      # 而 SqlInitializationAutoConfiguration 的绑定与属性前缀依赖于
+      # DataSourceProperties 的 name（此处为 h2-test-tidb），与自定义 Bean 名不一致，
+      # 结果是自动初始化器不会作用于业务库，表现为
+      # 「Table "FRAMEWORKS" not found」。
       #
-      # 测试 application-test.yml：两个数据源指向**两个不同的内存库**
-      #   tidb → jdbc:h2:mem:aicode_test_tidb
-      #   uid  → jdbc:h2:mem:aicode_test_uid
-      # 于是 Boot 的 SqlInitializationAutoConfiguration 只把
-      # SqlDataSourceScriptDatabaseInitializer 绑到「@Primary 的 uidDataSource」，
-      # 业务库（frameworks / project / map_* …）永远不会被初始化，
-      # 表现为 "Table FRAMEWORKS not found"。
-      #
-      # 因此测试环境分两条路径初始化：
-      #   - uid 库：保持 always，交给 Boot（脚本用 uid_schema.sql）。
-      #     BaiduUidConfig 的 uidGenerator 在 Bean 构造期就 SELECT worker_node，
-      #     该表必须先于任何业务 Bean 存在，故此处不能用 never。
-      #   - tidb 库：由 TestDatabaseInitializer 显式执行 schema.sql + data.sql
-      #     （见 src/test/java/com/aicode/support/TestDatabaseInitializer.java）。
-      #
-      # 注：uid_schema.sql 与 schema.sql 的建表内容完全一致，仅空格对齐不同。
-      #     指向 uid_schema.sql 是为了让意图自解释 —— 它服务于 uid 库。
-      schema-locations: classpath:db/uid_schema.sql
-      data-locations: ""
-      mode: always
+      # 历史背景：此前之所以能与 mode=always 共存，是因为项目还存在第二个
+      # uidDataSource（标了 @Primary）供 Boot 绑定，且业务表恰好不在被初始化的那个库里。
+      # 该数据源已随百度 UID 组件一并移除（见
+      # openspec/changes/archive/2026-10-14-replace-baidu-uid-generator），
+      # 故改为由 TestDatabaseInitializer 全权负责，避免再依赖这种巧合。
+      mode: never
   h2:
     console:
       enabled: false

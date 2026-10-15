@@ -25,8 +25,8 @@ import com.aicode.project.entity.*;
 import com.aicode.setting.dao.mapper.SettingMapper;
 import com.aicode.setting.entity.Setting;
 import com.aicode.setting.entity.SettingKey;
+import cn.hutool.core.util.IdUtil;
 import com.alibaba.fastjson2.JSON;
-import com.baidu.fsg.uid.UidGenerator;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -82,9 +82,6 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
     private ProjectJobMapper projectJobMapper;
     @Autowired
     private ProjectSqlMapper projectSqlMapper;
-    @Autowired
-    private UidGenerator uidGenerator;
-
     @Override
     public boolean save(Project project) {
         //1.判断必传参数
@@ -114,8 +111,9 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
         String basePackage = project.getBasePackage();
         basePackage = basePackage.endsWith(".") ? basePackage.substring(0, basePackage.lastIndexOf(".")) : basePackage;
         project.setBasePackage(basePackage);
-        project.setId(uidGenerator.getUID());
-        project.setCode(String.valueOf(project.getId()));
+        // 主键由数据库自增赋值（见 MybatisPlusConfigTidb 的 IdType.AUTO 配置）
+        // code 是业务编码，不是主键派生 —— 与 id 相互独立
+        project.setCode(IdUtil.getSnowflakeNextIdStr());
         project.setState(ProjectState.Enable.name());
         if (StringUtils.isBlank(project.getIsIncrement())) {
             project.setIsIncrement(YNEnum.N.name());
@@ -334,25 +332,23 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
                 throw new ProjectException(BaseException.BaseExceptionEnum.Result_Not_Exist);
             }
 
-            MapClassTable mapClassTable = new MapClassTable(String.valueOf(uidGenerator.getUID()), table.getTableName(), table.getRemarks());
+            MapClassTable mapClassTable = new MapClassTable(IdUtil.getSnowflakeNextIdStr(), table.getTableName(), table.getRemarks());
             mapClassTable.toJava();
 
             //保存项目与表的关系
             projectMapMapper.insert(ProjectMap.builder()
-                    .id(uidGenerator.getUID())
                     .projectCode(project.getCode())
                     .mapClassTableCode(mapClassTable.getCode())
                     .build());
 
-            //保存项目表信息
-            mapClassTable.setId(uidGenerator.getUID());
+            //保存项目表信息（id 由数据库自增赋值）
             mapClassTableMapper.insert(mapClassTable);
 
 
             List<MapFieldColumn> mapFieldColumns = new ArrayList<>();
             columnList.forEach(column -> {
                 MapFieldColumn mapFieldColumn = new MapFieldColumn();
-                mapFieldColumn.setCode(String.valueOf(uidGenerator.getUID()));
+                mapFieldColumn.setCode(IdUtil.getSnowflakeNextIdStr());
                 mapFieldColumn.setMapClassTableCode(mapClassTable.getCode());
                 mapFieldColumn.setColumn(column.getColumnName());
                 mapFieldColumn.setSqlType(column.getTypeName());
@@ -369,8 +365,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
                     mapFieldColumn.setIsState(ynEnum.name());
                 }
                 mapFieldColumn.toJava();
-                mapFieldColumn.setId(uidGenerator.getUID());
-                mapFieldColumns.add(mapFieldColumn);
+                mapFieldColumns.add(mapFieldColumn);   // id 由数据库自增赋值
             });
             //保存表的列信息
             mapFieldColumnMapper.batchInsert(mapFieldColumns);

@@ -12,11 +12,11 @@ import com.aicode.project.entity.ProjectRepositoryAccount;
 import com.aicode.project.entity.ProjectRepositoryAccountState;
 import com.aicode.project.entity.ProjectRepositoryTypeEnum;
 import com.alibaba.druid.util.StringUtils;
-import com.baidu.fsg.uid.UidGenerator;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import cn.hutool.core.util.IdUtil;
 
 
 /**
@@ -30,10 +30,6 @@ public class ProjectRepositoryAccountServiceImpl extends ServiceImpl<ProjectRepo
 
     @Autowired
     private ProjectRepositoryAccountDAO projectRepositoryAccountDAO;
-
-    @Autowired
-    private UidGenerator uidGenerator;
-
     @Override
     public boolean save(ProjectRepositoryAccount projectRepositoryAccount) {
         if (projectRepositoryAccount == null
@@ -46,7 +42,7 @@ public class ProjectRepositoryAccountServiceImpl extends ServiceImpl<ProjectRepo
             throw new ProjectRepositoryAccountException(BaseException.BaseExceptionEnum.Empty_Param);
         }
 
-        projectRepositoryAccount.setCode(String.valueOf(uidGenerator.getUID()));
+        projectRepositoryAccount.setCode(IdUtil.getSnowflakeNextIdStr());
         projectRepositoryAccount.setState(ProjectRepositoryAccountState.Enable.name());
         projectRepositoryAccount.setType(projectRepositoryAccount.getType()
                 .equalsIgnoreCase(ProjectRepositoryTypeEnum.GIT.name()) ? ProjectRepositoryTypeEnum.GIT.name() : ProjectRepositoryTypeEnum.SVN.name());

@@ -73,7 +73,6 @@ dependencies {
     implementation project(path: ':facade')
     //-----------项目中模块引入 End--------------
 
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'

@@ -1,7 +1,8 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { BrowserRouter } from 'react-router-dom'
+import { HashRouter } from 'react-router-dom'
 import { installAuthInterceptor } from './lib/auth/auth-interceptor'
+import { installShtmlSuffixInterceptor } from './lib/api/shtml-suffix'
 import App from './App'
 import './styles/tokens.css'
 
@@ -9,10 +10,19 @@ import './styles/tokens.css'
 // 在 React 树挂载之前注册一次拦截器；多次调用幂等。
 installAuthInterceptor()
 
+// M4 切运行时（D5）：接口路径统一补 `.shtml` 后缀，与后端
+// ShtmlSuffixRewriteFilter 对接。详见 openspec/specs/api-contract/spec.md。
+installShtmlSuffixInterceptor()
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <BrowserRouter>
+    {/* M4（D5）：BrowserRouter → HashRouter。
+        Spring Boot 4 对未匹配路径抛 NoResourceFoundException（不 fallback 到
+        index.html），因此前端页面路由必须走 hash 段（`/#/login`）才能深链直达
+        而不经服务端路由。详见 openspec/specs/api-contract/spec.md 的
+        "M4 切运行时 React 入口优先 Angular 静态产物" Requirement。 */}
+    <HashRouter>
       <App />
-    </BrowserRouter>
+    </HashRouter>
   </StrictMode>,
 )

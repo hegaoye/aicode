@@ -1,7 +1,13 @@
 # api-contract Specification
 
 ## Purpose
-定义 aicode 后端 REST 接口与仓库内静态前端（`src/main/resources/static/`）之间的可观测契约。前端为 Angular 7.0.4 + ng-zorro + jQuery 的打包产物，无法在 Java 侧做类型检查，因此所有跨语言约定（ID 序列化形态、路径后缀、响应结构、日期格式）必须由后端以可执行测试的方式显式守护。本能力是 Java 25 / Spring Boot 4.1 升级系列变更的验收基准。
+定义 aicode 后端 REST 接口与前端模块之间的可观测契约。
+
+M4 之前：前端为 `src/main/resources/static/` 下的 Angular 7.0.4 + ng-zorro + jQuery 打包产物，无法在 Java 侧做类型检查，因此所有跨语言约定（ID 序列化形态、路径后缀、响应结构、日期格式）必须由后端以可执行测试的方式显式守护。
+
+M4 之后（`feature/20261016/react-web-rewrite` 分支 + `2026-10-19-m4-cutover-to-react` 变更）：前端为 `aicode-web/` 模块下的 React 19 + TypeScript 实现，跨语言约定改由「`contracts/openapi/openapi.yaml` 契约文件 + orval 生成的 TypeScript 类型 + Vitest 跑 MSW mock」共同守护：① 后端契约 schema 由 `OpenApiExportIT` 在测试期自动导出并与入库 schema diff 守护；② 前端类型与请求函数由 orval 在 `aicode-web/build` 时从契约 schema 重生成；③ 前端 mock 与单测由 MSW handler（`aicode-web/src/generated/api.msw.ts`）拦截；④ 后端契约层仍以 `ApiContractIT` 集成测试守护（响应结构 + 错误码 + 日期格式 + 标识符字符串化）。本能力在 M4 后**同时**承担"契约 schema 守门"与"跨语言约定守门"两个角色。
+
+本能力在 M0 / M1 / M2 / M3 阶段是 Java 25 / Spring Boot 4.1 升级系列变更的验收基准；在 M4 之后是"React 前端落地 + 切运行时"系列变更的验收基准。
 
 ## Requirements
 
@@ -54,28 +60,28 @@
 
 #### Scenario: 无后缀路径仍可达
 
-- **WHEN** 客户端以 `/project/list` 形式请求
+- **WHEN** 客户端以 `/project/list` 形式请求任意已注册端点
 - **THEN** 系统 SHALL 正常处理该请求
 
 #### Scenario: 后缀兼容不覆盖静态资源
 
-- **WHEN** 客户端请求静态资源（如 `*.css`、`*.js`、`*.svg`、`*.woff2`）
-- **THEN** 系统 SHALL 按静态资源处理，SHALL NOT 因后缀兼容逻辑而改变其解析路径
+- **WHEN** 请求的资源路径以 `.css` / `.js` / `.svg` 等静态资源后缀结尾
+- **THEN** 兼容层 SHALL NOT 改写该路径
 
 #### Scenario: 后缀兼容不改变拦截器匹配
 
-- **WHEN** 客户端以 `/login/signin.shtml` 请求登录端点
-- **THEN** 登录拦截器的豁免规则 SHALL 仍然命中，SHALL NOT 返回 `9007`
+- **WHEN** 兼容层剥离了 `.shtml` 后缀
+- **THEN** 鉴权拦截器的路径匹配 SHALL 在剥离后的路径上进行，与无后缀请求一致
 
 #### Scenario: WebSocket 端点带后缀可达
 
-- **WHEN** 客户端以 `ws://<host>/websocket.shtml` 建立 WebSocket 连接
+- **WHEN** 客户端以 `/websocket.shtml` 连接 WebSocket 端点
 - **THEN** 连接 SHALL 成功建立
 
 #### Scenario: 兼容层不引入前缀外副作用
 
-- **WHEN** 客户端请求一个既不在已注册 API 前缀内、也不是静态资源的路径
-- **THEN** 该请求 SHALL 保持原有处理方式，SHALL NOT 被后缀兼容逻辑改写
+- **WHEN** 请求路径不在平台已注册的 API 前缀白名单内
+- **THEN** 兼容层 SHALL NOT 改写该路径，即使它以 `.shtml` 结尾
 
 ### Requirement: 统一响应结构
 
@@ -83,37 +89,37 @@
 
 #### Scenario: 成功响应结构
 
-- **WHEN** 任意接口处理成功
-- **THEN** 响应体 SHALL 满足 `code == "0000"`、`success == true`，且包含 `data` 键
+- **WHEN** 任意接口返回成功
+- **THEN** 响应体 SHALL 同时含 `code` / `info` / `data` / `success` 四个键，且 `success` 为 `true`
 
 #### Scenario: 失败响应使用标准错误码
 
-- **WHEN** 任意接口因参数或权限原因失败
-- **THEN** 响应体 SHALL 满足 `success == false`，且 `code` ∈ {`9003`（参数为空）, `9004`（参数非法）, `9007`（未授权/Token 无效）, `9999`（服务器错误）}
+- **WHEN** 任意接口返回业务失败
+- **THEN** `code` SHALL 取自平台标准错误码集合（`9003` / `9004` / `9007` / `9999` 等），`success` 为 `false`
 
 #### Scenario: AJAX 请求失败时返回 JSON 而非 HTML
 
-- **WHEN** 未携带有效令牌的 AJAX 请求（携带 `x-requested-with: XMLHttpRequest`）被拦截
-- **THEN** 响应体 SHALL 为 JSON 格式的失败响应，SHALL NOT 是 HTML 登录页
+- **WHEN** 前端以 AJAX 方式请求接口且请求失败
+- **THEN** 响应 SHALL 为 JSON 格式的错误结构，SHALL NOT 返回 HTML 登录页
 
 ### Requirement: 日期格式与时区
 
-系统 SHALL 以 `yyyy-MM-dd HH:mm:ss` 格式序列化日期时间字段，时区固定为 GMT+8。该语义 SHALL 在默认 JSON 库发生换代后仍被显式保证，SHALL NOT 依赖库的默认行为。
+系统 SHALL 以固定格式 `yyyy-MM-dd HH:mm:ss` 序列化所有日期字段，时区固定为 GMT+8，SHALL NOT 输出 ISO 8601 格式或时间戳数值。
 
 #### Scenario: 日期字段格式
 
-- **WHEN** 客户端读取返回对象中的日期时间字段（如 `createTime`、`modifyTime`）
-- **THEN** 该值 SHALL 匹配正则 `^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$`
+- **WHEN** 响应中包含日期字段
+- **THEN** 该字段 SHALL 匹配正则 `^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$`
 
 #### Scenario: 日期不以时间戳形式输出
 
-- **WHEN** 系统序列化日期时间字段
-- **THEN** 输出 SHALL NOT 是纪元毫秒数字
+- **WHEN** 响应中包含日期字段
+- **THEN** 该字段 SHALL 为字符串，SHALL NOT 为 JSON 数字
 
 #### Scenario: 时区固定为 GMT+8
 
-- **WHEN** 系统格式化日期时间
-- **THEN** 格式化 SHALL 使用 GMT+8 时区，SHALL NOT 受服务器本地时区影响
+- **WHEN** 服务端构造日期值
+- **THEN** 该值 SHALL 按 GMT+8 时区解释与序列化，SHALL NOT 依赖服务器本地时区
 
 ### Requirement: null 字段保留
 
@@ -121,69 +127,69 @@
 
 #### Scenario: 空值字段仍出现在 JSON 中
 
-- **WHEN** 某对象的某个字段值为 `null`
+- **WHEN** 响应对象的某字段值为 `null`
 - **THEN** 序列化后的 JSON SHALL 包含该键且值为 `null`，SHALL NOT 直接省略该键
 
 #### Scenario: 响应顶层 data 为 null 时保留
 
-- **WHEN** 接口成功但业务数据为空
+- **WHEN** 接口返回成功但无业务数据
 - **THEN** 响应体 SHALL 包含 `"data": null`
 
 #### Scenario: 默认序列化库换代后语义不变
 
-- **WHEN** 运行时切换到新的默认 JSON 库
+- **WHEN** 默认 JSON 库发生版本升级
 - **THEN** null 字段的保留行为 SHALL 与切换前一致
 
 ### Requirement: 契约测试在升级前先行落地
 
-系统的接口契约 SHALL 由可执行测试守护，且这些测试 SHALL 在任何升级变更开始之前就在当前基线上通过，作为后续升级的验收基准。
+系统 SHALL 提供可执行测试覆盖上述所有跨语言约定，且这些测试 SHALL 在每次框架升级**之前**就已全部通过，作为升级验收的基准。
 
 #### Scenario: 契约测试在升级前全绿
 
-- **WHEN** 在未做任何升级的基线版本上执行契约测试
-- **THEN** 全部契约场景 SHALL 通过
+- **WHEN** 框架升级前的基线提交
+- **THEN** 全部契约测试 SHALL 通过
 
 #### Scenario: 升级引入契约回归时测试失败
 
-- **WHEN** 某次依赖或运行时升级破坏了任一契约场景
-- **THEN** 对应的契约测试 SHALL 失败并明确指出被破坏的要求，SHALL NOT 静默通过
+- **WHEN** 某次框架升级改变了响应结构、日期格式或标识符序列化
+- **THEN** 对应契约测试 SHALL 失败，SHALL NOT 静默通过
 
 #### Scenario: 前端端点清单被显式登记
 
-- **WHEN** 静态前端调用了某个后端端点
-- **THEN** 该端点路径 SHALL 出现在契约测试的端点清单中，接受 `.shtml` 与无后缀双路径可达性验证
+- **WHEN** 新增或删除前端调用的端点
+- **THEN** 该端点 SHALL 在端点清单中被显式登记，可通过交叉校验断言发现遗漏
 
 ### Requirement: 统一响应包装的 data SHALL 携带真实结构
 
-统一响应包装的 `data` 字段 SHALL 携带接口出参的真实结构，SHALL NOT 是无类型占位（schema 为空对象）。接口 SHALL 通过泛型返回类型声明其出参形状，使序列化框架能够据此推导出 `data` 的具体 schema。
+系统 SHALL 以泛型 `R<T>` 声明接口出参类型，使 `data` 字段在 OpenAPI 契约中携带 `T` 的真实结构，SHALL NOT 为空对象 `{}`。
 
 #### Scenario: 契约中的 data 有具体 schema
 
-- **WHEN** 导出 OpenAPI 契约并查看统一响应包装的类型定义
-- **THEN** 其 `data` 字段 SHALL 引用具体的出参 schema，SHALL NOT 为空对象
+- **WHEN** 某接口声明 `R<SomeVO>`
+- **THEN** 契约中该接口响应的 `data` 节点 SHALL ref 到 `SomeVO` 的 schema，SHALL NOT 为 `{}`
 
 #### Scenario: 列表接口的 data 表达元素数组
 
-- **WHEN** 某接口返回一组记录
-- **THEN** 契约中该接口响应的 `data` SHALL 表达为对应元素类型的数组
+- **WHEN** 某接口声明 `R<List<XxxVO>>`
+- **THEN** 契约中 `data` SHALL 为 array of `XxxVO`
 
 #### Scenario: 无数据接口的 data 表达为空
 
-- **WHEN** 某接口只返回成功与否、不携带数据
-- **THEN** 其 `data` SHALL 表达为空，SHALL NOT 引用任意结构类型
+- **WHEN** 某接口声明 `R<Void>`
+- **THEN** 契约中 `data` SHALL 为空或无结构（不携带误导性的具体 schema）
 
 ### Requirement: 出参形状 SHALL 由声明类型承载而非运行期推断
 
-接口出参的形状 SHALL 由方法签名上的泛型参数承载，SHALL NOT 依赖运行期反射推断或由调用方事后解释。同一方法在不同分支返回形态不一致的 `data` 时，SHALL 统一为可表达该分支的类型。
+系统 SHALL 以方法签名上的泛型返回类型承载出参形状，SHALL NOT 依赖运行期反射推断，SHALL NOT 让同一方法的不同分支返回不同形状而不显式收窄。
 
 #### Scenario: 方法签名即出参契约
 
-- **WHEN** 查看任一接口方法的声明
-- **THEN** 其返回类型 SHALL 直接表明 `data` 的类型，SHALL NOT 是无类型包装
+- **WHEN** 某 Controller 方法声明 `R<XxxVO>`
+- **THEN** springdoc 导出的契约 SHALL 以 `XxxVO` 作为该方法的 `data` schema
 
 #### Scenario: 分支形态不一致时显式收窄
 
-- **WHEN** 某方法在成功与失败分支返回形态不同的 `data`
+- **WHEN** 某方法的多个返回分支形状不同
 - **THEN** 该方法的返回类型 SHALL 显式表达二者的共同类型，SHALL NOT 让契约出现二义
 
 ### Requirement: 泛型化 SHALL NOT 改变运行期 JSON 结构
@@ -204,13 +210,13 @@
 #### Scenario: 任何受保护端点的契约 schema SHALL NOT 直接 ref 实体类型
 
 - **WHEN** 评审或回归测试任何受保护 REST 接口的契约
-- **THEN** 契约 schema 中响应的顶层 schema SHALL 为 R-包络（如 `R<VO>` 渲染后的 `RProjectVO`、`R<PageVO<T>>` 渲染后的 `RPageVOProjectVO` 等），SHALL NOT 直接 ref 到实体类型（如 `Project`、`MapFieldColumn`、`Page`）
+- **THEN** 契约 schema 中响应的顶层 schema SHALL 为 R-包络（如 `R<VO>` 渲染后的 `RProjectVO`、`R<PageVO<T>>` 渲染后的 `RPageVOProjectSummaryVO` 等），SHALL NOT 直接 ref 到实体类型（如 `Project`、`MapFieldColumn`、`Page`）
 - **AND** 响应字段的 `data` 节点 SHALL 是该 VO / PageVO 的 schema，且 SHALL NOT 是 `{}` 或 `object` 这种无约束形态
 
 #### Scenario: 历史遗漏端点（如 loadByCode）改返 R<T> 后契约形状收敛
 
-- **WHEN** `GET /project/load/code/{code}` 由原本直返 `ProjectVO` 改造为返 `R<ProjectVO>`
-- **THEN** 契约 schema 中响应的 `data` 节点 SHALL ref `ProjectVO` 而不是裸 ref，SHALL NOT 出现 "ProjectVO 作为响应 schema 整体" 这种无包络形态
+- **WHEN** `GET /project/load/code/{code}` 由原本直返 `ProjectVO` 改造为返 `R<ProjectDetailVO>`
+- **THEN** 契约 schema 中响应的 `data` 节点 SHALL ref `ProjectDetailVO` 而不是裸 ref，SHALL NOT 出现 "ProjectVO 作为响应 schema 整体" 这种无包络形态
 - **AND** 任何"过去写过 R<T>"的客户端代码 SHALL 在无修改前提下仍能成功解构；存量"直接吃实体"的旧代码 SHALL 让 `resp.data.code` 取到 `undefined` 而非业务值，触发类型守护
 
 #### Scenario: 反向验证：以裸实体出参接入受保护接口 SHALL 立即失真
@@ -218,3 +224,26 @@
 - **WHEN** 临时把 Controller 装配改回直返持久化实体（破坏本 Requirement）
 - **THEN** `api-contract` 系列契约断言（如 `ApiContractIT` 期待 `data.code === 种子编码` 的断言） SHALL 失败，错误 SHALL 指向裸实体出参而非 `code` 字段缺省
 - **AND** 该反向验证保证本 Requirement 不会被后续回归悄悄破坏
+
+### Requirement: M4 切运行时 React 入口优先 Angular 静态产物
+
+切运行时后端 jar 含 `aicode-web` 模块提供的 `static/index.html`（React 19 + TypeScript 入口），`/` 路径 SHALL 由 Spring Boot 从 classpath 加载此 HTML；Angular 7 静态产物 SHALL 被删除，**不得**优先于 React 入口。
+
+#### Scenario: M4 后 `/` 命中 React 入口而非 Angular 老产物
+
+- **WHEN** 启动 `./gradlew :aicode:bootRun`（M4 后 aicode 依赖 aicode-web）后 GET `http://localhost:8080/`
+- **THEN** 响应 200 + Content-Type `text/html`，HTML body SHALL 含 `id="root"`（aicode-web React Vite 入口标记）且 SHALL NOT 含 Angular 老产物 hash（如 `10.460f310dc07dcf545995.js`）
+- **AND** `aicode/src/main/resources/static/` SHALL 已删除（Angular 产物不共存，避免 classpath 顺序歧义）
+
+#### Scenario: M4 后带 `.shtml` 后缀的 API 路径仍由 Spring MVC 处理
+
+- **WHEN** GET `http://localhost:8080/project/list.shtml?token=...&curPage=1&pageSize=5`（`*.shtml` 路径由 `ShtmlSuffixRewriteFilter` 重写为无后缀）
+- **THEN** 响应 200 + Content-Type `application/json`（非 `text/html`），body 为 Spring MVC R 包络 JSON 而**不**是 React `index.html`
+- **AND** React 入口不占用 `/api/*` 或 `/project/*` 等后端 API 路径（前端页面路由走 hash 段，不与 API 路径争用）
+
+#### Scenario: M4 后前端页面路由走 hash 段（`/#/...`）而非服务端路径
+
+- **WHEN** 用户在浏览器地址栏访问 `http://localhost:8080/#/login`、`/#/project/list`、`/#/account/me`
+- **THEN** hash 段不经服务端匹配，React Router（`HashRouter`）SHALL 在客户端渲染对应页面
+- **AND** 无 hash 的服务端路径（如 `GET /login`）SHALL 返回 400 JSON（R 包络错误），**不** SHALL fallback 到 `index.html` —— Spring Boot 4 对未匹配路径抛 `NoResourceFoundException`（不自动 SPA fallback）
+- **AND** 前端所有 API 请求 SHALL 统一带 `.shtml` 后缀（由 `src/lib/api/shtml-suffix.ts` axios 拦截器追加），与后端 `ShtmlSuffixRewriteFilter` 对接

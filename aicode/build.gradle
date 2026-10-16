@@ -94,6 +94,11 @@ dependencies {
     //-----------项目中模块引入 Start--------------
     implementation project(path: ':common')
     implementation project(path: ':facade')
+    // M4 切运行时：引入 aicode-web 模块（React 前端产物）。
+    // aicode-web 的 Jar 内部布局为 static/**，Spring Boot 从 classpath 的
+    // /static/ 提供页面，因此无需任何资源拷贝配置。
+    // 详见 openspec/changes/archive/2026-10-19-m4-cutover-to-react/。
+    implementation project(path: ':aicode-web')
     //-----------项目中模块引入 End--------------
 
     developmentOnly 'org.springframework.boot:spring-boot-devtools'

@@ -4,6 +4,7 @@ import { ContractError, unwrapSuccess } from '../../lib/contract-response'
 import { getAicodeRESTfulAPIs } from '../../generated/api'
 import type { ProjectDetailVO } from '../../generated/model/projectDetailVO'
 import ProjectSqlPanel from './ProjectSqlPanel'
+import RelationshipPanel from './RelationshipPanel'
 
 /**
  * `ProjectDetailPage` —— M3-A 第 2 阶段 + M3-C 字段裁切。
@@ -184,6 +185,8 @@ export default function ProjectDetailPage() {
       ))}
       {/* 代码生成配置流程的第 ②③ 步：导 SQL + 触发逆解析 */}
       <ProjectSqlPanel projectCode={code} />
+      {/* 第 ⑤ 步：配关联关系（MapRelationship 是"三层映射"的第三层） */}
+      <RelationshipPanel projectCode={code} />
     </section>
   )
 }

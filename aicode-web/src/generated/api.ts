@@ -43,11 +43,12 @@ import type {
   Modify4Params,
   PageVOAccountVO,
   RAccountPublicVO,
+  RBoolean,
   RFrameworkSummaryVO,
   RFrameworks,
-  RListMapClassTable,
+  RListMapClassTableVO,
   RListMapFieldColumnVO,
-  RListMapRelationship,
+  RListMapRelationshipReadVO,
   RObject,
   RPageProjectFramworkPageVO,
   RPageProjectModulePageVO,
@@ -62,6 +63,7 @@ import type {
   RProjectRepositoryAccount,
   RProjectSql,
   RProjectSqlVO,
+  RRelationshipFieldsVO,
   RString,
   RVoid,
   ScanPathParams,
@@ -175,7 +177,7 @@ const getModifyUrl = () => {
  */
 const modify2 = (
     mapRelationshipVO: MapRelationshipVO, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<boolean>> => {
+ ): Promise<AxiosResponse<RBoolean>> => {
     return axiosInstance.put(
       `/project/relationship/modify`,
       mapRelationshipVO,options
@@ -691,7 +693,7 @@ const getLoad1Url = (params: Load1Params,) => {
  */
 const list = (
     params: ListParams, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<RListMapRelationship>> => {
+ ): Promise<AxiosResponse<RListMapRelationshipReadVO>> => {
     return axiosInstance.get(
       `/project/relationship/list`,{
     ...options,
@@ -717,7 +719,7 @@ const getListUrl = (params: ListParams,) => {
  */
 const listMapFieldColumn = (
     params: ListMapFieldColumnParams, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<RObject>> => {
+ ): Promise<AxiosResponse<RRelationshipFieldsVO>> => {
     return axiosInstance.get(
       `/project/relationship/listMapFieldColumn`,{
     ...options,
@@ -743,7 +745,7 @@ const getListMapFieldColumnUrl = (params: ListMapFieldColumnParams,) => {
  */
 const listMapClassTable = (
     params: ListMapClassTableParams, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<RListMapClassTable>> => {
+ ): Promise<AxiosResponse<RListMapClassTableVO>> => {
     return axiosInstance.get(
       `/project/relationship/listMapClassTable`,{
     ...options,
@@ -1407,7 +1409,7 @@ export type UpdateIsPublic1Result = AxiosResponse<RFrameworks>
 export type UpdateIsPublicResult = AxiosResponse<RFrameworks>
 export type Modify1Result = AxiosResponse<RFrameworks>
 export type ModifyResult = AxiosResponse<RFrameworks>
-export type Modify2Result = AxiosResponse<boolean>
+export type Modify2Result = AxiosResponse<RBoolean>
 export type Modify3Result = AxiosResponse<boolean>
 export type Modify4Result = AxiosResponse<RProjectSqlVO>
 export type BuildResult = AxiosResponse<RProjectSqlVO>
@@ -1427,9 +1429,9 @@ export type Build7Result = AxiosResponse<AccountSaveVO>
 export type LoadResult = AxiosResponse<RProjectSql>
 export type ScanPathResult = AxiosResponse<RObject>
 export type Load1Result = AxiosResponse<RProjectRepositoryAccount>
-export type ListResult = AxiosResponse<RListMapRelationship>
-export type ListMapFieldColumnResult = AxiosResponse<RObject>
-export type ListMapClassTableResult = AxiosResponse<RListMapClassTable>
+export type ListResult = AxiosResponse<RListMapRelationshipReadVO>
+export type ListMapFieldColumnResult = AxiosResponse<RRelationshipFieldsVO>
+export type ListMapClassTableResult = AxiosResponse<RListMapClassTableVO>
 export type Load2Result = AxiosResponse<RProjectModule>
 export type List1Result = AxiosResponse<RPageProjectModulePageVO>
 export type Load3Result = AxiosResponse<RProject>

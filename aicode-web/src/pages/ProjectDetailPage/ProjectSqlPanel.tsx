@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { ContractError, unwrapSuccess } from '../../lib/contract-response'
 import { getAicodeRESTfulAPIs } from '../../generated/api'
 import type { ProjectSqlVO } from '../../generated/model/projectSqlVO'
-import type { MapClassTable } from '../../generated/model/mapClassTable'
+import type { MapClassTableVO } from '../../generated/model/mapClassTableVO'
 
 /**
  * `ProjectSqlPanel` —— `ProjectDetailPage` 的「SQL 与解析」区块。
@@ -47,7 +47,10 @@ export default function ProjectSqlPanel({ projectCode }: Props) {
   const [addedSegments, setAddedSegments] = useState<ProjectSqlVO[]>([])
   const [saving, setSaving] = useState(false)
   const [parseState, setParseState] = useState<ParseState>({ kind: 'idle' })
-  const [mapTables, setMapTables] = useState<MapClassTable[]>([])
+  // 用 MapClassTableVO（6 字段）而非 MapClassTable 实体 —— 后者虽仍留在契约
+  // components 里（其它端点可能用），但本端点已改返 VO；用实体类型会让
+  // 类型检查通过而运行时字段对不上（典型的"契约与运行时不一致"）。
+  const [mapTables, setMapTables] = useState<MapClassTableVO[]>([])
   const [parseResultState, setParseResultState] = useState<ParseResultState>('loading')
 
   const loadParseResult = useCallback(() => {
@@ -60,7 +63,7 @@ export default function ProjectSqlPanel({ projectCode }: Props) {
       .then((resp) => {
         const list = unwrapSuccess(resp)
         // 后端返回的是裸 List（无 PageVO 包络），可能为 null
-        setMapTables((list ?? []) as MapClassTable[])
+        setMapTables((list ?? []) as MapClassTableVO[])
         setParseResultState('done')
       })
       .catch(() => {

@@ -12,10 +12,13 @@ import com.aicode.map.entity.MapRelationship;
 import com.aicode.map.service.MapClassTableService;
 import com.aicode.map.service.MapFieldColumnService;
 import com.aicode.map.service.MapRelationshipService;
+import com.aicode.map.vo.MapClassTableVO;
+import com.aicode.map.vo.MapFieldColumnReadVO;
+import com.aicode.map.vo.MapRelationshipReadVO;
 import com.aicode.map.vo.MapRelationshipVO;
+import com.aicode.map.vo.RelationshipFieldsVO;
 import com.aicode.project.entity.ProjectMap;
 import com.aicode.project.service.ProjectMapService;
-import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import io.swagger.v3.oas.annotations.Operation;
@@ -121,11 +124,43 @@ public class MapRelationshipController {
             @Parameter(name = "classTableCode", description = "类表映射编码", required = true),
     })
     @GetMapping(value = "/list")
-    public R<java.util.List<com.aicode.map.entity.MapRelationship>> list(String classTableCode) {
+    public R<java.util.List<MapRelationshipReadVO>> list(String classTableCode) {
         Assert.hasText(classTableCode, "查询参数为空！");
         List<MapRelationship> relationships = mapRelationshipService.list(new LambdaQueryWrapper<MapRelationship>()
                 .eq(MapRelationship::getMapClassTableCode, classTableCode));
-        return R.success(relationships);
+        List<MapRelationshipReadVO> voList = new java.util.ArrayList<>(relationships.size());
+        for (MapRelationship entity : relationships) {
+            voList.add(toRelationshipReadVo(entity));
+        }
+        return R.success(voList);
+    }
+
+    /**
+     * 把持久化实体 {@link MapRelationship} 转换为关联关系读投影
+     * {@link MapRelationshipReadVO}（7 字段）。
+     *
+     * <p>刻意排除：自增主键 {@code id}（对外标识是业务编码 {@code code}）、
+     * 嵌套 {@code associateClass}（整个 {@code MapClassTable} 实体，列表场景必为 null）、
+     * 派生 boolean {@code oneToOne} / {@code oneToMany}（与 {@code isOneToOne} /
+     * {@code isOneToMany} 语义同源）。
+     *
+     * <p><b>与 {@link MapRelationshipVO} 的区别</b>：后者是
+     * {@code PUT /modify} 的 {@code @RequestBody} 入参载体，其 {@code id} 是该端点
+     * 查询必需的，不可裁。</p>
+     *
+     * <p>逐字段显式赋值，与 {@code ProjectController#toSummary} 保持一致：
+     * 显式胜过隐式，字段重命名会在编译期暴露。</p>
+     */
+    private static MapRelationshipReadVO toRelationshipReadVo(MapRelationship entity) {
+        MapRelationshipReadVO vo = new MapRelationshipReadVO();
+        vo.setCode(entity.getCode());
+        vo.setMapClassTableCode(entity.getMapClassTableCode());
+        vo.setAssociateCode(entity.getAssociateCode());
+        vo.setIsOneToOne(entity.getIsOneToOne());
+        vo.setIsOneToMany(entity.getIsOneToMany());
+        vo.setMainField(entity.getMainField());
+        vo.setJoinField(entity.getJoinField());
+        return vo;
     }
 
 
@@ -134,7 +169,7 @@ public class MapRelationshipController {
             @Parameter(name = "projectCode", description = "项目名", required = true)
     })
     @GetMapping(value = "/listMapClassTable")
-    public R<java.util.List<com.aicode.map.entity.MapClassTable>> listMapClassTable(String projectCode) {
+    public R<java.util.List<MapClassTableVO>> listMapClassTable(String projectCode) {
         Assert.hasText(projectCode, BaseException.BaseExceptionEnum.Empty_Param.toString());
         List<ProjectMap> projectMapList = projectMapService.list(new LambdaQueryWrapper<ProjectMap>()
                 .eq(ProjectMap::getProjectCode, projectCode));
@@ -144,11 +179,36 @@ public class MapRelationshipController {
             List<MapClassTable> mapRelationships = mapClassTableService.list(new LambdaQueryWrapper<MapClassTable>()
                     .in(MapClassTable::getCode, projectMapList.stream()
                             .map(projectMap -> projectMap.getMapClassTableCode()).collect(Collectors.toList())));
-            return R.success(mapRelationships);
+            // 出参返 VO 而非 9 字段实体 —— 见 api-data-object 的
+            // 「Controller SHALL 返回 VO 而非持久化实体」。实体的两个关联 list
+            // （mapFieldColumnList / mapRelationshipList）在此场景必为 null。
+            List<MapClassTableVO> voList = new java.util.ArrayList<>(mapRelationships.size());
+            for (MapClassTable entity : mapRelationships) {
+                voList.add(toClassTableVo(entity));
+            }
+            return R.success(voList);
 
         }
 
         return R.failed(BaseException.BaseExceptionEnum.Result_Not_Exist);
+    }
+
+    /**
+     * 把持久化实体 {@link MapClassTable} 转换为类表映射出参
+     * {@link MapClassTableVO}（6 字段）。
+     *
+     * <p>刻意排除：自增主键 {@code id}、嵌套 {@code mapFieldColumnList} /
+     * {@code mapRelationshipList}（列表场景必为 null）。</p>
+     */
+    private static MapClassTableVO toClassTableVo(MapClassTable entity) {
+        MapClassTableVO vo = new MapClassTableVO();
+        vo.setCode(entity.getCode());
+        vo.setTableName(entity.getTableName());
+        vo.setClassName(entity.getClassName());
+        vo.setClassModel(entity.getClassModel());
+        vo.setDashedCaseName(entity.getDashedCaseName());
+        vo.setNotes(entity.getNotes());
+        return vo;
     }
 
 
@@ -158,37 +218,74 @@ public class MapRelationshipController {
             @Parameter(name = "associateCode", description = "被关联编码"),
     })
     @GetMapping(value = "/listMapFieldColumn")
-    @ResponseBody
-    public R<Object> listMapFieldColumn(String mapClassTableCode, String associateCode) {
+    public R<RelationshipFieldsVO> listMapFieldColumn(String mapClassTableCode, String associateCode) {
         if (StringUtils.isEmpty(mapClassTableCode)) {
             return R.failed(BaseException.BaseExceptionEnum.Empty_Param);
         }
-        JSONObject jsonObject = new JSONObject();
         List<MapFieldColumn> fields = mapFieldColumnService.list(new LambdaQueryWrapper<MapFieldColumn>()
                 .eq(MapFieldColumn::getMapClassTableCode, mapClassTableCode));
-        jsonObject.put("mainFields", fields);
-
         List<MapFieldColumn> associateFields = mapFieldColumnService.list(new LambdaQueryWrapper<MapFieldColumn>()
                 .eq(MapFieldColumn::getMapClassTableCode, associateCode));
 
-        jsonObject.put("associateFields", associateFields);
         //查询关联关系
         MapRelationship mapRelationship = mapRelationshipService.getOne(new LambdaQueryWrapper<MapRelationship>()
                 .eq(MapRelationship::getMapClassTableCode, mapClassTableCode)
                 .eq(MapRelationship::getAssociateCode, associateCode));
-        jsonObject.put("mapRelationship", mapRelationship);
-        return R.success(jsonObject);
+
+        // 具名 VO 而非 JSONObject：原先的 R<Object> 让契约里 data 是无约束的 {}，
+        // 前端拿不到内部字段名 —— 见 api-contract 的
+        // 「R<Object> 出参 SHALL 被识别为契约缺陷而非合法写法」。
+        // 三个字段名与原 jsonObject.put 的 key 一一对应，SHALL NOT 改名。
+        RelationshipFieldsVO vo = new RelationshipFieldsVO();
+        vo.setMainFields(toFieldReadVoList(fields));
+        vo.setAssociateFields(toFieldReadVoList(associateFields));
+        vo.setMapRelationship(null == mapRelationship ? null : toRelationshipReadVo(mapRelationship));
+        return R.success(vo);
+    }
+
+    /**
+     * 把持久化实体 {@link MapFieldColumn} 转换为字段读投影
+     * {@link MapFieldColumnReadVO}（8 字段）的列表。
+     *
+     * <p>刻意排除：自增主键 {@code id}、嵌套 {@code displayAttribute}
+     * （由 {@code /displayAttribute/list} 单独给出，且该实体本身是"前端表单的 UI 契约"）、
+     * 嵌套 {@code mapRelationship}、{@code notes} / {@code defaultValue} /
+     * {@code sqlType} / {@code upper}、4 个派生 boolean
+     * （{@code checkDate} / {@code checkState} / {@code checkPk} 等）。</p>
+     *
+     * <p><b>与 {@link com.aicode.map.vo.MapFieldColumnVO} 的区别</b>：后者（13 字段）
+     * 是 {@code /displayAttribute/list} 的出参，被 {@code DisplayAttributesPage} 消费，
+     * 不可裁。</p>
+     */
+    private static List<MapFieldColumnReadVO> toFieldReadVoList(List<MapFieldColumn> entities) {
+        List<MapFieldColumnReadVO> voList = new java.util.ArrayList<>(entities.size());
+        for (MapFieldColumn entity : entities) {
+            MapFieldColumnReadVO vo = new MapFieldColumnReadVO();
+            vo.setCode(entity.getCode());
+            vo.setMapClassTableCode(entity.getMapClassTableCode());
+            vo.setColumn(entity.getColumn());
+            vo.setField(entity.getField());
+            vo.setFieldType(entity.getFieldType());
+            vo.setIsPrimaryKey(entity.getIsPrimaryKey());
+            vo.setIsDate(entity.getIsDate());
+            vo.setIsState(entity.getIsState());
+            voList.add(vo);
+        }
+        return voList;
     }
 
 
     @Operation(summary = "修改MapRelationship", description = "修改MapRelationship")
     @PutMapping("/modify")
-    public boolean modify(@RequestBody MapRelationshipVO mapRelationshipVO) {
+    public R<Boolean> modify(@RequestBody MapRelationshipVO mapRelationshipVO) {
         MapRelationship newMapRelationship = new MapRelationship();
         BeanUtils.copyProperties(mapRelationshipVO, newMapRelationship);
         boolean isUpdated = mapRelationshipService.update(newMapRelationship, new LambdaQueryWrapper<MapRelationship>()
                 .eq(MapRelationship::getId, mapRelationshipVO.getId()));
-        return isUpdated;
+        // R<Boolean> 而非裸 boolean：裸出参绕过 R 的 code/info/success 三元组，
+        // 前端的 unwrapSuccess 无从工作，该端点只能被特殊处理。
+        // 见 api-contract 的「端点 SHALL NOT 裸返 boolean 等非 R 包络类型」。
+        return R.success(isUpdated);
     }
 
 

@@ -504,7 +504,10 @@ Project 是聚合根：包含 `ProjectSql`、`ProjectFramwork`、`ProjectMap`、
 6. 生成主链路端到端集成测试（§7.7.3，mock Git / 模板）。
 7. Mapper 层 `@SpringBootTest` + H2 真实 SQL 验证：`TableMapperIT`（元数据）与 `MapFieldColumnMapperIT`（实体列映射）已落地，**其余实体仍缺**。新增实体时 SHALL 参照 `MapFieldColumnMapperIT` 补一条 —— 打桩 mapper 的测试不算覆盖。
 8. **代码生成主链路的端到端回归**：当前无测试覆盖「登录 → 建项目 → 导 SQL → init → 构建」全链路（§7.7.3）。2026-10-15 的列映射事故之所以能全绿通过，正是因为这条链路只被 mock 覆盖。
-9. **前端端点覆盖补齐（M5 议程）**：后端 43 个端点中，前端目前已消费 **11** 个（`/login/signin`、`/project/list`、`/project/load/code/{code}`、`/displayAttribute/list`、`/account/load`、`/project/job/execute`、`/framework/list`、WebSocket 构建日志、`POST /project/build`、`POST /project/sql/build`、`POST /project/init`）。**未接入的高价值端点**：`/project/relationship/build`（关联关系配置）、`/displayAttribute/save`（改字段显示方式，当前只读）。流程现状：建项目 → 导 SQL → 解析 → **配显示属性 ✅ / 关联关系 ❌** → 构建，前 5 步已可达。每接一个页面 SHALL 走 `aicode-web/README.md` §「How to wire next endpoint」五步。
+9. **前端端点覆盖补齐（M5 议程）**：后端 43 个端点中，前端目前已消费 **14** 个（`/login/signin`、`/project/list`、`/project/load/code/{code}`、`/displayAttribute/list`、`/account/load`、`/project/job/execute`、`/framework/list`、WebSocket 构建日志、`POST /project/build`、`POST /project/sql/build`、`POST /project/init`、
+  `GET /project/relationship/listMapClassTable`、`GET /project/relationship/listMapFieldColumn`、`POST /project/relationship/build`、`GET /project/relationship/list`）。**未接入的高价值端点**：`/displayAttribute/save`（改字段显示方式，当前只读）、关系删除（`DELETE /project/relationship/delete`）。
+
+> **流程现状：① 建项目 → ② 导 SQL → ③ 解析 → ④ 配显示属性 → ⑤ 配关联关系 → ⑥ 构建，六步全部可达**（M5 收官）。每接一个页面 SHALL 走 `aicode-web/README.md` §「How to wire next endpoint」五步。
 10. **CI / CD（§11.4）**：当前**无 CI**，M4 后构建链变成「gradle + node」双语言，风险放大。建议 GitHub Actions 至少含：`./aicode/gradlew clean build`（含 `:aicode-web:verifyApi` 契约漂移守卫）、`./aicode/gradlew test`、`cd aicode-web && npm ci && npm test`、`measurement/startup-time.sh` 性能基线。
 
 ---
@@ -640,10 +643,11 @@ opsx 入口（功能等价，运行时暴露哪个就用哪个）：
   - 契约守护：`TemplateDataExpansionTest` —— 固化「模板变量展开必须用 fastjson2 往返而非 hutool `BeanUtil.beanToMap`」（getter 名 vs 字段名键集差异）
   - **假分页回归防线（M5-C 后新增）**：`ApiContractIT` 场景⑦ 的 `project_list_reflectsPaginationParams` 与 `project_list_fallsBackToDefaultsWhenParamsInvalid` 两用例钉住「`/project/list` 的 `data.curPage` / `data.pageSize` / `data.totalPage` SHALL 回填实际查询参数」。此前 `ProjectController.list` 曾是**假分页**（`lambdaQuery().list()` 拉全量、`curPage` / `pageSize` 入参被忽略、三个分页字段从不 set 恒为 0），已由 `2026-10-18-project-list-real-pagination` 修为真分页。**同类待收敛**：`/account/list` 也只 `setTotalRow` 不设三个分页字段。
   - 外部依赖：`GitToolsCloneCompletenessTest` —— 需网络访问 GitHub，由 `@EnabledIfSystemProperty(named = "network.tests")` 守卫，默认**不执行**；离线 CI 需显式加 `-Dnetwork.tests=true`
-  - **前端（M1–M5 落地，20 文件 / 108 用例，MSW 驱动）**：
+  - **前端（M1–M5 落地，21 文件 / 119 用例，MSW 驱动）**：
     - **响应契约层**：`contract-response/index.test.ts`（6 用例：`R.success` 解构 / `ContractError` 带 code+info / 非 `0000` 视为失败 / 缺省 code → UNKNOWN / message 回退）
     - **页面层**：`DisplayAttributesPage`（1）/ `LoginPage`（3，含空 token 与 `R.code!=="0000"`）/ `ProjectListPage`（**9**：构建按钮展开与 `state!=='Enable'` 禁用 / 翻页重拉并整页替换 / 末页禁用且点击不发请求 / `buildingCodes` 跨翻页保留 / **翻回不重复调 `execute`**）/ `ProjectDetailPage`（4，含裸 VO 触发错误气泡的反向用例）/ `AccountPage`（3）/ `FrameworkListPage`（5，成功渲染含 `isPublic` 中文映射与分页信息 / 空态非错误 / `R.code!=="0000"` / 翻页重拉并替换表格 / 末页禁用且点击不发请求）
     - **写侧页面层（首个）**：`NewProjectPage`（**9**）—— 本仓**第一个有提交能力的页面**，此前 7 个页面全是只读的。用例含：9 字段渲染 / `databaseType`+`language` 是下拉（D9）/ `englishName` 旁提示「将作为数据库 schema 名」（D8）/ 提交带全部 9 字段 + token / 成功导航到 `/project/{code}` / `R.code!=="0000"` 错误气泡且**保留已填字段** / `9005` 重复时点明「已被占用」/ 不提交契约之外的参数 / 不渲染 token 输入框。字段完备性由**类型系统**守护（见 §10 的 TS 断言陷阱）
+    - **关联关系区块**：`RelationshipPanel`（**11**，挂在详情页）—— 代码生成第 ⑤ 步。4 条对应 `aicode-web-page` 的级联 Req（上游变化清空下游 / 下游候选项上游选定后才加载 / 两组级联互不干扰 / 提交前校验必填项），另 7 条覆盖：未选表时字段下拉禁用且给提示且**不发字段请求**、两侧表选定后**一次请求喂两个下拉**、提交带齐 6 参数、`一对多`↔`oneToMany=Y` 与 `一对一`↔`oneToOne=Y`/`oneToMany=N`（**不产生 Y/Y 非法组合**）、保存成功后**重拉**列表（`build` 是 upsert，code 会变，本地追加会显示失效 code）、关系列表用本地 code→tableName 映射且**映射不到时回落显示 `associateCode`**、无表时给引导空态
     - **写侧区块**：`ProjectSqlPanel`（5，挂在详情页）—— 导 SQL + 触发 `init` 解析 + 读解析结果。用例含：空 SQL 时保存按钮禁用 / 保存带 `projectCode`+`tsql` / **解析后重读结果**（非只在 mount 读一次）/ `init` 失败呈现可读错误 / 解析结果读失败降级为空态不阻断主流程
     - **鉴权层**：`token-store`（7）/ `auth-interceptor`（6，含重复安装幂等）/ `use-auth`（5，含多 tab storage 同步）
     - **实时层**：`ws-client`（7，含 `vi.stubGlobal('WebSocket')` 替身与一次重连）/ `use-build-log`（5）/ `build-log-panel`（**8**，含 `autoStart` / `onMounted` 翻页重挂防护）/ `shtml-suffix`（8，纯函数 + 拦截器 + 幂等）

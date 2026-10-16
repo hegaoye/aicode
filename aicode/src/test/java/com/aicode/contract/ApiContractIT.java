@@ -1114,4 +1114,190 @@ class ApiContractIT {
                     .contains("name VARCHAR(32)");
         }
     }
+
+    // ==================================================================
+    // 场景⑫：映射实体端点 SHALL 用读投影 VO，组合结构 SHALL NOT 用 R<Object>
+    // （2026-10-18-relationship-config 防护）
+    // ==================================================================
+
+    /**
+     * 本组守护三件事：
+     *
+     * <ol>
+     *   <li>{@code listMapClassTable} 的元素 SHALL 是 6 字段的 {@code MapClassTableVO}，
+     *       SHALL NOT 含自增主键 {@code id} 与两个恒 null 的关联 list；</li>
+     *   <li>{@code listMapFieldColumn} 的 {@code data} SHALL 是具名的
+     *       {@code RelationshipFieldsVO}（3 个 key），SHALL NOT 是无约束的
+     *       {@code {}} —— 该端点原先返 {@code R<Object>}，是本仓唯一一处；</li>
+     *   <li>{@code PUT /modify} SHALL 走 {@code R<Boolean>}，SHALL NOT 裸返
+     *       {@code boolean}（裸出参绕过 {@code R} 的 code/info/success，
+     *       前端 {@code unwrapSuccess} 无从工作）。</li>
+     * </ol>
+     *
+     * <p><b>反向验证</b>：把 {@code listMapFieldColumn} 改回 {@code R<Object>} →
+     * {@code data} 的 key 断言红；把 {@code modify} 改回裸 {@code boolean} →
+     * 场景⑫ 用例 3 红（此二者编译期不拦，<b>只有契约断言能抓到</b>）。</p>
+     */
+    @Nested
+    @DisplayName("场景⑫ 映射实体端点用读投影 VO，组合结构不用 R<Object>")
+    class RelationshipVoContract {
+
+        private static final String REL_PROJECT_CODE = "1882812765213425001";
+
+        /** `MapClassTableVO` 的 6 字段白名单。 */
+        private static final java.util.Set<String> CLASS_TABLE_VO_FIELDS = java.util.Set.of(
+                "code", "tableName", "className", "classModel", "dashedCaseName", "notes"
+        );
+
+        /** `MapFieldColumnReadVO` 的 8 字段白名单。 */
+        private static final java.util.Set<String> FIELD_READ_VO_FIELDS = java.util.Set.of(
+                "code", "mapClassTableCode", "column", "field", "fieldType",
+                "isPrimaryKey", "isDate", "isState"
+        );
+
+        @Test
+        @DisplayName("listMapClassTable 的 data[] SHALL 是 MapClassTableVO 6 字段")
+        void listMapClassTable_data_isMapClassTableVo() throws Exception {
+            String body = get("/project/relationship/listMapClassTable.shtml?projectCode="
+                    + REL_PROJECT_CODE, token);
+
+            JsonNode root = PARSER.readTree(body);
+            // 种子项目若尚未解析出表，本用例无对象可校验 —— 明确跳过而非误报
+            if (!root.path("success").asBoolean()) {
+                org.junit.jupiter.api.Assumptions.assumeTrue(false,
+                        "种子项目尚未 init 解析出表，本用例无对象可校验；"
+                                + "VO 投影由 listMapFieldColumn 与下面的 schema 断言覆盖");
+            }
+
+            JsonNode data = root.path("data");
+            assertThat(data.isArray())
+                    .as("data SHALL 是数组，实际=%s", data)
+                    .isTrue();
+            if (data.size() == 0) {
+                return;
+            }
+
+            java.util.Set<String> actual = fieldNames(data.get(0));
+            assertThat(actual)
+                    .as("data[0] 字段集合 SHALL ⊆ MapClassTableVO 6 字段（SHALL NOT 是 "
+                            + "MapClassTable 实体的 9 字段），实际=%s", actual)
+                    .isSubsetOf(CLASS_TABLE_VO_FIELDS);
+            assertThat(actual.contains("id"))
+                    .as("data[0] SHALL NOT 含自增主键 id —— 对外标识是业务编码 code，"
+                            + "实际=%s", actual)
+                    .isFalse();
+            for (String association : java.util.List.of("mapFieldColumnList", "mapRelationshipList")) {
+                assertThat(actual.contains(association))
+                        .as("data[0] SHALL NOT 含关联 list '%s'（列表场景必为 null），实际=%s",
+                                association, actual)
+                        .isFalse();
+            }
+        }
+
+        @Test
+        @DisplayName("listMapFieldColumn 的 data SHALL 是具名组合结构（3 个 key），SHALL NOT 空对象")
+        void listMapFieldColumn_data_isNamedStructure_notEmptyObject() throws Exception {
+            // 这是本组的核心断言：原实现返 R<Object>，契约里 data 是无约束的 {}，
+            // 前端既拿不到 key 也不知道内部结构 —— 端点在契约层面不可消费。
+            String body = get("/project/relationship/listMapFieldColumn.shtml"
+                    + "?mapClassTableCode=not-exist-a&associateCode=not-exist-b", token);
+
+            JsonNode root = PARSER.readTree(body);
+            assertThat(root.path("success").asBoolean())
+                    .as("该端点对未知编码 SHALL 仍成功（返回空候选）而非报错，实际=%s",
+                            root.path("info"))
+                    .isTrue();
+
+            JsonNode data = root.path("data");
+            assertThat(data.isObject())
+                    .as("data SHALL 是对象（RelationshipFieldsVO），实际=%s", data)
+                    .isTrue();
+            java.util.Set<String> keys = fieldNames(data);
+            assertThat(keys)
+                    .as("data SHALL 恰好含 mainFields / associateFields / mapRelationship 三个 key"
+                            + "（与后端原 jsonObject.put 的 key 一致，SHALL NOT 改名），实际=%s", keys)
+                    .containsExactlyInAnyOrder("mainFields", "associateFields", "mapRelationship");
+
+            // 字段候选的元素投影
+            JsonNode mainFields = data.path("mainFields");
+            assertThat(mainFields.isArray())
+                    .as("mainFields SHALL 是数组，实际=%s", mainFields)
+                    .isTrue();
+            if (mainFields.size() > 0) {
+                java.util.Set<String> f = fieldNames(mainFields.get(0));
+                assertThat(f)
+                        .as("mainFields[] 元素 SHALL ⊆ MapFieldColumnReadVO 8 字段，实际=%s", f)
+                        .isSubsetOf(FIELD_READ_VO_FIELDS);
+                assertThat(f.contains("displayAttribute"))
+                        .as("mainFields[] 元素 SHALL NOT 含嵌套 displayAttribute（由 "
+                                + "/displayAttribute/list 单独给出），实际=%s", f)
+                        .isFalse();
+            }
+        }
+
+        @Test
+        @DisplayName("PUT /project/relationship/modify SHALL 走 R<Boolean> 而非裸 boolean")
+        void relationshipModify_isWrappedInR() throws Exception {
+            // 裸 boolean 绕过了 R 的 code/info/success 三元组 ——
+            // 前端 unwrapSuccess 对 `true` 无从工作，该端点只能被特殊处理。
+            // 该断言读的是导出契约的 schema（而非实际调用，因 modify 是 PUT + @RequestBody）。
+            String yaml = mockMvc.perform(MockMvcRequestBuilders.get("/v3/api-docs.yaml"))
+                    .andReturn().getResponse().getContentAsString(StandardCharsets.UTF_8);
+            assertThat(yaml).contains("/project/relationship/modify:");
+
+            int idx = yaml.indexOf("/project/relationship/modify:");
+            String seg = yaml.substring(idx, yaml.indexOf("\n  /", idx + 5));
+            assertThat(seg)
+                    .as("modify 的响应 schema SHALL NOT 是裸 `type: boolean`"
+                            + "（裸出参不在 R 包络内），实际片段=%s", seg)
+                    .doesNotContain("type: boolean");
+            assertThat(seg)
+                    .as("modify 的响应 schema SHALL ref RBoolean，实际片段=%s", seg)
+                    .contains("RBoolean");
+        }
+
+        @Test
+        @DisplayName("listMapClassTable 的响应 schema SHALL ref RListMapClassTableVO 而非裸实体")
+        void listMapClassTable_schema_isVoNotEntity() throws Exception {
+            // 上一个用例在种子项目未 init 时会跳过（无 MapClassTable 数据），
+            // 本用例在 **schema 层** 校验 VO 投影，因此无论有无数据都执行 ——
+            // 保证「VO 投影」这条契约始终有守护，不留"靠数据运气"的空白。
+            String yaml = mockMvc.perform(MockMvcRequestBuilders.get("/v3/api-docs.yaml"))
+                    .andReturn().getResponse().getContentAsString(StandardCharsets.UTF_8);
+            int idx = yaml.indexOf("/project/relationship/listMapClassTable:");
+            assertThat(idx)
+                    .as("契约 SHALL 含 /project/relationship/listMapClassTable 端点")
+                    .isNotNegative();
+            String seg = yaml.substring(idx, yaml.indexOf("\n  /", idx + 5));
+
+            assertThat(seg)
+                    .as("listMapClassTable 的响应 SHALL ref RListMapClassTableVO"
+                            + "（6 字段投影），SHALL NOT ref 裸实体 RListMapClassTable，"
+                            + "实际片段=%s", seg)
+                    .contains("RListMapClassTableVO");
+            assertThat(seg)
+                    .as("listMapClassTable 的响应 SHALL NOT ref 裸实体，实际片段=%s", seg)
+                    .doesNotContain("schemas/RListMapClassTable\"");
+        }
+
+        @Test
+        @DisplayName("三个裸映射实体 schema SHALL NOT 再被任何响应引用")
+        void noMappingEntitySchemaIsReferencedByResponse() throws Exception {
+            // MapClassTable / MapRelationship / MapFieldColumn 三个实体的 schema
+            // 仍会留在契约 components 里（其它端点可能用），但 SHALL NOT 有任何
+            // 响应 $ref 指向它们 —— 那是"裸实体出参"的直接证据。
+            String yaml = mockMvc.perform(MockMvcRequestBuilders.get("/v3/api-docs.yaml"))
+                    .andReturn().getResponse().getContentAsString(StandardCharsets.UTF_8);
+
+            // 只看 paths 段（components 里的定义与 properties 引用不算）
+            int pathsEnd = yaml.indexOf("\ncomponents:");
+            String paths = pathsEnd > 0 ? yaml.substring(0, pathsEnd) : yaml;
+            for (String entity : java.util.List.of("MapClassTable", "MapRelationship", "MapFieldColumn")) {
+                assertThat(paths)
+                        .as("paths 段 SHALL NOT 出现对裸实体 %s 的响应 $ref（SHALL 用 *VO / *ReadVO）"
+                                + "；出现即说明该端点直出实体", entity)
+                        .doesNotContain("schemas/RList" + entity + "\"");
+            }
+        }
+    }
 }

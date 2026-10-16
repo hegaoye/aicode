@@ -1,0 +1,264 @@
+/*
+ * BuildLogPanel —— 代码生成实时日志窗。
+ *
+ * 来源：OpenDesign 原型 `build-log.html` 的 <style>，**数值逐条原样转录**。
+ * .btn / .btn-solid / .btn-ghost / .footer-bar 之外的按钮基元已在 base.css 中
+ * （原型把同一套类复制了多遍，本文件只保留本组件私有的部分，不重复定义按钮）。
+ *
+ * ---------------------------------------------------------------------------
+ * 【`.ln-error` 为本次新增，原型无对应】
+ *
+ * 原型只画了**成功态**的日志窗（面板顶部一枚 ❌ 徽章表达失败，见 build-log.html）。
+ * 但实现有 error 态，且 error 态**刻意不自动收起**（用户要看到失败原因），
+ * 面板里必然出现带失败语义的日志行 —— 原型没给这一行准备样式。
+ *
+ * 取值理由：比 `.ln-warn`（橙）**更重**，用品牌红 `var(--accent)` + weight 600，
+ * 叠加 6% 的浅红底（与 `.tip-panel` / `--tip-bg` 同配方）——
+ * ① 与面板顶部的失败徽章同源，用户不需要学第二套红色的含义；
+ * ② 全站只有一种红（`--accent`），不引入第二种红，守住「单红预算」；
+ * ③ 加浅红底是为了让整行「跳出来」：`.ln` 是逐行滚动的文本块，
+ * 只靠字色在长日志里很容易被扫过去。
+ * ---------------------------------------------------------------------------
+ *
+ * 【其余新增类 —— 原型没有，但实现必须有，原因为逐条列出】
+ *
+ *   .log-head .right   原型 .log-head 只有 `.left` + `.status` 两个子元素，靠
+ *                      space-between 分居两端。本面板右端要并排放「已运行时长 /
+ *                      状态徽章 / 关闭」三样，用 .right 收成一组（沿用 base.css
+ *                      里 `.panel-head .right` 的惯例，不新造命名风格）。
+ *   .log-close         原型页面不需要关闭按钮（面板自动收起）；本面板 error 态
+ *                      刻意保留，必须给用户一个手动收起的出口。
+ *   .status.running    原型 .status 只有「Finished: SUCCESS」一种（绿底绿字）。
+ *                      运行态改用中性灰 + 复用 `.dot` 的 pulse 打转动效 ——
+ *                      绿色是终态语义，运行中就绿会把人骗了。
+ *   .status.error      失败态用品牌红，底色配方沿用原型的 color-mix 14%。
+ *   .stage/.stage-text/.stage-bar
+ *                      原型静态页没有「构建阶段」区（阶段进度是实现侧的后端
+ *                      type=progress 事件带来的），此处的排版按同一套 mono 12px
+ *                      节奏自造，未改动任何原型既有取值。
+ *
+ * 【刻意保留的原型取值 —— 即便对内嵌面板略显宽松，也按「数值不改」照抄】
+ *   .log-wrap 的 margin-block: 28px 24px
+ *   .log-body 的 max-height: 640px（原型是整页；内嵌面板满屏长日志时会偏高）
+ *   .footer-bar 的 padding-block: 16px 48px（48px 是原型整页的页尾留白）
+ */
+
+/* 原型 build-log.html 的 :root 里有 `--chat`（链接色），tokens.css / base.css
+   均未收录 —— `.ln-link` 是本组件唯一用到它的地方，故就地定义、注明出处。
+   令牌体系的唯一真源仍是 tokens.css，此处只是补一个漏收的分身。 */
+:root {
+  --chat: oklch(58% 0.16 245);
+}
+
+/* ---------------------------------------------------------------------------
+ * 日志窗外壳
+ * ------------------------------------------------------------------------ */
+.log-wrap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-block: 28px 24px;
+}
+
+/* ---------------------------------------------------------------------------
+ * 头部 —— 等宽字体的小灰条，像终端的标题栏
+ * ------------------------------------------------------------------------ */
+.log-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--border);
+  background: oklch(97.5% 0.005 240);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.log-head .left {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.log-head .right {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* 状态圆点：构建期的「心跳」，沿用原型的呼吸动效 */
+.log-head .dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: oklch(62% 0.14 145);
+  animation: pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(1.3);
+  }
+}
+
+.log-head .name {
+  color: var(--fg);
+}
+
+/* 状态徽章 —— 原型只有「Finished: SUCCESS」一种（绿底绿字） */
+.log-head .status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: 4px;
+  background: color-mix(in oklch, var(--success) 14%, transparent);
+  color: var(--success);
+  font-weight: 500;
+}
+
+/* 运行中：中性灰 —— 绿色是终态语义，构建中就绿会误导 */
+.log-head .status-running {
+  background: color-mix(in oklch, var(--muted) 12%, transparent);
+  color: var(--muted);
+}
+
+/* 失败：品牌红，配方沿用原型的 color-mix 14% */
+.log-head .status-error {
+  background: color-mix(in oklch, var(--accent) 14%, transparent);
+  color: var(--accent);
+}
+
+/* 关闭 —— 与 .status 同一节奏（小圆角 + 弱描边），不与 .btn 抢视觉重量 */
+.log-close {
+  font: inherit;
+  padding: 3px 10px;
+  color: var(--muted);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  transition:
+    color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.log-close:hover {
+  color: var(--fg);
+  border-color: var(--fg);
+}
+
+/* ---------------------------------------------------------------------------
+ * 构建阶段（第 N/M 步 + 进度条）—— 原型无对应，实现侧结构化阶段事件用
+ * ------------------------------------------------------------------------ */
+.stage {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 18px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.stage-text {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--fg);
+  white-space: nowrap;
+}
+
+.stage-bar {
+  flex: 1;
+  height: 4px;
+  min-width: 60px;
+  appearance: none;
+  -webkit-appearance: none;
+  border: 0;
+  border-radius: 2px;
+  background: var(--border);
+}
+
+.stage-bar::-webkit-progress-bar {
+  background: var(--border);
+  border-radius: 2px;
+}
+
+.stage-bar::-webkit-progress-value {
+  background: var(--accent);
+  border-radius: 2px;
+}
+
+.stage-bar::-moz-progress-bar {
+  background: var(--accent);
+  border-radius: 2px;
+}
+
+/* ---------------------------------------------------------------------------
+ * 日志正文 —— 等宽、保留换行（SQL 脚本是一整段多行文本）
+ * ------------------------------------------------------------------------ */
+.log-body {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  line-height: 1.7;
+  color: oklch(28% 0.02 250);
+  padding: 18px 22px 24px;
+  max-height: 640px;
+  overflow: auto;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.log-body .ln {
+  display: block;
+}
+
+.log-body .ln-event {
+  color: oklch(48% 0.06 250);
+}
+
+.log-body .ln-sql {
+  color: oklch(48% 0.12 245);
+  font-weight: 500;
+}
+
+.log-body .ln-ok {
+  color: var(--success);
+  font-weight: 500;
+}
+
+.log-body .ln-warn {
+  color: var(--warn); /* 原型字面量 oklch(58% 0.18 40)，与 --warn 同值 */
+}
+
+.log-body .ln-error {
+  color: var(--accent);
+  font-weight: 600;
+  background: color-mix(in oklch, var(--accent) 6%, transparent);
+}
+
+.log-body .ln-done {
+  color: var(--success);
+  font-weight: 600;
+}
+
+.log-body .ln-link {
+  color: var(--chat);
+  text-decoration: underline;
+}
+
+/* ---------------------------------------------------------------------------
+ * 底部动作条
+ * ------------------------------------------------------------------------ */
+.footer-bar {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  padding-block: 16px 48px;
+}

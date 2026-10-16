@@ -21,10 +21,17 @@
  *   ④ 6 个 .panel 之间的接缝（两段字段栅格的节奏 / 构建历史表的空态 /
  *      内嵌子面板的外距与内层标题收敛）
  *
- * ① 与 ② 当前没有 JSX 命中：「SQL 信息」面板的实际代码块由 ProjectSqlPanel 的
- * .editor-wrap 承担、「技术信息」面板因后端 /project/framwork/add 契约缺入参
- * （见 §10 的 @Parameter(hidden=true) 陷阱）暂为 pending 空态。先把原型的类
- * 转录在此，接口落地时只写 JSX、不必再回头补样式。
+ * ① 与 ② 当前没有 JSX 命中，且这是**有意识的预置**、不是遗漏：
+ *   - 「SQL 信息」面板：原型的 body 是只读的深色代码块 `.sql-block`，
+ *     我们嵌入的是 ProjectSqlPanel 的可编辑器 `.editor-wrap`。功能优先，
+ *     可编辑版胜出。待「编辑 →」能跳到独立的只读预览页时再收敛回 `.sql-block`。
+ *   - 「技术信息」面板：因后端 /project/framwork/add 与 /project/repository/build
+ *     的契约缺入参（见 §10 的 @Parameter(hidden=true) 陷阱）暂为 pending 空态。
+ *
+ *   追踪：这两个端点的修复已排在本轮视觉重写验收之后（见
+ *   docs/superpowers/specs/2026-10-16-aicode-web-visual-rewrite-design.md §6）。
+ *   接口落地时只写 JSX、不必回头重新从原型推导样式 —— 这正是预置的目的。
+ *   若届时决定改设计（如统一用可编辑器），请连带删除这里的 ① 与 ②。
  */
 
 /* ---------------------------------------------------------------------------

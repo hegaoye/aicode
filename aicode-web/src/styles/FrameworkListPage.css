@@ -35,19 +35,9 @@
  *      按 `row.textContent` 断言它。把技术编码放在 `.sr-only` 里，
  *      视觉 100% 还原原型的同时让文本仍可被断言与朗读。
  *
- * 若后续页面需要，请收编进 base.css（那边有「新增跨页类必须先登记」的约定）。
+ * `.sr-only` 本规则已收编进 base.css —— 本页建起它时被另外两页引用，
+ * 留在页面级 CSS 里等于让那两页的可用性依赖「技术架构页的样式被加载」。
  * ------------------------------------------------------------------------ */
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0 0 0 0);
-  white-space: nowrap;
-  border: 0;
-}
 
 /* 页面级错误气泡：与其他页面（LoginPage / NewProjectPage 等）同款红色提示，
    原型只在 .form-field .err 里给了同色同号，页面级提示沿用该视觉。 */

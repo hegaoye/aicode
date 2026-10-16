@@ -218,6 +218,21 @@ export default function ProjectListPage() {
                           onMounted={() => {
                             mountedPanelsRef.current.add(rowCode)
                           }}
+                          onClosed={(code) => {
+                            // 释放该行的「构建中」态。
+                            //
+                            // 不做的话该行**永久**卡在禁用态 —— buildingCodes 原本
+                            // 只有加入没有移除，构建一次即失去再次构建的能力
+                            // （用户要反复构建到满意，这是核心工作流）。
+                            //
+                            // 用**函数式更新**而非闭包里的 buildingCodes：多行的
+                            // 面板若并发关闭，逐个基于旧快照会互相覆盖导致漏删。
+                            setBuildingCodes((prev) => {
+                              const next = new Set(prev)
+                              next.delete(code)
+                              return next
+                            })
+                          }}
                         />
                       </td>
                     </tr>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useBuildLog } from './use-build-log'
 
 /**
@@ -35,6 +35,23 @@ interface Props {
    * 与 `autoStart` 配合实现"首次启动 / 翻回不重启"。
    */
   onMounted?: () => void
+  /**
+   * **面板从 DOM 消失时**回调一次（2026-10-18-building-codes-release-on-terminal）。
+   *
+   * <p>两条触发路径，二者对调用方的意义完全相同（该行的构建流程已结束或已被放弃）：</p>
+   * <ul>
+   *   <li>构建到达终态 —— {@code done} 时本面板自动收起（见组件内的注释）；</li>
+   *   <li>用户点面板上的「关闭」按钮 —— 触发 {@code useBuildLog().clear()}。</li>
+   * </ul>
+   *
+   * <p>调用方（{@code ProjectListPage}）据此释放该行的「构建中」态 ——
+   * 否则该行会**永久**卡在禁用态、失去再次构建的能力（构建一次即报废）。</p>
+   *
+   * <p>⚠️ <b>不会</b>在「翻回正在构建的行」时触发 —— 那种情况下本面板以
+   * {@code autoStart={false}} 挂载、{@code status} 初始即 {@code idle}，
+   * 若无守卫会立刻误触发，让用户得以重复触发构建（后端并发检查会拒绝）。</p>
+   */
+  onClosed?: (projectCode: string) => void
 }
 
 function formatElapsed(ms: number): string {
@@ -48,6 +65,7 @@ export default function BuildLogPanel({
   projectCode,
   autoStart = true,
   onMounted,
+  onClosed,
 }: Props) {
   const { status, entries, startedAt, startStream, clear } = useBuildLog(projectCode)
   const [now, setNow] = useState<number>(Date.now())
@@ -59,6 +77,35 @@ export default function BuildLogPanel({
     // 仅在 mount 时触发一次；onMounted 是内联箭头函数，故意不进依赖
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  /**
+   * 「面板曾显示过内容，现在消失了」的守卫 —— `onClosed` 的触发条件。
+   *
+   * <p><b>为什么不能简单判「当前不是 running」</b>：翻回正在构建的行时，本面板以
+   * `autoStart={false}` 挂载（调用方的 `mountedPanelsRef` 已有该 code），
+   * `useBuildLog` 的 `status` 初始即 `idle`，面板本就渲染 `null`。
+   * 若那样写，翻回的**第一次渲染**就会触发 `onClosed` → 释放该行的进行态 →
+   * 用户可重复触发构建（后端 Executing 检查拒绝，用户看到「点了没反应」）。</p>
+   *
+   * <p>故用 `hasShownRef`：只有「本面板实例确实显示过运行态」才认为它「消失过」。
+   * 触发后复位，使同一个面板实例最多触发一次。</p>
+   */
+  const hasShownRef = useRef(false)
+  useEffect(() => {
+    if (status === 'running') {
+      hasShownRef.current = true
+      return
+    }
+    // error 刻意不触发：面板保留让用户看失败原因，用户点「关闭」后 status 转 idle 才触发
+    if (status === 'idle' || status === 'done') {
+      if (hasShownRef.current) {
+        hasShownRef.current = false
+        onClosed?.(projectCode ?? '')
+      }
+    }
+    // onClosed 是内联箭头函数，故意不进依赖（否则每次父组件渲染都会重跑本效果）
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [status, projectCode])
 
   // mount 时自动启动构建流（autoStart=false 时不启 —— 见 Props 的 Javadoc）
   useEffect(() => {

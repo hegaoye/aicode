@@ -16,16 +16,36 @@ import ProjectListPage from './index'
 // `useBuildLog.tsx` 里 `import { connect } from './ws-client'`，
 // vitest 内 vi.mock 用 './ws-client' 字面指向 `./ws-client.ts` 文件。
 // 不走绝对路径，避免模块解析差异。
+/**
+ * 可投递消息的 ws 替身 —— 记录每次 `connect` 的 `onMessage`，
+ * 让用例能模拟服务端推送（终态事件）。
+ *
+ * <p>2026-10-18-building-codes-release-on-terminal 需要它来验证
+ * 「构建终态后该行释放『构建中』」这条端到端链路：
+ * ws 终态 → hook 终态 → 面板消失 → onClosed → setBuildingCodes 移除。</p>
+ */
+const wsConnections: Array<{ onMessage: (msg: string | null) => void }> = []
 vi.mock(
   // 同一文件的不同字面路径被 vite 当作同一模块
   '../../lib/realtime/ws-client',
   () => ({
-    connect: vi.fn(() => ({
-      close: vi.fn(),
-      send: vi.fn(),
-    })),
+    connect: vi.fn((_url: string, onMessage: (msg: string | null) => void) => {
+      wsConnections.push({ onMessage })
+      return {
+        close: vi.fn(),
+        send: vi.fn(),
+      }
+    }),
   }),
 )
+
+/** 向最近建立的 ws 连接投递一条消息。 */
+function pushWsMessage(msg: string | null) {
+  const last = wsConnections[wsConnections.length - 1]
+  act(() => {
+    last?.onMessage(msg)
+  })
+}
 
 /**
  * 路由需要 `MemoryRouter` 包裹；token 必须预先存在否则 `<RequireAuth>` 在
@@ -33,6 +53,38 @@ vi.mock(
  * 守卫，但拦截器仍要 token 存在才能正常请求（否则 axios.get 缺 header 也无所谓）；
  * 为与真实使用一致，预设 localStorage 一个 token。
  */
+
+/** 单行 Enable 数据 —— 「构建中」态的用例用它。 */
+const SINGLE_ROW = {
+  success: true,
+  code: '0000',
+  info: 'success',
+  data: {
+    curPage: 1,
+    pageSize: 10,
+    totalRow: 1,
+    totalPage: 1,
+    records: [
+      {
+        code: '1882812765213425001',
+        name: 'contract-demo',
+        englishName: 'contract-demo',
+        createTime: '2026-10-16 13:11:15',
+        state: 'Enable',
+      },
+    ],
+  },
+}
+
+/** execute 端点 —— 点「构建」会调它；返回成功即可（构建本身是异步 + ws 的）。 */
+function useExecuteOk(counter: { count: number }) {
+  server.use(
+    http.get('*/project/job/execute*', () => {
+      counter.count += 1
+      return HttpResponse.json({ success: true, code: '0000', info: 'success', data: null })
+    }),
+  )
+}
 
 function renderPage() {
   return render(
@@ -45,6 +97,7 @@ function renderPage() {
 describe('ProjectListPage', () => {
   beforeEach(() => {
     setToken('jwt-for-project-list-test')
+    wsConnections.length = 0
   })
 
   afterEach(() => {
@@ -446,5 +499,127 @@ describe('ProjectListPage', () => {
     expect(executeCount).toBe(1)
     // 且面板仍正常挂载（日志面板不因防护而消失）
     expect(screen.getByTestId('project-list-log-row')).toBeInTheDocument()
+  })
+
+  // ================================================================
+  // 「构建中」态的释放（2026-10-18-building-codes-release-on-terminal）
+  //
+  // buildingCodes 原本**只有加入没有移除** → 构建结束后该行**永久**卡在
+  // 禁用态、失去再次构建的能力（构建一次即报废）。而代码生成的核心
+  // 工作流恰恰是「反复构建到满意」。
+  //
+  // 触发路径：ws 终态 → useBuildLog 终态 → 面板消失 → onClosed →
+  // setBuildingCodes 移除该 code。
+  // ================================================================
+
+  it('收到 done 终态后该行 SHALL 释放「构建中」，按钮恢复可点', async () => {
+    const exec = { count: 0 }
+    server.use(getList2MockHandler(SINGLE_ROW))
+    useExecuteOk(exec)
+    renderPage()
+    await screen.findByTestId('project-list-build-button')
+
+    // 点构建 → 进入进行态
+    fireEvent.click(screen.getByTestId('project-list-build-button'))
+    await waitFor(() => {
+      expect(screen.getByTestId('project-list-build-button')).toBeDisabled()
+    })
+    expect(screen.getByTestId('project-list-build-button').textContent).toContain('构建中')
+
+    // 服务端推送结构化终态
+    await act(async () => {
+      pushWsMessage(JSON.stringify({ type: 'done', message: '构建成功' }))
+      await Promise.resolve()
+    })
+
+    // 按钮恢复可点、文案复位 —— 关键断言
+    await waitFor(() => {
+      expect(screen.getByTestId('project-list-build-button')).not.toBeDisabled()
+    })
+    expect(screen.getByTestId('project-list-build-button').textContent).not.toContain('构建中')
+    // 日志面板已自动收起（上一变更的行为），但这不影响按钮状态
+  })
+
+  it('收到 error 终态时面板保留，按钮仍禁用（用户看完错误点关闭才释放）', async () => {
+    // 这是刻意设计：构建失败时用户需要看到失败原因，
+    // 把错误面板自动藏掉是反直觉的（见 build-log-terminal-signal 的 design D5）。
+    const exec = { count: 0 }
+    server.use(getList2MockHandler(SINGLE_ROW))
+    useExecuteOk(exec)
+    renderPage()
+    await screen.findByTestId('project-list-build-button')
+
+    fireEvent.click(screen.getByTestId('project-list-build-button'))
+    await waitFor(() => {
+      expect(screen.getByTestId('project-list-build-button')).toBeDisabled()
+    })
+
+    await act(async () => {
+      pushWsMessage(JSON.stringify({ type: 'error', message: '构建失败：建表失败' }))
+      await Promise.resolve()
+    })
+
+    // 面板仍在（可见 ❌ 徽章）→ 按钮仍禁用
+    await waitFor(() => {
+      expect(screen.getByTestId('build-log-status-error')).toBeInTheDocument()
+    })
+    expect(screen.getByTestId('project-list-build-button')).toBeDisabled()
+  })
+
+  it('翻回正在构建的行 SHALL NOT 误释放（面板以 autoStart=false 挂载、status 初始即 idle）', async () => {
+    // 本变更最关键的回归防线：若无 hasShownRef 守卫，翻回的第一次渲染
+    // 就会触发 onClosed → 释放进行态 → 用户可重复触发构建
+    // （后端 Executing 检查会拒绝，用户看到"点了没反应"）。
+    const exec = { count: 0 }
+    server.use(
+      getList2MockHandler(async (info) => {
+        const isPage2 = String(info.request.url).includes('curPage=2')
+        return {
+          success: true,
+          code: '0000',
+          info: 'success',
+          data: {
+            curPage: isPage2 ? 2 : 1,
+            pageSize: 10,
+            totalRow: 11,
+            totalPage: 2,
+            records: [
+              {
+                code: isPage2 ? 'p2-code' : 'p1-code',
+                name: isPage2 ? '第 2 页项目' : '第 1 页项目',
+                englishName: isPage2 ? 'page2' : 'page1',
+                state: 'Enable',
+                createTime: '2026-10-16 13:11:15',
+              },
+            ],
+          },
+        } as unknown as RPageVOProjectSummaryVO
+      }),
+    )
+    useExecuteOk(exec)
+    renderPage()
+
+    await screen.findByTestId('project-list-build-button')
+    fireEvent.click(screen.getByTestId('project-list-build-button'))
+    await waitFor(() => {
+      expect(screen.getByTestId('project-list-build-button')).toBeDisabled()
+    })
+
+    // 翻到第 2 页 —— 第 1 页的面板卸载
+    fireEvent.click(screen.getByTestId('project-list-next'))
+    await waitFor(() => {
+      expect(screen.getByText('p2-code')).toBeInTheDocument()
+    })
+    expect(screen.getByTestId('project-list-build-button')).not.toBeDisabled()
+
+    // 翻回第 1 页 —— 该行面板以 autoStart={false} 重新挂载（mountedPanelsRef 已有该 code）
+    fireEvent.click(screen.getByTestId('project-list-prev'))
+    await waitFor(() => {
+      expect(screen.getByText('p1-code')).toBeInTheDocument()
+    })
+
+    // 关键断言：按钮**仍禁用** —— 翻回不等于构建结束
+    expect(screen.getByTestId('project-list-build-button')).toBeDisabled()
+    expect(screen.getByTestId('project-list-build-button').textContent).toContain('构建中')
   })
 })

@@ -11,6 +11,8 @@ import BuildLogPanel from './build-log-panel'
 let statusValue: 'idle' | 'running' | 'done' | 'error' = 'running'
 let entriesValue: { at: number; text: string }[] = []
 let startedAtValue: number | null = Date.now()
+/** clear 的可替换实现（默认空操作） */
+let clearImpl: () => void = () => undefined
 /** startStream 被调次数 —— 用于验 autoStart 语义 */
 const startStreamMock = vi.fn(() => Promise.resolve())
 
@@ -20,11 +22,14 @@ vi.mock('./use-build-log', () => ({
     entries: entriesValue,
     startedAt: startedAtValue,
     startStream: () => startStreamMock(),
-    clear: () => undefined,
+    // 可被用例改写 —— 以模拟用户点「关闭」按钮（2026-10-18-building-codes-release-on-terminal
+    // 的 onClosed 触发路径之一）
+    clear: () => clearImpl(),
   }),
 }))
 
 beforeEach(() => {
+  clearImpl = () => undefined
   statusValue = 'running'
   entriesValue = [
     { at: 1000, text: '开始构建...' },
@@ -132,5 +137,73 @@ describe('BuildLogPanel', () => {
     expect(screen.getByTestId('build-log-panel')).toBeInTheDocument()
     expect(screen.getByTestId('build-log-status-error')).toBeInTheDocument()
     expect(screen.getByText('构建失败: 建表失败')).toBeInTheDocument()
+  })
+
+  // ================================================================
+  // onClosed（2026-10-18-building-codes-release-on-terminal）
+  //
+  // 触发条件是「面板曾显示过内容，现在消失了」—— 用 hasShownRef 守卫。
+  // 若无守卫，翻回正在构建的行（面板以 autoStart=false 挂载、status
+  // 初始即 idle）会在第一次渲染就误触发。
+  // ================================================================
+
+  it('running → done SHALL 触发一次 onClosed', () => {
+    const onClosed = vi.fn()
+    const { rerender } = render(
+      <BuildLogPanel projectCode="contract-demo" onClosed={onClosed} />,
+    )
+    expect(onClosed).not.toHaveBeenCalled()
+
+    statusValue = 'done'
+    rerender(<BuildLogPanel projectCode="contract-demo" onClosed={onClosed} />)
+
+    expect(onClosed).toHaveBeenCalledTimes(1)
+    expect(onClosed).toHaveBeenCalledWith('contract-demo')
+  })
+
+  it('running → clear()（status 转 idle）SHALL 触发一次 onClosed', () => {
+    const onClosed = vi.fn()
+    const { rerender } = render(
+      <BuildLogPanel projectCode="contract-demo" onClosed={onClosed} />,
+    )
+    expect(onClosed).not.toHaveBeenCalled()
+
+    // 用户点面板的「关闭」按钮 → useBuildLog().clear() → status 转 idle
+    clearImpl = () => {
+      statusValue = 'idle'
+    }
+    statusValue = 'idle'
+    rerender(<BuildLogPanel projectCode="contract-demo" onClosed={onClosed} />)
+
+    expect(onClosed).toHaveBeenCalledTimes(1)
+  })
+
+  it('【关键防线】初始就 idle（翻回场景）SHALL NOT 触发 onClosed', () => {
+    // 翻回正在构建的行时：面板以 autoStart={false} 挂载 → 不调 startStream
+    // → status 初始即 idle → 面板渲染 null。若无 hasShownRef 守卫，
+    // 此刻就会误触发 onClosed → 释放该行进行态 → 用户可重复触发构建。
+    const onClosed = vi.fn()
+    render(<BuildLogPanel projectCode="contract-demo" onClosed={onClosed} />)
+
+    expect(onClosed).not.toHaveBeenCalled()
+  })
+
+  it('error SHALL NOT 触发 onClosed（面板保留让用户看失败原因）', () => {
+    const onClosed = vi.fn()
+    const { rerender } = render(
+      <BuildLogPanel projectCode="contract-demo" onClosed={onClosed} />,
+    )
+    statusValue = 'error'
+    rerender(<BuildLogPanel projectCode="contract-demo" onClosed={onClosed} />)
+
+    expect(onClosed).not.toHaveBeenCalled()
+    // 面板仍在渲染（❌ 徽章可见）
+    expect(screen.getByTestId('build-log-panel')).toBeInTheDocument()
+  })
+
+  it('未传 onClosed 时 SHALL NOT 抛错（prop 可选）', () => {
+    expect(() =>
+      render(<BuildLogPanel projectCode="contract-demo" />),
+    ).not.toThrow()
   })
 })

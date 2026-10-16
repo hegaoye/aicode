@@ -62,6 +62,28 @@ public class BuildProgress implements java.io.Serializable {
     // ---- 构造工厂（避免 type 的裸字符串散落） ----
 
     /**
+     * 构建阶段事件 —— 在每个步骤边界上报（2026-10-18-build-stage-progress）。
+     *
+     * <p>字段与 {@code ProjectInitProgress.progress} <b>刻意一致</b>，让前端的
+     * {@code ProgressEvent} 一套类型通吃构建与解析两个任务域，防止两侧协议漂移。</p>
+     *
+     * @param phase   步骤的**稳定标识**（如 {@code downloadTemplate}），SHALL NOT 用会随
+     *                文案变化的字符串 —— 文案一改，断言它的测试就红
+     * @param current 步骤序号（从 1 开始）
+     * @param total   步骤总数
+     * @param message 该步骤的可读名称（展示用）
+     */
+    public static BuildProgress progress(String phase, int current, int total, String message) {
+        BuildProgress p = new BuildProgress();
+        p.setType("progress");
+        p.setPhase(phase);
+        p.setCurrent(current);
+        p.setTotal(total);
+        p.setMessage(message);
+        return p;
+    }
+
+    /**
      * 构建成功终态。
      *
      * <p>替代原文本 {@code "Finished: SUCCESS"} —— 该消息此前从未被前端识别

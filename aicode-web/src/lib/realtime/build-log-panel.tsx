@@ -67,7 +67,7 @@ export default function BuildLogPanel({
   onMounted,
   onClosed,
 }: Props) {
-  const { status, entries, startedAt, startStream, clear } = useBuildLog(projectCode)
+  const { status, entries, startedAt, stage, startStream, clear } = useBuildLog(projectCode)
   const [now, setNow] = useState<number>(Date.now())
 
   // 每次 mount 通知调用方一次。声明在 autoStart 效果之前 —— 顺序不改变
@@ -178,6 +178,30 @@ if (status === 'idle' || status === 'done') {
           关闭
         </button>
       </header>
+      {/* 构建阶段（2026-10-18-build-stage-progress）：此前用户只能盯着一串滚动日志，
+          不知道"到哪一步了、是不是卡住了"。这里显示「第 N/7 步：<步骤名>」+ 进度条。
+          stage 为 null（未收到阶段事件）时不显示，不占位。 */}
+      {stage ? (
+        <div data-testid="build-stage" style={{ margin: 'var(--space-2) 0' }}>
+          {stage.total > 0 ? (
+            <p className="muted" data-testid="build-stage-text">
+              第 {stage.current}/{stage.total} 步：{stage.message ?? stage.phase ?? ''}
+            </p>
+          ) : (
+            <p className="muted" data-testid="build-stage-text">
+              {stage.message ?? stage.phase ?? '处理中…'}
+            </p>
+          )}
+          {stage.total > 0 ? (
+            <progress
+              data-testid="build-stage-bar"
+              value={stage.current}
+              max={stage.total}
+              style={{ width: '100%' }}
+            />
+          ) : null}
+        </div>
+      ) : null}
       <p className="muted" style={{ margin: 'var(--space-2) 0' }}>
         已运行 {formatElapsed(elapsed)}
       </p>

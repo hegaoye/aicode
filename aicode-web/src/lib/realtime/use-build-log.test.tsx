@@ -263,4 +263,86 @@ describe('useBuildLog', () => {
       '生成数据库结构与类模型成功！',
     ])
   })
+
+  // ================================================================
+  // 构建阶段（2026-10-18-build-stage-progress）
+  //
+  // 此前前端拿不到任何阶段信息 —— 用户只能盯着一串滚动日志。
+  // 关键约束：**阶段事件不进日志列表**（阶段已在面板顶部结构化展示，
+  // 再进日志列表会造成重复内容），且**不改变终态**。
+  // ================================================================
+
+  it('收到 type=progress SHALL 记下阶段且 entries 不变（不混入日志列表）', async () => {
+    const { result } = renderHook(() => useBuildLog('contract-demo'))
+    await act(async () => {
+      await result.current.startStream()
+    })
+    const before = result.current.entries.length
+
+    push(JSON.stringify({
+      type: 'progress', phase: 'downloadTemplate', current: 3, total: 7,
+      message: '下载技术模板',
+    }))
+
+    expect(result.current.stage).toEqual({
+      phase: 'downloadTemplate',
+      current: 3,
+      total: 7,
+      message: '下载技术模板',
+    })
+    expect(result.current.entries).toHaveLength(before)
+    expect(result.current.entries.map((e) => e.text).join(' '))
+      .not.toContain('downloadTemplate')
+  })
+
+  it('阶段事件 SHALL NOT 改变 status（终态仅由 done / error 决定）', async () => {
+    const { result } = renderHook(() => useBuildLog('contract-demo'))
+    await act(async () => {
+      await result.current.startStream()
+    })
+
+    push(JSON.stringify({ type: 'progress', phase: 'generateSource', current: 4, total: 7 }))
+    expect(result.current.status).toBe('running')
+
+    push(JSON.stringify({ type: 'done', message: '构建成功' }))
+    expect(result.current.status).toBe('done')
+  })
+
+  it('clear() SHALL 重置 stage', async () => {
+    const { result } = renderHook(() => useBuildLog('contract-demo'))
+    await act(async () => {
+      await result.current.startStream()
+    })
+    push(JSON.stringify({ type: 'progress', phase: 'buildProject', current: 1, total: 7 }))
+    expect(result.current.stage).not.toBeNull()
+
+    await act(async () => {
+      result.current.clear()
+    })
+    expect(result.current.stage).toBeNull()
+  })
+
+  it('7 个阶段的 phase SHALL 按顺序上报且 current 递增', async () => {
+    // 守护 design D1 的阶段序列：phase 是**稳定标识**，不是文案
+    const { result } = renderHook(() => useBuildLog('contract-demo'))
+    await act(async () => {
+      await result.current.startStream()
+    })
+
+    const expected = [
+      ['buildProject', 1],
+      ['convertModel', 2],
+      ['downloadTemplate', 3],
+      ['generateSource', 4],
+      ['readModule', 5],
+      ['versionControl', 6],
+      ['packageZip', 7],
+    ]
+    for (const [phase, current] of expected) {
+      push(JSON.stringify({ type: 'progress', phase, current, total: 7 }))
+      expect(result.current.stage?.phase).toBe(phase)
+      expect(result.current.stage?.current).toBe(current)
+      expect(result.current.stage?.total).toBe(7)
+    }
+  })
 })

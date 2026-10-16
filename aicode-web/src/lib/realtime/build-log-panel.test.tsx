@@ -9,6 +9,8 @@ import BuildLogPanel from './build-log-panel'
  */
 
 let statusValue: 'idle' | 'running' | 'done' | 'error' = 'running'
+/** 当前构建阶段（2026-10-18-build-stage-progress） */
+let stageValue: { phase: string | null; current: number; total: number; message: string | null } | null = null
 let entriesValue: { at: number; text: string }[] = []
 let startedAtValue: number | null = Date.now()
 /** clear 的可替换实现（默认空操作） */
@@ -21,6 +23,8 @@ vi.mock('./use-build-log', () => ({
     status: statusValue,
     entries: entriesValue,
     startedAt: startedAtValue,
+    terminalMessage: null,
+    stage: stageValue,
     startStream: () => startStreamMock(),
     // 可被用例改写 —— 以模拟用户点「关闭」按钮（2026-10-18-building-codes-release-on-terminal
     // 的 onClosed 触发路径之一）
@@ -30,6 +34,7 @@ vi.mock('./use-build-log', () => ({
 
 beforeEach(() => {
   clearImpl = () => undefined
+  stageValue = null
   statusValue = 'running'
   entriesValue = [
     { at: 1000, text: '开始构建...' },
@@ -205,5 +210,39 @@ describe('BuildLogPanel', () => {
     expect(() =>
       render(<BuildLogPanel projectCode="contract-demo" />),
     ).not.toThrow()
+  })
+
+  // ================================================================
+  // 构建阶段显示（2026-10-18-build-stage-progress）
+  // ================================================================
+
+  it('stage 有值时 SHALL 显示「第 N/M 步：<步骤名>」与进度条', () => {
+    stageValue = { phase: 'downloadTemplate', current: 3, total: 7, message: '下载技术模板' }
+    render(<BuildLogPanel projectCode="contract-demo" />)
+
+    expect(screen.getByTestId('build-stage')).toBeInTheDocument()
+    expect(screen.getByTestId('build-stage-text').textContent)
+      .toContain('第 3/7 步')
+    expect(screen.getByTestId('build-stage-text').textContent)
+      .toContain('下载技术模板')
+    const bar = screen.getByTestId('build-stage-bar') as HTMLProgressElement
+    expect(bar.value).toBe(3)
+    expect(bar.max).toBe(7)
+  })
+
+  it('stage 为 null 时 SHALL NOT 显示阶段区（不占位）', () => {
+    stageValue = null
+    const { container } = render(<BuildLogPanel projectCode="contract-demo" />)
+
+    expect(screen.queryByTestId('build-stage')).toBeNull()
+    expect(container.innerHTML).not.toContain('build-stage')
+  })
+
+  it('stage.total 未知（0）时只显示文案、不显示进度条', () => {
+    stageValue = { phase: 'buildProject', current: 0, total: 0, message: '创建工作空间' }
+    render(<BuildLogPanel projectCode="contract-demo" />)
+
+    expect(screen.getByTestId('build-stage-text').textContent).toContain('创建工作空间')
+    expect(screen.queryByTestId('build-stage-bar')).toBeNull()
   })
 })

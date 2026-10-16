@@ -114,6 +114,7 @@ public class GeneratorSVImpl implements GenerateSV {
         List<ProjectFramwork> projectFramworkList = null;
         try {
             //1.创建项目
+                reportStage("buildProject", 1, "创建工作空间");
             String logText = "Start By AI-Code @Copyright <a href='http://www.aicode.io' target='_blank'>AI-Code</a>";
             WSClientManager.sendMessage(logText);
             logsSV.saveLogs(logText, path);
@@ -135,6 +136,7 @@ public class GeneratorSVImpl implements GenerateSV {
 
 
             //2.获取类信息
+                reportStage("convertModel", 2, "转换模型");
             logText = "转化数据库结构与类模型...";
             WSClientManager.sendMessage(logText);
             logsSV.saveLogs(logText, path);
@@ -157,6 +159,7 @@ public class GeneratorSVImpl implements GenerateSV {
             logsSV.saveLogs("转化数据库结构与类模型成功！", path);
 
             //3.获取模板信息
+                reportStage("downloadTemplate", 3, "下载技术模板");
             projectFramworkList = projectFramworkMapper.selectList(new LambdaQueryWrapper<ProjectFramwork>().eq(ProjectFramwork::getProjectCode, projectCode));
             project.setProjectFramworkList(projectFramworkList);
             //从git中检出技术模板库
@@ -186,6 +189,7 @@ public class GeneratorSVImpl implements GenerateSV {
             logsSV.saveLogs(logText, path);
 
             //4.生成源码
+                reportStage("generateSource", 4, "生成源码");
             WSClientManager.sendMessage("开始生成源码...");
             logsSV.saveLogs("开始生成源码...", path);
             projectFramworkList.forEach(projectFramwork -> {
@@ -214,6 +218,7 @@ public class GeneratorSVImpl implements GenerateSV {
             logsSV.saveLogs(sqllog, path);
 
             //5.获取模块信息：从 project_module 关联取模块代码，再查 module 表拿名称/说明
+                reportStage("readModule", 5, "获取模块信息");
             List<ProjectModule> projectModules = projectModuleMapper.selectList(
                     new LambdaQueryWrapper<ProjectModule>().eq(ProjectModule::getProjectCode, projectCode));
             List<String> moduleNames = new ArrayList<>();
@@ -232,6 +237,7 @@ public class GeneratorSVImpl implements GenerateSV {
             logsSV.saveLogs(moduleLog, path);
 
             //6.获取版本控制管理信息
+                reportStage("versionControl", 6, "版本控制与推送");
             ProjectRepositoryAccount projectRepositoryAccount = projectRepositoryAccountMapper.selectOne(new LambdaQueryWrapper<ProjectRepositoryAccount>().eq(ProjectRepositoryAccount::getProjectCode, project.getCode()));
 
             if (projectRepositoryAccount != null) {
@@ -248,6 +254,7 @@ public class GeneratorSVImpl implements GenerateSV {
             }
 
             //7.创建压缩文件
+                reportStage("packageZip", 7, "打包交付");
             zipPackager.pack(project);
             String endLog = "代码已打包ZIP, ⇛⇛⇛  <a style='text-decoration:underline;' href='" + project.getDownloadUrl() + "' target='_blank'>[点击下载" + project.getEnglishName() + ".zip]</a>";
             WSClientManager.sendMessage(endLog);
@@ -288,6 +295,32 @@ public class GeneratorSVImpl implements GenerateSV {
             }
             WSClientManager.sendMessage("End");
         }
+    }
+
+    /** 构建主链路的步骤总数（仅用于进度上报的分母）。 */
+    private static final int STAGE_TOTAL = 7;
+
+    /**
+     * 上报构建阶段进度（2026-10-18-build-stage-progress）。
+     *
+     * <p>7 个步骤共用本方法，避免将来改协议时漏改其中一处 —— 若各写一遍
+     * {@code JSON.toJSONString(BuildProgress.progress(...))}，协议演进必然出现遗漏。</p>
+     *
+     * <p><b>只增不改</b>：本变更在 {@link #aiCode} 的 7 个步骤边界<b>插入</b>上报，
+     * 既有语句（17 处自由文本日志、{@code ProjectJobState} 状态更新、
+     * {@code finally} 的模板清理）一行未删未改 —— 生成主链路是核心资产（AGENTS §5.5）。</p>
+     *
+     * <p>阶段在<b>步骤开始时</b>上报（而非结束）：用户关心的是「现在卡在哪」，
+     * 不是「刚做完什么」。</p>
+     *
+     * @param phase   步骤的稳定标识（SHALL NOT 用会随文案变化的字符串 ——
+     *                文案一改，断言它的测试就红）
+     * @param current 步骤序号（从 1 开始）
+     * @param message 该步骤的可读名称
+     */
+    private void reportStage(String phase, int current, String message) {
+        WSClientManager.sendMessage(JSON.toJSONString(
+                BuildProgress.progress(phase, current, STAGE_TOTAL, message)));
     }
 
     //清理临时模板数据

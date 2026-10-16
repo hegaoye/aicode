@@ -86,4 +86,35 @@ class BuildProgressTerminalSignalTest {
 
         assertThat(buildKeys).isEqualTo(initKeys);
     }
+
+    // ================================================================
+    // 阶段事件（2026-10-18-build-stage-progress）
+    // ================================================================
+
+    @Test
+    @DisplayName("BuildProgress.progress SHALL 序列化出 type=progress 与阶段字段")
+    void progress_carriesStageFields() {
+        String json = JSON.toJSONString(
+                BuildProgress.progress("downloadTemplate", 3, 7, "下载技术模板"));
+        JSONObject obj = JSON.parseObject(json);
+
+        assertThat(obj.getString("type")).isEqualTo("progress");
+        assertThat(obj.getString("phase")).isEqualTo("downloadTemplate");
+        assertThat(obj.getIntValue("current")).isEqualTo(3);
+        assertThat(obj.getIntValue("total")).isEqualTo(7);
+        assertThat(obj.getString("message")).isEqualTo("下载技术模板");
+    }
+
+    @Test
+    @DisplayName("progress 的字段集 SHALL 与 ProjectInitProgress.progress 一致")
+    void progress_fieldShapeMatchesInitProgress() {
+        // 两侧刻意同形，前端一套 ProgressEvent 通吃 —— 任何一侧改字段都会让本测试红。
+        Set<String> build = JSON.parseObject(
+                JSON.toJSONString(BuildProgress.progress("p", 1, 2, "m"))).keySet();
+        Set<String> init = JSON.parseObject(
+                JSON.toJSONString(com.aicode.project.vo.ProjectInitProgress.progress("p", 1, 2, "m")))
+                .keySet();
+
+        assertThat(build).isEqualTo(init);
+    }
 }

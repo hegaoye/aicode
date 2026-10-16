@@ -35,12 +35,27 @@ export interface BuildLogEntry {
   text: string
 }
 
+/**
+ * 当前构建阶段（由服务端的 `type=progress` 事件给出）。
+ *
+ * <p>2026-10-18-build-stage-progress：代码生成有 7 个步骤，此前前端**看不到任何阶段信息**
+ * —— 用户只能盯着一串滚动日志。本字段让面板能显示「第 N/7 步：<步骤名>」。</p>
+ */
+export interface BuildStage {
+  phase: string | null
+  current: number
+  total: number
+  message: string | null
+}
+
 export interface UseBuildLogReturn {
   status: BuildLogStatus
   entries: BuildLogEntry[]
   startedAt: number | null
   /** 终态消息的文案（done / error 时可读）；供 UI 呈现失败原因 */
   terminalMessage: string | null
+  /** 当前阶段；未收到阶段事件时为 null */
+  stage: BuildStage | null
   startStream: () => Promise<void>
   clear: () => void
 }
@@ -68,6 +83,7 @@ export function useBuildLog(projectCode: string | null | undefined): UseBuildLog
   const [entries, setEntries] = useState<BuildLogEntry[]>([])
   const [startedAt, setStartedAt] = useState<number | null>(null)
   const [terminalMessage, setTerminalMessage] = useState<string | null>(null)
+  const [stage, setStage] = useState<BuildStage | null>(null)
   const wsRef = useRef<WSClient | null>(null)
   const startTimeRef = useRef<number | null>(null)
   /**
@@ -89,6 +105,7 @@ export function useBuildLog(projectCode: string | null | undefined): UseBuildLog
     statusRef.current = 'idle'
     setStartedAt(null)
     setTerminalMessage(null)
+    setStage(null)
     startTimeRef.current = null
   }, [])
 
@@ -151,6 +168,17 @@ export function useBuildLog(projectCode: string | null | undefined): UseBuildLog
 
       // ① 结构化终态事件（{"type":"done"|"error", ...}）
       const event = parseProgressEvent(msg)
+      if (event && event.type === 'progress') {
+        // 阶段事件：**只更新阶段展示，不进日志列表**（阶段已在面板顶部结构化展示，
+        // 再塞进日志列表会造成重复内容），也不改变终态（终态仅由 done / error 决定）
+        setStage({
+          phase: event.phase ?? null,
+          current: event.current ?? 0,
+          total: event.total ?? 0,
+          message: event.message ?? null,
+        })
+        return
+      }
       if (event && event.type !== 'progress') {
         setStatus(event.type)
         statusRef.current = event.type
@@ -184,5 +212,5 @@ export function useBuildLog(projectCode: string | null | undefined): UseBuildLog
     }
   }, [])
 
-  return { status, entries, startedAt, terminalMessage, startStream, clear }
+  return { status, entries, startedAt, terminalMessage, stage, startStream, clear }
 }

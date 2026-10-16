@@ -55,19 +55,24 @@ public class ProjectInitExecutor {
     public void execute(String code) {
         log.info("异步执行逆解析, projectCode:{}", code);
         this.lastProgress = null;
-        try {
-            Consumer<ProjectInitProgress> reporter = progress -> {
-                this.lastProgress = progress;
-                WSClientManager.sendMessage(JSON.toJSONString(progress));
-            };
-            projectService.execute(code, reporter);
-            WSClientManager.sendMessage(
-                    JSON.toJSONString(ProjectInitProgress.done("解析完成")));
-        } catch (Exception e) {
-            String msg = buildFailureMessage(e);
-            log.error("逆解析异步执行异常, projectCode:{}, message:{}", code, msg, e);
-            WSClientManager.sendMessage(JSON.toJSONString(ProjectInitProgress.error(msg)));
-        }
+        // 房间上下文：进度与终态只投递给订阅了本项目的连接。
+        // try/catch SHALL 在 withRoom **内部** —— 否则 catch 里推的 error 消息
+        // 会因 ThreadLocal 已清理而广播给所有连接（design D4）。
+        WSClientManager.withRoom(code, () -> {
+            try {
+                Consumer<ProjectInitProgress> reporter = progress -> {
+                    this.lastProgress = progress;
+                    WSClientManager.sendMessage(JSON.toJSONString(progress));
+                };
+                projectService.execute(code, reporter);
+                WSClientManager.sendMessage(
+                        JSON.toJSONString(ProjectInitProgress.done("解析完成")));
+            } catch (Exception e) {
+                String msg = buildFailureMessage(e);
+                log.error("逆解析异步执行异常, projectCode:{}, message:{}", code, msg, e);
+                WSClientManager.sendMessage(JSON.toJSONString(ProjectInitProgress.error(msg)));
+            }
+        });
     }
 
     /**

@@ -23,11 +23,18 @@ public class ProjectJobExecutor {
     @Async
     public void execute(String projectCode, ProjectJob projectJob) {
         log.info("异步执行构建, projectCode:{}, projectJobCode:{}", projectCode, projectJob.getCode());
-        try {
-            generateSV.aiCode(projectCode, projectJob);
-        } catch (Exception e) {
-            log.error("项目构建异步执行异常, projectCode:{}, projectJobCode:{}", projectCode, projectJob.getCode(), e);
-            WSClientManager.sendMessage("构建调度异常，详见日志");
-        }
+        // 房间上下文：让 aiCode 内部 17 处 sendMessage 只投递给订阅了本项目的连接，
+        // 而不必把 projectCode 沿方法签名一路下传（那会动生成主链路）。
+        // try/catch SHALL 在 withRoom **内部** —— 否则 catch 里推的消息会因
+        // ThreadLocal 已清理而广播给所有连接。
+        WSClientManager.withRoom(projectCode, () -> {
+            try {
+                generateSV.aiCode(projectCode, projectJob);
+            } catch (Exception e) {
+                log.error("项目构建异步执行异常, projectCode:{}, projectJobCode:{}",
+                        projectCode, projectJob.getCode(), e);
+                WSClientManager.sendMessage("构建调度异常，详见日志");
+            }
+        });
     }
 }

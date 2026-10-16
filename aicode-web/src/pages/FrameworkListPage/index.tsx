@@ -43,12 +43,17 @@ function renderIsPublic(value: string | undefined): string {
 export default function FrameworkListPage() {
   // 全局 axios 实例在 orval 生成物内部使用即可；每次渲染创建一份 api 是廉价的
   const api = useMemo(() => getAicodeRESTfulAPIs(), [])
+  // 当前页码：初值 1。db/data.sql 有 34 条框架种子 / PAGE_SIZE 20 = 2 页，
+  // 翻页控件据此启用（详见 openspec/changes/2026-10-18-framework-list-pagination/）。
+  const [curPage, setCurPage] = useState<number>(1)
   const [state, setState] = useState<LoadState>({ kind: 'loading' })
 
   useEffect(() => {
     let cancelled = false
+    // 切页期间先回到 loading —— 避免"上一页的表格行 + 新页码的分页信息"瞬时错配
+    setState({ kind: 'loading' })
     api
-      .list4({ curPage: 1, pageSize: PAGE_SIZE })
+      .list4({ curPage, pageSize: PAGE_SIZE })
       .then((resp) => {
         if (cancelled) {
           return
@@ -72,7 +77,7 @@ export default function FrameworkListPage() {
     return () => {
       cancelled = true
     }
-  }, [api])
+  }, [api, curPage])
 
   if (state.kind === 'loading') {
     return (
@@ -99,8 +104,9 @@ export default function FrameworkListPage() {
   // 也不读 createTimeBegin/End、updateTimeBegin/End（BaseVO 查询辅助字段）。
   const records = state.data.records ?? []
   const totalRow = state.data.totalRow ?? records.length
-  const curPage = state.data.curPage ?? 1
-  const totalPage = state.data.totalPage ?? 1
+  // 后端返回的页码用于纠正本地状态（正常与本地 curPage 相同；不一致时以本地为准）
+  const serverTotalPage = state.data.totalPage ?? 1
+  const totalPage = Math.max(serverTotalPage, curPage)
 
   return (
     <section>
@@ -109,9 +115,9 @@ export default function FrameworkListPage() {
         <small
           className="muted"
           style={{ marginLeft: '0.5em', fontWeight: 'normal' }}
-          data-testid="framework-list-paging"
+          data-testid="framework-list-total"
         >
-          共 {totalRow} 条 · 第 {curPage}/{totalPage} 页
+          共 {totalRow} 条
         </small>
       </h1>
       {records.length === 0 ? (
@@ -149,6 +155,42 @@ export default function FrameworkListPage() {
           </tbody>
         </table>
       )}
+
+      {/*
+        翻页控件。单页时（totalPage <= 1）两按钮均禁用但控件仍渲染 ——
+        隐藏会让布局在"翻到第 2 页时按钮突然出现"时跳动（design D4）。
+      */}
+      <nav
+        data-testid="framework-list-pager"
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 'var(--space-3)',
+          marginTop: 'var(--space-4)',
+        }}
+      >
+        <button
+          type="button"
+          className="btn-primary"
+          data-testid="framework-list-prev"
+          disabled={curPage <= 1}
+          onClick={() => setCurPage((p) => Math.max(1, p - 1))}
+        >
+          上一页
+        </button>
+        <span className="muted" data-testid="framework-list-paging">
+          第 {curPage}/{totalPage} 页
+        </span>
+        <button
+          type="button"
+          className="btn-primary"
+          data-testid="framework-list-next"
+          disabled={curPage >= totalPage}
+          onClick={() => setCurPage((p) => p + 1)}
+        >
+          下一页
+        </button>
+      </nav>
     </section>
   )
 }

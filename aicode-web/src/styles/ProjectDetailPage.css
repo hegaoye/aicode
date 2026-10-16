@@ -1,0 +1,192 @@
+/*
+ * ProjectDetailPage 单页专属样式 —— 视觉基准：OpenDesign 原型 project-review.html。
+ *
+ * 【以它为准】本项目的 13 个原型页各抄了一份同一套类且略有出入，
+ * project-review.html 的 .panel* / .badge / .empty-state / .grid-2 / .sql-block /
+ * .tech-line / .build-bar 是最全的一版，逐页比对以它为基准（见 base.css 头部）。
+ *
+ * 【只写本文件独有的】base.css 已有的下列基元一律不重复定义（改一处忘另一处是
+ * 这类迁移最常见的回归源）：
+ *   .container .page-head .page-head .meta .panel .panel-head .panel-head .title
+ *   .panel-head .right .panel-head .edit .panel-body .badge .badge.ok .badge.pending
+ *   .empty-state .grid-2 .field .field .k .field .v .data-table .muted .page-error
+ *
+ * 【类名沿用原型原名】.sql-block / .tech-line / .build-bar / .btn-build 都是原型原名，
+ * 不重命名 —— 验收方式是「逐页与原型并排比对」，改名会让比对失效。
+ *
+ * 本文件落四组东西：
+ *   ① SQL 代码块：.sql-block 及其 4 个语义着色 span（.kw/.ty/.cm/.str）
+ *   ② 技术栈行：.tech-line 及其 .stack / .desc（「技术信息」面板待接口落地后用）
+ *   ③ 构建条：.build-bar / .btn-build
+ *   ④ 6 个 .panel 之间的接缝（两段字段栅格的节奏 / 构建历史表的空态 /
+ *      内嵌子面板的外距与内层标题收敛）
+ *
+ * ① 与 ② 当前没有 JSX 命中：「SQL 信息」面板的实际代码块由 ProjectSqlPanel 的
+ * .editor-wrap 承担、「技术信息」面板因后端 /project/framwork/add 契约缺入参
+ * （见 §10 的 @Parameter(hidden=true) 陷阱）暂为 pending 空态。先把原型的类
+ * 转录在此，接口落地时只写 JSX、不必再回头补样式。
+ */
+
+/* ---------------------------------------------------------------------------
+ * ① SQL 代码块（project-review.html 逐字转录）
+ *
+ * 编辑器配色 token 由 base.css 提供：--editor-bg / --editor-fg（原型 :root 同名
+ * token），此处不重复定义。
+ * ------------------------------------------------------------------------ */
+.sql-block {
+  background: var(--editor-bg);
+  color: var(--editor-fg);
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  line-height: 1.7;
+  padding: 20px 22px;
+  max-height: 320px;
+  overflow: auto;
+  white-space: pre;
+}
+
+.sql-block .kw {
+  color: oklch(78% 0.16 245);
+}
+
+.sql-block .ty {
+  color: oklch(82% 0.12 80);
+}
+
+.sql-block .cm {
+  color: oklch(58% 0.04 250);
+  font-style: italic;
+}
+
+.sql-block .str {
+  color: oklch(82% 0.14 50);
+}
+
+/* ---------------------------------------------------------------------------
+ * ② 技术栈行（project-review.html 逐字转录）
+ * ------------------------------------------------------------------------ */
+.tech-line {
+  display: flex;
+  gap: 12px;
+  align-items: baseline;
+  flex-wrap: wrap;
+  font-size: 13px;
+}
+
+.tech-line .k {
+  color: var(--muted);
+  flex-shrink: 0;
+  min-width: 96px;
+}
+
+.tech-line .stack {
+  font-family: var(--font-mono);
+  padding: 4px 10px;
+  border: 1px solid color-mix(in oklch, var(--accent) 30%, var(--border));
+  border-radius: 4px;
+  color: var(--fg);
+  font-size: 12px;
+}
+
+.tech-line .desc {
+  color: var(--muted);
+  flex: 1;
+}
+
+/* ---------------------------------------------------------------------------
+ * ③ 构建条（project-review.html 逐字转录）
+ * ------------------------------------------------------------------------ */
+.build-bar {
+  display: flex;
+  justify-content: center;
+  padding-block: var(--gap-xl);
+  margin-top: var(--gap-md);
+}
+
+.btn-build {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 32px;
+  background: var(--accent);
+  color: var(--surface);
+  border-radius: 6px;
+  font-weight: 500;
+  font-size: 15px;
+  border: 0;
+  transition:
+    background 0.15s ease,
+    transform 0.1s ease;
+}
+
+.btn-build:hover:not(:disabled) {
+  background: color-mix(in oklch, var(--accent) 88%, black);
+}
+
+.btn-build:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+/* 禁用态为新增：原型的按钮一点就跳 build-log.html，没有「构建中」这一态，
+   而实现的构建是异步的（进度经 WebSocket 推），必须让用户看得出「在跑、
+   别再点」。base.css 的禁用态规则只覆盖 .btn-* 四兄弟，不含 .btn-build。 */
+.btn-build:disabled {
+  opacity: 0.45;
+  cursor: progress;
+  transform: none;
+}
+
+/* ---------------------------------------------------------------------------
+ * ④ 6 个 .panel 的接缝
+ * ------------------------------------------------------------------------ */
+
+/* 「项目信息」面板里两段 .grid-2 的纵向节奏 —— .grid-2 自身 margin:0，
+   两段直接相邻会贴在一起（第一段末行与第二段首行之间没有间距）。 */
+.detail-fields .grid-2 + .grid-2 {
+  margin-top: var(--gap-lg);
+}
+
+/* 构建历史表的空态行 —— 原型把它写在 <td colspan="4"> 的内联样式上
+   （padding:28px; text-align:center; color:var(--muted)），取值未改，
+   只把布局样式从 TSX 挪进 CSS（布局样式不得进 TSX）。 */
+.build-history-empty {
+  padding: 28px;
+  text-align: center;
+  color: var(--muted);
+}
+
+/* 两个内嵌子面板（.editor-wrap / .relationship-panel）自带底部外距，
+   那是它们独立成页时的节奏；嵌进 .panel-body 后由面板统一收口。 */
+.panel-body > .relationship-panel {
+  margin-bottom: 0;
+}
+
+/*
+ * 内层标题的收敛（ProjectSqlPanel 与 RelationshipPanel 的不对称）。
+ *
+ * 背景：两个子面板由两次不同的重写任务产出，对「要不要内层 <h2>」的判断不一致 ——
+ *   · ProjectSqlPanel 删了 `<h2>SQL 与解析</h2>`（理由：标题已由 .panel-head 提供）；
+ *   · RelationshipPanel 留了 `<h2>关联关系</h2>`。
+ * 重组后两者嵌进结构完全同构的 .panel-body，留一个不露一个会让相邻两个面板
+ * 观感不一致 —— 本次重写的验收方式是逐页与原型并排比对，而原型的 6 个面板
+ * 内部一律没有任何内层标题。
+ *
+ * 处置：**视觉上对齐（都不显示内层标题），语义上保留**——用 .sr-only 的同款
+ * 裁剪而不是 display:none，因为 .panel-head 的标题是 <span> 而非 heading 元素，
+ * 抹掉这个 <h2> 会让该区块在辅助技术里失去标题。
+ *
+ * 之所以从本文件用 CSS 收敛而不去改 RelationshipPanel.tsx：那两个文件属于
+ * 另两个重写任务，本任务不碰（避免跨任务改动引发回归）。
+ * 将来 RelationshipPanel 拿掉 <h2> 后，本条即可删除。
+ */
+.panel-body .relationship-panel > h2 {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}

@@ -390,6 +390,7 @@ Project 是聚合根：包含 `ProjectSql`、`ProjectFramwork`、`ProjectMap`、
 > **架构断言**（`aicode/src/test/java/com/aicode/architecture/VendoredDeadCodeIsolationTest.java`）：禁止重新引用 `common` 中已删除的 vendored 死代码区域 `com.aicode.core.tools.core..`。豁免集为该区域内仍被生产代码引用的 3 个类 —— `StringHelper` / `Field` / `typemapping.DatabaseDataTypesUtils`（豁免同时覆盖 Lombok 生成的 `$` 嵌套类）。**注意其能力边界：仅覆盖编译期类型引用**，反射、注解、MyBatis XML 与资源文件中的引用不在覆盖范围内 —— 断言通过不等于不存在运行时引用。
 
 > **实体列映射事故（2026-10-15，已修复）**：`MapFieldColumn` 的字段被抽到基类导致 12 个 `@TableField` 丢失，MyBatis-Plus 回退到 snake_case 命名策略，代码生成主链路报 `Column "map_class_table_code" not found` 而**全部 215 个测试皆绿**。根因是**没有任何测试让该实体真正生成并执行 SQL**（业务层纯内存装配、生成链路测试打桩 mapper）。修复方式是回退基类抽取 + 新增 `MapFieldColumnMapperIT`（真实 schema + 真实 Mapper）。教训：**「测试全绿」不等于「被改动的属性被测过」**。
+> **同类第二个实例（2026-10-18，由新增的 `InitChainIT` 抓到）**：`ProjectServiceImpl.parse()` 对每列无条件调 `StringTools.getStateOrType(column.getRemarks())`，而 `remarks` 在用户导入的建表 SQL **没写 `COMMENT`** 时为 null → `Pattern.matcher(null)` → NPE → **整个逆解析失败**。之所以从未暴露：`StringToolsTest` 的 3 条 `getStateOrType` 用例**全部传非 null 字符串**，而所有 `parse` 的测试都打桩了 `columnDAO`（`remarks` 总有值）。**两次事故的共同点：出问题的分支都只存在于「真实输入 + 真实执行」的组合里，而测试只覆盖 mock。**
 
 本节为 **to-be 规范**：约定后续测试应如何组织与编写，并在 §7.10 给出优先补齐清单。**新增功能应同步补测试**，逐步建立安全网。
 

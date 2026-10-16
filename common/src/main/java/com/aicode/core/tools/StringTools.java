@@ -74,6 +74,17 @@ public class StringTools {
     }
 
     public static List<String> getByPattern(String str, String patternStr) {
+        // null 安全：Pattern.matcher(null) 会抛 NPE（"Cannot invoke
+        // CharSequence.length() because this.text is null"）。
+        //
+        // 该路径是真实缺陷的入口：ProjectServiceImpl.parse() 对每一列无条件调
+        // getStateOrType(column.getRemarks())，而 remarks 在用户没写 COMMENT 时为 null
+        // → 整个逆解析失败。2026-10-18 由新增的 InitChainIT（真实 SQL 走一遍）抓到。
+        //
+        // 语义：null 即「没有可匹配的内容」→ 返回空列表，与空串一致。
+        if (str == null) {
+            return new ArrayList<>();
+        }
         Pattern p = Pattern.compile(patternStr, Pattern.CASE_INSENSITIVE);
         Matcher m = p.matcher(str);
         List<String> list = new ArrayList<>();

@@ -3,6 +3,7 @@ package com.aicode.core.tools;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -60,6 +61,46 @@ class StringToolsTest {
         Map<String, Object> result = StringTools.getStateOrType("1234567890");
         // 实际行为：可能仍匹配到数字，断言不抛错即可
         assertNotNull(result);
+    }
+
+    // ============================================================
+    // null 安全（2026-10-18：InitChainIT 抓到的真实缺陷）
+    //
+    // ProjectServiceImpl.parse() 对每列无条件调 getStateOrType(column.getRemarks())，
+    // 而 remarks 在用户没写 COMMENT 时为 null → getByPattern(null, reg) →
+    // Pattern.matcher(null) → NPE → **整个逆解析失败**。
+    //
+    // 此前未暴露的原因：getStateOrType 的 3 条用例全传非 null 字符串，而所有 parse 的
+    // 测试都打桩了 columnDAO（remarks 总有值）。这与 AGENTS §7.1 记载的
+    // 「@TableField 丢失但 215 个测试皆绿」是同一类问题 —— 只测 mock 覆盖的路径。
+    // ============================================================
+
+    @Test
+    @DisplayName("getByPattern(null, pattern) SHALL 返回空列表而非抛 NPE")
+    void getByPattern_null_returnsEmptyNotNpe() {
+        List<String> result = StringTools.getByPattern(null, "\\w+");
+
+        assertNotNull(result);
+        assertTrue(result.isEmpty(), "null 即「无可匹配内容」，SHALL 与空串一致");
+    }
+
+    @Test
+    @DisplayName("getStateOrType(null) SHALL 返回空 map（⇒ 调用方得 isState=N）")
+    void getStateOrType_null_returnsEmptyMap() {
+        Map<String, Object> result = StringTools.getStateOrType(null);
+
+        assertNotNull(result, "SHALL NOT 抛异常 —— 无 COMMENT 的列是真实输入");
+        assertTrue(result.isEmpty(),
+                "空 map ⇒ parse() 里 ynEnum 走 N 分支 ⇒ isState=N，与「注释无状态语义」一致");
+    }
+
+    @Test
+    @DisplayName("getByPattern(null) 与 getByPattern(\"\") SHALL 行为一致")
+    void getByPattern_null_behavesSameAsEmpty() {
+        List<String> fromNull = StringTools.getByPattern(null, "[\\u4e00-\\u9fa5]+");
+        List<String> fromEmpty = StringTools.getByPattern("", "[\\u4e00-\\u9fa5]+");
+
+        assertEquals(fromEmpty, fromNull, "null 与空串 SHALL 同义 —— 减少调用方的分支");
     }
 
     // ============================================================

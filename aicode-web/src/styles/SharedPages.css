@@ -1,0 +1,61 @@
+/*
+ * 展示属性页 与 账户页 的页面级样式。
+ *
+ * 原型无对应页面 —— OpenDesign「ai-code 页面设计」的 12 个应用页里没有
+ * 「展示属性」与「账户信息」。因此本文件仅保证与重写页共享基元观感，不做独立设计。
+ * 类名一律复用 base.css，不新增跨页类。
+ *
+ * 复用的基元（全部来自 base.css，本文件不改写它们的任何属性）：
+ *   .container .page-head .tip-panel .section-title .table-card .data-table
+ *   .row-actions .panel .panel-head .panel-body .empty-state
+ *   .form-row .form-input .radio-group .form-foot .btn-primary .btn-ghost
+ *   .field-error .field（k/v 形态）
+ *
+ * ---------------------------------------------------------------------------
+ * 唯一的例外：.grid-2
+ * ---------------------------------------------------------------------------
+ * base.css 从 project-review.html 抽取时收了同页的 .panel / .panel-head /
+ * .panel-body / .badge / .empty-state，漏了同一条规则里的 .grid-2。
+ * 账户页的 3 字段 k/v 需要两列栅格（原型的「项目信息」面板正是这么排 8 个 k/v），
+ * 故按任务允许的二选一在此补上 —— **取值逐字取自原型 project-review.html**，
+ * 不是本文件发明；若详情页任务也需要，请直接复用本条，不要再定义一遍。
+ *
+ * 另外两处是单页专属的极小补充，同样只有原型依据：
+ *   1. .grid-2 > .field > dd —— 本页把 .grid-2 挂在 <dl> 上（k/v 用语义化
+ *      dt/dd），浏览器给 dl / dd 的默认外边距要归零，否则与原型对齐不一致。
+ *   2. .attr-constraints —— 展示属性页「约束」勾选行复用 .radio-group 的排版，
+ *      base.css 只给 input[type='radio'] 设了 accent-color，checkbox 需补。
+ *      选择器带 .attr-constraints 限定，不会外溢到其他页面的 .radio-group。
+ */
+
+/* ---------------------------------------------------------------------------
+ * 两列栅格 —— 逐字取自原型 project-review.html
+ * ------------------------------------------------------------------------ */
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 32px;
+  row-gap: 14px;
+  /* 原型的 .grid-2 只挂在 div 上（无默认外边距）；本页挂在 <dl> 上，需要归零 */
+  margin: 0;
+}
+
+@media (max-width: 720px) {
+  .grid-2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+.grid-2 > .field > dd {
+  margin: 0;
+}
+
+/* ---------------------------------------------------------------------------
+ * 约束勾选行 —— 排版来自 .radio-group，这里只补 checkbox 的强调色与尺寸
+ * ------------------------------------------------------------------------ */
+.attr-constraints input[type='checkbox'] {
+  accent-color: var(--accent);
+  width: 14px;
+  height: 14px;
+  margin: 0;
+}

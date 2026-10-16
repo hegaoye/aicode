@@ -117,138 +117,178 @@ export default function DisplayAttributesPage() {
 
   if (state.kind === 'loading') {
     return (
-      <table aria-busy="true">
-        <caption>展示属性列表（加载中）</caption>
-      </table>
+      <div className="container">
+        <section className="panel" aria-busy="true">
+          <div className="panel-head">
+            <span className="title">展示属性</span>
+          </div>
+          <div className="panel-body empty-state">加载中…</div>
+        </section>
+      </div>
     )
   }
 
   if (state.kind === 'error') {
     return (
-      <p role="alert" data-testid="display-attributes-error">
-        加载失败：{state.error.info || state.error.code}
-      </p>
+      <div className="container">
+        <section className="panel">
+          <div className="panel-head">
+            <span className="title">展示属性</span>
+          </div>
+          <div className="panel-body">
+            <p role="alert" className="field-error show" data-testid="display-attributes-error">
+              加载失败：{state.error.info || state.error.code}
+            </p>
+          </div>
+        </section>
+      </div>
     )
   }
 
   return (
-    <section>
-      <table>
-        <caption>展示属性列表</caption>
-        <thead>
-          <tr>
-            <th scope="col">数据库列名</th>
-            <th scope="col">Java 属性名</th>
-            <th scope="col">显示名称</th>
-            <th scope="col">控件预览</th>
-          </tr>
-        </thead>
-        <tbody>
-          {state.rows.map((row) => {
-            const da = row.displayAttribute
-            // 以 (mapClassTableCode, code) 复合作为 key，确保行稳定可比较。
-            const key = `${row.mapClassTableCode ?? ''}::${row.code ?? ''}`
-            return (
-              <tr key={key} data-testid="display-attributes-row">
-                <td>{row.column ?? '—'}</td>
-                <td>{row.field ?? '—'}</td>
-                <td>{da?.displayName ?? '—'}</td>
-                <td>
-                  {da ? (
-                    <DisplayControl
-                      attribute={da}
-                      value=""
-                      onChange={() => {
-                        /* 只读预览；编辑走下方的表单区 */
-                      }}
-                    />
-                  ) : (
-                    '—'
-                  )}
-                </td>
-              </tr>
-            )
-          })}
-          {state.rows.length === 0 ? (
+    <div className="container">
+      <div className="page-head">
+        <div>
+          <h1>展示属性</h1>
+          <p className="meta">字段的显示名与控件类型 —— 生成代码里表单的来源</p>
+        </div>
+      </div>
+
+      <div className="tip-panel">
+        <div className="tip-title">操作提示</div>
+        <ul>
+          <li>展示属性决定生成代码里表单的控件与校验规则</li>
+          <li data-testid="display-attr-rebuild-hint">
+            改完需重新构建才生效 —— 回到项目详情页重新构建，才能在生成的代码里看到效果
+          </li>
+        </ul>
+      </div>
+
+      {/* ---------- 读态表格：当前已存配置的预览 ---------- */}
+      <div className="section-title">字段一览</div>
+      <div className="table-card">
+        <table className="data-table" aria-label="展示属性列表">
+          <thead>
             <tr>
-              <td colSpan={4}>（暂无数据）</td>
+              <th scope="col">数据库列名</th>
+              <th scope="col">Java 属性名</th>
+              <th scope="col">显示名称</th>
+              <th scope="col">控件预览</th>
             </tr>
-          ) : null}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {state.rows.map((row) => {
+              const da = row.displayAttribute
+              // 以 (mapClassTableCode, code) 复合作为 key，确保行稳定可比较。
+              const key = `${row.mapClassTableCode ?? ''}::${row.code ?? ''}`
+              return (
+                <tr key={key} data-testid="display-attributes-row">
+                  <td>
+                    <span className="name">{row.column ?? '—'}</span>
+                  </td>
+                  <td>
+                    <span className="name">{row.field ?? '—'}</span>
+                  </td>
+                  <td>{da?.displayName ?? '—'}</td>
+                  <td>
+                    {/* .row-actions 是原型的行内操作条形态（inline-flex + 对齐），
+                        此处复用它承载行内的控件预览 —— 表格本身是只读的，
+                        不引入「点击跳到编辑区」这类新交互。 */}
+                    <span className="row-actions">
+                      {da ? (
+                        <DisplayControl
+                          attribute={da}
+                          value=""
+                          onChange={() => {
+                            /* 只读预览；编辑走下方的表单区 */
+                          }}
+                        />
+                      ) : (
+                        '—'
+                      )}
+                    </span>
+                  </td>
+                </tr>
+              )
+            })}
+            {state.rows.length === 0 ? (
+              <tr>
+                <td colSpan={4}>（暂无数据）</td>
+              </tr>
+            ) : null}
+          </tbody>
+        </table>
+      </div>
 
       {/* ---------- 编辑区（2026-10-18-display-attribute-write） ---------- */}
-      <section style={{ marginTop: 'var(--space-5)' }}>
-        <h2>编辑展示属性</h2>
-        <p className="muted" data-testid="display-attr-rebuild-hint">
-          展示属性决定**生成代码**里表单的控件与校验 —— 改完需回到项目详情页重新构建，
-          才能在生成的代码里看到效果。
-        </p>
-
-        {rows.length === 0 ? (
-          <p className="muted" data-testid="display-attr-empty">
+      <div className="section-title">编辑展示属性</div>
+      {rows.length === 0 ? (
+        /* 空态不带 panel-head —— 标题已由上面的 .section-title 承担，
+           避免「编辑展示属性」在同一屏出现两次。形态取自原型 project-review.html
+           的 <div class="panel-body empty-state">尚未配置表模型关系</div>。 */
+        <div className="panel">
+          <div className="panel-body empty-state" data-testid="display-attr-empty">
             （暂无字段可配置 —— 先在项目详情页导入 SQL 并解析）
-          </p>
-        ) : (
-          <>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-3)' }}>
-              {rows.map((row) => {
-                const key = `${row.mapClassTableCode ?? ''}::${row.code ?? ''}`
-                const da = row.displayAttribute
-                return (
-                  <DisplayAttributeForm
-                    key={key}
-                    row={row}
-                    value={{
-                      // 隐藏的定位键（design D6）：让用户编辑它等于改主键，
-                      // 出错会静默跳过且无提示
-                      mapFieldColumnCode: row.code ?? '',
-                      mapClassTableCode: row.mapClassTableCode ?? '',
-                      ...(da ?? {}),
-                    }}
-                    onChange={(patch) => {
-                      // 用函数式更新在**最新** state 上 merge —— 见
-                      // DisplayAttributeForm 的 Props.onChange Javadoc：
-                      // 收完整对象会因 stale closure 丢改动。
-                      setRows((prev) =>
-                        prev.map((r) =>
-                          `${r.mapClassTableCode ?? ''}::${r.code ?? ''}` === key
-                            ? {
-                                ...r,
-                                displayAttribute: {
-                                  mapFieldColumnCode: r.code ?? '',
-                                  mapClassTableCode: r.mapClassTableCode ?? '',
-                                  ...(r.displayAttribute ?? {}),
-                                  ...patch,
-                                } as never,
-                              }
-                            : r,
-                        ),
-                      )
-                    }}
-                  />
-                )
-              })}
-            </div>
+          </div>
+        </div>
+      ) : (
+        <>
+          {rows.map((row) => {
+            const key = `${row.mapClassTableCode ?? ''}::${row.code ?? ''}`
+            const da = row.displayAttribute
+            return (
+              <DisplayAttributeForm
+                key={key}
+                row={row}
+                value={{
+                  // 隐藏的定位键（design D6）：让用户编辑它等于改主键，
+                  // 出错会静默跳过且无提示
+                  mapFieldColumnCode: row.code ?? '',
+                  mapClassTableCode: row.mapClassTableCode ?? '',
+                  ...(da ?? {}),
+                }}
+                onChange={(patch) => {
+                  // 用函数式更新在**最新** state 上 merge —— 见
+                  // DisplayAttributeForm 的 Props.onChange Javadoc：
+                  // 收完整对象会因 stale closure 丢改动。
+                  setRows((prev) =>
+                    prev.map((r) =>
+                      `${r.mapClassTableCode ?? ''}::${r.code ?? ''}` === key
+                        ? {
+                            ...r,
+                            displayAttribute: {
+                              mapFieldColumnCode: r.code ?? '',
+                              mapClassTableCode: r.mapClassTableCode ?? '',
+                              ...(r.displayAttribute ?? {}),
+                              ...patch,
+                            } as never,
+                          }
+                        : r,
+                    ),
+                  )
+                }}
+              />
+            )
+          })}
 
-            {errorMsg ? (
-              <p role="alert" data-testid="display-attr-error" style={{ color: 'var(--accent)' }}>
-                {errorMsg}
-              </p>
-            ) : null}
+          {errorMsg ? (
+            <p role="alert" className="field-error show" data-testid="display-attr-error">
+              {errorMsg}
+            </p>
+          ) : null}
+          <div className="form-foot">
             <button
               type="button"
               className="btn-primary"
               data-testid="display-attr-save-all"
               disabled={saving}
               onClick={() => void handleSaveAll()}
-              style={{ marginTop: 'var(--space-3)' }}
             >
               {saving ? '保存中…' : '保存全部'}
             </button>
-          </>
-        )}
-      </section>
-    </section>
+          </div>
+        </>
+      )}
+    </div>
   )
 }

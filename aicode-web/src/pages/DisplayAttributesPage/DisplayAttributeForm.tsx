@@ -12,6 +12,11 @@ import type { MapFieldColumnVO } from '../../generated/model/mapFieldColumnVO'
  * `displayCss` / `validateText` 是给高级用户直接写代码的，
  * `matchType` / `fieldValidationMode` 需要配套的查询表单才能体现价值。</p>
  *
+ * <p><b>视觉形态</b>：原型没有「字段属性」页，本组件按基元拼装 ——
+ * `.panel` + `.panel-head`（列名 + 当前显示名）+ `.panel-body` 内的
+ * `.form-row`（左标签 + 右输入，视觉规则 4「表单即视觉」）。原先的
+ * `<fieldset>` / `<legend>` 与行内 `style` 由此替换 —— 语义分组由面板承担。</p>
+ *
  * <p><b>提交时机</b>：本组件<b>只改本地 state，不自己发请求</b> ——
  * 由页面级「保存全部」批量提交（design D4：后端端点是逐条 upsert 的批量接口，
  * 逐行提交会产生 N 个请求且中途失败无法表达"哪些成功了"）。</p>
@@ -77,78 +82,101 @@ export default function DisplayAttributeForm({ row, value, onChange }: Props) {
   )
 
   return (
-    <fieldset data-testid={`display-attr-form-${row.code ?? row.field ?? ''}`}>
-      <legend>
-        <code>{row.column ?? row.field ?? '—'}</code>
-        {row.displayAttribute?.displayName ? (
-          <small className="muted">（当前显示名：{row.displayAttribute.displayName}）</small>
-        ) : null}
-      </legend>
-
-      <div className="field">
-        <label htmlFor={`display-attr-displayType-${row.code}`}>控件类型</label>
-        <select
-          id={`display-attr-displayType-${row.code}`}
-          data-testid="display-attr-displayType-input"
-          value={value.displayType ?? ''}
-          onChange={(e) => set({ displayType: normalizeDisplayType(e.target.value) })}
-        >
-          <option value="">（未设置）</option>
-          {DISPLAY_TYPE_OPTIONS.map((opt) => (
-            <option key={opt} value={opt}>
-              {opt}
-            </option>
-          ))}
-        </select>
+    <section className="panel" data-testid={`display-attr-form-${row.code ?? row.field ?? ''}`}>
+      <div className="panel-head">
+        <span className="title">{row.column ?? row.field ?? '—'}</span>
+        <span className="right">
+          {row.displayAttribute?.displayName ? (
+            <span className="muted">当前显示名：{row.displayAttribute.displayName}</span>
+          ) : null}
+        </span>
       </div>
 
-      <div className="field">
-        <label htmlFor={`display-attr-displayName-${row.code}`}>显示名</label>
-        <input
-          id={`display-attr-displayName-${row.code}`}
-          data-testid="display-attr-displayName-input"
-          value={value.displayName ?? ''}
-          onChange={(e) => set({ displayName: e.target.value })}
-        />
-      </div>
-
-      <div className="field">
-        <label htmlFor={`display-attr-displayNo-${row.code}`}>显示顺序</label>
-        <input
-          id={`display-attr-displayNo-${row.code}`}
-          data-testid="display-attr-displayNo-input"
-          type="number"
-          value={value.displayNo ?? ''}
-          onChange={(e) =>
-            set({ displayNo: e.target.value === '' ? undefined : Number(e.target.value) })
-          }
-        />
-      </div>
-
-      <fieldset style={{ border: 'none', padding: 0, margin: 'var(--space-2) 0' }}>
-        <legend className="muted" style={{ color: 'var(--muted)' }}>
-          约束
-        </legend>
-        {(
-          [
-            ['isRequired', '必填'],
-            ['isInsert', '可插入'],
-            ['isAllowUpdate', '可更新'],
-            ['isListPageDisplay', '列表页显示'],
-            ['isDetailPageDisplay', '详情页显示'],
-          ] as const
-        ).map(([field, label]) => (
-          <label key={field} style={{ marginRight: 'var(--space-4)', display: 'inline-block' }}>
-            <input
-              type="checkbox"
-              data-testid={`display-attr-${field}-input`}
-              checked={value[field] === 'Y'}
-              onChange={() => toggle(field, value[field])}
-            />{' '}
-            {label}
+      <div className="panel-body">
+        <div className="form-row">
+          <label className="label" htmlFor={`display-attr-displayType-${row.code}`}>
+            控件类型
+            <span className="hint">决定生成代码里用哪种表单控件</span>
           </label>
-        ))}
-      </fieldset>
-    </fieldset>
+          <div className="field">
+            <select
+              id={`display-attr-displayType-${row.code}`}
+              className="form-input"
+              data-testid="display-attr-displayType-input"
+              value={value.displayType ?? ''}
+              onChange={(e) => set({ displayType: normalizeDisplayType(e.target.value) })}
+            >
+              <option value="">（未设置）</option>
+              {DISPLAY_TYPE_OPTIONS.map((opt) => (
+                <option key={opt} value={opt}>
+                  {opt}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        <div className="form-row">
+          <label className="label" htmlFor={`display-attr-displayName-${row.code}`}>
+            显示名
+          </label>
+          <div className="field">
+            <input
+              id={`display-attr-displayName-${row.code}`}
+              className="form-input"
+              data-testid="display-attr-displayName-input"
+              value={value.displayName ?? ''}
+              onChange={(e) => set({ displayName: e.target.value })}
+            />
+          </div>
+        </div>
+
+        <div className="form-row">
+          <label className="label" htmlFor={`display-attr-displayNo-${row.code}`}>
+            显示顺序
+          </label>
+          <div className="field">
+            <input
+              id={`display-attr-displayNo-${row.code}`}
+              className="form-input"
+              data-testid="display-attr-displayNo-input"
+              type="number"
+              value={value.displayNo ?? ''}
+              onChange={(e) =>
+                set({ displayNo: e.target.value === '' ? undefined : Number(e.target.value) })
+              }
+            />
+          </div>
+        </div>
+
+        <div className="form-row">
+          {/* 勾选组无单一关联控件，故不写 htmlFor —— 与原型 radio-group 行同构 */}
+          <label className="label">约束</label>
+          <div className="field">
+            <div className="radio-group attr-constraints" role="group" aria-label="约束">
+              {(
+                [
+                  ['isRequired', '必填'],
+                  ['isInsert', '可插入'],
+                  ['isAllowUpdate', '可更新'],
+                  ['isListPageDisplay', '列表页显示'],
+                  ['isDetailPageDisplay', '详情页显示'],
+                ] as const
+              ).map(([field, label]) => (
+                <label key={field}>
+                  <input
+                    type="checkbox"
+                    data-testid={`display-attr-${field}-input`}
+                    checked={value[field] === 'Y'}
+                    onChange={() => toggle(field, value[field])}
+                  />{' '}
+                  {label}
+                </label>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
   )
 }

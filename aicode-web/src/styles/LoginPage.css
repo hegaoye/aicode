@@ -1,0 +1,304 @@
+/*
+ * 登录页 —— OpenDesign 原型 `login.html` 的原样转录。
+ *
+ * 登录页是「全屏独立舞台」：不套 AppShell、没有 topnav，因此本文件自带
+ * 全部页面级样式。跨页基元仍复用 base.css（.btn-primary / .field-error /
+ * .field），本文件只补登录语境下的补充规则。
+ *
+ * 【不得重命名类名】类名逐字取自原型，验收方式是「与原型并排比对」。
+ *
+ * 两处与原型的必要偏差（均因本项目是多页 SPA，而非原型那样的单文件页面）：
+ *   1. 原型把三条 110° 斜纹网格放在 `.auth-stage::before` 上，本文件上移到
+ *      元素自身的 background-image —— 视觉规则 5 要求网格呼吸，而
+ *      `breathe` 关键帧（tokens.css）动的是 `background-position`，
+ *      伪元素上没有这条网格就没有可呼吸的层。点阵层（::after）保留原样。
+ *   2. 原型的 `.btn-primary` / `.field-error` 是平铺选择器，在单文件页面里
+ *      天然只作用于本页；本项目的 `.btn-primary` 被另外 8 个页面复用
+ *      （base.css 里是空心描边版），故登录语境下的补充规则一律收在
+ *      `.auth-card` 之下，数值与原型逐字一致。
+ */
+
+/* ---------------------------------------------------------------------------
+ * 舞台：深蓝底 + 三层斜纹科技网格 + 点阵，网格做极弱呼吸（视觉规则 5）
+ * ------------------------------------------------------------------------ */
+.auth-stage {
+  min-height: 100vh;
+  background: var(--login-bg);
+  background-image:
+    linear-gradient(110deg, transparent 30%, oklch(45% 0.08 250 / 0.45) 31%, transparent 33%),
+    linear-gradient(110deg, transparent 55%, oklch(45% 0.08 250 / 0.30) 56%, transparent 58%),
+    linear-gradient(110deg, transparent 80%, oklch(45% 0.08 250 / 0.40) 81%, transparent 83%);
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  padding: 48px 24px;
+  animation: breathe 12s ease-in-out infinite alternate;
+}
+
+/* 点阵 */
+.auth-stage::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(oklch(45% 0.08 250 / 0.35) 1px, transparent 1.5px);
+  background-size: 26px 26px;
+  background-position: 0 0;
+  mask-image: linear-gradient(180deg, transparent 0%, black 12%, black 80%, transparent 100%);
+  opacity: 0.6;
+  pointer-events: none;
+  animation: gridDrift 32s linear infinite;
+}
+
+@keyframes gridDrift {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 26px 26px;
+  }
+}
+
+/* 像素簇（装饰性像素点阵） */
+.pixel-cluster {
+  position: absolute;
+  width: 88px;
+  height: 88px;
+  background-image: linear-gradient(
+    oklch(45% 0.1 250 / 0.55),
+    oklch(45% 0.1 250 / 0.55)
+  );
+  background-size: 11px 11px;
+  mask-image:
+    radial-gradient(circle at 12% 25%, black 0 5%, transparent 6%),
+    radial-gradient(circle at 60% 12%, black 0 4%, transparent 5%),
+    radial-gradient(circle at 80% 60%, black 0 5%, transparent 6%),
+    radial-gradient(circle at 30% 70%, black 0 4%, transparent 5%),
+    radial-gradient(circle at 45% 45%, black 0 3%, transparent 4%),
+    radial-gradient(circle at 70% 35%, black 0 3%, transparent 4%);
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.pixel-cluster.tl {
+  top: 8%;
+  left: 6%;
+}
+.pixel-cluster.br {
+  bottom: 12%;
+  right: 5%;
+  transform: scaleX(-1);
+}
+.pixel-cluster.bl {
+  bottom: 18%;
+  left: 14%;
+  transform: scale(0.8);
+}
+
+/* ---------------------------------------------------------------------------
+ * 卡片
+ * ------------------------------------------------------------------------ */
+.auth-card {
+  position: relative;
+  width: min(440px, 100%);
+  background: var(--surface);
+  border-radius: 8px;
+  box-shadow:
+    0 30px 60px -30px oklch(10% 0.04 250 / 0.6),
+    0 2px 6px oklch(10% 0.04 250 / 0.18);
+  padding: 44px 44px 36px;
+  z-index: 1;
+}
+
+.auth-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--accent);
+  text-align: center;
+  letter-spacing: -0.01em;
+  margin-bottom: 32px;
+}
+
+.auth-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* 原型的 .field 无样式（普通块容器）；base.css 的 .field 是「k / v」横向行。
+   登录卡内的 .field 承载「输入 + 错误」的纵向堆叠，切回块级 —— 特异性
+   (0,2,0) 稳压 base.css 的 (0,1,0)，无需改基元文件。 */
+.auth-fields .field {
+  display: block;
+}
+
+.input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-wrap .ic {
+  position: absolute;
+  left: 14px;
+  color: var(--muted);
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.input-wrap .ic svg {
+  width: 16px;
+  height: 16px;
+}
+
+.auth-input {
+  width: 100%;
+  padding: 12px 14px 12px 42px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--fg);
+  font-size: 14px;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.auth-input::placeholder {
+  color: var(--muted);
+}
+
+.auth-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.auth-row-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+.remember-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.remember-row input[type='checkbox'] {
+  width: 14px;
+  height: 14px;
+  accent-color: var(--accent);
+}
+
+/* 登录语境下的 .btn-primary：实心红、通栏（与「单红预算」一致 —— 本页
+   没有 topnav 的红分隔线，红色预算全给主按钮）。 */
+.auth-card .btn-primary {
+  width: 100%;
+  margin-top: 18px;
+  padding: 12px 20px;
+  background: var(--accent);
+  color: var(--surface);
+  border: 1px solid var(--accent);
+  border-radius: 6px;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  transition: background 0.15s ease;
+}
+
+.auth-card .btn-primary:hover {
+  background: color-mix(in oklch, var(--accent) 88%, black);
+}
+
+.auth-card .btn-primary:active {
+  transform: translateY(1px);
+}
+
+.auth-card .btn-primary[disabled] {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.auth-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 14px;
+}
+
+.link-register {
+  color: var(--fg);
+  font-size: 13px;
+  border-bottom: 1px solid transparent;
+  padding-bottom: 1px;
+  transition:
+    color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.link-register:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+/* 登录语境下的 .field-error 补充规则：仅比基元多一条上间距，
+   display / .show 语义与 base.css 完全一致，不重复声明。 */
+.auth-card .field-error {
+  margin-top: 6px;
+}
+
+/* 卡内底部签名 */
+.auth-foot {
+  margin-top: 28px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border);
+  font-size: 12px;
+  color: var(--muted);
+  text-align: center;
+  font-family: var(--font-mono);
+  letter-spacing: 0.04em;
+}
+
+/* 提交中的加载态（视觉规则 5：仅保留极小动效） */
+.auth-card .btn-primary.loading {
+  pointer-events: none;
+  background: color-mix(in oklch, var(--accent) 80%, black);
+}
+
+.auth-card .btn-primary.loading::after {
+  content: '';
+  width: 14px;
+  height: 14px;
+  margin-left: 8px;
+  border: 2px solid color-mix(in oklch, var(--surface) 70%, transparent);
+  border-top-color: var(--surface);
+  border-radius: 50%;
+  display: inline-block;
+  vertical-align: -2px;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* 规则 5：尊重系统的「减少动态效果」偏好 */
+@media (prefers-reduced-motion: reduce) {
+  .auth-stage,
+  .auth-stage::after {
+    animation: none;
+  }
+
+  .auth-card .btn-primary.loading::after {
+    animation: none;
+  }
+}

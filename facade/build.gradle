@@ -52,6 +52,10 @@ dependencies {
 
     // 版本由 Spring Boot BOM 管理（见本文件 dependencyManagement 块的 BOM import）
     testImplementation 'org.junit.jupiter:junit-jupiter'
+    // AGENTS.md §7.10 第 2 项：facade 零测试已补（EnumInvariantsTest 参数化覆盖
+    // 12 个枚举的 getEnum 大小写不敏感 / 未知值返 null / val 标签非空三个不变量）。
+    // 断言风格与 common / aicode 对齐用 AssertJ（AGENTS.md §7.2「优先 AssertJ」）。
+    testImplementation 'org.assertj:assertj-core'
     // Gradle 9 要求 JUnit Platform Launcher 显式出现在测试运行期类路径。
     // 本模块当前尚无测试（见 AGENTS.md §7.1 空白点），但一旦补测即会踩到
     // 与 common 相同的 "Could not start Gradle Test Executor" 故障，故预先补齐。

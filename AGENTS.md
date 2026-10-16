@@ -52,10 +52,10 @@ CDS（Class Data Sharing）的运维操作与实测数据见 §9。
 
 | 模块 | 角色 | 备注 |
 |------|------|------|
-| `:aicode`  | Spring Boot 应用 — 控制器、服务、Mapper | **唯一持有接口层的模块**；入口 `com.aicode.Application`。13 MB 旧 Angular 产物仍在 `src/main/resources/static/`，待 React 前端验收通过后由 M4 删除 |
+| `:aicode`  | Spring Boot 应用 — 控制器、服务、Mapper | **唯一持有接口层的模块**；入口 `com.aicode.Application`。以 `implementation project(':aicode-web')` 引入 React 前端产物（M4 起 `/` 由 React 接管）；13 MB 旧 Angular 产物已于 M4 删除 |
 | `:aicode-web` | React 前端模块（Vite + TS） | Jar 内布局 `static/**`，被 `aicode` 以 `implementation` 引入后由 Spring Boot 从 classpath 提供。node 为弱依赖，见 §3 |
-| `:facade`  | 与下游生成工程共享的 DTO / facade 类型 | 依赖 `:common`。无 main，**无测试** |
-| `:common` | 共享工具：JGit、hutool、JWT、pinyin4j、zip4j | 被 `:facade` 与 `:aicode` 同时依赖。**禁**引入 spring-web（详见 §6.2）。有 8 个工具层单测 |
+| `:facade`  | 与下游生成工程共享的 DTO / facade 类型 | 依赖 `:common`。无 main；有 `EnumInvariantsTest`（参数化覆盖 12 个枚举的 `getEnum` 大小写不敏感 / 未知值返 null / `val` 标签非空三个不变量） |
+| `:common` | 共享工具：JGit、hutool、JWT、pinyin4j、zip4j | 被 `:facade` 与 `:aicode` 同时依赖。**禁**引入 spring-web（详见 §6.2）。有 56 个工具层单测（9 个测试类） |
 
 依赖方向**单向、无环**（详见 §6.2）：
 
@@ -497,13 +497,15 @@ Project 是聚合根：包含 `ProjectSql`、`ProjectFramwork`、`ProjectMap`、
    - **Java 25 / Spring Boot 4.1 升级系列的每一波都必须跑它**，红了即代表某次升级破坏了前后端契约；契约定义见 `openspec/specs/api-contract/spec.md`，变更记录见 `openspec/changes/archive/2026-10-14-add-api-contract-tests/`
    - 已知以 `@Disabled` 登记的缺陷：`unauthorized_returns9007AsJson` —— `excludePathPatterns` 的通配规则使 `.shtml` 请求绕过鉴权。**已确认不修复**（见该测试内的 Javadoc 说明），此断言长期保持 `@Disabled`，不得视为通过
 1. `common` 工具纯函数单测：`StringTools`、`StringHelper`、`DatabaseDataTypesUtils`、`ZipTools`、`JwtToken`。
-2. `facade` 枚举转换单测：`TemplateEngineEnum`、`ModuleEnum`、各 `*State`。
+2. ~~`facade` 枚举转换单测：`TemplateEngineEnum`、`ModuleEnum`、各 `*State`。~~ **已完成**（2026-10-16）：`facade/src/test/java/com/aicode/enums/EnumInvariantsTest.java` 参数化覆盖 12 个枚举的 `getEnum` 大小写不敏感 / 未知值与 null 返 `null` / `val` 标签非空三个不变量，共 39 用例；另加 `ProjectJobState`（构建 5 态）/ `ProjectState`（3 态，`Enable` 被前端构建按钮消费）/ `DisplayAttributeDisplayType`（前端 `DisplayControl` 分发的 4 个字面）三个语义锚定断言。
 3. `TemplateData` 装配单测（§7.7.1）—— 保护生成逻辑的核心数据模型。
 4. `TemplateHelper` 渲染单测（§7.7.2，Freemarker + Beetl 各一）。
 5. Controller 切片测试（`MockMvc`）：登录、建项目、导 SQL、init 的响应体与错误码。
 6. 生成主链路端到端集成测试（§7.7.3，mock Git / 模板）。
 7. Mapper 层 `@SpringBootTest` + H2 真实 SQL 验证：`TableMapperIT`（元数据）与 `MapFieldColumnMapperIT`（实体列映射）已落地，**其余实体仍缺**。新增实体时 SHALL 参照 `MapFieldColumnMapperIT` 补一条 —— 打桩 mapper 的测试不算覆盖。
 8. **代码生成主链路的端到端回归**：当前无测试覆盖「登录 → 建项目 → 导 SQL → init → 构建」全链路（§7.7.3）。2026-10-15 的列映射事故之所以能全绿通过，正是因为这条链路只被 mock 覆盖。
+9. **前端端点覆盖补齐（M5 议程）**：后端 43 个端点中，前端目前只消费约 6 个（`/login/signin`、`/project/list`、`/project/load/code/{code}`、`/displayAttribute/list`、`/account/load`、`/project/job/execute`）。**未接入的高价值端点**：`/framework/list`（建项目第一步选技术栈）、`/project/sql/*` 与 `/project/relationship/*`（代码生成的核心配置流程）。每接一个页面 SHALL 走 `aicode-web/README.md` §「How to wire next endpoint」五步。
+10. **CI / CD（§11.4）**：当前**无 CI**，M4 后构建链变成「gradle + node」双语言，风险放大。建议 GitHub Actions 至少含：`./aicode/gradlew clean build`（含 `:aicode-web:verifyApi` 契约漂移守卫）、`./aicode/gradlew test`、`cd aicode-web && npm ci && npm test`、`measurement/startup-time.sh` 性能基线。
 
 ---
 
@@ -602,14 +604,16 @@ opsx 入口（功能等价，运行时暴露哪个就用哪个）：
 
 ### 11.2 架构演进
 
-- **前后端分离**：当前前端以 Angular 构建产物形式放在 `aicode/src/main/resources/static/`。后续可考虑独立前端仓库 + 独立 CI，前端走 nginx 静态托管。
+- **前后端分离**：M4 起前端已是独立 Gradle 模块 `aicode-web`（Jar 内布局 `static/**`，由 `aicode` 以 `implementation` 引入后从 classpath 提供），与后端源码物理分离。进一步可考虑**独立前端仓库 + 独立 CI + nginx 静态托管**（此时 `aicode-web/build.gradle` 的 `static/**` 布局约定可平移为 nginx `root`）。
 - **服务拆分**：单体应用可拆为「元数据服务 / 模板服务 / 代码生成服务 / 任务调度服务」四个微服务，对应 K8s 部署。
 - **持久化升级**：H2 适合单机开发与演示，生产场景应切到 MySQL / PostgreSQL；schema 兼容 MySQL 模式但需要严格回归。当前 H2 为 2.4.240（Boot BOM 管理），升级后**必须删除存量 `.mv.db` 让其重建**。
 - **缓存层**：Druid 已配置，可考虑引入 Redis 缓存「模板元数据 / 项目配置 / 解析结果」。
 
 ### 11.3 测试演进
 
-- **已落地 26 个测试类、222 个用例**（详见 §7.1 的分布表）。按层覆盖情况：
+- **已落地 37 个测试类 / 296 个用例**（2026-10-16 M4 后实测；后端 20 类 215 用例 + `common` 9 类 56 用例 + `facade` 1 类 39 用例 + 前端 17 文件 80 用例）。按层覆盖情况：
+  - **契约层（M4 后新增，跨语言约定的四方守护）**：`ApiContractIT`（10 个 `@Nested` 场景组：标识符序列化 / `.shtml` 兼容 / 统一响应 / 日期格式 / null 保留 / 契约先行 / `R.data` 真实结构 / 出参形状由泛型承载 / 泛型化不改运行期 JSON / 受保护接口走 `R<T>`）+ 场景⑦ `PageVO<ProjectSummaryVO>` + 场景⑧ `R<ProjectDetailVO>` + 场景⑨ `R<AccountPublicVO>`（password 防护）；`OpenApiExportIT`（契约自动导出）+ `DisplayAttributeVoContractIT` + `ShtmlSuffixRewriteFilterTest`；`M4CutoverIntegrationTest`（M4 切运行时 4 不变量，RANDOM_PORT + JDK HttpClient）
+  - **facade 枚举（§7.10 第 2 项已补）**：`EnumInvariantsTest`（39 用例，参数化覆盖 12 个枚举的 `getEnum` 大小写不敏感 / 未知值与 null 返 `null` / `val` 标签非空；另加 `ProjectJobState` 5 态 / `ProjectState` 3 态 / `DisplayAttributeDisplayType` 前端分发 4 字面三个语义锚定）
   - Controller 层（`MockMvc`）：`LoginCtrlShtmlPathTest`（`.shtml` 路由回归）、`MapRelationshipControllerTest`、`ProjectControllerDownloadTest`、`ProjectInitEndpointTest` —— 均为 `@SpringBootTest(MOCK)` + `@MockitoBean` 打桩业务层，加载真实 `WebMvcConfigurer`
   - Service 层：`ProjectJobServiceImplConcurrencyTest`（并发）、`SqlReverseParseTest`（SQL 逆解析）
   - 生成主链路：`CodeGenPipelineTest`（占位符风格）、`TemplateEngineAdapterTest`（`aicode.json` 引擎探测）、`MapClassTableTest`（类名/模块名推导）
@@ -620,7 +624,13 @@ opsx 入口（功能等价，运行时暴露哪个就用哪个）：
   - 契约导出：`OpenApiExportIT` —— 导出 `contracts/openapi/openapi.yaml` 并做规范化（剥离 `servers` 块与无 `schema` 的装饰性参数）。**契约因此会在每次测试时被刷新**，入库漂移由 `:aicode-web:verifyApi` 判定
   - 契约守护：`TemplateDataExpansionTest` —— 固化「模板变量展开必须用 fastjson2 往返而非 hutool `BeanUtil.beanToMap`」（getter 名 vs 字段名键集差异）
   - 外部依赖：`GitToolsCloneCompletenessTest` —— 需网络访问 GitHub，由 `@EnabledIfSystemProperty(named = "network.tests")` 守卫，默认**不执行**；离线 CI 需显式加 `-Dnetwork.tests=true`
-- **仍有空白**（详见 §7.10）：`facade` 零测试；Mapper 层 DAO 单测覆盖仍偏薄。
+  - **前端（M1–M4 落地，17 文件 / 80 用例，MSW 驱动）**：
+    - **响应契约层**：`contract-response/index.test.ts`（6 用例：`R.success` 解构 / `ContractError` 带 code+info / 非 `0000` 视为失败 / 缺省 code → UNKNOWN / message 回退）
+    - **页面层**：`DisplayAttributesPage`（1）/ `LoginPage`（3，含空 token 与 `R.code!=="0000"`）/ `ProjectListPage`（5，含构建按钮展开与 `state!=='Enable'` 禁用）/ `ProjectDetailPage`（4，含裸 VO 触发错误气泡的反向用例）/ `AccountPage`（3）
+    - **鉴权层**：`token-store`（7）/ `auth-interceptor`（6，含重复安装幂等）/ `use-auth`（5，含多 tab storage 同步）
+    - **实时层**：`ws-client`（7，含 `vi.stubGlobal('WebSocket')` 替身与一次重连）/ `use-build-log`（5）/ `build-log-panel`（3）/ `shtml-suffix`（8，纯函数 + 拦截器 + 幂等）
+    - **组件层**：`AppShell`（2，登录态挂 AccountMenu / 未登录不挂）
+- **仍有空白**（详见 §7.10）：`facade` 零测试；Mapper 层 DAO 单测覆盖仍偏薄；**代码生成主链路无端到端回归**（登录 → 建项目 → 导 SQL → init → 构建 全链路仍只被 mock 覆盖）。
 - **已完成**：接口契约回归测试 `ApiContractIT`（59 用例，见 §7.10 第 0 项），已作为 Java 25 / Spring Boot 4.1 升级全程的验收金标准，并在 Boot 4.1.1 上全绿。
 - **M1 已合并（2026-10-16，`feature/20261016/react-web-rewrite` 分支 + 变更 `2026-10-16-aicode-web-first-business-page`）**：首个契约驱动业务页面 `DisplayAttributesPage` 落地。`src/lib/contract-response`（`unwrapSuccess` + `ContractError`）、`src/lib/display-controls`（`DisplayControl` 分发器）、`src/test-setup.ts`（MSW `setupServer`）沉淀出"如何接下一个端点"五步样板（详见 `aicode-web/README.md` §How to wire next endpoint）；Vitest 17 用例通过、`npm run build` 与 `npm run typecheck` 全绿；首次让契约链有真实消费者，下一次 M2/M3 可在此基础上扩充。`api-contract-artifact` 的 Scenario 「mock 与真实契约同源」因此真正具备可演示态（M0 链路就绪但无消费者）。
 - **M2 已合并（`feature/20261016/react-web-rewrite` 分支 + 三个变更）**：

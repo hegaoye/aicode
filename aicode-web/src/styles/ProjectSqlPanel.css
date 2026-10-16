@@ -1,0 +1,250 @@
+/*
+ * ProjectSqlPanel —— 项目详情页内嵌的「SQL 信息」面板（代码生成流程第 ②③ 步）。
+ *
+ * 来源：OpenDesign 原型 `wizard-step2-sql.html` 的 <style> 段。数值逐字转录，
+ * 类名沿用原型原名 —— 本次重写的验收方式是「逐页与原型并排比对」，改名会让
+ * 比对失效（同 base.css 的约定）。
+ *
+ * 只做本组件自身的样式：不套 AppShell、不用 .container（组件渲染在详情页某个
+ * .panel-body 内）。跨页基元（.form-foot / .btn-* / .table-card / .data-table /
+ * .section-title / .muted）由 base.css 提供，此处不重复定义。
+ *
+ * 编辑器配色 token 由 base.css 提供：--editor-bg / --editor-fg / --editor-line /
+ * --editor-gutter（原型 :root 的同名 token）。
+ */
+
+/* ---------------------------------------------------------------------------
+ * SQL 编辑器外壳
+ * ------------------------------------------------------------------------ */
+.editor-wrap {
+  background: var(--editor-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: var(--gap-lg);
+}
+
+.editor-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  background: oklch(20% 0.012 250);
+  border-bottom: 1px solid oklch(25% 0.015 250);
+  color: var(--editor-gutter);
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+.editor-bar .tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.editor-bar .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: oklch(45% 0.02 250);
+}
+
+/* .dot.live —— 文件名 tab 前的「有内容」状态点。
+   ⚠️ 呼吸动画取自同项目的 build-log.html（`.log-head .dot`，同一枚绿色状态点
+   oklch(62% 0.14 145)，@keyframes pulse 数值一致）；wizard-step2-sql.html 本页
+   只给了静态底色。视觉规则 5 允许「极小动效」，此处与 build-log 的状态语言对齐。 */
+.editor-bar .dot.live {
+  background: oklch(62% 0.14 145);
+  animation: sql-pulse 1.4s ease-in-out infinite;
+}
+
+.editor-bar .name {
+  color: var(--editor-fg);
+}
+
+.editor-bar .meta {
+  color: var(--editor-gutter);
+}
+
+.editor {
+  position: relative;
+  display: grid;
+  grid-template-columns: 56px 1fr;
+  min-height: 480px;
+  max-height: 560px;
+  overflow: auto;
+  background: var(--editor-bg);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+/* 行号槽。原型没有 overflow —— 但原型的 28 行是硬编码的静态稿：内容超出一屏时
+   行号列会把 .editor 撑高、滚动条跑到行号槽上。实现里行号随内容动态增长，故必须
+   自己收住溢出，再由 textarea 的 scrollTop 同步（见 ProjectSqlPanel.tsx）。 */
+.gutter {
+  padding: 14px 0;
+  text-align: right;
+  color: var(--editor-gutter);
+  background: oklch(13% 0.01 250);
+  border-right: 1px solid oklch(22% 0.012 250);
+  user-select: none;
+  overflow: hidden;
+}
+
+.gutter span {
+  display: block;
+  padding-right: 14px;
+}
+
+.editor textarea {
+  width: 100%;
+  padding: 14px 18px;
+  border: 0;
+  background: transparent;
+  color: var(--editor-fg);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.7;
+  resize: none;
+  outline: none;
+  tab-size: 4;
+}
+
+.editor textarea::placeholder {
+  color: var(--editor-gutter);
+}
+
+@keyframes sql-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(1.3);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .editor-bar .dot.live {
+    animation: none;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * 保存反馈 / 已保存的 SQL 段
+ * ------------------------------------------------------------------------ */
+.sql-error {
+  margin-top: var(--gap-md);
+  font-size: 13px;
+  color: var(--accent);
+}
+
+.sql-saved {
+  margin-top: var(--gap-md);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+.sql-saved code {
+  color: var(--fg);
+}
+
+/* ---------------------------------------------------------------------------
+ * 异步解析进度区（ws 推结构化进度；原型该页无此结构，样式沿用面板配色自洽）
+ *
+ * 三条语义防线在此固化，改 DOM 时一并复核：
+ *   1. total === 0（建库阶段内部无可切分点）→ 显示不确定进度文案，
+ *      **不得**渲染 project-parse-bar（0% 空进度条会让用户以为卡住）；
+ *   2. total > 0 → 渲染进度条 + 「N/M（百分比）」；
+ *   3. status === 'error' → 进度区保留不自动消失，失败位置要看得到。
+ * ------------------------------------------------------------------------ */
+.parse-progress {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: var(--gap-lg);
+  padding: 14px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.parse-progress[data-status='error'] {
+  background: var(--tip-bg);
+  border-color: color-mix(in oklch, var(--accent) 18%, transparent);
+}
+
+/* 不确定进度：呼吸点 + 文案（原型视觉规则 5 的极小动效） */
+.parse-indeterminate {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--fg);
+}
+
+.parse-indeterminate::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: sql-pulse 1.4s ease-in-out infinite;
+}
+
+.parse-bar {
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--fg-soft);
+  overflow: hidden;
+}
+
+.parse-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  background: var(--accent);
+  transition: width 0.2s ease;
+}
+
+.parse-msg {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.parse-error {
+  font-size: 13px;
+  color: var(--accent);
+}
+
+.parse-count {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.parse-dismiss {
+  padding: 6px 14px;
+  font-size: 13px;
+}
+
+.parse-done {
+  margin-bottom: var(--gap-lg);
+  font-size: 13px;
+  color: var(--success);
+}
+
+/* ---------------------------------------------------------------------------
+ * 解析结果（表 ↔ 类映射）
+ * ------------------------------------------------------------------------ */
+.sql-result {
+  margin-top: var(--gap-lg);
+}

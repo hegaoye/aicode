@@ -7,6 +7,7 @@ import App from './App'
 import './styles/tokens.css'
 import './styles/base.css'
 import './styles/AppShell.css'
+import './styles/ProjectSqlPanel.css'
 
 // 应用启动 —— 见 openspec/specs/aicode-web-auth/spec.md
 // 在 React 树挂载之前注册一次拦截器；多次调用幂等。

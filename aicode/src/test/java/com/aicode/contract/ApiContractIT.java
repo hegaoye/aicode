@@ -666,4 +666,64 @@ class ApiContractIT {
         JsonNode voList = PARSER.readTree(body).path("data").path("voList");
         return (voList.isArray() && voList.size() > 0) ? voList.get(0) : null;
     }
+
+
+    // ==================================================================
+    // 场景⑨：账户加载端点 SHALL 走 R<AccountPublicVO> 且不含 password 字段（M3-D 防护）
+    // ==================================================================
+
+    /**
+     * `AccountController.loadByCode` 是 M3-D 落地的端点：返 R<AccountPublicVO>（3 字段
+     * id / code / account，**不含** password）。本 Scenario 组为这条加固提供契约守护与
+     * 反向验证 —— 一旦后续回归把 password 字段暴露给前端，本 Nested 立刻变红。
+     *
+     * 详见 {@code openspec/changes/2026-10-17-account-load-and-menu/}。
+     */
+    @Nested
+    @DisplayName("场景⑨ 账户加载端点走 R<AccountPublicVO>（不含 password 字段）")
+    class AccountLoadReturnsAccountPublicVO {
+
+        /**
+         * 与 db/data.sql 中 contract-test 账户对应的字面编码（accountCode）。
+         * M3-D 实施：loadByCode 端点不再要求前端传 code —— 后端从 token claim
+         * 抽 accountCode 自己查账户，所以本测试直接用同一个 mock 但走 query
+         * 路径。详见 {@code AccountController.loadByCode}。
+         */
+        private static final String SEED_ACCOUNT_CODE = "21218cca77804d2ba2";
+
+        @Test
+        @DisplayName("正常路径下 data 字段是 AccountPublicVO 形态，含 id / code / account 不含 password")
+        void accountLoad_returns_R_wrapped_AccountPublicVO() throws Exception {
+            String body = get("/account/load.shtml?code=" + SEED_ACCOUNT_CODE, token);
+
+            JsonNode root = PARSER.readTree(body);
+            assertThat(root.path("success").asBoolean())
+                    .as("R 包络的 success 字段 SHALL 为 true，实际=%s", root.path("success"))
+                    .isTrue();
+            assertThat(root.path("code").asText())
+                    .as("R 包络的 code 字段 SHALL 等于 0000，实际=%s", root.path("code"))
+                    .isEqualTo("0000");
+
+            JsonNode data = root.path("data");
+            assertThat(data.isObject())
+                    .as("data 字段 SHALL 是 AccountPublicVO 对象而非空/null，实际=%s", data)
+                    .isTrue();
+            // 正常字段断言
+            assertThat(data.path("code").asText())
+                    .as("data.code SHALL 等于 seed 编码（1882812765213425002）")
+                    .isEqualTo(SEED_ACCOUNT_CODE);
+            // M3-D 反向验证：data SHALL NOT 含 password 字段 —— 即便后端
+            // 错误地改成 AccountVO 形态（含 password）也立刻被该断言挡下
+            java.util.Set<String> allowed = java.util.Set.of("id", "code", "account");
+            java.util.Set<String> actual = fieldNames(data);
+            assertThat(actual)
+                    .as("data SHALL NOT 出现 AccountPublicVO 3 字段以外的字段（password 防护）"
+                            + "，实际=%s", actual)
+                    .isSubsetOf(allowed);
+            // 显式断言 password 字段绝对不在
+            assertThat(actual.contains("password"))
+                    .as("data 字段集合 SHALL NOT 含 password —— M3-D 防护重点")
+                    .isFalse();
+        }
+    }
 }

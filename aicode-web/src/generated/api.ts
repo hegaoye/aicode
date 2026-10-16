@@ -36,10 +36,12 @@ import type {
   Load4Params,
   Load5Params,
   Load6Params,
+  LoadByCode1Params,
   LoadParams,
   MapRelationshipVO,
   Modify4Params,
   PageVOAccountVO,
+  RAccountPublicVO,
   RFrameworks,
   RListMapClassTable,
   RListMapFieldColumnVO,
@@ -1120,6 +1122,33 @@ const getList5Url = (params: List5Params,) => {
 }
 
 /**
+ * 按 code 加载账户信息（不含密码）
+ * @deprecated
+ * @summary 按 code 加载账户信息
+ */
+const loadByCode1 = (
+    params?: LoadByCode1Params, options?: AxiosRequestConfig
+ ): Promise<AxiosResponse<RAccountPublicVO>> => {
+    return axiosInstance.get(
+      `/account/load`,{
+    ...options,
+        params: {...params, ...options?.params},}
+    );
+  }
+const getLoadByCode1Url = (params?: LoadByCode1Params,) => {
+
+  return axiosInstance.create({
+    baseURL: '',
+    params: null,
+  }).getUri({
+    url: `/account/load`,
+    baseURL: '',
+    params,
+
+  });
+}
+
+/**
  * 查询Account信息集合
  * @deprecated
  * @summary 查询Account信息集合
@@ -1368,7 +1397,7 @@ const getModify10Url = () => {
   });
 }
 
-return {updateIsPublic1,updateIsPublic,modify1,modify,modify2,modify3,modify4,build,modify5,build1,build2,build3,init,add,_delete,build4,reg,delete1,build5,build6,build7,load,scanPath,load1,list,listMapFieldColumn,listMapClassTable,load2,list1,load3,loadByCode,list2,execute,load4,list3,downloadFile,load5,signin,load6,list4,list5,list6,delete2,delete3,modify6,modify8,modify7,modify9,modify12,modify11,modify10,getUpdateIsPublic1Url,getUpdateIsPublicUrl,getModify1Url,getModifyUrl,getModify2Url,getModify3Url,getModify4Url,getBuildUrl,getModify5Url,getBuild1Url,getBuild2Url,getBuild3Url,getInitUrl,getAddUrl,getDeleteUrl,getBuild4Url,getRegUrl,getDelete1Url,getBuild5Url,getBuild6Url,getBuild7Url,getLoadUrl,getScanPathUrl,getLoad1Url,getListUrl,getListMapFieldColumnUrl,getListMapClassTableUrl,getLoad2Url,getList1Url,getLoad3Url,getLoadByCodeUrl,getList2Url,getExecuteUrl,getLoad4Url,getList3Url,getDownloadFileUrl,getLoad5Url,getSigninUrl,getLoad6Url,getList4Url,getList5Url,getList6Url,getDelete2Url,getDelete3Url,getModify6Url,getModify8Url,getModify7Url,getModify9Url,getModify12Url,getModify11Url,getModify10Url}};
+return {updateIsPublic1,updateIsPublic,modify1,modify,modify2,modify3,modify4,build,modify5,build1,build2,build3,init,add,_delete,build4,reg,delete1,build5,build6,build7,load,scanPath,load1,list,listMapFieldColumn,listMapClassTable,load2,list1,load3,loadByCode,list2,execute,load4,list3,downloadFile,load5,signin,load6,list4,list5,loadByCode1,list6,delete2,delete3,modify6,modify8,modify7,modify9,modify12,modify11,modify10,getUpdateIsPublic1Url,getUpdateIsPublicUrl,getModify1Url,getModifyUrl,getModify2Url,getModify3Url,getModify4Url,getBuildUrl,getModify5Url,getBuild1Url,getBuild2Url,getBuild3Url,getInitUrl,getAddUrl,getDeleteUrl,getBuild4Url,getRegUrl,getDelete1Url,getBuild5Url,getBuild6Url,getBuild7Url,getLoadUrl,getScanPathUrl,getLoad1Url,getListUrl,getListMapFieldColumnUrl,getListMapClassTableUrl,getLoad2Url,getList1Url,getLoad3Url,getLoadByCodeUrl,getList2Url,getExecuteUrl,getLoad4Url,getList3Url,getDownloadFileUrl,getLoad5Url,getSigninUrl,getLoad6Url,getList4Url,getList5Url,getLoadByCode1Url,getList6Url,getDelete2Url,getDelete3Url,getModify6Url,getModify8Url,getModify7Url,getModify9Url,getModify12Url,getModify11Url,getModify10Url}};
 export type UpdateIsPublic1Result = AxiosResponse<RFrameworks>
 export type UpdateIsPublicResult = AxiosResponse<RFrameworks>
 export type Modify1Result = AxiosResponse<RFrameworks>
@@ -1410,6 +1439,7 @@ export type SigninResult = AxiosResponse<RString>
 export type Load6Result = AxiosResponse<RFrameworks>
 export type List4Result = AxiosResponse<RPageFrameworksPageVO>
 export type List5Result = AxiosResponse<RListMapFieldColumnVO>
+export type LoadByCode1Result = AxiosResponse<RAccountPublicVO>
 export type List6Result = AxiosResponse<PageVOAccountVO>
 export type Delete2Result = AxiosResponse<RString>
 export type Delete3Result = AxiosResponse<RString>

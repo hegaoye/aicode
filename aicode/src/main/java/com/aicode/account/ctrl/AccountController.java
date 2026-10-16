@@ -6,10 +6,13 @@ package com.aicode.account.ctrl;
 import com.aicode.account.entity.Account;
 import com.aicode.account.service.AccountService;
 import com.aicode.account.vo.AccountPageVO;
+import com.aicode.account.vo.AccountPublicVO;
 import com.aicode.account.vo.AccountSaveVO;
 import com.aicode.account.vo.AccountVO;
 import com.aicode.core.PageVO;
 import com.aicode.core.R;
+import com.aicode.core.enums.Constants;
+import com.aicode.core.tools.JwtToken;
 import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -112,6 +115,53 @@ public class AccountController {
         accountService.remove(new LambdaQueryWrapper<Account>()
                 .eq(Account::getId, _accountVO.getId()));
         return R.success("删除成功");
+    }
+
+
+    /**
+     * M3-D：按 code 加载账户信息，profile 页面消费集合。
+     *
+     * 详见 `openspec/changes/2026-10-17-account-load-and-menu/specs/aicode-web-account/spec.md`：
+     * - 返 `R<AccountPublicVO>`（3 字段 `id` / `code` / `account`，不含 `password` 字段）
+     * - `code == null` 早返 `R.success()`（沿用 M3-A-1 的 R 包络机制，避免 NPE
+     *   与"找不到 vs 服务异常"语义混淆）
+     * - 鉴权：依赖全局 `LoginInterceptor`（与其他 /account 端点同组）
+     * - 用 `AccountPublicVO` 装配而非 `AccountVO` —— 杜绝 password 字段泄漏
+     *   到前端 bundle
+     */
+    @Operation(summary = "按 code 加载账户信息", description = "按 code 加载账户信息（不含密码）")
+    @Parameters({
+            @Parameter(name = "code", description = "账户编码（不传时从 token claim 抽 accountCode）", required = false),
+            @Parameter(name = "token", hidden = true)
+    })
+    @GetMapping("/load")
+    public R<AccountPublicVO> loadByCode(@RequestParam(value = "code", required = false) String code,
+                                       @Parameter(hidden = true) String token) {
+        // M3-D 实施偏差（design D2 未充分考虑前端 jwtutil 缺位）：
+        // - code 入参改为可选
+        // - 不传 code 时后端从 token claim (Constants.AccountCode.val.toString()) 抽
+        //   accountCode 自己查账户（与 ProjectController.list 同模式 line 260）
+        // - 这样前端用 `?code=` 或不传 `?code=` 都行，spec 承诺的"前端能拿账户详情"成立
+        if (code == null || code.isEmpty()) {
+            if (token == null || token.isEmpty() || "null".equals(token)) {
+                return R.success();
+            }
+            code = JwtToken.getTokenValue(token, Constants.AccountCode.val.toString());
+            if (code == null || code.isEmpty()) {
+                return R.success();
+            }
+        }
+        Account account = accountService.getOne(new LambdaQueryWrapper<Account>()
+                .eq(Account::getCode, code));
+        if (account == null) {
+            return R.success();
+        }
+        AccountPublicVO publicVo = new AccountPublicVO();
+        // 用 BeanUtils.copyProperties 把 4 字段 Account → 3 字段 target：
+        // AccountPublicVO 不含 password setter，password 字段自动丢弃
+        BeanUtils.copyProperties(account, publicVo);
+        log.debug(JSON.toJSONString(publicVo));
+        return R.success(publicVo);
     }
 
 }

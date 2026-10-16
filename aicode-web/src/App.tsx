@@ -4,6 +4,7 @@ import LoginPage from './pages/LoginPage'
 import DisplayAttributesPage from './pages/DisplayAttributesPage'
 import ProjectListPage from './pages/ProjectListPage'
 import ProjectPlaceholderPage from './pages/ProjectPlaceholderPage'
+import AccountPage from './pages/AccountPage'
 import RequireAuth from './components/RequireAuth'
 
 /**
@@ -48,6 +49,18 @@ export default function App() {
           <RequireAuth>
             <AppShell>
               <ProjectPlaceholderPage />
+            </AppShell>
+          </RequireAuth>
+        }
+      />
+
+      {/* M3-D：账户详情页 */}
+      <Route
+        path="/account/me"
+        element={
+          <RequireAuth>
+            <AppShell>
+              <AccountPage />
             </AppShell>
           </RequireAuth>
         }

@@ -622,6 +622,7 @@ opsx 入口（功能等价，运行时暴露哪个就用哪个）：
   - 外部依赖：`GitToolsCloneCompletenessTest` —— 需网络访问 GitHub，由 `@EnabledIfSystemProperty(named = "network.tests")` 守卫，默认**不执行**；离线 CI 需显式加 `-Dnetwork.tests=true`
 - **仍有空白**（详见 §7.10）：`facade` 零测试；Mapper 层 DAO 单测覆盖仍偏薄。
 - **已完成**：接口契约回归测试 `ApiContractIT`（59 用例，见 §7.10 第 0 项），已作为 Java 25 / Spring Boot 4.1 升级全程的验收金标准，并在 Boot 4.1.1 上全绿。
+- **M1 已合并（2026-10-16，`feature/20261016/react-web-rewrite` 分支 + 变更 `2026-10-16-aicode-web-first-business-page`）**：首个契约驱动业务页面 `DisplayAttributesPage` 落地。`src/lib/contract-response`（`unwrapSuccess` + `ContractError`）、`src/lib/display-controls`（`DisplayControl` 分发器）、`src/test-setup.ts`（MSW `setupServer`）沉淀出"如何接下一个端点"五步样板（详见 `aicode-web/README.md` §How to wire next endpoint）；Vitest 17 用例通过、`npm run build` 与 `npm run typecheck` 全绿；首次让契约链有真实消费者，下一次 M2/M3 可在此基础上扩充。`api-contract-artifact` 的 Scenario 「mock 与真实契约同源」因此真正具备可演示态（M0 链路就绪但无消费者）。
 - 性能基线：把 `measurement/startup-time.sh` 的输出接入 CI，**冷启动回归超过阈值**则 fail。
 
 ### 11.4 CI / CD

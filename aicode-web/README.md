@@ -77,3 +77,37 @@ public R<Frameworks> updateIsPublic(@Parameter(hidden = true) Frameworks framewo
 
 **待修**：这些 `@Parameters` 块应逐个复核 —— 删除与签名不符者、
 为确有其事者补 `schema = @Schema(type = ...)`。
+
+## 如何接下一个业务端点（M1 沉淀的样板）
+
+`DisplayAttributesPage` 是契约链上**第一个**真实业务页面，把"读取契约生成物 →
+触发请求 → 解构 `R` → 字段渲染"的整套样板沉淀了下来。后续接入（login / 项目
+列表 / 工程 job 等）按下面五步走，每步都对应一处固定代码位置：
+
+1. **在 `contracts/openapi/openapi.yaml` 找到 path**
+   - 路径以 `/<domain>/<action>` 形式出现。后端 Controller 改完之后已自动入库；
+     手动加端点不更新契约是反模式。
+2. **拷一份 orval 生成的请求签名作为入口**
+   - 在 `src/generated/api.ts` 找 `getAicodeRESTfulAPIs().<opName>(params)`；
+     这是 orval 从 `operationId` 派生的固定标识。
+   - 业务**不**手写 `axios.get(...)`，**不**复制 `AxiosResponse<R<T>>` 接口。
+3. **包 `unwrapSuccess` 取 `data`**
+   - 从 `src/lib/contract-response` 导入 `unwrapSuccess`，
+     自动从 `resp.data.data` 推导返回类型；失败抛 `ContractError`，
+     含 `code` 与 `info`。
+4. **决定是否要走 `<DisplayControl>` 分发**
+   - 表单/输入场景：把 `displayAttribute` 字段包到 `<DisplayControl>` 里。
+   - 表格/展示场景：直接渲染 VO 字段即可，不需要分发器。
+   - 新增一种 `displayType` 支持时，在 `src/lib/display-controls/index.tsx`
+     的 `CONTROLS` 表里加一行 + 新建一个最小受控组件。`unknown.tsx` 是兜底。
+5. **加 MSW handler 与单测**
+   - 第一步：在 `src/test-setup.ts` 追加 `get<OpName>MockHandler()`（已有端点也
+     可一并预注册，避免后续页面忘注册导致穿透网络）。
+   - 第二步：在测试里用 `server.use(get<OpName>MockHandler(fixedResp))` 覆盖
+     特定数据；不覆写就吃 orval 默认的 faker mock。
+   - 第三步：渲染 → `findByText` 验证成功路径；让 mock 返回 `success=false`
+     验证 `ContractError` 的 `info` 进入错误气泡。
+
+**反向验证**：临时在 `src/test-setup.ts` 把 `beforeAll(() => server.listen())` 注释
+掉，跑 `npm test`，应当看到 `AxiosError: Network Error` —— 证明 MSW 真的在拦。
+恢复 listen 后 17 用例全绿。

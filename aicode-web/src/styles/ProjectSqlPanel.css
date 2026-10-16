@@ -50,12 +50,11 @@
 }
 
 /* .dot.live —— 文件名 tab 前的「有内容」状态点。
-   ⚠️ 呼吸动画取自同项目的 build-log.html（`.log-head .dot`，同一枚绿色状态点
-   oklch(62% 0.14 145)，@keyframes pulse 数值一致）；wizard-step2-sql.html 本页
-   只给了静态底色。视觉规则 5 允许「极小动效」，此处与 build-log 的状态语言对齐。 */
+   原型 wizard-step2-sql.html 逐字只有 `background: oklch(62% 0.14 145)`，
+   且该页 `<style>` 内没有任何 @keyframes。故此处**不加**呼吸动画：
+   视觉规则 5 要求「极小动效」，凭 build-log 的同类绿点补一个反而偏离原型。 */
 .editor-bar .dot.live {
   background: oklch(62% 0.14 145);
-  animation: sql-pulse 1.4s ease-in-out infinite;
 }
 
 .editor-bar .name {
@@ -127,8 +126,10 @@
   }
 }
 
+/* 注：`.dot.live` 已按原型去掉动画，故此处不再需要 reduced-motion 兜底；
+   仅 `.parse-bar-fill`（不确定进度）仍需保留。 */
 @media (prefers-reduced-motion: reduce) {
-  .editor-bar .dot.live {
+  .parse-bar-fill {
     animation: none;
   }
 }

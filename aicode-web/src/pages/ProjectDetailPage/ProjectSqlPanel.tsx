@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { unwrapSuccess } from '../../lib/contract-response'
 import { getAicodeRESTfulAPIs } from '../../generated/api'
 import type { ProjectSqlVO } from '../../generated/model/projectSqlVO'
@@ -28,6 +28,11 @@ import { useInitProgress } from '../../lib/realtime/use-init-progress'
  * <p><b>为何不列出现有 SQL 段</b>：后端没有「按项目列出所有 SQL 段」的端点 ——
  * `GET /project/sql/load` 需要单个 `code`。本区块只展示本次会话中新加的段，
  * 刷新后消失。这是后端能力缺口，不是本实现偷懒。</p>
+ *
+ * <p><b>视觉基准</b>：OpenDesign 原型 `wizard-step2-sql.html`。编辑器外壳
+ * （`.editor-wrap` / `.editor-bar` / `.editor` / `.gutter`）逐字沿用原型类名与数值，
+ * 样式集中在 `styles/ProjectSqlPanel.css`。原型硬编码了 28 行行号，实现必须随内容
+ * 动态计算 —— 否则用户粘贴超过 28 行就整体错位。</p>
  */
 
 interface Props {
@@ -44,6 +49,8 @@ export default function ProjectSqlPanel({ projectCode }: Props) {
   const [saveError, setSaveError] = useState<string | null>(null)
   const [mapTables, setMapTables] = useState<MapClassTableVO[]>([])
   const [parseResultState, setParseResultState] = useState<'loading' | 'done'>('loading')
+  /** 行号槽的 ref —— textarea 滚动时把 scrollTop 同步过去，行号才不会与代码错位。 */
+  const gutterRef = useRef<HTMLDivElement>(null)
 
   const loadParseResult = useCallback(() => {
     if (!projectCode) {
@@ -112,26 +119,56 @@ export default function ProjectSqlPanel({ projectCode }: Props) {
   const progressPercent =
     progress.total > 0 ? Math.round((progress.current / progress.total) * 100) : 0
 
+  // 行号随内容动态计算（原型硬编码 28 行是静态稿做法，粘贴超过 28 行就错位）。
+  // 空内容算 1 行 —— 空 textarea 在视觉上就是一行。
+  const lineCount = tsql === '' ? 1 : tsql.split('\n').length
+  const lineNumbers = useMemo(
+    () => Array.from({ length: lineCount }, (_, i) => i + 1),
+    [lineCount],
+  )
+
+  // textarea 是唯一真正滚动的容器（.gutter 自己 overflow:hidden），
+  // 故滚动时同步行号槽的 scrollTop。
+  const syncGutterScroll = useCallback((e: React.UIEvent<HTMLTextAreaElement>) => {
+    const gutter = gutterRef.current
+    if (gutter) {
+      gutter.scrollTop = e.currentTarget.scrollTop
+    }
+  }, [])
+
   return (
     <section data-testid="project-sql-panel">
-      <h2>SQL 与解析</h2>
+      {/* ---------- SQL 编辑器（原型 .editor-wrap） ---------- */}
+      <div className="editor-wrap">
+        <div className="editor-bar">
+          <span className="tab">
+            <span className="dot live" aria-hidden="true" />
+            <span className="name">schema.sql</span>
+          </span>
+          <span className="meta">UTF-8 · {lineCount} 行 · MySQL</span>
+        </div>
+        <div className="editor">
+          <div className="gutter" ref={gutterRef} aria-hidden="true">
+            {lineNumbers.map((n) => (
+              <span key={n}>{n}</span>
+            ))}
+          </div>
+          <textarea
+            data-testid="project-sql-tsql"
+            aria-label="建表 SQL 脚本"
+            spellCheck={false}
+            placeholder="在此粘贴或编辑 SQL 脚本…"
+            value={tsql}
+            onChange={(e) => setTsql(e.target.value)}
+            onScroll={syncGutterScroll}
+          />
+        </div>
+      </div>
 
-      <label htmlFor="project-sql-tsql" style={{ color: 'var(--muted)' }}>
-        建表 SQL 脚本
-      </label>
-      <textarea
-        id="project-sql-tsql"
-        data-testid="project-sql-tsql"
-        rows={6}
-        style={{ width: '100%', marginTop: 'var(--space-2)' }}
-        placeholder={'CREATE TABLE user (\n  id BIGINT PRIMARY KEY,\n  name VARCHAR(64)\n);'}
-        value={tsql}
-        onChange={(e) => setTsql(e.target.value)}
-      />
-      <div style={{ display: 'flex', gap: 'var(--space-3)', marginTop: 'var(--space-2)' }}>
+      <div className="form-foot">
         <button
           type="button"
-          className="btn-primary"
+          className="btn-ghost"
           data-testid="project-sql-save"
           disabled={saving || !tsql.trim()}
           onClick={() => void handleSaveSql()}
@@ -145,58 +182,63 @@ export default function ProjectSqlPanel({ projectCode }: Props) {
           disabled={parseBusy}
           onClick={handleParse}
         >
-          {parseBusy ? '解析中…' : '解析'}
+          {parseBusy ? '解析中…' : '初始化数据库并进入下一步'}
         </button>
       </div>
 
       {saveError ? (
-        <p role="alert" data-testid="project-sql-error" style={{ color: 'var(--accent)' }}>
+        <p role="alert" className="sql-error" data-testid="project-sql-error">
           {saveError}
         </p>
       ) : null}
 
-      {/* ---------- 异步进度区 ---------- */}
+      {/* ---------- 异步进度区 ----------
+          三条语义防线：total=0 显示不确定进度文案（不得出 0% 空进度条）；
+          error 时进度区保留不自动消失，让用户看清失败位置。 */}
       {showProgressArea ? (
         <div
+          className="parse-progress"
           data-testid="project-parse-progress"
           data-status={progress.status}
-          style={{ marginTop: 'var(--space-3)' }}
         >
           {progress.indeterminate ? (
             // total 未知（建库阶段内部无可切分点）—— 显示文案而非 0/0 的空进度条
-            <p className="muted" data-testid="project-parse-indeterminate">
+            <p className="parse-indeterminate" data-testid="project-parse-indeterminate">
               {progress.message || '正在处理…'}
             </p>
           ) : (
-            <progress
+            <div
+              className="parse-bar"
               data-testid="project-parse-bar"
-              value={progress.current}
-              max={progress.total > 0 ? progress.total : 1}
-              style={{ width: '100%' }}
-            />
-          )}
-          <p className="muted" data-testid="project-parse-message">
-            {progress.message}
-          </p>
-          {progress.status === 'error' ? (
-            <p
-              role="alert"
-              data-testid="project-parse-error"
-              style={{ color: 'var(--accent)' }}
+              role="progressbar"
+              aria-valuemin={0}
+              aria-valuenow={progress.current}
+              aria-valuemax={progress.total > 0 ? progress.total : 1}
             >
+              <div className="parse-bar-fill" style={{ width: `${progressPercent}%` }} />
+            </div>
+          )}
+          {/* error 态由下面的 parse-error 承载同一句话，此处不再重复一遍 */}
+          {progress.status !== 'error' ? (
+            <p className="parse-msg" data-testid="project-parse-message">
+              {progress.message}
+            </p>
+          ) : null}
+          {progress.status === 'error' ? (
+            <p className="parse-error" role="alert" data-testid="project-parse-error">
               {progress.message}
             </p>
           ) : null}
           {!progress.indeterminate && progress.total > 0 ? (
-            <small className="muted" data-testid="project-parse-count">
+            <small className="parse-count" data-testid="project-parse-count">
               {progress.current}/{progress.total}（{progressPercent}%）
             </small>
           ) : null}
           {progress.status === 'error' ? (
             <button
               type="button"
+              className="btn-ghost parse-dismiss"
               data-testid="project-parse-dismiss"
-              style={{ marginTop: 'var(--space-2)' }}
               onClick={progress.clear}
             >
               关闭
@@ -206,13 +248,13 @@ export default function ProjectSqlPanel({ projectCode }: Props) {
       ) : null}
 
       {progress.status === 'done' ? (
-        <p className="muted" data-testid="project-parse-done">
+        <p className="parse-done" data-testid="project-parse-done">
           {progress.message || '解析完成'}
         </p>
       ) : null}
 
       {addedSegments.length > 0 ? (
-        <ul data-testid="project-sql-saved" style={{ marginTop: 'var(--space-3)' }}>
+        <ul className="sql-saved" data-testid="project-sql-saved">
           {addedSegments.map((seg) => (
             <li key={seg.code ?? Math.random().toString()}>
               已保存 SQL 段 <code>{seg.code ?? '—'}</code>（{seg.state ?? '—'}）
@@ -221,35 +263,37 @@ export default function ProjectSqlPanel({ projectCode }: Props) {
         </ul>
       ) : null}
 
-      <section style={{ marginTop: 'var(--space-4)' }}>
-        <h3>解析结果</h3>
+      <div className="sql-result">
+        <div className="section-title">解析结果</div>
         {parseResultState === 'loading' ? (
           <p className="muted">读取中…</p>
         ) : mapTables.length === 0 ? (
           <p className="muted" data-testid="project-sql-nothing-parsed">
-            尚未解析出表 —— 点上方「解析」让 aicode 逆解析你导入的 SQL。
+            尚未解析出表 —— 点上方「初始化数据库并进入下一步」让 aicode 逆解析你导入的 SQL。
           </p>
         ) : (
-          <table data-testid="project-sql-parsed">
-            <thead>
-              <tr>
-                <th scope="col">表名</th>
-                <th scope="col">类名</th>
-                <th scope="col">前端命名</th>
-              </tr>
-            </thead>
-            <tbody>
-              {mapTables.map((t) => (
-                <tr key={t.code ?? t.tableName ?? Math.random().toString()}>
-                  <td>{t.tableName ?? '—'}</td>
-                  <td>{t.className ?? '—'}</td>
-                  <td>{t.dashedCaseName ?? '—'}</td>
+          <div className="table-card">
+            <table className="data-table" data-testid="project-sql-parsed">
+              <thead>
+                <tr>
+                  <th scope="col">表名</th>
+                  <th scope="col">类名</th>
+                  <th scope="col">前端命名</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {mapTables.map((t) => (
+                  <tr key={t.code ?? t.tableName ?? Math.random().toString()}>
+                    <td>{t.tableName ?? '—'}</td>
+                    <td>{t.className ?? '—'}</td>
+                    <td>{t.dashedCaseName ?? '—'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
-      </section>
+      </div>
     </section>
   )
 }

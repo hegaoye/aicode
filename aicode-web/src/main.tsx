@@ -12,6 +12,7 @@ import './styles/BuildLogPanel.css'
 import './styles/FrameworkListPage.css'
 import './styles/LoginPage.css'
 import './styles/NewProjectPage.css'
+import './styles/ProjectListPage.css'
 import './styles/ProjectSqlPanel.css'
 import './styles/RelationshipPanel.css'
 

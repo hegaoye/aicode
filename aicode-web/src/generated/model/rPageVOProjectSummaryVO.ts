@@ -5,11 +5,11 @@
  * aicode 应用
  * OpenAPI spec version: 1.0
  */
-import type { PageVOProjectVO } from './pageVOProjectVO';
+import type { PageVOProjectSummaryVO } from './pageVOProjectSummaryVO';
 
-export interface RPageVOProjectVO {
+export interface RPageVOProjectSummaryVO {
   info?: string;
-  data?: PageVOProjectVO;
+  data?: PageVOProjectSummaryVO;
   code?: string;
   success?: boolean;
 }

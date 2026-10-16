@@ -654,7 +654,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/RProjectVO"
+                $ref: "#/components/schemas/RProjectDetailVO"
   /project/list:
     get:
       tags:
@@ -688,7 +688,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/RPageVOProjectVO"
+                $ref: "#/components/schemas/RPageVOProjectSummaryVO"
   /project/job/execute:
     get:
       tags:
@@ -1801,34 +1801,21 @@ components:
           type: string
         success:
           type: boolean
-    ProjectVO:
+    ProjectDetailVO:
       type: object
       properties:
-        id:
-          type: integer
-          format: int64
-          description: id
         code:
           type: string
           description: 项目编码
         name:
           type: string
           description: 项目名
-        description:
-          type: string
-          description: 项目描述
         englishName:
           type: string
           description: 项目英文名
-        databaseType:
+        description:
           type: string
-          description: "数据库类型:Mysql,Oracle"
-        language:
-          type: string
-          description: "项目语言:Java,Python,Js"
-        state:
-          type: string
-          description: "项目状态：停用[Disenable]，启用[Enable]"
+          description: 项目描述
         copyright:
           type: string
           description: 项目版权文字信息
@@ -1841,25 +1828,10 @@ components:
         basePackage:
           type: string
           description: 项目基础包名
-        sqlFile:
-          type: string
-          description: 数据库脚本文件地址
-        downloadUrl:
-          type: string
-          description: 项目下载地址
         buildNumber:
           type: integer
           format: int32
           description: 生成次数
-        isRepository:
-          type: string
-          description: 是否仓库管理
-        isParseTable:
-          type: string
-          description: 是否已经解析表
-        isParseClass:
-          type: string
-          description: 是否已经解析类
         createTime:
           type: string
           format: date-time
@@ -1871,21 +1843,18 @@ components:
         accountCode:
           type: string
           description: 账户编码
-        isIncrement:
-          type: string
-          description: 是否增量生成
-    RProjectVO:
+    RProjectDetailVO:
       type: object
       properties:
         info:
           type: string
         data:
-          $ref: "#/components/schemas/ProjectVO"
+          $ref: "#/components/schemas/ProjectDetailVO"
         code:
           type: string
         success:
           type: boolean
-    PageVOProjectVO:
+    PageVOProjectSummaryVO:
       type: object
       properties:
         createTimeBegin:
@@ -1915,14 +1884,33 @@ components:
         records:
           type: array
           items:
-            $ref: "#/components/schemas/ProjectVO"
-    RPageVOProjectVO:
+            $ref: "#/components/schemas/ProjectSummaryVO"
+    ProjectSummaryVO:
+      type: object
+      properties:
+        code:
+          type: string
+          description: 项目编码
+        name:
+          type: string
+          description: 项目名
+        englishName:
+          type: string
+          description: 项目英文名
+        state:
+          type: string
+          description: "项目状态：停用[Disenable]，启用[Enable]"
+        createTime:
+          type: string
+          format: date-time
+          description: 创建时间
+    RPageVOProjectSummaryVO:
       type: object
       properties:
         info:
           type: string
         data:
-          $ref: "#/components/schemas/PageVOProjectVO"
+          $ref: "#/components/schemas/PageVOProjectSummaryVO"
         code:
           type: string
         success:

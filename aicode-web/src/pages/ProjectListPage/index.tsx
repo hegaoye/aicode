@@ -1,10 +1,11 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ContractError, unwrapSuccess } from '../../lib/contract-response'
 import { getToken } from '../../lib/auth/token-store'
 import { getAicodeRESTfulAPIs } from '../../generated/api'
-import type { ProjectVO } from '../../generated/model/projectVO'
-import type { PageVOProjectVO } from '../../generated/model/pageVOProjectVO'
+import BuildLogPanel from '../../lib/realtime/build-log-panel'
+import type { ProjectSummaryVO } from '../../generated/model/projectSummaryVO'
+import type { PageVOProjectSummaryVO } from '../../generated/model/pageVOProjectSummaryVO'
 
 /**
  * `ProjectListPage` —— M2 第 2 阶段接入的第二个契约驱动业务页面。
@@ -28,7 +29,7 @@ import type { PageVOProjectVO } from '../../generated/model/pageVOProjectVO'
 
 type LoadState =
   | { kind: 'loading' }
-  | { kind: 'ready'; data: PageVOProjectVO }
+  | { kind: 'ready'; data: PageVOProjectSummaryVO }
   | { kind: 'error'; error: ContractError }
 
 const PAGE_SIZE = 10
@@ -57,6 +58,9 @@ export default function ProjectListPage() {
   // 全局 axios 实例在 orval 生成物内部使用即可；每次渲染创建一份 api 是廉价的
   const api = useMemo(() => getAicodeRESTfulAPIs(), [])
   const [state, setState] = useState<LoadState>({ kind: 'loading' })
+  // 记录哪些行当前正在"构建中"——BuildLogPanel 应挂载。同时启动 hook 的 startStream。
+  // key 是 row.code。
+  const [buildingCodes, setBuildingCodes] = useState<Set<string>>(new Set())
 
   useEffect(() => {
     let cancelled = false
@@ -88,6 +92,17 @@ export default function ProjectListPage() {
     }
   }, [api])
 
+  const startBuildFor = useCallback((code: string) => {
+    if (!code || buildingCodes.has(code)) {
+      return
+    }
+    setBuildingCodes((prev) => {
+      const next = new Set(prev)
+      next.add(code)
+      return next
+    })
+  }, [buildingCodes])
+
   if (state.kind === 'loading') {
     return (
       <section aria-busy="true">
@@ -108,7 +123,7 @@ export default function ProjectListPage() {
     )
   }
 
-  const records: ProjectVO[] = state.data.records ?? []
+  const records: ProjectSummaryVO[] = state.data.records ?? []
 
   return (
     <section>
@@ -127,24 +142,52 @@ export default function ProjectListPage() {
               <th scope="col">项目编码</th>
               <th scope="col">项目名</th>
               <th scope="col">英文名</th>
+              <th scope="col">状态</th>
               <th scope="col">创建时间</th>
-              <th scope="col">操作</th>
+              <th scope="col">详情</th>
+              <th scope="col">构建</th>
             </tr>
           </thead>
           <tbody>
-            {records.map((row) => (
-              <tr key={row.code ?? row.id} data-testid="project-list-row">
-                <td>{row.code ?? '—'}</td>
-                <td>{row.name ?? '—'}</td>
-                <td>{row.englishName ?? '—'}</td>
-                <td>{formatDate(row.createTime)}</td>
-                <td>
-                  <Link to={`/project/${encodeURIComponent(row.code ?? '')}`}>
-                    详情
-                  </Link>
-                </td>
-              </tr>
-            ))}
+            {records.map((row) => {
+              const rowCode = row.code ?? ''
+              const isEnable = row.state === 'Enable'
+              const isBuilding = buildingCodes.has(rowCode)
+              return (
+                <>
+                  <tr key={rowCode || 'row-no-code'} data-testid="project-list-row">
+                    <td>{rowCode || '—'}</td>
+                    <td>{row.name ?? '—'}</td>
+                    <td>{row.englishName ?? '—'}</td>
+                    <td>{row.state ?? '—'}</td>
+                    <td>{formatDate(row.createTime)}</td>
+                    <td>—</td>
+                    <td>
+                      <Link to={`/project/${encodeURIComponent(rowCode)}`}>详情</Link>
+                    </td>
+                    <td>
+                      <button
+                        type="button"
+                        className="btn-primary"
+                        data-testid="project-list-build-button"
+                        disabled={!isEnable || isBuilding}
+                        title={isEnable ? '开始构建' : '项目未启用'}
+                        onClick={() => startBuildFor(rowCode)}
+                      >
+                        {isBuilding ? '构建中…' : '构建'}
+                      </button>
+                    </td>
+                  </tr>
+                  {isBuilding ? (
+                    <tr key={`${rowCode || 'row'}-log`} data-testid="project-list-log-row">
+                      <td colSpan={6}>
+                        <BuildLogPanel projectCode={rowCode} />
+                      </td>
+                    </tr>
+                  ) : null}
+                </>
+              )
+            })}
           </tbody>
         </table>
       )}

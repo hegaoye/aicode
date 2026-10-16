@@ -460,25 +460,26 @@ class ApiContractIT {
     // ==================================================================
 
     /**
-     * 该组关注的端点是 {@code /project/list} —— 它已经切到 {@code PageVO<ProjectVO>}
-     * （参见 {@code openspec/changes/2026-10-17-project-list-vo-contract}）。
-     * 契约断言通过 {@code data.records}（PageVO 字段）而非 {@code data.voList}（历史 Page
-     * 字段）来钉死真实形状 —— 字段名错位会立即变红。
+     * 该组关注的端点是 {@code /project/list} —— M3-C 改造后它切到
+     * {@code PageVO<ProjectSummaryVO>}（5 字段投影，详见
+     * {@code openspec/changes/2026-10-17-project-vo-trim/}）。
+     * 契约断言通过 {@code data.records}（PageVO 字段）来钉死真实形状；
+     * 字段名错位会立即变红。
      */
     @Nested
-    @DisplayName("场景⑦ 分页列表接口应使用 PageVO<XxxVO>（records 字段非空且元素为 ProjectVO）")
+    @DisplayName("场景⑦ 分页列表接口应使用 PageVO<ProjectSummaryVO>（records 字段非空且元素为 ProjectSummaryVO）")
     class ProjectListPageVoContract {
 
         /**
-         * 与 db/data.sql 中 contract-demo 种子对应的 19 位雪花编码。本字段值用于反向
-         * 验证：{@link #project_list_records_fieldSet_isSuperSetOfProjectVO} 用 {@code asText()}
-         * 锁定真实值，使得任何装配错误（如 {@code vo.setCode(project.getCode())} 被误删后
-         * Jackson 会把该字段序列化为 {@code null}）都会让断言变红。
+         * 与 db/data.sql 中 contract-demo 种子对应的 19 位雪花编码。
+         * M3-C：ProjectSummaryVO 包含 code / name / englishName / state /
+         * createTime 共 5 字段；裁切掉的 description / databaseType 等
+         * 不会出现在 records 元素中。
          */
         private static final String SEED_PROJECT_CODE = "1882812765213425001";
 
         @Test
-        @DisplayName("data.records 是非空数组，首项含 ProjectVO 关键字段且值非空")
+        @DisplayName("data.records 是非空数组，首项含 ProjectSummaryVO 关键字段且值非空")
         void project_list_records_containProjectVOFields() throws Exception {
             String body = get("/project/list.shtml?curPage=1&pageSize=10", token);
 
@@ -503,24 +504,23 @@ class ApiContractIT {
         }
 
         @Test
-        @DisplayName("data.records 元素字段集合 ⊇ ProjectVO 持久化字段集合（钉死 schema 不退化）")
+        @DisplayName("data.records 元素字段集合 ⊆ ProjectSummaryVO 5 字段（钉死 M3-C 裁切生效）")
         void project_list_records_fieldSet_isSuperSetOfProjectVO() throws Exception {
             String body = get("/project/list.shtml?curPage=1&pageSize=10", token);
 
             JsonNode records = PARSER.readTree(body).path("data").path("records");
             assertThat(records).isNotEmpty();
 
+            // M3-C 裁切后，列表 VO 仅有 5 字段（code / name / englishName /
+            // state / createTime）；M3-A-2 的 22 字段全集合已经收窄。
+            // 反向：records[0] 实际字段集合 SHALL NOT 出现 ProjectSummaryVO
+            // 持久化字段以外的字段。
             java.util.Set<String> allowed = java.util.Set.of(
-                    "id", "code", "name", "description", "englishName", "databaseType",
-                    "language", "state", "copyright", "author", "phone", "basePackage",
-                    "sqlFile", "downloadUrl", "buildNumber", "isRepository", "isParseTable",
-                    "isParseClass", "createTime", "updateTime", "accountCode", "isIncrement"
+                    "code", "name", "englishName", "state", "createTime"
             );
-            // 仅校验首条记录的字段集合 ⊆ allowed —— 若 VO 之后做字段裁剪（api-data-object
-            // 要求「不多于前端消费集」），allowed 应同步收窄。
             java.util.Set<String> actual = fieldNames(records.get(0));
             assertThat(actual)
-                    .as("records[0] SHALL NOT 出现 ProjectVO 持久化字段集合以外的字段，实际=%s", actual)
+                    .as("records[0] SHALL NOT 出现 ProjectSummaryVO 持久化字段以外的字段，实际=%s", actual)
                     .isSubsetOf(allowed);
 
             // 反向：核心持久化字段 SHALL 存在 —— 防止装配断章。
@@ -540,18 +540,22 @@ class ApiContractIT {
      * 详见 {@code openspec/changes/2026-10-18-project-load-by-code-vo-contract/}。
      */
     @Nested
-    @DisplayName("场景⑧ 受保护端点走 R<T> 包装（loadByCode 应返 R<ProjectVO>）")
+    @DisplayName("场景⑧ 受保护端点走 R<T> 包装（loadByCode 应返 R<ProjectDetailVO>）")
     class LoadByCodeReturnsWrappedVO {
 
         /**
-         * 与 db/data.sql 中 contract-demo 种子对应的 19 位雪花编码。该字段值用
-         * 于 `data.code` 反向验证（强等值），保证一旦 Controller 改回裸返实体，
-         * 断言会立刻因 `data.code === undefined !== SEED_PROJECT_CODE` 失败。
+         * 与 db/data.sql 中 contract-demo 种子对应的 19 位雪花编码。
+         * M3-C 改造：loadByCode 现在返 R<ProjectDetailVO>（12 字段投影）而非
+         * 原 22 字段 ProjectVO。下方"正常路径"用例断言 description 字段
+         * 强等值 —— description 是 ProjectDetailVO 独有字段（ProjectSummaryVO
+         * 不含），如 M3-C 漏改，Controller 仍返 ProjectVO 不带 description 字段
+         * 类型，断言会立刻失败。
          */
         private static final String SEED_PROJECT_CODE = "1882812765213425001";
+        private static final String SEED_PROJECT_DESCRIPTION = "契约回归测试种子项目";
 
         @Test
-        @DisplayName("正常路径下 data 字段是 ProjectVO 形态，含 code / name / englishName 等")
+        @DisplayName("正常路径下 data 字段是 ProjectDetailVO 形态，含 code / name / englishName / description 等")
         void loadByCode_returns_R_wrapped_ProjectVO() throws Exception {
             // 注：loadByCode 不需要 token，但本测试仍以 token 调用以维持与其他 contract 测试一致
             String body = get(
@@ -568,8 +572,17 @@ class ApiContractIT {
 
             JsonNode data = root.path("data");
             assertThat(data.isObject())
-                    .as("data 字段 SHALL 是 ProjectVO 对象而非空/null，实际=%s", data)
+                    .as("data 字段 SHALL 是 ProjectDetailVO 对象而非空/null，实际=%s", data)
                     .isTrue();
+            // M3-C 反向验证：用 description 强等值（ProjectDetailVO 12 字段之一；
+            // ProjectSummaryVO 7 字段不含此字段）。如 M3-C 漏改返 22 字段 ProjectVO，
+            // data.description 仍存在 —— 但 ProjectVO 已从代码中删除，本断言
+            // 还同时验证 description 字符串值映射正确。
+            assertThat(data.path("description").asText())
+                    .as("data.description SHALL 等于种子描述'契约回归测试种子项目'，"
+                            + "如 M3-C 漏改返旧 ProjectVO 形态，该断言仍可能通过；"
+                            + "真正的反向验证见 task 4.4（add 22 字段断言）")
+                    .isEqualTo(SEED_PROJECT_DESCRIPTION);
             assertThat(data.path("code").asText())
                     .as("data.code SHALL 等于种子编码；如为 'undefined'/'null'，说明 Controller 改回裸实体")
                     .isEqualTo(SEED_PROJECT_CODE);
@@ -579,6 +592,20 @@ class ApiContractIT {
             assertThat(data.path("englishName").asText())
                     .as("data.englishName SHALL 等于种子英文名 contract-demo")
                     .isEqualTo("contract-demo");
+
+            // M3-C 反向验证：被裁切的字段 SHALL NOT 出现在 data 中。
+            // ProjectDetailVO 不含 databaseType / language / state / sqlFile /
+            // downloadUrl / isRepository / isParseTable / isParseClass / isIncrement
+            // / id。data 含任意一个都说明返回了旧 22 字段 ProjectVO 或实体全集。
+            java.util.Set<String> allowed = java.util.Set.of(
+                    "code", "name", "englishName", "description", "copyright", "author",
+                    "phone", "basePackage", "buildNumber", "createTime", "updateTime", "accountCode"
+            );
+            java.util.Set<String> actual = fieldNames(data);
+            assertThat(actual)
+                    .as("data SHALL NOT 出现 ProjectDetailVO 12 字段以外的字段（裁切生效），"
+                            + "实际=%s", actual)
+                    .isSubsetOf(allowed);
         }
 
         @Test

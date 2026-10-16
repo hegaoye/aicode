@@ -16,7 +16,8 @@ import com.aicode.frameworks.service.FrameworksService;
 import com.aicode.map.service.MapRelationshipService;
 import com.aicode.project.entity.*;
 import com.aicode.project.service.*;
-import com.aicode.project.vo.ProjectVO;
+import com.aicode.project.vo.ProjectDetailVO;
+import com.aicode.project.vo.ProjectSummaryVO;
 import com.aicode.setting.entity.SettingKey;
 import com.aicode.setting.service.SettingService;
 import com.alibaba.fastjson2.JSON;
@@ -272,8 +273,8 @@ public class ProjectController {
             @Parameter(name = "pageSize", description = "分页大小", required = true)
     })
     @GetMapping(value = "/list")
-    public R<PageVO<ProjectVO>> list(String token, Integer curPage, Integer pageSize) {
-        PageVO<ProjectVO> pageVO = new PageVO<>();
+    public R<PageVO<ProjectSummaryVO>> list(String token, Integer curPage, Integer pageSize) {
+        PageVO<ProjectSummaryVO> pageVO = new PageVO<>();
         if (StringUtils.isBlank(token) || "null".equals(token)) {
             return R.success(pageVO);
         }
@@ -284,9 +285,9 @@ public class ProjectController {
                 .orderByDesc(Project::getCreateTime)
                 .list();
 
-        List<ProjectVO> records = new java.util.ArrayList<>(projectList.size());
+        List<ProjectSummaryVO> records = new java.util.ArrayList<>(projectList.size());
         for (Project project : projectList) {
-            records.add(toProjectVO(project));
+            records.add(toSummary(project));
         }
 
         pageVO.setTotalRow(projectList.size());
@@ -297,37 +298,50 @@ public class ProjectController {
     }
 
     /**
-     * 把持久化实体 {@link Project} 转换为出参视图对象 {@link ProjectVO}。
+     * 把持久化实体 {@link Project} 转换为列表出参视图对象 {@link ProjectSummaryVO}。
+     *
+     * 7 字段（code / name / englishName / state / createTime / updateTime /
+     * accountCode）—— 列表场景只关心"哪一行、什么状态、谁拥有、何时建"。
      *
      * 逐字段显式赋值而非 {@link BeanUtils#copyProperties} —— 显式胜过隐式：
      * 任何字段重命名会在编译期暴露给维护者，避免悄悄漂移到不期望的字段
      * （参考 `display-attribute-vo-contract` 归档变更的同等做法）。
      */
-    private ProjectVO toProjectVO(Project project) {
-        ProjectVO vo = new ProjectVO();
-        vo.setId(project.getId());
+    private ProjectSummaryVO toSummary(Project project) {
+        ProjectSummaryVO vo = new ProjectSummaryVO();
         vo.setCode(project.getCode());
         vo.setName(project.getName());
-        vo.setDescription(project.getDescription());
         vo.setEnglishName(project.getEnglishName());
-        vo.setDatabaseType(project.getDatabaseType());
-        vo.setLanguage(project.getLanguage());
         vo.setState(project.getState());
-        vo.setCopyright(project.getCopyright());
-        vo.setAuthor(project.getAuthor());
-        vo.setPhone(project.getPhone());
-        vo.setBasePackage(project.getBasePackage());
-        vo.setSqlFile(project.getSqlFile());
-        vo.setDownloadUrl(project.getDownloadUrl());
-        vo.setBuildNumber(project.getBuildNumber());
-        vo.setIsRepository(project.getIsRepository());
-        vo.setIsParseTable(project.getIsParseTable());
-        vo.setIsParseClass(project.getIsParseClass());
         vo.setCreateTime(project.getCreateTime());
-        vo.setUpdateTime(project.getUpdateTime());
-        vo.setAccountCode(project.getAccountCode());
-        vo.setIsIncrement(project.getIsIncrement());
         return vo;
+    }
+
+    /**
+     * 把持久化实体 {@link Project} 转换为详情出参视图对象 {@link ProjectDetailVO}。
+     *
+     * 12 字段（code / name / englishName / description / copyright / author /
+     * phone / basePackage / buildNumber / createTime / updateTime /
+     * accountCode）—— 详情页关注"项目名/描述/作者/路径/构建次数"，配置
+     * 类字段（databaseType / language / state / isRepository 等）刻意移除。
+     *
+     * 返回 {@code target} 的入参形式让测试可复用同一映射函数；与 toSummary
+     * 保持手工 setXxx 风格一致。
+     */
+    private ProjectDetailVO copyToDetail(Project project, ProjectDetailVO target) {
+        target.setCode(project.getCode());
+        target.setName(project.getName());
+        target.setEnglishName(project.getEnglishName());
+        target.setDescription(project.getDescription());
+        target.setCopyright(project.getCopyright());
+        target.setAuthor(project.getAuthor());
+        target.setPhone(project.getPhone());
+        target.setBasePackage(project.getBasePackage());
+        target.setBuildNumber(project.getBuildNumber());
+        target.setCreateTime(project.getCreateTime());
+        target.setUpdateTime(project.getUpdateTime());
+        target.setAccountCode(project.getAccountCode());
+        return target;
     }
 
 
@@ -340,14 +354,16 @@ public class ProjectController {
      * - code 不存在的路径：service.getOne 返 null → 顺手返 `R.success(null)`，
      *   避免 `BeanUtils.copyProperties(null, ...)` 在 Spring 6+ 抛 NPE（让前端区分
      *   "找不到" 与 "服务异常" —— 既有逻辑曾以 NPE→9999 掩盖两种语义）；
-     * - 正常路径：装配 ProjectVO 后 `R.success(projectVO)`，让前端 M3-A
+     * - 正常路径：装配 ProjectDetailVO 后 `R.success(projectDetail)`，让前端 M3-A
      *   `ProjectDetailPage` 走 `unwrapSuccess` 样板消费；
+     * - M3-C：装配类字段 `databaseType` / `language` / `state` / `isRepository` 等
+     *   在 detail 中也移除（详见 `2026-10-17-project-vo-trim`）；
      * - 鉴权：依赖全局 `LoginInterceptor`（按 `auth-account` R5，新接口禁止
      *   `?token=` URL 参数），调用方由 axios 拦截器注入 Authorization 头。
      */
     @Operation(summary = "按 code 加载项目", description = "按 code 加载项目")
     @GetMapping("/load/code/{code}")
-    public R<ProjectVO> loadByCode(@PathVariable String code) {
+    public R<ProjectDetailVO> loadByCode(@PathVariable String code) {
         if (code == null) {
             // 用 R.success() 无参版本：避免 null 走 R.success(BaseExceptionEnum) 重载
             // （后者实现是 baseExceptionEnum.code，在 null 下 NPE —— 见 common R.java:61）
@@ -360,10 +376,10 @@ public class ProjectController {
             // 找不到对应 Project：返 R.success()（data=null）而非走 NPE→9999 路径
             return R.success();
         }
-        ProjectVO projectVO = new ProjectVO();
-        BeanUtils.copyProperties(project, projectVO);
-        log.debug(JSON.toJSONString(projectVO));
-        return R.success(projectVO);
+        ProjectDetailVO projectDetailVO = new ProjectDetailVO();
+        copyToDetail(project, projectDetailVO);
+        log.debug(JSON.toJSONString(projectDetailVO));
+        return R.success(projectDetailVO);
     }
 
 
@@ -406,10 +422,11 @@ public class ProjectController {
             @Parameter(name = "code", description = "项目编码", required = true)
     })
     @PostMapping("/delete")
-    public R<String> delete(@Parameter(hidden = true) ProjectVO projectVO) {
-        Project newProject = new Project();
-        BeanUtils.copyProperties(projectVO, newProject);
-        projectService.delete(projectVO.getCode());
+    public R<String> delete(@Parameter(hidden = true) String code) {
+        // M3-C：原方法以 ProjectVO 为入参（用 projectVO.getCode() + BeanUtils.copyProperties
+        // 全拷贝到 Project 实体），与 ProjectVO 实体全集拷贝形态一同被裁切。改用
+        // String code 入参即可——这里实际只用 code 字段。
+        projectService.delete(code);
         return R.success("删除成功");
     }
 

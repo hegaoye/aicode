@@ -48,15 +48,15 @@ import type {
   RPageFrameworksPageVO,
   RPageProjectFramworkPageVO,
   RPageProjectModulePageVO,
-  RPageVOProjectVO,
+  RPageVOProjectSummaryVO,
   RProject,
+  RProjectDetailVO,
   RProjectFramwork,
   RProjectJob,
   RProjectModule,
   RProjectRepositoryAccount,
   RProjectSql,
   RProjectSqlVO,
-  RProjectVO,
   RString,
   RVoid,
   ScanPathParams,
@@ -842,7 +842,7 @@ const getLoad3Url = (params: Load3Params,) => {
  */
 const loadByCode = (
     code: string, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<RProjectVO>> => {
+ ): Promise<AxiosResponse<RProjectDetailVO>> => {
     return axiosInstance.get(
       `/project/load/code/${code}`,options
     );
@@ -866,7 +866,7 @@ const getLoadByCodeUrl = (code: string,) => {
  */
 const list2 = (
     params: List2Params, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<RPageVOProjectVO>> => {
+ ): Promise<AxiosResponse<RPageVOProjectSummaryVO>> => {
     return axiosInstance.get(
       `/project/list`,{
     ...options,
@@ -1399,8 +1399,8 @@ export type ListMapClassTableResult = AxiosResponse<RListMapClassTable>
 export type Load2Result = AxiosResponse<RProjectModule>
 export type List1Result = AxiosResponse<RPageProjectModulePageVO>
 export type Load3Result = AxiosResponse<RProject>
-export type LoadByCodeResult = AxiosResponse<RProjectVO>
-export type List2Result = AxiosResponse<RPageVOProjectVO>
+export type LoadByCodeResult = AxiosResponse<RProjectDetailVO>
+export type List2Result = AxiosResponse<RPageVOProjectSummaryVO>
 export type ExecuteResult = AxiosResponse<RProjectJob>
 export type Load4Result = AxiosResponse<RProjectFramwork>
 export type List3Result = AxiosResponse<RPageProjectFramworkPageVO>

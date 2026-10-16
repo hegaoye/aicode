@@ -2,16 +2,16 @@ import { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { ContractError, unwrapSuccess } from '../../lib/contract-response'
 import { getAicodeRESTfulAPIs } from '../../generated/api'
-import type { ProjectVO } from '../../generated/model/projectVO'
+import type { ProjectDetailVO } from '../../generated/model/projectDetailVO'
 
 /**
- * `ProjectDetailPage` —— M3-A 第 2 阶段：契约驱动的项目详情页。
+ * `ProjectDetailPage` —— M3-A 第 2 阶段 + M3-C 字段裁切。
  *
  * 数据流：
  *   1. `useParams<{ code: string }>()` 取 URL `:code` 入参；
  *   2. `getAicodeRESTfulAPIs().loadByCode(code)` 拿到
- *      `AxiosResponse<RProjectVO>`（M3-A-1 已统一包络）；
- *   3. `unwrapSuccess(resp)` 拆出 `ProjectVO`；失败抛 `ContractError`；
+ *      `AxiosResponse<RProjectDetailVO>`（M3-A-1 R 包络 + M3-C 12 字段投影）；
+ *   3. `unwrapSuccess(resp)` 拆出 `ProjectDetailVO`；失败抛 `ContractError`；
  *   4. 按"标识 + 细节 + 时间 + 关联"四组，键值列表渲染。
  *
  * 错误状态分两类（详见 design D4）：
@@ -27,15 +27,21 @@ import type { ProjectVO } from '../../generated/model/projectVO'
 
 type LoadState =
   | { kind: 'loading' }
-  | { kind: 'ready'; data: ProjectVO | null }
+  | { kind: 'ready'; data: ProjectDetailVO | null }
   | { kind: 'error'; error: ContractError }
 
 /**
- * 显示约定：把 `ProjectVO` 的 22 个持久化字段按用户语义分组。
+ * 显示约定：把 `ProjectDetailVO` 的 12 个字段按用户语义分组。
  * 字段名直接来自后端（即"V 字段"），不在前端再翻译；表格展示用
  * `<dl>/<dt>/<dd>` 语义，让浏览器原生可读、对辅助技术友好。
+ *
+ * M3-C 调整：从 22 字段全展示收紧到 12 字段（详见
+ * `openspec/changes/2026-10-17-project-vo-trim/`）。配置 / 元数据类字段
+ * （`databaseType` / `language` / `state` / `isRepository` /
+ * `isParseTable` / `isParseClass` / `isIncrement` / `sqlFile` /
+ * `downloadUrl`）从详情页也移除，让"详情"也是消费场景对齐的视图。
  */
-const FIELD_GROUPS: Array<{ title: string; fields: Array<keyof ProjectVO> }> = [
+const FIELD_GROUPS: Array<{ title: string; fields: Array<keyof ProjectDetailVO> }> = [
   {
     title: '标识',
     fields: ['code', 'name', 'englishName'],
@@ -44,19 +50,10 @@ const FIELD_GROUPS: Array<{ title: string; fields: Array<keyof ProjectVO> }> = [
     title: '细节',
     fields: [
       'description',
-      'databaseType',
-      'language',
-      'state',
       'copyright',
       'author',
       'phone',
       'basePackage',
-      'sqlFile',
-      'downloadUrl',
-      'isRepository',
-      'isParseTable',
-      'isParseClass',
-      'isIncrement',
     ],
   },
   {
@@ -105,9 +102,9 @@ export default function ProjectDetailPage() {
           return
         }
         const projectVO = unwrapSuccess(resp)
-        // unwrapSuccess 的返回类型是 NonNullable<ProjectVO>，但实际运行时 data 可能为 null
+        // unwrapSuccess 的返回类型是 NonNullable<ProjectDetailVO>，但实际运行时 data 可能为 null
         // （M3-A-1 引入的"找不到 project"早返路径）—— 视作业务空态
-        setState({ kind: 'ready', data: (projectVO ?? null) as ProjectVO | null })
+        setState({ kind: 'ready', data: (projectVO ?? null) as ProjectDetailVO | null })
       })
       .catch((err: unknown) => {
         if (cancelled) {
@@ -159,7 +156,7 @@ export default function ProjectDetailPage() {
   }
 
   // state.kind === 'ready' && state.data !== null —— 真实数据
-  const data = (state as { kind: 'ready'; data: ProjectVO }).data
+  const data = (state as { kind: 'ready'; data: ProjectDetailVO }).data
 
   return (
     <section data-testid="project-detail-content">

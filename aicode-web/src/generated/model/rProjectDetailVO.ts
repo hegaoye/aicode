@@ -5,11 +5,11 @@
  * aicode 应用
  * OpenAPI spec version: 1.0
  */
-import type { ProjectVO } from './projectVO';
+import type { ProjectDetailVO } from './projectDetailVO';
 
-export interface RProjectVO {
+export interface RProjectDetailVO {
   info?: string;
-  data?: ProjectVO;
+  data?: ProjectDetailVO;
   code?: string;
   success?: boolean;
 }

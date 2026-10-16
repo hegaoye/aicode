@@ -5,9 +5,9 @@
  * aicode 应用
  * OpenAPI spec version: 1.0
  */
-import type { ProjectVO } from './projectVO';
+import type { ProjectSummaryVO } from './projectSummaryVO';
 
-export interface PageVOProjectVO {
+export interface PageVOProjectSummaryVO {
   createTimeBegin?: string;
   createTimeEnd?: string;
   updateTimeBegin?: string;
@@ -16,5 +16,5 @@ export interface PageVOProjectVO {
   pageSize?: number;
   totalRow?: number;
   totalPage?: number;
-  records?: ProjectVO[];
+  records?: ProjectSummaryVO[];
 }

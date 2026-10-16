@@ -17,7 +17,7 @@ export interface PageFrameworksPageVO {
   sortColumns?: string;
   optObjectList?: unknown[];
   optObject?: unknown;
+  totalPage?: number;
   needCountQuery?: boolean;
   lastPage?: boolean;
-  totalPage?: number;
 }

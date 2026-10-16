@@ -107,6 +107,28 @@ public R<Frameworks> updateIsPublic(@Parameter(hidden = true) Frameworks framewo
 
 **`signin` 端点不在守卫范围**：登录接口本身不被 `<RequireAuth>` 包裹（避免循环跳），登录成功后由 `LoginPage` 调 `useAuth().signIn(token)` 后跳原路径。
 
+## 实时推送（WebSocket）
+
+新增 `aicode-web-realtime` 能力（`src/lib/realtime/`）让前端可以消费后端 ws 推送
+的实时日志。当业务页面要"按下按钮触发后台 + 实时查看该后台进度"时，按下面四步：
+
+1. **后端**：仓库 ws 路径 `/websocket.shtml`，前缀 `# `；后端代码用
+   `WSClientManager.sendMessage(...)` 推送 free-form 文本（无需约定 sentinel）。
+2. **`ws-client`**（`src/lib/realtime/ws-client.ts`）：薄 `connect(url, onMessage)` 包装，
+   自动注入 `?token=<token>` URL 参数（`auth-account` R5 URL 参数兼容分支），
+   首连接掉线 500ms 后一次重连。
+3. **`useBuildLog(projectCode)`**（hook）：`startStream()` 调 `api.execute({ code })`
+   → 经 `unwrapSuccess` 验真 → 启动 ws；ws 推送逐条进 `entries`，4 状态机
+   `idle | running | error`（详见 spec）。
+4. **`<BuildLogPanel projectCode />`**（UI）：组件 mount 时自动调 hook 的 `startStream`；
+   `idle` 时 `return null`，`running/error` 渲染日志面板（标题 + 已运行时长 + 倒序条目 + 关闭按钮）。
+
+**新接实时页面仅需**：
+1. 路由表按"受保护端点"规则包 `<RequireAuth>`；
+2. 业务页面 import `{ useBuildLog, BuildLogPanel } from '<lib>/realtime/...'`；
+3. 触发构建后 render `<BuildLogPanel projectCode={...} />`；
+4. 测试用 `vi.mock('<lib>/realtime/ws-client', ...)` 把 ws-client 替身（jsdom 不实现 WebSocket）。
+
 ## 如何接下一个业务端点（M1 沉淀的样板）
 
 `DisplayAttributesPage` 是契约链上**第一个**真实业务页面，把"读取契约生成物 →

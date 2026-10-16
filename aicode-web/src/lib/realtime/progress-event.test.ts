@@ -1,8 +1,12 @@
 import { describe, expect, it } from 'vitest'
-import { parseInitEvent } from './use-init-progress'
+import {
+  parseProgressEvent,
+  PROGRESS_EVENT_FIELD_NAMES,
+} from './progress-event'
 
 /**
- * `useInitProgress` 的**消息解析**单测。
+ * `progress-event` 的**消息解析**单测 —— 该模块被 `useInitProgress` 与
+ * `useBuildLog` **共用**，故它是两个消费方的共同防线。
  *
  * <p>只测纯函数 `parseInitEvent` —— 它承载了 spec「消费端 SHALL 按消息形态分流」的
  * 全部判定逻辑，而 hook 的状态机需要 WebSocket 环境（jsdom 不实现，见 AGENTS §7）。</p>
@@ -11,7 +15,7 @@ import { parseInitEvent } from './use-init-progress'
  * `ProjectSqlPanel.test.tsx` 覆盖（那里 mock 掉 `ws-client` 后直接投递消息）。</p>
  */
 
-describe('parseInitEvent（ws 消息分流）', () => {
+describe('parseProgressEvent（ws 消息分流 —— 协议的唯一判定处）', () => {
   // ---- 结构化事件被正确识别 ----
 
   it('progress 事件 SHALL 被解析并保留全部字段', () => {
@@ -22,7 +26,7 @@ describe('parseInitEvent（ws 消息分流）', () => {
       total: 12,
       message: '正在解析第 4/12 张表：t_order',
     })
-    expect(parseInitEvent(raw)).toEqual({
+    expect(parseProgressEvent(raw)).toEqual({
       type: 'progress',
       phase: 'parse',
       current: 3,
@@ -32,11 +36,11 @@ describe('parseInitEvent（ws 消息分流）', () => {
   })
 
   it('done / error 事件 SHALL 被识别', () => {
-    expect(parseInitEvent(JSON.stringify({ type: 'done', message: '解析完成' }))).toEqual({
+    expect(parseProgressEvent(JSON.stringify({ type: 'done', message: '解析完成' }))).toEqual({
       type: 'done',
       message: '解析完成',
     })
-    expect(parseInitEvent(JSON.stringify({ type: 'error', message: '已解析 4/12 张表后失败' }))).toEqual({
+    expect(parseProgressEvent(JSON.stringify({ type: 'error', message: '已解析 4/12 张表后失败' }))).toEqual({
       type: 'error',
       message: '已解析 4/12 张表后失败',
     })
@@ -54,34 +58,34 @@ describe('parseInitEvent（ws 消息分流）', () => {
       '',
       '   ',
     ]) {
-      expect(parseInitEvent(line)).toBeNull()
+      expect(parseProgressEvent(line)).toBeNull()
     }
   })
 
   it('以 { 开头但非法 JSON SHALL 返回 null 而非抛错', () => {
-    expect(parseInitEvent('{ 这不是合法 JSON')).toBeNull()
-    expect(parseInitEvent('{"unclosed": ')).toBeNull()
-    expect(parseInitEvent('{')).toBeNull()
+    expect(parseProgressEvent('{ 这不是合法 JSON')).toBeNull()
+    expect(parseProgressEvent('{"unclosed": ')).toBeNull()
+    expect(parseProgressEvent('{')).toBeNull()
   })
 
   it('形似 JSON 但无 type 字段 SHALL 返回 null', () => {
-    expect(parseInitEvent('{"foo":1}')).toBeNull()
-    expect(parseInitEvent('[1,2,3]')).toBeNull()
-    expect(parseInitEvent('null')).toBeNull()
-    expect(parseInitEvent('42')).toBeNull()
+    expect(parseProgressEvent('{"foo":1}')).toBeNull()
+    expect(parseProgressEvent('[1,2,3]')).toBeNull()
+    expect(parseProgressEvent('null')).toBeNull()
+    expect(parseProgressEvent('42')).toBeNull()
   })
 
   it('type 不是三个合法值之一 SHALL 返回 null', () => {
     // 否则消费方会把别的任务的事件当成本任务的进度
-    expect(parseInitEvent(JSON.stringify({ type: 'warning', message: 'x' }))).toBeNull()
-    expect(parseInitEvent(JSON.stringify({ type: 'build-progress' }))).toBeNull()
+    expect(parseProgressEvent(JSON.stringify({ type: 'warning', message: 'x' }))).toBeNull()
+    expect(parseProgressEvent(JSON.stringify({ type: 'build-progress' }))).toBeNull()
   })
 
   // ---- 前导空白容忍 ----
 
   it('前导空白 SHALL 容忍（判据用 trimStart 后再判首字符）', () => {
     const raw = `  ${JSON.stringify({ type: 'done', message: '解析完成' })}`
-    expect(parseInitEvent(raw)).toEqual({ type: 'done', message: '解析完成' })
+    expect(parseProgressEvent(raw)).toEqual({ type: 'done', message: '解析完成' })
   })
 
   // ---- 字段名与后端契约的对应（ws 无契约守护，靠本断言钉住） ----
@@ -90,7 +94,7 @@ describe('parseInitEvent（ws 消息分流）', () => {
     // 后端：facade/project/vo/ProjectInitProgress.java 的字段是
     //   type / phase / current / total / message
     // 若前端改了字段名（手抄错），本断言列出实际拿到的键，便于 review 时对照。
-    const parsed = parseInitEvent(
+    const parsed = parseProgressEvent(
       JSON.stringify({
         type: 'progress',
         phase: 'parse',
@@ -100,12 +104,12 @@ describe('parseInitEvent（ws 消息分流）', () => {
       }),
     )
     expect(Object.keys(parsed ?? {}).sort()).toEqual(
-      ['current', 'message', 'phase', 'total', 'type'],
+      [...PROGRESS_EVENT_FIELD_NAMES].sort(),
     )
   })
 
   it('缺失可选字段的事件 SHALL 不报错（phase/current/total 可省）', () => {
-    expect(parseInitEvent(JSON.stringify({ type: 'done' }))).toEqual({ type: 'done' })
-    expect(parseInitEvent(JSON.stringify({ type: 'progress' }))).toEqual({ type: 'progress' })
+    expect(parseProgressEvent(JSON.stringify({ type: 'done' }))).toEqual({ type: 'done' })
+    expect(parseProgressEvent(JSON.stringify({ type: 'progress' }))).toEqual({ type: 'progress' })
   })
 })

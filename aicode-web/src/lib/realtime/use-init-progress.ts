@@ -2,6 +2,11 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { unwrapSuccess } from '../../lib/contract-response'
 import { getAicodeRESTfulAPIs } from '../../generated/api'
 import { connect, type WSClient } from './ws-client'
+import {
+  parseProgressEvent,
+  type ProgressEvent,
+  type ProgressPhase,
+} from './progress-event'
 
 /**
  * `useInitProgress` —— 消费 `POST /project/init` 的异步进度（2026-10-18-init-async-progress）。
@@ -11,42 +16,16 @@ import { connect, type WSClient } from './ws-client'
  *
  * ## 为什么不复用 `useBuildLog`
  *
- * <p>两者形态与生命周期都不同：`useBuildLog` 的状态机与「先调 execute 再订阅」的时序耦合，
- * 且只认自由文本（`appendEntry(msg)`）。`init` 需要的是结构化事件 + `done` 后触发重拉。
- * 硬合并会让构建日志被迫接受结构化事件。</p>
+ * <p>两者形态与生命周期都不同：`useBuildLog` 的状态机与「先调 execute 再订阅」的时序耦合。
+ * `init` 需要的是结构化事件 + `done` 后触发重拉。硬合并会让构建日志被迫接受结构化事件。</p>
  *
  * ## 消息分流
  *
- * <p>通道上同时有两类消息：结构化事件（以 `{` 开头的 JSON）与构建日志的自由文本。
- * 判据**只看首字符**，SHALL NOT 依赖关键词匹配（spec 的
- * 「消费端 SHALL 按消息形态分流」）。以 `{` 开头但 JSON 非法时按文本处理，
- * 不抛错、不中断订阅。</p>
- *
- * ## ⚠️ 无契约守护
- *
- * <p>ws 通道不在 OpenAPI 覆盖范围内，故 `InitProgressEvent` 的字段名与后端
- * `ProjectInitProgress` 的一致性**只能靠测试与 review 保障**。
- * 改后端字段名时必须同步改这里并跑测试。</p>
+ * <p>判据在 {@link parseProgressEvent} 里（协议的唯一判定处，`useBuildLog` 也复用它）——
+ * 首字符 `{` 即结构化，否则按自由文本处理。</p>
  */
 
-/** 进度事件类型 —— 与后端 `ProjectInitProgress` 的 `type` 字段一一对应。 */
-export type InitProgressEventType = 'progress' | 'done' | 'error'
-
-/** 阶段 —— 与后端 `ProjectInitProgress` 的 `phase` 字段一一对应。 */
-export type InitProgressPhase = 'createDatabase' | 'parse'
-
-/**
- * 进度事件结构 —— 字段名与后端 `ProjectInitProgress` 严格对应。
- *
- * <p>`current` 是**已完成数**（不是当前索引），前端可直接渲染 `current/total`。</p>
- */
-export interface InitProgressEvent {
-  type: InitProgressEventType
-  phase?: InitProgressPhase
-  current?: number
-  total?: number
-  message?: string
-}
+export type { ProgressEvent, ProgressPhase }
 
 export type InitProgressStatus =
   /** 尚未开始 */
@@ -62,7 +41,7 @@ export type InitProgressStatus =
 
 export interface UseInitProgressReturn {
   status: InitProgressStatus
-  phase: InitProgressPhase | null
+  phase: ProgressPhase | null
   current: number
   total: number
   message: string
@@ -78,36 +57,9 @@ function initWsUrl(projectCode: string): string {
   return `${proto}://${host}/websocket.shtml?buildId=${encodeURIComponent(projectCode)}`
 }
 
-/**
- * 解析一条 ws 消息。
- *
- * @returns 结构化事件；非结构化消息返回 `null`（由调用方按自由文本处理）
- */
-export function parseInitEvent(raw: string): InitProgressEvent | null {
-  // 判据只看首字符 —— 自由文本日志行以散文开头，不会撞上
-  if (!raw.trimStart().startsWith('{')) {
-    return null
-  }
-  try {
-    const parsed = JSON.parse(raw) as unknown
-    // 形似 JSON 但不是事件对象（如 {"foo":1}）→ 按文本处理，不抛错
-    if (!parsed || typeof parsed !== 'object' || !('type' in parsed)) {
-      return null
-    }
-    const type = (parsed as { type: unknown }).type
-    if (type !== 'progress' && type !== 'done' && type !== 'error') {
-      return null
-    }
-    return parsed as InitProgressEvent
-  } catch {
-    // 以 { 开头但非法 JSON → 按文本处理，不中断订阅
-    return null
-  }
-}
-
 export function useInitProgress(onDone?: () => void): UseInitProgressReturn {
   const [status, setStatus] = useState<InitProgressStatus>('idle')
-  const [phase, setPhase] = useState<InitProgressPhase | null>(null)
+  const [phase, setPhase] = useState<ProgressPhase | null>(null)
   const [current, setCurrent] = useState(0)
   const [total, setTotal] = useState(0)
   const [message, setMessage] = useState('')
@@ -157,7 +109,7 @@ export function useInitProgress(onDone?: () => void): UseInitProgressReturn {
           // 自由文本（构建日志等）—— 本 hook 不关心，静默忽略
           return
         }
-        const event = parseInitEvent(raw)
+        const event = parseProgressEvent(raw)
         if (!event) {
           return
         }

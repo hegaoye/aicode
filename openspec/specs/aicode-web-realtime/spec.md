@@ -28,15 +28,22 @@
 
 ### Requirement: useBuildLog SHALL 协同 api.execute 与 ws 接收，返回 3 状态
 
-`useBuildLog(projectCode)` React hook 返 `{ status, entries, startedAt, startStream(), clear() }`，其中：
-- `status ∈ { 'idle', 'running', 'error' }` —— **不**含 `completed`（设计决定见下方 blockquote）；
-- `startStream()` SHALL 调 `api.execute({ code: projectCode })`，收到 `R.success` 后 SHALL 设 `status = 'running'` 并保持 ws 连入；
-- ws 收到的每条原始文本 SHALL 移除后端 `WSClientManager.sendMessage(...)` 加的 `"# "` 前缀后，追加为一条 entry（时间戳 + 文本）；
-- `api.execute` 抛 `ContractError` 或 ws 连续断连（不含重连）时 SHALL 设 `status = 'error'`，追加一条错误 entry；
-- `status = 'running'` SHALL 持续到用户手动 `clear()` 或组件 unmount（cleanup），而非依赖后端发"sentinel 字符串"——本仓库后端 `GeneratorSVImpl.aiCode` 的 ws 推送是 free-form 日志（实测 line 117/129/138/155/163-165/169/180 等），没有 `DONE` 标识；
-- 同 `useEffect` cleanup SHALL 调用 `ws-client.close()` 并重置 `status = 'idle'`。
+`useBuildLog(projectCode)` SHALL 协同 `api.execute({ code })` 与 ws 接收，返回构建日志的
+状态与条目。消费方（`BuildLogPanel`）SHALL NOT 自行解释 ws 消息。
 
-> **设计决定（completed 状态刻意砍掉）**：构建完成的"completed"语义不在本能力范围。后端 `ProjectJob.state` 从 `Executing` 变 `Completed` 是另一回事，由前端拉取 `ProjectJobVO` 详情（未来的"项目构建完成"详情面板，M3-E 议程）才能看到。Real-time panel 只展示"进行中条目 + 主动关闭"。本能力不再加 `completed` 状态，由"ws 仍在收 / ws 已关"两类视觉区分。
+**SHALL 识别结构化终态事件**：服务端在构建结束（无论成败）时推送 `type=done` 或
+`type=error` 的结构化事件，消费端 SHALL 据此转入终态 —— SHALL NOT 把终态事件当作普通日志行
+追加到条目列表里让用户自己读。
+
+状态机 SHALL 为 **4 态**：`idle`（未开始）/ `running`（执行中）/ `done`（成功结束）/
+`error`（失败结束）。收到终态后 SHALL **停止累加日志**（构建已结束，后续消息多为收尾噪声）。
+
+> **2026-10-18 修订说明**：原文写「返回 3 状态」，但实际需要区分**成功结束**与
+> **失败结束** —— 两者对用户是完全不同的信号（前者可下载 ZIP，后者要查日志）。
+> 且原文隐含"终态靠用户点关闭按钮触发"（见 `BuildLogPanel` Req），
+> 那是当时没有可用终态信号时的将就；服务端其实**早已推送** `Finished: SUCCESS` /
+> `Finished: ERROR`，只是前端从未识别。
+
 
 #### Scenario: startStream 立即把 status 切到 running 并追加起始条目
 
@@ -66,18 +73,63 @@
 - **WHEN** 用户在 `running` 状态点击 `<BuildLogPanel>` 的"关闭"按钮调 `clear()`
 - **THEN** `status` SHALL 变 `idle`，ws 连接 SHALL 被关闭；然而本约束**不**清除已有 entries（用户可以再次 click "构建"续接）
 
+
+#### Scenario: 首个终态 SHALL 权威 —— 其后的一切消息均忽略
+
+- **WHEN** 已收到终态（`done` 或 `error`）之后，又收到日志行 / `End` 等收尾噪声 /
+  甚至**矛盾的终态**（例如先 `done` 后又来 `error`）
+- **THEN** 消费端 SHALL 忽略这些消息：不追加到条目列表，SHALL NOT 改变终态
+- **AND** 理由：构建已结束，之后的消息都是收尾噪声或异常残留。允许覆盖会让用户看到
+  「已完成后又变成失败」这类自相矛盾的现象
+
+#### Scenario: 收到 done 事件 SHALL 转入成功终态并停止累加日志
+
+- **WHEN** 日志流过程中收到 `{"type":"done","message":"构建成功"}`
+- **THEN** 状态 SHALL 变为 `done`
+- **AND** 该消息 SHALL NOT 出现在日志条目列表里
+- **AND** 后续到达的消息 SHALL NOT 继续追加到条目列表
+
+#### Scenario: 收到 error 事件 SHALL 转入失败终态
+
+- **WHEN** 日志流过程中收到 `{"type":"error","message":"构建失败，详见日志"}`
+- **THEN** 状态 SHALL 变为 `error`
+- **AND** 该消息 SHALL NOT 出现在日志条目列表里
+- **AND** 失败原因 SHALL 可被消费方读取（供 UI 呈现）
+
+#### Scenario: 自由文本日志行 SHALL 照常累加
+
+- **WHEN** 收到 `git 努力下载中.....` 这类自由文本消息
+- **THEN** 它 SHALL 被追加到日志条目列表
+- **AND** 状态 SHALL 保持 `running`（直到收到终态）
+
+#### Scenario: 兼容旧格式的终态字符串
+
+- **WHEN** 收到 `Finished: SUCCESS` / `Finished: ERROR` 这类**非结构化**的终态字符串
+  （旧版服务端，或本变更尚未部署的混合版本）
+- **THEN** 消费端 SHALL 仍能识别并转入对应终态，SHALL NOT 把它当普通日志行
+- **AND** 该兼容 SHALL 有测试守护 —— 混合部署期间两个版本会并存
+
 ### Requirement: BuildLogPanel SHALL 是 useBuildLog 的浅渲染，不持业务逻辑
 
-`<BuildLogPanel projectCode>` UI 组件 SHALL 直接消费 `useBuildLog(projectCode)` 返回值并渲染条目；mount 时 SHALL 调 `useBuildLog().startStream()` 触发构建；`status === 'idle'` 时组件 SHALL NOT 渲染任何 DOM（返回 null）；其它状态 SHALL 渲染条目列表与关闭按钮；`status === 'error'` 时 SHALL 额外显示 ❌ 徽章。
+`<BuildLogPanel projectCode>` SHALL 是 `useBuildLog` 的浅渲染：面板自身 SHALL NOT 解释
+ws 消息、SHALL NOT 判断构建是否结束、SHALL NOT 维护独立于 hook 的状态。
 
-组件 SHALL 接受两个**可选** prop 用于"重新挂载"场景（列表页翻页会让行内面板卸载再挂载）：
+`BuildLogPanel` 新增一个 `@Component` 形态的 "done"（构建成功）—— **由 hook 驱动**：
+面板消费 `status === 'done'`，SHALL NOT 自己监听 ws。
 
-- `autoStart?: boolean`（默认 `true`）—— mount 时是否自动 `startStream()`。传 `false` 时 SHALL NOT 触发构建，SHALL 仍按当前 `status` 正常渲染（防护 SHALL NOT 让面板消失）；
-- `onMounted?: () => void` —— 每次 mount 恰好回调一次，供调用方记录"该 code 的面板曾挂载过"，从而在下次挂载时传 `autoStart={false}`。
+**构建成功后 SHALL 自动收起面板**（`done` 态返回 `null`，等同 `idle` 的表现），并 SHALL 提供重新打开
+的入口（调用 `startStream` 或复用已有日志）。
 
-> **为何需要**：翻回"构建中"所在页时面板会重新挂载，若仍自动 `startStream()` 则会重复调
-> `api.execute({ code })`；而后端 `ProjectJobServiceImpl#execute` 对已有 `Executing` 任务的
-> `projectCode` 会抛 `Server_Error`，用户看到误导性的"构建失败"。
+**构建失败时 SHALL NOT 自动收起**（`error` 态保持渲染，含 ❌ 徽章与失败原因）——
+把错误面板自动藏掉是反直觉的，且会让「构建失败」看起来像是「什么都没发生」。
+用户看完错误后 SHALL 仍可点「关闭」手动收起。
+
+> **为何自动收起**：构建往往要几十秒，期间面板一直占据列表行下方的空间。原设计让用户手点
+> 「关闭」，是因为当时没有可用的终态信号 —— 而服务端其实早已推送（见 `useBuildLog` Req 的
+> 修订说明）。有了可靠终态后，「让用户自己判断何时收起」是本可避免的负担。
+>
+> **自动收起 SHALL NOT 丢弃已收集的日志**：重新打开 SHALL 仍能看到完整条目。
+
 
 #### Scenario: BuildLogPanel 状态机与条目渲染
 
@@ -103,6 +155,29 @@
 - **THEN** `onMounted` SHALL 恰好被调用 1 次
 - **AND** 组件卸载后重新挂载（模拟列表页翻走再翻回），`onMounted` SHALL 再被调用 1 次（累计 2 次）
 - **AND** 未传 `onMounted` 时 SHALL NOT 抛错（该 prop 可选）
+
+
+#### Scenario: running 状态渲染构建日志
+
+- **WHEN** `status === 'running'`，面板渲染日志条目、已运行时长与关闭按钮
+- **THEN** 关闭按钮 SHALL 调 `useBuildLog().clear()`，手动收起面板
+
+#### Scenario: 构建成功后面板 SHALL 自动收起
+
+- **WHEN** `status` 从 `running` 变为 `done`
+- **THEN** 面板 SHALL 渲染为 `null`（从 DOM 移除），SHALL NOT 继续占据空间
+- **AND** 上层列表行的"构建中…"标记 SHALL 随之结束（由 hook 的状态驱动）
+
+#### Scenario: 构建失败时面板 SHALL 保留（不自动收起）
+
+- **WHEN** `status` 变为 `error`
+- **THEN** 面板 SHALL 继续渲染，含 ❌ 徽章与失败原因
+- **AND** SHALL NOT 自动收起 —— 用户需要看到失败信息
+
+#### Scenario: 自动收起 SHALL NOT 丢弃已收集的日志
+
+- **WHEN** 构建结束后面板自动收起，随后用户再次打开构建流
+- **THEN** 面板 SHALL 仍能渲染构建期间收集到的全部日志条目
 
 ### Requirement: 消费端 SHALL 按消息形态分流结构化事件与自由文本
 

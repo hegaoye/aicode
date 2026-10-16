@@ -24,6 +24,7 @@ import com.aicode.module.dao.mapper.ModuleMapper;
 import com.aicode.module.entity.Module;
 import com.aicode.project.dao.mapper.*;
 import com.aicode.project.entity.*;
+import com.aicode.project.vo.BuildProgress;
 import com.aicode.project.service.generator.SqlEmitter;
 import com.aicode.project.service.generator.TemplateEngineAdapter;
 import com.aicode.project.service.generator.ZipPackager;
@@ -257,7 +258,12 @@ public class GeneratorSVImpl implements GenerateSV {
 
         } catch (Exception e) {
             log.error("项目构建异常, projectCode:{}, projectJobCode:{}", projectCode, projectJob.getCode(), e);
-            WSClientManager.sendMessage("构建失败，详见日志（projectJob=" + projectJob.getCode() + "）");
+            // 终态消息结构化（2026-10-18-build-log-terminal-signal）：原先是裸字符串，
+            // 前端 useBuildLog 从不识别、只当日志行 appendEntry，故面板永远不自动收起。
+            // 中间日志行保持自由文本（见 spec 的「协议边界」）——
+            // 包装那 17 处只增噪音、零消费方使用。
+            WSClientManager.sendMessage(JSON.toJSONString(
+                    BuildProgress.error("构建失败，详见日志（projectJob=" + projectJob.getCode() + "）")));
             logsSV.saveLogs("构建失败: " + e.getClass().getSimpleName() + "（详见服务端日志）", path);
 
             projectJob.setState(ProjectJobState.Error.name());
@@ -273,10 +279,11 @@ public class GeneratorSVImpl implements GenerateSV {
             }
             ProjectJob projectJobLoad = projectJobMapper.selectOne(new LambdaQueryWrapper<ProjectJob>().eq(ProjectJob::getCode, projectJob.getCode()));
             if (projectJobLoad != null && ProjectJobState.Completed.name().equals(projectJobLoad.getState())) {
-                WSClientManager.sendMessage("Finished: SUCCESS");
+                // ws 走结构化终态事件；落盘文本保持不变（服务端日志仍可 grep 到）
+                WSClientManager.sendMessage(JSON.toJSONString(BuildProgress.done("构建成功")));
                 logsSV.saveLogs("Finished: SUCCESS", path);
             } else {
-                WSClientManager.sendMessage("Finished: ERROR");
+                WSClientManager.sendMessage(JSON.toJSONString(BuildProgress.error("构建失败")));
                 logsSV.saveLogs("Finished: ERROR", path);
             }
             WSClientManager.sendMessage("End");

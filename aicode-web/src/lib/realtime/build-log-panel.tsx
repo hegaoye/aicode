@@ -77,7 +77,21 @@ export default function BuildLogPanel({
     return () => clearInterval(id)
   }, [status, startedAt])
 
-  if (status === 'idle') {
+  /**
+ * 自动收起 —— 2026-10-18-build-log-terminal-signal。
+ *
+ * <p>此前只判 `idle`，所以构建**成功**后���板一直挂在列表行下方，用户不知道好了没、
+ * 只能自己点「关闭」。那时没有可用终态信号（服务端虽有 `Finished: SUCCESS`，
+ * 但本 hook 从不识别），故 design D1 把"用户主动关闭"写成了既定设计。</p>
+ *
+ * <p><b>⚠️ 只在 `done`（成功）时收起，`error` 刻意保留</b>：构建失败时用户<b>需要</b>
+ * 看到失败原因与 ❌ 徽章 —— 把错误面板自动藏掉是反直觉的，且会让"构建失败"看起来
+ * 像是"什么都没发生"。用户看完错误后仍可点「关闭」手动收起。</p>
+ *
+ * <p><b>自动收起 ≠ clear</b>：`clear()` 会清空日志条目，手动关闭按钮仍走它。
+ * 收起只是「从 DOM 移除」，日志仍留在 hook 的 state 里，重新打开可见。</p>
+ */
+if (status === 'idle' || status === 'done') {
     return null
   }
 

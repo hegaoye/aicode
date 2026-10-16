@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { ContractError, unwrapSuccess } from '../contract-response'
 import { getAicodeRESTfulAPIs } from '../../generated/api'
 import { connect, type WSClient } from './ws-client'
+import { parseProgressEvent } from './progress-event'
 
 /**
  * `useBuildLog` —— 协同 `api.execute` + ws 实时日志的 React hook。
@@ -20,7 +21,14 @@ import { connect, type WSClient } from './ws-client'
  * "ProjectJob.state = Completed" 由前端后续拉取承担，非实时主题，详见 design D1。
  */
 
-export type BuildLogStatus = 'idle' | 'running' | 'error'
+/**
+ * 构建状态机 —— **4 态**（2026-10-18-build-log-terminal-signal 起）。
+ *
+ * <p>此前只有 `idle` / `running` / `error` 三态，<b>没有「成功结束」态</b> ——
+ * 因为服务端早已推送 `Finished: SUCCESS`，但本 hook 对每条消息一律 `appendEntry`，
+ * 从不识别（grep `Finished` 零命中）。故成功与失败对用户是同一个信号。</p>
+ */
+export type BuildLogStatus = 'idle' | 'running' | 'done' | 'error'
 
 export interface BuildLogEntry {
   at: number
@@ -31,9 +39,23 @@ export interface UseBuildLogReturn {
   status: BuildLogStatus
   entries: BuildLogEntry[]
   startedAt: number | null
+  /** 终态消息的文案（done / error 时可读）；供 UI 呈现失败原因 */
+  terminalMessage: string | null
   startStream: () => Promise<void>
   clear: () => void
 }
+
+/**
+ * 旧版服务端的终态字符串 —— **混合部署兜底**（design D4）。
+ *
+ * <p>前端静态资源经 `:aicode-web` 打包进 Jar，与后端**不在同一个部署单元**，
+ * 存在新旧混跑窗口。字符串匹配虽是脆弱手段（协议主路径是结构化 JSON），
+ * 但两套都认可让混跑期行为与各自现状一致，部署完成后自动收敛到 JSON 优先。</p>
+ */
+const LEGACY_TERMINALS: ReadonlyArray<[RegExp, BuildLogStatus, string]> = [
+  [/^Finished:\s*SUCCESS$/i, 'done', '构建成功'],
+  [/^Finished:\s*ERROR$/i, 'error', '构建失败'],
+]
 
 function wsUrl(code: string): string {
   const proto = typeof window !== 'undefined' && window.location.protocol === 'https:' ? 'wss' : 'ws'
@@ -45,8 +67,16 @@ export function useBuildLog(projectCode: string | null | undefined): UseBuildLog
   const [status, setStatus] = useState<BuildLogStatus>('idle')
   const [entries, setEntries] = useState<BuildLogEntry[]>([])
   const [startedAt, setStartedAt] = useState<number | null>(null)
+  const [terminalMessage, setTerminalMessage] = useState<string | null>(null)
   const wsRef = useRef<WSClient | null>(null)
   const startTimeRef = useRef<number | null>(null)
+  /**
+   * 当前状态镜像 —— 供 ws 回调读取。
+   *
+   * <p>回调闭包里的 `status` 可能是过期的（connect 时捕获的那一份），
+   * 故终态判断必须读 ref 而非 state。</p>
+   */
+  const statusRef = useRef<BuildLogStatus>('idle')
 
   const appendEntry = useCallback((text: string) => {
     setEntries((prev) => [...prev, { at: Date.now(), text }])
@@ -56,7 +86,9 @@ export function useBuildLog(projectCode: string | null | undefined): UseBuildLog
     wsRef.current?.close()
     wsRef.current = null
     setStatus('idle')
+    statusRef.current = 'idle'
     setStartedAt(null)
+    setTerminalMessage(null)
     startTimeRef.current = null
   }, [])
 
@@ -78,6 +110,7 @@ export function useBuildLog(projectCode: string | null | undefined): UseBuildLog
     // 先清空 entries——重新开始
     setEntries([])
     setStatus('running')
+    statusRef.current = 'running'
     const startedAtValue = Date.now()
     setStartedAt(startedAtValue)
     startTimeRef.current = startedAtValue
@@ -105,6 +138,38 @@ export function useBuildLog(projectCode: string | null | undefined): UseBuildLog
         setStatus('error')
         return
       }
+
+      // ---- 2026-10-18-build-log-terminal-signal：先分流，再决定是否当日志行 ----
+      // 顺序很重要：终态事件绝不能被 appendEntry 当成普通日志行。
+
+      // ⓿ 终态已定则忽略后续一切消息。构建已结束，之后到达的无论是日志行、
+      //    'End' 等收尾噪声、还是**矛盾的终态**（先 done 后 error），一律不处理 ——
+      //    首个终态是权威的。若允许覆盖，用户会看到"已完成后又变成失败"的诡异现象。
+      if (statusRef.current === 'done' || statusRef.current === 'error') {
+        return
+      }
+
+      // ① 结构化终态事件（{"type":"done"|"error", ...}）
+      const event = parseProgressEvent(msg)
+      if (event && event.type !== 'progress') {
+        setStatus(event.type)
+        statusRef.current = event.type
+        setTerminalMessage(event.message ?? null)
+        return   // 不 appendEntry
+      }
+      // 构建场景不会有 progress 事件（中间日志是自由文本）；若真收到，
+      // 当作收尾噪声忽略，不进日志列表。
+
+      // ② 旧版字符串终态（混合部署兜底，见 LEGACY_TERMINALS 的说明）
+      const legacy = LEGACY_TERMINALS.find(([re]) => re.test(msg.trim()))
+      if (legacy) {
+        setStatus(legacy[1])
+        statusRef.current = legacy[1]
+        setTerminalMessage(legacy[2])
+        return   // 不 appendEntry
+      }
+
+      // ③ 其余都是自由文本日志行
       appendEntry(msg)
     })
     wsRef.current = ws
@@ -119,5 +184,5 @@ export function useBuildLog(projectCode: string | null | undefined): UseBuildLog
     }
   }, [])
 
-  return { status, entries, startedAt, startStream, clear }
+  return { status, entries, startedAt, terminalMessage, startStream, clear }
 }

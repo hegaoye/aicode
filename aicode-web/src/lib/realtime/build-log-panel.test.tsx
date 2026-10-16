@@ -8,7 +8,7 @@ import BuildLogPanel from './build-log-panel'
  * 单独覆盖（hook 测试范围），这里只验 panel 渲染层。
  */
 
-let statusValue: 'idle' | 'running' | 'error' = 'running'
+let statusValue: 'idle' | 'running' | 'done' | 'error' = 'running'
 let entriesValue: { at: number; text: string }[] = []
 let startedAtValue: number | null = Date.now()
 /** startStream 被调次数 —— 用于验 autoStart 语义 */
@@ -105,5 +105,32 @@ describe('BuildLogPanel', () => {
 
   it('未传 onMounted 时 SHALL NOT 抛错（prop 可选）', () => {
     expect(() => render(<BuildLogPanel projectCode="contract-demo" />)).not.toThrow()
+  })
+
+  // ================================================================
+  // 自动收起（2026-10-18-build-log-terminal-signal）
+  //
+  // 此前只判 idle，构建成功后面板一直挂着、用户不知道好了没 —— 那时
+  // 没有可用终态信号（服务端虽有 Finished: SUCCESS，但 hook 从不识别）。
+  //
+  // ⚠️ **error 刻意不收起**：构建失败时用户需要看到失败原因与 ❌ 徽章，
+  // 把错误面板自动藏掉是反直觉的，且会让「构建失败」看起来像「什么都没发生」。
+  // ================================================================
+
+  it('done 状态 SHALL 自动收起（不渲染任何 DOM）', () => {
+    statusValue = 'done'
+    const { container } = render(<BuildLogPanel projectCode="contract-demo" />)
+    expect(screen.queryByTestId('build-log-panel')).toBeNull()
+    expect(container.firstChild).toBeNull()
+  })
+
+  it('error 状态 SHALL 保留面板（不自动收起，让用户看到失败原因）', () => {
+    statusValue = 'error'
+    entriesValue = [{ at: 1000, text: '构建失败: 建表失败' }]
+    render(<BuildLogPanel projectCode="contract-demo" />)
+    // ❌ 徽章与失败条目都还在
+    expect(screen.getByTestId('build-log-panel')).toBeInTheDocument()
+    expect(screen.getByTestId('build-log-status-error')).toBeInTheDocument()
+    expect(screen.getByText('构建失败: 建表失败')).toBeInTheDocument()
   })
 })

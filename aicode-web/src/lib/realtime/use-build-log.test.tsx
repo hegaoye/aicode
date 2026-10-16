@@ -160,4 +160,107 @@ describe('useBuildLog', () => {
     expect(result.current.entries).toEqual([])
     expect(lastConnect!.closed).toBe(true)
   })
+
+  // ================================================================
+  // 终态识别（2026-10-18-build-log-terminal-signal）
+  //
+  // 背景：服务端 aiCode 的 finally 块**早已**推送 `Finished: SUCCESS` /
+  // `Finished: ERROR`，但本 hook 对每条消息一律 appendEntry、从不识别
+  // （grep `Finished` 零命中）—— 故「后端有信号、前端漏消费」。
+  // 本组把终态升级为结构化事件，并保留对旧字符串的兼容。
+  // ================================================================
+
+  /** 投递一条 ws 消息。 */
+  function push(msg: string | null) {
+    act(() => {
+      lastConnect?.onMessage?.(msg)
+    })
+  }
+
+  it('收到 {"type":"done"} SHALL 转 done 终态且 NOT 进日志列表', async () => {
+    const { result } = renderHook(() => useBuildLog('contract-demo'))
+    await act(async () => {
+      await result.current.startStream()
+    })
+    push('开始生成源码...')
+    expect(result.current.entries.map((e) => e.text)).toContain('开始生成源码...')
+
+    push(JSON.stringify({ type: 'done', message: '构建成功' }))
+
+    expect(result.current.status).toBe('done')
+    expect(result.current.terminalMessage).toBe('构建成功')
+    // 关键：终态绝不能被当作日志行
+    expect(result.current.entries.map((e) => e.text)).not.toContain('构建成功')
+  })
+
+  it('收到 {"type":"error"} SHALL 转 error 且 terminalMessage 可读', async () => {
+    const { result } = renderHook(() => useBuildLog('contract-demo'))
+    await act(async () => {
+      await result.current.startStream()
+    })
+
+    push(JSON.stringify({ type: 'error', message: '构建失败，详见日志（projectJob=123）' }))
+
+    expect(result.current.status).toBe('error')
+    expect(result.current.terminalMessage).toContain('projectJob=123')
+    expect(result.current.entries.map((e) => e.text)).not.toContain('projectJob=123')
+  })
+
+  it('终态后到达的日志行 SHALL NOT 再追加（构建已结束）', async () => {
+    const { result } = renderHook(() => useBuildLog('contract-demo'))
+    await act(async () => {
+      await result.current.startStream()
+    })
+    push(JSON.stringify({ type: 'done', message: '构建成功' }))
+    const countAtDone = result.current.entries.length
+
+    push('End')            // 收尾噪声
+    push('Finished: ERROR') // 甚至来一条矛盾的终态（不应覆盖 done）
+
+    expect(result.current.entries).toHaveLength(countAtDone)
+    expect(result.current.status).toBe('done')
+  })
+
+  it('【兼容】旧字符串 Finished: SUCCESS SHALL 转 done 且不进日志列表', async () => {
+    // 混合部署兜底：前端静态资源与后端不在同一部署单元，存在新旧混跑窗口
+    const { result } = renderHook(() => useBuildLog('contract-demo'))
+    await act(async () => {
+      await result.current.startStream()
+    })
+
+    push('Finished: SUCCESS')
+
+    expect(result.current.status).toBe('done')
+    expect(result.current.entries.map((e) => e.text)).not.toContain('Finished: SUCCESS')
+  })
+
+  it('【兼容】旧字符串 Finished: ERROR SHALL 转 error 且不进日志列表', async () => {
+    const { result } = renderHook(() => useBuildLog('contract-demo'))
+    await act(async () => {
+      await result.current.startStream()
+    })
+
+    push('Finished: ERROR')
+
+    expect(result.current.status).toBe('error')
+    expect(result.current.entries.map((e) => e.text)).not.toContain('Finished: ERROR')
+  })
+
+  it('中间日志行 SHALL 照常追加且不进终态', async () => {
+    const { result } = renderHook(() => useBuildLog('contract-demo'))
+    await act(async () => {
+      await result.current.startStream()
+    })
+
+    for (const line of ['git 努力下载中.....', '生成数据库结构与类模型成功！']) {
+      push(line)
+    }
+
+    expect(result.current.status).toBe('running')
+    expect(result.current.entries.map((e) => e.text)).toEqual([
+      '开始构建...',
+      'git 努力下载中.....',
+      '生成数据库结构与类模型成功！',
+    ])
+  })
 })

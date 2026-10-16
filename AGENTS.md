@@ -630,6 +630,7 @@ opsx 入口（功能等价，运行时暴露哪个就用哪个）：
 
 - 已有 actuator + Prometheus 指标（`micrometer-registry-prometheus`，Prometheus client 1.x）。注意 Boot 4 中相关端点默认 `access=none`，需显式开放（见 §10）。
 - 后续可接入 ELK / Loki 做日志聚合，引入 OpenTelemetry 做链路追踪。
+- **契约相关的待办（`feature/20261016/react-web-rewrite` 分支）**：`api-contract` 能力的 Purpose 写死了「仓库内静态前端（Angular 7.0.4 + ng-zorro + jQuery 的打包产物）」与「所有跨语言约定必须由后端以可执行测试的方式显式守护」。React + TypeScript 前端落地（M4）后该表述失效，届时 SHALL 对 `api-contract` 的 Purpose 做 MODIFIED —— 跨语言约定将改由「`contracts/openapi/openapi.yaml` 契约文件 + orval 生成类型 + Vitest 跑 MSW mock」共同守护，而非仅靠后端测试。
 - WebSocket 构建日志（README 提及）目前**未结构化**，应统一接入 traceId。
 
 ### 11.6 模板管理

@@ -1,0 +1,361 @@
+/*
+ * 项目列表页（OpenDesign 原型 dashboard.html）页面级样式。
+ *
+ * 规则（与 base.css 头部一致）：
+ *   1. 类名一律沿用原型原名，验收方式是「逐页与原型并排比对」，改名会让比对失效；
+ *   2. base.css 已有的 `.container` / `.page-head` / `.btn-primary` / `.empty-state`
+ *      本文件**不再定义**（dashboard 的 `.page-head h1` 用 `--fs-h1`，base.css 已把
+ *      该槽位收敛为 `--fs-title`，沿用基元）；
+ *   3. 数值逐字取自原型，未做任何「优化」。
+ *
+ * 原型的 --gap-md 是 20px、--radius 是 10px，而本仓 tokens/base.css 收敛为
+ * 18px / 6px；本文件一律用仓库 token，不在页面级覆盖色板与尺度。
+ */
+
+/* ---------------------------------------------------------------------------
+ * 工具条：左侧标签页 + 右侧搜索（dashboard.html）
+ * ------------------------------------------------------------------------ */
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gap-md);
+  margin-bottom: var(--gap-md);
+  flex-wrap: wrap;
+}
+
+.tabs {
+  display: inline-flex;
+  gap: 4px;
+  background: transparent;
+}
+
+.tabs button {
+  background: transparent;
+  border: 0;
+  padding: 8px 14px;
+  font-size: 14px;
+  color: var(--muted);
+  border-radius: 8px;
+  transition:
+    color 0.15s ease,
+    background 0.15s ease;
+}
+
+.tabs button:hover {
+  color: var(--fg);
+  background: var(--fg-soft);
+}
+
+.tabs button[aria-selected='true'] {
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.search {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.search input {
+  width: 240px;
+  padding: 8px 12px 8px 36px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  font-size: 13px;
+  color: var(--fg);
+  transition: border-color 0.15s ease;
+}
+
+.search input::placeholder {
+  color: var(--muted);
+}
+
+.search input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.search .ic {
+  position: absolute;
+  left: 12px;
+  color: var(--muted);
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.search .ic svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* ---------------------------------------------------------------------------
+ * 项目卡片网格（dashboard.html）
+ * ------------------------------------------------------------------------ */
+.project-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--gap-md);
+}
+
+@media (max-width: 1080px) {
+  .project-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 820px) {
+  .project-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 540px) {
+  .project-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* 「创建新项目」卡片 —— 原型把整卡做成 <a>；本仓的卡片里要塞「构建」按钮
+   （button 不能嵌在 a 里，交互元素嵌套是无效 HTML），故整卡可点语义由
+   卡片内的链接承担。 */
+.card-new {
+  aspect-ratio: 16 / 9;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--muted);
+  transition:
+    border-color 0.15s ease,
+    color 0.15s ease,
+    background 0.15s ease;
+}
+
+.card-new:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: color-mix(in oklch, var(--accent) 3%, var(--surface));
+}
+
+.card-new .plus {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+}
+
+.card-new .plus svg {
+  width: 22px;
+  height: 22px;
+  stroke-width: 1.4;
+}
+
+.card-new span {
+  font-size: 13px;
+}
+
+/* 项目卡片 */
+.proj {
+  aspect-ratio: 16 / 9;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 18px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  position: relative;
+  overflow: hidden;
+  transition:
+    border-color 0.15s ease,
+    transform 0.15s ease,
+    box-shadow 0.2s ease;
+}
+
+/* ⚠️ 刻意未转录原型的 `cursor: pointer`：原型整卡是 <a>，本仓的卡片含
+   「构建」按钮与「详情」链接，整卡并非可点区域，留着指针光标是骗人的。 */
+.proj:hover {
+  border-color: color-mix(in oklch, var(--accent) 50%, var(--border));
+  transform: translateY(-1px);
+  box-shadow: 0 12px 24px -16px oklch(20% 0.06 25 / 0.25);
+}
+
+.proj .tag-row {
+  display: inline-flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.tag.lang-java {
+  color: oklch(48% 0.16 35);
+  border-color: color-mix(in oklch, oklch(48% 0.16 35) 30%, var(--border));
+}
+
+.tag.lang-js {
+  color: oklch(48% 0.12 80);
+  border-color: color-mix(in oklch, oklch(48% 0.12 80) 30%, var(--border));
+}
+
+.tag.lang-py {
+  color: oklch(48% 0.10 200);
+  border-color: color-mix(in oklch, oklch(48% 0.10 200) 30%, var(--border));
+}
+
+.tag.db {
+  color: var(--accent);
+  border-color: color-mix(in oklch, var(--accent) 30%, var(--border));
+}
+
+.proj h3 {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.proj .id {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.proj .meta-row {
+  margin-top: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.proj .meta-row .status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.proj .meta-row .status::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: oklch(62% 0.14 145);
+}
+
+.proj .meta-row .status.draft::before {
+  background: oklch(62% 0.10 80);
+}
+
+.proj .meta-row .status.building::before {
+  background: var(--accent);
+  animation: status-pulse 1.4s ease-in-out infinite;
+}
+
+/* 「生成中」圆点的脉冲。
+   原型把它叫 `@keyframes pulse`，而 BuildLogPanel.css 已有同名 keyframes
+   （`.log-head .dot` 在用，50% 处是 scale(1.3)，原型是 1.4）。同名 keyframes
+   由后定义者全局生效，在这里重定义会把构建日志窗的动画一起改掉，
+   故另起本页专用名 —— 时长与缓动与原型一致。 */
+@keyframes status-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(1.4);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * 以下几块**不是**原型的，是本页把原型静态稿补成可用界面所必需的：
+ *   ① .proj-cell / .proj-actions —— 原型的卡片整张可点、卡内没有任何按钮；本仓的
+ *                        「构建」是核心工作流的一环，必须有可点的按钮。
+ *                        ⚠️ 关键约束：原型卡片是 aspect-ratio 16/9 + overflow:hidden
+ *                        的定高盒子，实测把操作行塞进卡内会被裁掉（只露出按钮上沿），
+ *                        故操作行落在**卡片下方**（同一网格单元内），卡片本身保持
+ *                        原型的 16/9 形态不变；
+ *   ② .proj-logs      —— 构建日志窗挂在网格下方（等价于表格版的 colspan 整行）；
+ *   ③ .list-total / .list-pager —— 页头计数与分页条，原型静态稿里没有，
+ *                        样式数值取自 TSX 原有的内联样式，逐字外迁。
+ * ------------------------------------------------------------------------ */
+
+/* 网格单元：一张 16/9 卡片 + 卡下的操作行。
+   「创建新项目」卡片也套同款单元（其下为空），保证同一行里各列等高。 */
+.proj-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+
+/* 卡片下方操作行：「详情」链接 + 「构建」按钮 */
+.proj-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.proj-actions .detail {
+  color: var(--accent);
+  font-size: 13px;
+}
+
+.proj-actions .detail:hover {
+  opacity: 0.7;
+}
+
+/* 卡片下方的主按钮比页头那个小一号，与卡片的紧凑感对齐 */
+.proj-actions .btn-primary {
+  padding: 6px 14px;
+  font-size: 12.5px;
+}
+
+/* 网格下方的构建日志窗 */
+.proj-logs {
+  margin-top: var(--gap-md);
+}
+
+.proj-log + .proj-log {
+  margin-top: var(--gap-md);
+}
+
+/* 页头的「共 N 条」计数（原型没有；数值来自原内联样式 margin-left: 0.5em） */
+.list-total {
+  margin-left: 0.5em;
+}
+
+/* 分页条（原型没有；布局数值来自原内联样式） */
+.list-pager {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+
+/* 空态占满整行网格，别缩成一张卡片 */
+.project-grid .empty-state {
+  grid-column: 1 / -1;
+}

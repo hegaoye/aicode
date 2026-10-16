@@ -104,7 +104,7 @@ describe('ProjectListPage', () => {
     window.localStorage.clear()
   })
 
-  it('默认 mock 命中后渲染表格行', async () => {
+  it('默认 mock 命中后渲染项目卡片', async () => {
     const fixed: RPageVOProjectSummaryVO = {
       success: true,
       code: '0000',
@@ -129,7 +129,7 @@ describe('ProjectListPage', () => {
 
     renderPage()
 
-    // 等待行出现；records 渲染到 <tr data-testid="project-list-row">
+    // 等待卡片出现；records 渲染到 <article class="proj" data-testid="project-list-row">
     const row = await screen.findByTestId('project-list-row')
     expect(row).toBeInTheDocument()
     expect(row.textContent).toContain('contract-demo')
@@ -253,7 +253,7 @@ describe('ProjectListPage', () => {
     expect(screen.getByTestId('project-list-error').textContent).toContain('未授权')
   })
 
-  it('点击「下一页」SHALL 重新拉取并替换表格（首页「上一页」禁用）', async () => {
+  it('点击「下一页」SHALL 重新拉取并替换卡片（首页「上一页」禁用）', async () => {
     // overrideResponse 函数形式按请求的 curPage 返回不同数据
     server.use(
       getList2MockHandler(async (info) => {
@@ -296,7 +296,7 @@ describe('ProjectListPage', () => {
     // 点击「下一页」
     fireEvent.click(screen.getByTestId('project-list-next'))
 
-    // 第 2 页数据替换表格内容
+    // 第 2 页数据替换卡片内容
     await waitFor(() => {
       expect(screen.getByText('p2-code')).toBeInTheDocument()
     })
@@ -621,5 +621,106 @@ describe('ProjectListPage', () => {
     // 关键断言：按钮**仍禁用** —— 翻回不等于构建结束
     expect(screen.getByTestId('project-list-build-button')).toBeDisabled()
     expect(screen.getByTestId('project-list-build-button').textContent).toContain('构建中')
+  })
+
+  // ================================================================
+  // 卡片网格还原（2026-10 前端视觉重写 任务 4）新增的两条守护
+  // ================================================================
+
+  it('空 records SHALL 显示卡片网格空态提示而非一片空白', async () => {
+    // 卡片网格里第一格恒是「创建新项目」，所以空列表**不会**是纯空白 ——
+    // 但用户仍需要一句「这里本来该有东西」的提示，否则会把「加载失败」
+    // 与「还没建过项目」搞混。
+    server.use(
+      getList2MockHandler({
+        success: true,
+        code: '0000',
+        info: 'success',
+        data: { curPage: 1, pageSize: 10, totalRow: 0, totalPage: 0, records: [] },
+      } as unknown as RPageVOProjectSummaryVO),
+    )
+
+    const { container } = renderPage()
+
+    // 「创建新项目」入口仍在网格里
+    expect(await screen.findByText('创建新项目')).toBeInTheDocument()
+    expect(container.querySelector('.card-new')).not.toBeNull()
+    // 空态提示挂在同一网格内，且不是「没有渲染任何卡片」
+    const empty = await screen.findByTestId('project-list-empty')
+    expect(empty.textContent).toContain('（暂无数据）')
+    expect(container.querySelector('.project-grid')).toContainElement(empty)
+    expect(screen.queryAllByTestId('project-list-row')).toHaveLength(0)
+  })
+
+  it('buildingCodes SHALL 以 project code 为键而非行索引（翻页后不贴错行）', async () => {
+    // 卡片网格按 grid 重排、翻页后行序彻底不同 —— 若「构建中」按下标存，
+    // 第 2 页的下标 1 会背上第 1 页那次构建的进行态（按钮被无故禁用、
+    // 状态点误闪「生成中」），用户点不动也说不清为什么。
+    server.use(
+      getList2MockHandler(async (info) => {
+        const isPage2 = String(info.request.url).includes('curPage=2')
+        return {
+          success: true,
+          code: '0000',
+          info: 'success',
+          data: {
+            curPage: isPage2 ? 2 : 1,
+            pageSize: 10,
+            totalRow: 20,
+            totalPage: 2,
+            records: [
+              {
+                code: isPage2 ? 'p2-first' : 'p1-first',
+                name: isPage2 ? '第 2 页项目甲' : '第 1 页项目甲',
+                englishName: 'alpha',
+                state: 'Enable',
+                createTime: '2026-10-16 13:11:15',
+              },
+              {
+                code: isPage2 ? 'p2-second' : 'p1-second',
+                name: isPage2 ? '第 2 页项目乙' : '第 1 页项目乙',
+                englishName: 'beta',
+                state: 'Enable',
+                createTime: '2026-10-16 13:11:15',
+              },
+            ],
+          },
+        } as unknown as RPageVOProjectSummaryVO
+      }),
+    )
+    useExecuteOk({ count: 0 })
+    const { container } = renderPage()
+
+    // 第 1 页有两张卡片；构建**第二张**（下标 1）
+    await screen.findByText('p1-first')
+    expect(container.querySelectorAll('.proj')).toHaveLength(2)
+    fireEvent.click(screen.getAllByTestId('project-list-build-button')[1])
+    await waitFor(() => {
+      expect(screen.getAllByTestId('project-list-build-button')[1]).toBeDisabled()
+    })
+
+    // 翻到第 2 页 —— 两个项目都没在构建，按钮都应可点
+    fireEvent.click(screen.getByTestId('project-list-next'))
+    await waitFor(() => {
+      expect(screen.getByText('p2-first')).toBeInTheDocument()
+    })
+    expect(screen.getByText('p2-second')).toBeInTheDocument()
+    for (const btn of screen.getAllByTestId('project-list-build-button')) {
+      expect(btn).not.toBeDisabled()
+    }
+
+    // 翻回第 1 页 —— 进行态仍精确落在**第二个**项目上
+    fireEvent.click(screen.getByTestId('project-list-prev'))
+    await waitFor(() => {
+      expect(screen.getByText('p1-first')).toBeInTheDocument()
+    })
+    const back = screen.getAllByTestId('project-list-build-button')
+    expect(back[0]).not.toBeDisabled()
+    expect(back[1]).toBeDisabled()
+    expect(back[1].textContent).toContain('构建中')
+    // 卡片状态点同步显示「生成中」，且只在第二张卡上
+    const statuses = screen.getAllByTestId('project-list-status')
+    expect(statuses[0].textContent).toContain('已生成')
+    expect(statuses[1].textContent).toContain('生成中')
   })
 })

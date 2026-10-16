@@ -5,6 +5,7 @@ import DisplayAttributesPage from './pages/DisplayAttributesPage'
 import ProjectListPage from './pages/ProjectListPage'
 import ProjectPlaceholderPage from './pages/ProjectPlaceholderPage'
 import AccountPage from './pages/AccountPage'
+import FrameworkListPage from './pages/FrameworkListPage'
 import RequireAuth from './components/RequireAuth'
 
 /**
@@ -15,7 +16,8 @@ import RequireAuth from './components/RequireAuth'
  *
  * 路由守卫：
  * - /login、/login.shtml 不守卫；
- * - /displayAttributes、/project/list、/project/:code 都用 <RequireAuth> 包裹；
+ * - /displayAttributes、/project/list、/project/:code、/account/me、/frameworks
+ *   都用 <RequireAuth> 包裹；
  * - `*` → `/` 占位路由仍然不守卫（M0 老路径）。
  */
 export default function App() {
@@ -66,6 +68,18 @@ export default function App() {
         }
       />
 
+      {/* M5-A2：框架技术池列表 */}
+      <Route
+        path="/frameworks"
+        element={
+          <RequireAuth>
+            <AppShell>
+              <FrameworkListPage />
+            </AppShell>
+          </RequireAuth>
+        }
+      />
+
       {/* 占位路由：受 M1 起的真实页面逐步替换 —— 当前不守卫；M3 一并讨论守卫范围 */}
       <Route
         path="/"
@@ -81,6 +95,11 @@ export default function App() {
               M2 已接入：
               {' '}
               <Link to="/project/list">查看项目列表</Link>
+            </p>
+            <p>
+              M5 已接入：
+              {' '}
+              <Link to="/frameworks">查看框架列表</Link>
             </p>
           </AppShell>
         }

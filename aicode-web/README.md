@@ -90,7 +90,12 @@ public R<Frameworks> updateIsPublic(@Parameter(hidden = true) Frameworks framewo
   已经是 `ProjectVO`（22 字段），`aicode-web/src/generated/model/` 下
   `projectVO.ts` / `pageVOProjectVO.ts` / `rPageVOProjectVO.ts` 都已生成。
 
-接入这两个端点的具体业务步骤与 M1 相同，按"How to wire next endpoint"
+- **`GET /framework/list`** —— 已在 `2026-10-18-framework-list-vo-contract` 变更中由
+  `R<Page<FrameworksPageVO>>` 收敛为 `R<PageVO<FrameworkSummaryVO>>`（7 字段，无 Git 口令）。
+  **M5-A2（`2026-10-18-framework-list-page`）已接入前端**：`/frameworks` 路由渲染
+  4 列表格（`code` / `name` / `description` / `isPublic`）+ 分页信息。
+
+接入这些端点的具体业务步骤与 M1 相同，按"How to wire next endpoint"
 五步走即可。
 
 ## 受保护端点（鉴权接入）

@@ -629,9 +629,9 @@ opsx 入口（功能等价，运行时暴露哪个就用哪个）：
   - 契约导出：`OpenApiExportIT` —— 导出 `contracts/openapi/openapi.yaml` 并做规范化（剥离 `servers` 块与无 `schema` 的装饰性参数）。**契约因此会在每次测试时被刷新**，入库漂移由 `:aicode-web:verifyApi` 判定
   - 契约守护：`TemplateDataExpansionTest` —— 固化「模板变量展开必须用 fastjson2 往返而非 hutool `BeanUtil.beanToMap`」（getter 名 vs 字段名键集差异）
   - 外部依赖：`GitToolsCloneCompletenessTest` —— 需网络访问 GitHub，由 `@EnabledIfSystemProperty(named = "network.tests")` 守卫，默认**不执行**；离线 CI 需显式加 `-Dnetwork.tests=true`
-  - **前端（M1–M4 落地，17 文件 / 80 用例，MSW 驱动）**：
+  - **前端（M1–M5 落地，18 文件 / 83 用例，MSW 驱动）**：
     - **响应契约层**：`contract-response/index.test.ts`（6 用例：`R.success` 解构 / `ContractError` 带 code+info / 非 `0000` 视为失败 / 缺省 code → UNKNOWN / message 回退）
-    - **页面层**：`DisplayAttributesPage`（1）/ `LoginPage`（3，含空 token 与 `R.code!=="0000"`）/ `ProjectListPage`（5，含构建按钮展开与 `state!=='Enable'` 禁用）/ `ProjectDetailPage`（4，含裸 VO 触发错误气泡的反向用例）/ `AccountPage`（3）
+    - **页面层**：`DisplayAttributesPage`（1）/ `LoginPage`（3，含空 token 与 `R.code!=="0000"`）/ `ProjectListPage`（5，含构建按钮展开与 `state!=='Enable'` 禁用）/ `ProjectDetailPage`（4，含裸 VO 触发错误气泡的反向用例）/ `AccountPage`（3）/ `FrameworkListPage`（3，成功渲染含 `isPublic` 中文映射与分页信息 / 空态非错误 / `R.code!=="0000"`）
     - **鉴权层**：`token-store`（7）/ `auth-interceptor`（6，含重复安装幂等）/ `use-auth`（5，含多 tab storage 同步）
     - **实时层**：`ws-client`（7，含 `vi.stubGlobal('WebSocket')` 替身与一次重连）/ `use-build-log`（5）/ `build-log-panel`（3）/ `shtml-suffix`（8，纯函数 + 拦截器 + 幂等）
     - **组件层**：`AppShell`（2，登录态挂 AccountMenu / 未登录不挂）

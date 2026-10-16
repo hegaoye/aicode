@@ -2,12 +2,14 @@ import '@testing-library/jest-dom/vitest'
 import { afterAll, afterEach, beforeAll } from 'vitest'
 import { setupServer } from 'msw/node'
 import {
-  // 当前批次 M1 用到的端点
+  // 当前 M1 关心
   getList5MockHandler,
-  // 后续接入页面可能用到的端点 —— 注册就绪，M2/M3 不必改 setupFile
+  // M2-1 + M2-2 关心
+  getList2MockHandler,
+  getSigninMockHandler,
+  // 邻居端点：避免后续页面测试忘注册时"穿透到真实网络"
   getListMockHandler,
   getList1MockHandler,
-  getList2MockHandler,
   getList3MockHandler,
   getList4MockHandler,
   getList6MockHandler,
@@ -24,12 +26,14 @@ import {
  * 新增端点接入测试时请同时在本文件中追加对应 handler。
  */
 export const server = setupServer(
-  // 当前 M1 关心的端点
+  // M1 关心的端点
   getList5MockHandler(),
+  // M2-1 + M2-2 关心的端点
+  getList2MockHandler(),
+  getSigninMockHandler(),
   // 邻居端点：避免后续页面测试忘注册时"穿透到真实网络"
   getListMockHandler(),
   getList1MockHandler(),
-  getList2MockHandler(),
   getList3MockHandler(),
   getList4MockHandler(),
   getList6MockHandler(),

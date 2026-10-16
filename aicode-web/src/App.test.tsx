@@ -1,11 +1,16 @@
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
+import { MemoryRouter } from 'react-router-dom'
 import LoginPage from './pages/LoginPage'
 import type { MapFieldColumnVO } from './generated/model/mapFieldColumnVO'
 
 describe('契约驱动的最小组件测试（M0 骨架）', () => {
   it('登录页渲染出账号与密码输入框', () => {
-    render(<LoginPage />)
+    render(
+      <MemoryRouter>
+        <LoginPage />
+      </MemoryRouter>,
+    )
     expect(screen.getByLabelText('账号')).toBeInTheDocument()
     expect(screen.getByLabelText('密码')).toBeInTheDocument()
   })

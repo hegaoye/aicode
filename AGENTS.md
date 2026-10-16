@@ -623,6 +623,10 @@ opsx 入口（功能等价，运行时暴露哪个就用哪个）：
 - **仍有空白**（详见 §7.10）：`facade` 零测试；Mapper 层 DAO 单测覆盖仍偏薄。
 - **已完成**：接口契约回归测试 `ApiContractIT`（59 用例，见 §7.10 第 0 项），已作为 Java 25 / Spring Boot 4.1 升级全程的验收金标准，并在 Boot 4.1.1 上全绿。
 - **M1 已合并（2026-10-16，`feature/20261016/react-web-rewrite` 分支 + 变更 `2026-10-16-aicode-web-first-business-page`）**：首个契约驱动业务页面 `DisplayAttributesPage` 落地。`src/lib/contract-response`（`unwrapSuccess` + `ContractError`）、`src/lib/display-controls`（`DisplayControl` 分发器）、`src/test-setup.ts`（MSW `setupServer`）沉淀出"如何接下一个端点"五步样板（详见 `aicode-web/README.md` §How to wire next endpoint）；Vitest 17 用例通过、`npm run build` 与 `npm run typecheck` 全绿；首次让契约链有真实消费者，下一次 M2/M3 可在此基础上扩充。`api-contract-artifact` 的 Scenario 「mock 与真实契约同源」因此真正具备可演示态（M0 链路就绪但无消费者）。
+- **M2 已合并（`feature/20261016/react-web-rewrite` 分支 + 三个变更）**：
+  - **`2026-10-17-project-list-vo-contract`** —— `ProjectController.list` 由 `R<Page>` 改造为 `R<PageVO<ProjectVO>>`，22 字段 VO 真实化；契约 `RPageVOProjectVO` / `PageVOProjectVO` 入库与 orval 生成物对齐；`api-data-object` 能力增补 1 Requirement "分页列表接口 SHALL 使用 PageVO<XxxVO>" 含 3 Scenarios；ApiContractIT 新增场景⑦ ProjectListPageVoContract 双用例守护。
+  - **`2026-10-17-login-and-project-list-pages`** —— `LoginPage` 与 `ProjectListPage` 接入消费契约层；引入前端鉴权能力 `aicode-web-auth`（含 5 Requirement 14 Scenario）落地 `src/lib/auth/{token-store, auth-interceptor, use-auth}` 三件套 + `<RequireAuth>` 路由守卫；axios 拦截器实现 `Authorization: Bearer <token>` Header 注入 + 9007 自动跳登录；Vitest 43 用例通过、`npm run build` 96 modules transformed / 328 KB / gzip 105 KB；详情页 `ProjectPlaceholderPage` 占位待 M3 接入；`/displayAttributes` 一并加入守卫（design Open Question 答案更新为"全部守卫"）。
+  - **`project-list-vo-contract`** 与 **`login-and-project-list-pages`** 一起，让 M2 阶段两个新业务页面（登录 + 项目列表）真正具备可演示态，连通契约链到 UI 的端到端链路。M3 关注详情页（`loadByCode`）+ 一键构建（`/project/job/execute` + WebSocket）+ 字段裁剪。
 - 性能基线：把 `measurement/startup-time.sh` 的输出接入 CI，**冷启动回归超过阈值**则 fail。
 
 ### 11.4 CI / CD

@@ -93,6 +93,20 @@ public R<Frameworks> updateIsPublic(@Parameter(hidden = true) Frameworks framewo
 接入这两个端点的具体业务步骤与 M1 相同，按"How to wire next endpoint"
 五步走即可。
 
+## 受保护端点（鉴权接入）
+
+`aicode-web` 已具备完整前端登录态管理（详见
+`openspec/specs/aicode-web-auth/spec.md`），接入一个"受保护"的业务页面
+需依次：
+
+1. **在路由表里用 `<RequireAuth>` 包裹**：`App.tsx` 中把 `<Route path="..." element={<RequireAuth>...</RequireAuth>}>` 即可；无 token 时跳 `/login`，并把原路径通过 `state.from` 传给 LoginPage（M3 一并接）。
+2. **页面里调 `getToken()` 显式填 `params.token`**：仓库 `orval` 生成的 `list2({ token, ... })` 仍然要求参数形式 `token`，调用方用 `getToken() ?? ""` 填充；axios 拦截器同时会在 `Authorization: Bearer <token>` 头里再带一份，双轨兼容。
+3. **`auth-interceptor` 已由 `main.tsx` 启动时一次性安装**，业务代码不必显式关心，但**新增依赖 axios 的拦截器场景**（如 `manualCreate`）需自己调 `installAuthInterceptor()`。
+4. **MSW handler 必须在 `test-setup.ts` 注册**：与 M1 通用规则一致——`getSigninMockHandler` / `getList2MockHandler` 等都已注册，新增端点接时按 neighbors 原则一起 append。
+5. **失败以 `ContractError` 气泡呈现**：与 M1 `DisplayAttributesPage` 一致——`unwrapSuccess` 失败抛 `ContractError`，被 `unwrapSuccess` 后的 `.catch(err: ContractError)` 捕获，写入 `{kind:'error'}` 状态后渲染 `<p role="alert" data-testid="...">`。
+
+**`signin` 端点不在守卫范围**：登录接口本身不被 `<RequireAuth>` 包裹（避免循环跳），登录成功后由 `LoginPage` 调 `useAuth().signIn(token)` 后跳原路径。
+
 ## 如何接下一个业务端点（M1 沉淀的样板）
 
 `DisplayAttributesPage` 是契约链上**第一个**真实业务页面，把"读取契约生成物 →

@@ -2,6 +2,7 @@ import axios from 'axios'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import {
   __resetShtmlSuffixForTests,
+  API_PREFIXES,
   installShtmlSuffixInterceptor,
   shouldAddShtmlSuffix,
 } from './shtml-suffix'
@@ -95,5 +96,33 @@ describe('shtml-suffix 拦截器', () => {
       axios.interceptors.request as unknown as { handlers: unknown[] }
     ).handlers
     expect(handlers.length).toBe(1)
+  })
+})
+
+/**
+ * Review Focus #1 的钉死测试。
+ *
+ * 视觉重写新增页面时最容易引入「新的一级路由前缀」，而白名单漏登记的后果是
+ * 请求不带 `.shtml` → 后端 `ShtmlSuffixRewriteFilter` 不剥 → Spring MVC 找不到
+ * 路由 → 400 `NoResourceFoundException`。这个失败**不会**让任何页面级测试变红，
+ * 只在浏览器里表现为「这个按钮点了没反应」。故在此把清单写死。
+ */
+describe('API 前缀白名单', () => {
+  it('前缀清单 SHALL 与后端 ShtmlSuffixRewriteFilter.API_PREFIXES 一致', () => {
+    expect([...API_PREFIXES]).toEqual([
+      '/project',
+      '/framework',
+      '/displayAttribute',
+      '/logs',
+      '/login',
+      '/account',
+    ])
+  })
+
+  it('白名单里每个前缀 SHALL 确实会触发补后缀（清单不是死数据）', () => {
+    for (const prefix of API_PREFIXES) {
+      expect(shouldAddShtmlSuffix(`${prefix}`)).toBe(true)
+      expect(shouldAddShtmlSuffix(`${prefix}/list`)).toBe(true)
+    }
   })
 })

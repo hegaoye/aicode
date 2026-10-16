@@ -26,8 +26,12 @@ const SHTML_SUFFIX = '.shtml'
  * 后端 API 一级路由前缀白名单 —— 必须与后端
  * `com.aicode.filter.ShtmlSuffixRewriteFilter#API_PREFIXES` 保持一致。
  * 不在该白名单内的路径（如 `/assets/*`、`/actuator/*`）不加后缀。
+ *
+ * 导出供测试钉死：新增页面若引入新的后端一级路由（如 `/module/xxx`），
+ * 必须同步这里，否则该路径的请求不会补 `.shtml` → 后端
+ * `NoResourceFoundException`（400），而**没有任何其他测试会红**。
  */
-const API_PREFIXES = [
+export const API_PREFIXES = [
   '/project',
   '/framework',
   '/displayAttribute',

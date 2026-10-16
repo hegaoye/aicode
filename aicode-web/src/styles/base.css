@@ -1,0 +1,703 @@
+/*
+ * 全局重置 + 跨页复用基元。
+ *
+ * 来源：OpenDesign 项目「ai-code 页面设计」的 13 个原型页面。原型把同一套类
+ * 复制了 13 遍且**略有出入**，本文件是取舍后的唯一版本 —— 抽取时以语义最全的
+ * 那一版为准：
+ *   .container .page-head .btn-* .form-* .field .radio-group .stepper .step
+ *     .tip-panel  ← new-project.html（表单流页面最全）
+ *   .panel .panel-head .panel-body .badge .empty-state  ← project-review.html
+ *   .section-title .table-card .data-table .row-actions  ← wizard-step3-models.html
+ *   .btn .btn-solid .btn-outline .footer-bar              ← build-log.html
+ *
+ * 【不得重命名类名】验收方式是「逐页与原型并排比对」，改名会让比对失效。
+ * 新增跨页类必须先加到本文件的基元清单，不得在页面级 .css 里私造。
+ */
+
+/* ---------------------------------------------------------------------------
+ * 原型用到、但 tokens.css 未定义的 token。
+ *
+ * 色板（--bg / --surface / --fg / --muted / --border / --accent …）仍以
+ * tokens.css 为唯一真源，本块只补语义色与编辑器配色，数值逐字取自原型。
+ * ------------------------------------------------------------------------ */
+:root {
+  --success: oklch(58% 0.14 145);
+  --warn: oklch(58% 0.18 40);
+  --fg-soft: color-mix(in oklch, var(--fg) 6%, transparent);
+
+  --editor-bg: oklch(15% 0.01 250);
+  --editor-fg: oklch(88% 0.02 80);
+  --editor-line: oklch(35% 0.02 250);
+  --editor-gutter: oklch(45% 0.02 250);
+
+  /* 布局尺度。原型各页 --container 取值不一（920 / 1180 / 1280），
+     合并成单一 .container 后取众数 1180px；原本 920px 的表单流页面
+     用 .page-narrow 局部覆盖，保住原型的收窄观感。 */
+  --gap-xs: 8px;
+  --gap-sm: 12px;
+  --gap-md: 18px;
+  --gap-lg: 28px;
+  --gap-xl: 48px;
+  --container: 1180px;
+  --gutter: 32px;
+}
+
+/* ---------------------------------------------------------------------------
+ * 全局重置（原型的 <style> 首段，13 页完全一致）
+ * ------------------------------------------------------------------------ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+}
+
+p {
+  text-wrap: pretty;
+  margin: 0;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  text-wrap: balance;
+  margin: 0;
+  font-family: var(--font-display);
+}
+
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ---------------------------------------------------------------------------
+ * 骨架
+ * ------------------------------------------------------------------------ */
+.container {
+  max-width: var(--container);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+/* 原型的表单流页面（new-project / wizard-step3）刻意把 --container 收到 920px，
+   窄栏聚焦、减少视线横向移动。此类页面在容器外包一层 .page-narrow 生效。 */
+.page-narrow {
+  --container: 920px;
+}
+
+/* 迁移期的双轨：已还原的页面用 .container 自己管左右留白（--gutter 32px），
+   所以 padding 归零；尚未重写的页面仍在靠 .page 的 padding，故只在没有
+   .container 的后代时保留它。等 8 个页面全部迁移完，这条可删除。 */
+.page {
+  display: block;
+  padding: var(--space-6);
+}
+
+.page:has(.container) {
+  padding: 0;
+}
+
+.pagefoot {
+  padding-block: var(--gap-xl);
+  color: var(--muted);
+  font-size: 13px;
+  border-top: 1px solid var(--border);
+  margin-top: var(--gap-xl);
+  text-align: center;
+}
+
+.pagefoot .row-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gap-md);
+  flex-wrap: wrap;
+}
+
+/* ---------------------------------------------------------------------------
+ * 页头（dashboard.html）
+ * ------------------------------------------------------------------------ */
+.page-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--gap-md);
+  flex-wrap: wrap;
+  margin-bottom: var(--gap-lg);
+}
+
+.page-head h1 {
+  font-size: var(--fs-title);
+  font-weight: 700;
+  letter-spacing: -0.015em;
+}
+
+.page-head .meta {
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+/* ---------------------------------------------------------------------------
+ * 按钮
+ * ------------------------------------------------------------------------ */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 22px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  border: 1.5px solid transparent;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+/* 主按钮：空心描边，hover 反色 —— 原型的「单红预算」规则（每屏红色 ≤2 次）
+   意味着主按钮不能是实心红块，否则与 topnav 的红分隔线抢预算。 */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 22px;
+  border: 1.5px solid var(--accent);
+  background: transparent;
+  color: var(--accent);
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+}
+
+.btn-primary:hover {
+  background: var(--accent);
+  color: var(--surface);
+}
+
+.btn-primary:active {
+  transform: translateY(1px);
+}
+
+.btn-primary:disabled,
+.btn-ghost:disabled,
+.btn-solid:disabled,
+.btn-outline:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 14px;
+  transition:
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.btn-ghost:hover:not(:disabled) {
+  border-color: var(--fg);
+  color: var(--fg);
+}
+
+.btn-solid {
+  background: var(--accent);
+  color: var(--surface);
+  border-color: var(--accent);
+}
+
+.btn-solid:hover:not(:disabled) {
+  background: color-mix(in oklch, var(--accent) 88%, black);
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.btn-outline:hover:not(:disabled) {
+  background: var(--accent);
+  color: var(--surface);
+}
+
+/* ---------------------------------------------------------------------------
+ * 表单流 —— 左标签 + 右输入（视觉规则 4「表单即视觉」）
+ * ------------------------------------------------------------------------ */
+.form-row {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  gap: 16px;
+  align-items: start;
+  padding-block: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.form-row:last-of-type {
+  border-bottom: 0;
+}
+
+.form-row .label {
+  text-align: right;
+  padding-top: 9px;
+  font-size: 13px;
+  color: var(--fg);
+}
+
+.form-row .label .req {
+  color: var(--accent);
+  margin-right: 2px;
+  font-weight: 600;
+}
+
+.form-row .label .hint {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.form-input,
+.form-textarea {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--fg);
+  font-size: 13px;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.form-input::placeholder,
+.form-textarea::placeholder {
+  color: var(--muted);
+}
+
+.form-input:focus,
+.form-textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.form-textarea {
+  min-height: 84px;
+  resize: vertical;
+  line-height: 1.55;
+  font-family: inherit;
+}
+
+.form-input.error,
+.form-textarea.error {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--accent) 18%, transparent);
+}
+
+.field-error {
+  font-size: 12px;
+  color: var(--accent);
+  display: none;
+}
+
+.field-error.show {
+  display: block;
+}
+
+.radio-group {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 8px 22px;
+  padding-top: 5px;
+}
+
+.radio-group label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  user-select: none;
+  font-size: 13px;
+  padding: 4px 0;
+}
+
+.radio-group input[type='radio'] {
+  accent-color: var(--accent);
+  width: 14px;
+  height: 14px;
+}
+
+.radio-group label:hover {
+  color: var(--accent);
+}
+
+.form-foot {
+  margin-top: var(--gap-lg);
+  padding-top: var(--gap-md);
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--gap-md);
+}
+
+/* ---------------------------------------------------------------------------
+ * 五步向导步骤条（仅 new-project 家族使用；详情页不复用）
+ * ------------------------------------------------------------------------ */
+.stepper {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  padding-block: 28px;
+  align-items: center;
+  position: relative;
+}
+
+.stepper::before {
+  content: '';
+  position: absolute;
+  left: 10%;
+  right: 10%;
+  top: 50%;
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    var(--accent) 0%,
+    var(--accent) 25%,
+    var(--border) 25%,
+    var(--border) 100%
+  );
+  z-index: 1;
+  transform: translateY(-0.5px);
+}
+
+.step {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  position: relative;
+  color: var(--muted);
+  text-align: left;
+}
+
+.step .num {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  color: var(--muted);
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+  position: relative;
+  z-index: 2;
+}
+
+.step .label {
+  font-size: 13px;
+  white-space: nowrap;
+  text-align: left;
+  position: relative;
+  z-index: 2;
+}
+
+.step .step-link {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  color: inherit;
+}
+
+.step a:hover .num {
+  border-color: var(--accent);
+}
+
+.step.done .num {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--surface);
+}
+
+.step.done .label {
+  color: var(--fg);
+}
+
+.step.active .num {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--surface);
+  box-shadow: 0 0 0 4px var(--accent-soft);
+}
+
+.step.active .label {
+  color: var(--accent);
+  font-weight: 500;
+}
+
+/* ---------------------------------------------------------------------------
+ * 操作提示面板（红底 6% —— 「单红预算」里的一格）
+ * ------------------------------------------------------------------------ */
+.tip-panel {
+  background: var(--tip-bg);
+  border: 1px solid color-mix(in oklch, var(--accent) 18%, transparent);
+  border-radius: var(--radius);
+  padding: 18px 22px;
+  margin-bottom: var(--gap-xl);
+}
+
+.tip-panel .tip-title {
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--fg);
+  margin-bottom: 10px;
+}
+
+.tip-panel ul {
+  margin: 0;
+  padding-left: 20px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.85;
+}
+
+.tip-panel ul li::marker {
+  color: var(--accent);
+}
+
+/* ---------------------------------------------------------------------------
+ * 面板（project-review.html）
+ * ------------------------------------------------------------------------ */
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: var(--gap-md);
+  overflow: hidden;
+}
+
+.panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 22px;
+  border-bottom: 1px solid var(--border);
+  background: oklch(97.5% 0.005 240);
+}
+
+.panel-head .title {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.panel-head .right {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.panel-head .edit {
+  font-size: 12px;
+  color: var(--accent);
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-family: var(--font-mono);
+}
+
+.badge.ok {
+  background: color-mix(in oklch, var(--success) 14%, transparent);
+  color: var(--success);
+}
+
+.badge.pending {
+  background: color-mix(in oklch, var(--warn) 14%, transparent);
+  color: var(--warn);
+}
+
+.panel-body {
+  padding: 22px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 22px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+/* ---------------------------------------------------------------------------
+ * 表格（wizard-step3-models.html）
+ * ------------------------------------------------------------------------ */
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-left: 12px;
+  border-left: 3px solid var(--accent);
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: var(--gap-md);
+  color: var(--fg);
+}
+
+.table-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: var(--gap-lg);
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.data-table th,
+.data-table td {
+  padding: 14px 18px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+.data-table thead th {
+  background: oklch(96.5% 0.005 240);
+  color: var(--muted);
+  font-weight: 500;
+  font-size: 12px;
+  letter-spacing: 0.02em;
+}
+
+.data-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.data-table tbody tr:hover {
+  background: oklch(98% 0.005 240);
+}
+
+.data-table .name {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--fg);
+}
+
+.row-actions {
+  display: inline-flex;
+  gap: 14px;
+  align-items: center;
+}
+
+.row-actions a {
+  color: var(--accent);
+  font-size: 13px;
+  transition: opacity 0.15s ease;
+}
+
+.row-actions a:hover {
+  opacity: 0.7;
+}
+
+/* .field 在原型里有两种用法：project-review 的 k/v 对、new-project 的表单项容器。
+   .form-row .field 特异性更高，自动在表单行内切到列向布局 —— 无需第二个类名。 */
+.field {
+  display: flex;
+  gap: 12px;
+  align-items: baseline;
+  font-size: 13px;
+}
+
+.field .k {
+  color: var(--muted);
+  flex-shrink: 0;
+  min-width: 96px;
+}
+
+.field .v {
+  color: var(--fg);
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+}
+
+.form-row .field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+/* ---------------------------------------------------------------------------
+ * 窄屏 —— 原型的 @media 收敛在 720px 一个断点
+ * ------------------------------------------------------------------------ */
+@media (max-width: 720px) {
+  .stepper {
+    grid-template-columns: repeat(5, auto);
+    overflow-x: auto;
+    padding-block: 20px;
+  }
+
+  .step .label {
+    display: none;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  .form-row .label {
+    text-align: left;
+    padding-top: 0;
+  }
+}

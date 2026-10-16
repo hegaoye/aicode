@@ -616,6 +616,8 @@ opsx 入口（功能等价，运行时暴露哪个就用哪个）：
   - **处方**：给任何"异步任务 + UI 状态"的组合 SHALL 显式写出**进入**与**释放**两条路径的 spec；测试 SHALL 覆盖释放路径。
   - **连带教训**：释放路径的实现不能简单判「当前不是运行态」—— 翻回/重新挂载会呈现"非运行态"但任务**仍在跑**（误释放 → 用户可重复触发，后端并发检查拒绝 → "点了没反应"）。判据必须是「**确实到达过终态**」或「用户**主动关闭**了」，故用 `hasShownRef` 记录"曾显示过运行态"。
 - ⚠️ **断言「某能力不存在」之前 SHALL 先 grep 确认 —— 且**代码注释也会过期**，不能作为依据（2026-10-18 教训）**：`2026-10-18-init-async-progress` 里我写了「构建日志**无完成信号**」，依据是 `use-build-log.tsx` 里的注释「无 `[DONE]` sentinel」。**grep 后发现后端 `GeneratorSVImpl` 的 finally 块早已推送 `Finished: SUCCESS` / `Finished: ERROR`** —— 注释说的是没有 `[DONE]` 这个**名字**，不是没有终态信号。真相是「后端有信号、前端从不识别」（`use-build-log` 对每条消息一律 `appendEntry`，grep `Finished` 零命中）。**注释描述的是实现而非契约，且会随实现演进而失效。**
+- ⚠️ **口令散列 SHALL NOT 放进 SQL 的 `WHERE` 子句（实测，2026-10-18）**：`LoginCtrl.signin` 曾是 `.eq(Account::getPassword, Md5.md5(password))` —— 散列值进 SQL。两个后果：① 若开启 SQL 日志，散列值会落盘；② **它在算法层面就排除了带盐散列** —— BCrypt 每次加随机盐、相同口令两次散列不同，`WHERE password = ?` 必然失效。正确做法是「先按账户名查记录、再用编码器在应用内比对」。**判据：任何单向散列（带盐）都不能用于数据库等值匹配。**
+- ⚠️ **`spring-security-crypto` 在 Boot BOM 下把 `spring-core` 标为 optional —— 必须显式补（实测，2026-10-18）**：只加 `spring-security-crypto` 时**编译通过、运行期抛** `NoClassDefFoundError: org/springframework/util/StringUtils`（`BCryptPasswordEncoder` 内部用到它）。这类失败只在跑测试/启动时暴露，编译期完全无感。另注：`common` 模块的测试依赖**只有 `junit-jupiter`**（无 AssertJ / Mockito），写断言须用 JUnit 原生。
 - ⚠️ **WebSocket 是单 Session（`WSClientManager` 用 static `put`/`get`），多标签页或并发任务会混流（实测，2026-10-18）**：`WSClientManager` 只保存**一个** `Session`（`put` 覆盖、`get` 返回它），所以同一时刻只有最后连上的客户端能收到推送。两个后果：① 开两个标签页，进度只推到后连的那个；② 若两个任务并发（如解析进行中又点构建），消息混在同一条连接上。
   - **缓解**：`2026-10-18-init-async-progress` 引入的协议靠 **`type` 字段分流**（结构化事件 vs free-form 文本），消费端按首字符 `{` 判定形态、按 `type` 分派。**但这只解决「能不能分辨」，解决不了「送到哪个标签页」**。
   - **彻底修法**：按 token + 项目分房间（`@ServerEndpoint` 的 session 路由 + `ConcurrentHashMap<room, Set<Session>>`），属独立议题。
@@ -633,7 +635,7 @@ opsx 入口（功能等价，运行时暴露哪个就用哪个）：
 
 ### 11.1 安全加固（高优先级）
 
-- **密码存储**：当前为 MD5（见 `openspec/specs/auth-account/spec.md`）。应升级为 **BCrypt** 或 **Argon2**，并提供平滑迁移方案。
+- **密码存储**：~~当前为 MD5~~ —— **已升级为 BCrypt**（`2026-10-18-password-bcrypt-migration`，`common` 的 `PasswordHasher`）。带随机盐 + 自适应 cost，同一口令两次散列不同。存量无盐 MD5 走**登录时透明升级**（双格式并存：按 `$2` 前缀分派，MD5 校验通过后顺手改写为 BCrypt，用户无感）。⚠️ **已泄漏的旧 MD5 仍需轮换口令** —— 本变更不能修复已落盘的散列（彩虹表随时可用），见下方运维建议。
 - **鉴权方式**：JWT 走 URL query 参数会被记录在代理日志、浏览器历史中。应迁移到 **`Authorization: Bearer`** Header。
 - **多用户**：当前单用户模式不能满足企业场景，需引入用户-角色-权限（RBAC）模型。
 - **H2 控制台暴露**：`/h2` 默认对外可访问，应通过 profile 或配置项在生产环境关闭（详见 §6.13）。

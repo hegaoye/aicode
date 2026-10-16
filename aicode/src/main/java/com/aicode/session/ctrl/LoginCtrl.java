@@ -6,7 +6,7 @@ import com.aicode.core.BaseException;
 import com.aicode.core.R;
 import com.aicode.core.enums.Constants;
 import com.aicode.core.tools.JwtToken;
-import com.aicode.core.tools.Md5;
+import com.aicode.core.tools.PasswordHasher;
 import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import io.swagger.v3.oas.annotations.Operation;
@@ -49,15 +49,33 @@ public class LoginCtrl {
             Assert.hasText(account, BaseException.BaseExceptionEnum.Empty_Param.toString());
             Assert.hasText(password, BaseException.BaseExceptionEnum.Empty_Param.toString());
 
+            // 查询条件**只含账户名**：带盐散列每次结果不同，相同口令两次散列不相等，
+            // `WHERE password = ?` 这种等值匹配在算法层面就不可行；且它还会让散列值
+            // 出现在 SQL 日志里（AGENTS §10 已登记该坑）。
             Account accountObj = accountService.getOne(new LambdaQueryWrapper<Account>()
-                    .eq(Account::getAccount, account)
-                    .eq(Account::getPassword, Md5.md5(password)));
-            String token = null;
-            if (accountObj != null) {
-                token = JwtToken.createToken(Constants.AccountCode.val.toString(), accountObj.getCode());
-            } else {
+                    .eq(Account::getAccount, account));
+
+            // 「账户不存在」与「口令错误」返回同样的空 data，不签发 token ——
+            // 防账户枚举（沿用既有 auth-account Req 的约定）。
+            if (accountObj == null) {
                 return R.success();
             }
+            if (!PasswordHasher.matches(password, accountObj.getPassword())) {
+                return R.success();
+            }
+
+            // 透明升级：存量弱散列（无盐 MD5）在**校验通过后**改写为 BCrypt。
+            // 顺序必须是「先校验、后改写」—— 口令错误时改写会把合法用户锁死
+            // （攻击者可用任意错误口令把口令替换成他不知道的值）。
+            if (PasswordHasher.needsUpgrade(accountObj.getPassword())) {
+                Account toUpdate = new Account();
+                toUpdate.setId(accountObj.getId());
+                toUpdate.setPassword(PasswordHasher.hash(password));
+                accountService.updateById(toUpdate);
+                log.info("账户口令已从旧格式升级为 BCrypt, code:{}", accountObj.getCode());
+            }
+
+            String token = JwtToken.createToken(Constants.AccountCode.val.toString(), accountObj.getCode());
             log.info(JSON.toJSONString(accountObj));
             return R.success(token);
         } catch (Exception e) {
@@ -77,6 +95,9 @@ public class LoginCtrl {
     public R<Void> reg(@Parameter(hidden = true) Account account) {
         Assert.hasText(account.getAccount(), BaseException.BaseExceptionEnum.Empty_Param.toString());
         Assert.hasText(account.getPassword(), BaseException.BaseExceptionEnum.Empty_Param.toString());
+        // 散列后再落库 —— 此前直接 save(account) 会把**明文口令**写进库
+        // （比 MD5 更严重）。散列在实体入参上就地替换，避免调用方拿到散列后的值。
+        account.setPassword(PasswordHasher.hash(account.getPassword()));
         accountService.save(account);
         return R.success();
     }

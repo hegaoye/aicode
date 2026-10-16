@@ -1,0 +1,366 @@
+/*
+ * 技术架构管理页（tech-architecture.html）页面级样式。
+ *
+ * 规则（与 base.css 头部一致）：
+ *   1. 类名一律沿用原型原名，验收方式是「逐页与原型并排比对」，改名会让比对失效；
+ *   2. base.css 已有的 `.page-head` / `.panel` / `.panel-head` / `.data-table` /
+ *      `.btn-primary` / `.btn-ghost` / `.row-actions` 本文件**不再定义**；
+ *   3. 数值逐字取自原型，未做任何「优化」。
+ *
+ * 本文件只补 tech-architecture.html 独有的四组能力：
+ *   ① 表格容器与单元格（.table-wrap / .mono / .truncate）
+ *   ② 开关与行内操作（.toggle / .row-actions button·.edit·.del）
+ *   ③ 分页条（.pager / .pager .pages / .current）
+ *   ④ 弹窗与表单校验（.modal-mask / .modal* / .form-field / .invalid / .err）
+ */
+
+/* ---------------------------------------------------------------------------
+ * --blue：原型的 .row-actions .edit 用的蓝。tokens.css 是唯一 token 源且
+ * 不在本任务的可改范围内，而该色只有本页用，故在页面级局部补一个，
+ * 取值与原型 :root 里的 `--blue: oklch(54% 0.18 245)` 逐字一致。
+ * 若后续页面也需要，应收编进 tokens.css 并删除此块。
+ * ------------------------------------------------------------------------ */
+:root {
+  --blue: oklch(54% 0.18 245);
+}
+
+/* ---------------------------------------------------------------------------
+ * 只对读屏可见的文本。
+ *
+ * 两处必须用它：
+ *   ① `.toggle` 开关 —— 原型只有一颗色块，视觉上不能加文字，但「是否公开库」
+ *      这一列对读屏用户必须有名字；
+ *   ② 表格行内的业务编码 —— 原型的 7 列里没有「编码」列（与原型完全一致），
+ *      但它是对外契约的一部分（行内写操作全靠它定位），且契约回归测试
+ *      按 `row.textContent` 断言它。把技术编码放在 `.sr-only` 里，
+ *      视觉 100% 还原原型的同时让文本仍可被断言与朗读。
+ *
+ * 若后续页面需要，请收编进 base.css（那边有「新增跨页类必须先登记」的约定）。
+ * ------------------------------------------------------------------------ */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* 页面级错误气泡：与其他页面（LoginPage / NewProjectPage 等）同款红色提示，
+   原型只在 .form-field .err 里给了同色同号，页面级提示沿用该视觉。 */
+.page-error {
+  color: var(--accent);
+  font-size: 13px;
+}
+
+/* 原型 .panel-head 里的副标题类（base.css 已有 .panel-head .title，
+   但没有 .lead）—— 数值逐字取自原型。 */
+.panel-head .lead {
+  color: var(--muted);
+  font-size: 12px;
+  margin-top: 2px;
+}
+
+/* 原型 `.btn-primary svg { width: 14px; height: 14px }` 定的是「添加」按钮里的
+   加号图标。base.css 未收录这条（它的 .btn-primary 是 new-project 的空心变体），
+   而 SVG 不带 width/height 时默认撑满容器 —— 不定尺图标会把按钮撑变形。
+   限定在 .page-head 内，避免越界影响其他页面。 */
+.page-head .btn-primary svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* ---------------------------------------------------------------------------
+ * 表格容器（tech-architecture.html）
+ * ------------------------------------------------------------------------ */
+.table-wrap {
+  overflow-x: auto;
+}
+
+/* 原型把 vertical-align 与列宽写在 <th> 的内联样式上；本页不允许 TSX 内联样式，
+   因此挪到 CSS —— 列宽取值（64px / 120px）未改。 */
+.framework-table th,
+.framework-table td {
+  vertical-align: middle;
+}
+
+.framework-table th.col-index {
+  width: 64px;
+}
+
+.framework-table th.col-actions {
+  width: 120px;
+}
+
+.framework-table td.mono {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+.framework-table td.truncate {
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---------------------------------------------------------------------------
+ * 是否公开库开关（tech-architecture.html）
+ * ------------------------------------------------------------------------ */
+.toggle {
+  position: relative;
+  display: inline-block;
+  width: 36px;
+  height: 20px;
+  background: var(--accent);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  flex-shrink: 0;
+}
+
+.toggle.off {
+  background: oklch(82% 0.01 25);
+}
+
+.toggle::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 18px;
+  width: 16px;
+  height: 16px;
+  background: var(--surface);
+  border-radius: 50%;
+  transition: left 0.15s ease;
+}
+
+.toggle.off::after {
+  left: 2px;
+}
+
+/* 原型的 .toggle 是 <span>，本页改用 <button> 承载开关语义（可聚焦、可 Tab、
+   可 aria-checked）。下面三条只是把 button 的浏览器默认样式归零，
+   归零后与 <span> 版本视觉完全一致。 */
+button.toggle {
+  border: 0;
+  padding: 0;
+  vertical-align: middle;
+}
+
+/* 待接口接入的写操作（添加 / 删除）在视觉上是完整按钮，只是不可点，
+   因此需要一套禁用态观感 —— 原型的写操作均可点，故此处为新增。 */
+.toggle:disabled,
+.row-actions button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ---------------------------------------------------------------------------
+ * 行内操作（tech-architecture.html）
+ * 布局（.row-actions 本身）已在 base.css，本块只补按钮与两个动作的着色。
+ * ------------------------------------------------------------------------ */
+.row-actions button {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  transition:
+    color 0.15s ease,
+    transform 0.15s ease;
+}
+
+.row-actions .edit {
+  color: var(--blue);
+}
+
+.row-actions .edit:hover:not(:disabled) {
+  color: color-mix(in oklch, var(--blue) 70%, black);
+}
+
+.row-actions .del {
+  color: var(--accent);
+}
+
+.row-actions .del:hover:not(:disabled) {
+  color: color-mix(in oklch, var(--accent) 70%, black);
+}
+
+.row-actions svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* ---------------------------------------------------------------------------
+ * 分页条（tech-architecture.html）
+ * ------------------------------------------------------------------------ */
+.pager {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 22px;
+  border-top: 1px solid var(--border);
+  background: oklch(98% 0.004 240);
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.pager .pages {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.pager .pages button {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--muted);
+  transition: all 0.15s ease;
+}
+
+.pager .pages button.current {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--surface);
+}
+
+.pager .pages button:hover:not(.current) {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* ---------------------------------------------------------------------------
+ * 弹窗（tech-architecture.html 的「添加技术架构」弹窗）
+ *
+ * 原型的弹窗由「添加」按钮打开；本页「添加」按钮暂不可用（契约无入参），
+ * 故同一个弹窗结构由「编辑」驱动，两种模式共用这套样式，
+ * 后续接 `api.build5` 时不需要再写一遍结构。
+ * ------------------------------------------------------------------------ */
+.modal-mask {
+  position: fixed;
+  inset: 0;
+  background: oklch(20% 0.02 25 / 0.45);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  padding: 24px;
+}
+
+.modal-mask.open {
+  display: flex;
+}
+
+.modal {
+  width: 520px;
+  max-width: 100%;
+  background: var(--surface);
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  box-shadow: 0 20px 48px -12px oklch(20% 0.02 25 / 0.35);
+  overflow: hidden;
+}
+
+.modal-head {
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--border);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.modal-body {
+  padding: 22px;
+}
+
+.modal-foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 14px 22px;
+  border-top: 1px solid var(--border);
+  background: oklch(98% 0.004 240);
+}
+
+/* ---------------------------------------------------------------------------
+ * 弹窗表单与必填校验（tech-architecture.html）
+ * ------------------------------------------------------------------------ */
+.form-field {
+  margin-bottom: 16px;
+}
+
+.form-field label {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+/* 必填星号：原型是 label 里的内联 <span style="color:var(--accent)">，
+   本页改用类；`.req` 是 base.css 已有的同名约定（.form-row .label .req）。 */
+.form-field .req {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* 「是否公开库」那一栏：原型是紧跟在 label 下面的内联 label
+   （display:inline-flex; gap:8px; font-weight:400; color:var(--fg)），
+   原样搬成类，避免 TSX 内联样式。 */
+.form-field .switch-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 400;
+  color: var(--fg);
+  cursor: pointer;
+  user-select: none;
+  font-size: 13px;
+}
+
+.form-field input,
+.form-field select,
+.form-field textarea {
+  width: 100%;
+  padding: 9px 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font: inherit;
+  color: var(--fg);
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.form-field input:focus,
+.form-field select:focus,
+.form-field textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.form-field .err {
+  display: none;
+  color: var(--accent);
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.form-field.invalid .err {
+  display: block;
+}
+
+.form-field.invalid input {
+  border-color: var(--accent);
+}

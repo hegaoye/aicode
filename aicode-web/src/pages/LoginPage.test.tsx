@@ -48,7 +48,9 @@ describe('LoginPage', () => {
 
     renderLogin()
     fillForm('admin', '888888')
-    fireEvent.click(screen.getByRole('button', { name: /登录/ }))
+    // 原型的提交按钮字面是「登 录」（中间一个空格做字距），加载态是
+    // 「正在登录」—— 正则同时容忍两种写法
+    fireEvent.click(screen.getByRole('button', { name: /登\s*录/ }))
 
     await waitFor(() => {
       expect(window.localStorage.getItem('aicode.token')).toBe('jwt-from-test')
@@ -67,7 +69,7 @@ describe('LoginPage', () => {
 
     renderLogin()
     fillForm('admin', 'wrong')
-    fireEvent.click(screen.getByRole('button', { name: /登录/ }))
+    fireEvent.click(screen.getByRole('button', { name: /登\s*录/ }))
 
     expect(await screen.findByTestId('login-error')).toHaveTextContent('账号或密码错误')
     expect(window.localStorage.getItem('aicode.token')).toBeNull()
@@ -85,7 +87,7 @@ describe('LoginPage', () => {
 
     renderLogin()
     fillForm('admin', '888888')
-    fireEvent.click(screen.getByRole('button', { name: /登录/ }))
+    fireEvent.click(screen.getByRole('button', { name: /登\s*录/ }))
 
     expect(await screen.findByTestId('login-error')).toHaveTextContent('参数非法')
     expect(window.localStorage.getItem('aicode.token')).toBeNull()

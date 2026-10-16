@@ -11,13 +11,15 @@ import BuildLogPanel from './build-log-panel'
 let statusValue: 'idle' | 'running' | 'error' = 'running'
 let entriesValue: { at: number; text: string }[] = []
 let startedAtValue: number | null = Date.now()
+/** startStream 被调次数 —— 用于验 autoStart 语义 */
+const startStreamMock = vi.fn(() => Promise.resolve())
 
 vi.mock('./use-build-log', () => ({
   useBuildLog: () => ({
     status: statusValue,
     entries: entriesValue,
     startedAt: startedAtValue,
-    startStream: () => Promise.resolve(),
+    startStream: () => startStreamMock(),
     clear: () => undefined,
   }),
 }))
@@ -64,5 +66,44 @@ describe('BuildLogPanel', () => {
     render(<BuildLogPanel projectCode="contract-demo" />)
     expect(screen.getByTestId('build-log-status-error')).toBeInTheDocument()
     expect(screen.getByTestId('build-log-status-error').textContent).toBe('❌')
+  })
+
+  // ---- autoStart / onMounted（2026-10-18-project-list-pagination 新增）----
+  //
+  // 背景：列表页翻回"构建中"所在页时 panel 会重新挂载。若此时仍自动
+  // startStream()，就会重复调 api.execute，后端 Executing 检查会拒绝。
+  // 见 openspec/changes/2026-10-18-project-list-pagination/design.md - D3。
+
+  it('autoStart 缺省（true）时 mount SHALL 调 startStream', () => {
+    render(<BuildLogPanel projectCode="contract-demo" />)
+    expect(startStreamMock).toHaveBeenCalledTimes(1)
+  })
+
+  it('autoStart={false} 时 mount SHALL NOT 调 startStream（仍正常渲染面板）', () => {
+    render(<BuildLogPanel projectCode="contract-demo" autoStart={false} />)
+    expect(startStreamMock).toHaveBeenCalledTimes(0)
+    // 防护不应让面板消失 —— 日志仍可见
+    expect(screen.getByTestId('build-log-panel')).toBeInTheDocument()
+  })
+
+  it('projectCode 为空时即便 autoStart=true 也 SHALL NOT 调 startStream', () => {
+    render(<BuildLogPanel projectCode={null} />)
+    expect(startStreamMock).toHaveBeenCalledTimes(0)
+  })
+
+  it('onMounted 每次 mount SHALL 恰好调一次（与 autoStart 无关）', () => {
+    const onMounted = vi.fn()
+    const { unmount } = render(
+      <BuildLogPanel projectCode="contract-demo" autoStart={false} onMounted={onMounted} />,
+    )
+    expect(onMounted).toHaveBeenCalledTimes(1)
+    unmount()
+    // 重新挂载（模拟列表页翻回）→ 再调一次，供调用方写"已挂载过"集合
+    render(<BuildLogPanel projectCode="contract-demo" autoStart={false} onMounted={onMounted} />)
+    expect(onMounted).toHaveBeenCalledTimes(2)
+  })
+
+  it('未传 onMounted 时 SHALL NOT 抛错（prop 可选）', () => {
+    expect(() => render(<BuildLogPanel projectCode="contract-demo" />)).not.toThrow()
   })
 })

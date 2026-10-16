@@ -18,6 +18,23 @@ import { useBuildLog } from './use-build-log'
 
 interface Props {
   projectCode: string | null | undefined
+  /**
+   * mount 时是否自动触发 `startStream()`（默认 `true`）。
+   *
+   * <p>**何时传 `false`**：列表页翻回"构建中"所在页时，`BuildLogPanel` 会重新挂载。
+   * 若此时自动 `startStream()`，会重新调 `api.execute({ code })` —— 而后端
+   * `ProjectJobServiceImpl#execute` 有并发检查（同一 projectCode 已有 `Executing`
+   * 任务则抛 `Server_Error`），用户会看到误导性的"构建失败"。</p>
+   *
+   * <p>调用方（如 `ProjectListPage`）用它区分"首次点击构建"与"翻回已构建页"。</p>
+   */
+  autoStart?: boolean
+  /**
+   * 首次挂载后回调一次（每次 mount 调一次）。调用方用它把 code 记进
+   * "已挂载过"集合，从而在下次挂载时传 `autoStart={false}`。
+   * 与 `autoStart` 配合实现"首次启动 / 翻回不重启"。
+   */
+  onMounted?: () => void
 }
 
 function formatElapsed(ms: number): string {
@@ -27,18 +44,30 @@ function formatElapsed(ms: number): string {
   return m > 0 ? `${m}m ${s}s` : `${s}s`
 }
 
-export default function BuildLogPanel({ projectCode }: Props) {
+export default function BuildLogPanel({
+  projectCode,
+  autoStart = true,
+  onMounted,
+}: Props) {
   const { status, entries, startedAt, startStream, clear } = useBuildLog(projectCode)
   const [now, setNow] = useState<number>(Date.now())
 
-  // mount 时自动启动构建流
+  // 每次 mount 通知调用方一次。声明在 autoStart 效果之前 —— 顺序不改变
+  // autoStart 的取值（prop 在 render 期已定型），仅为可读性。
   useEffect(() => {
-    if (projectCode) {
+    onMounted?.()
+    // 仅在 mount 时触发一次；onMounted 是内联箭头函数，故意不进依赖
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // mount 时自动启动构建流（autoStart=false 时不启 —— 见 Props 的 Javadoc）
+  useEffect(() => {
+    if (projectCode && autoStart) {
       void startStream()
     }
-    // startStream 是稳定引用；projectCode 变化才重启动
+    // startStream 是稳定引用；projectCode / autoStart 变化才重启动
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [projectCode])
+  }, [projectCode, autoStart])
 
   useEffect(() => {
     if (status !== 'running' || startedAt === null) {

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ContractError, unwrapSuccess } from '../../lib/contract-response'
 import { getToken } from '../../lib/auth/token-store'
@@ -58,15 +58,26 @@ export default function ProjectListPage() {
   // 全局 axios 实例在 orval 生成物内部使用即可；每次渲染创建一份 api 是廉价的
   const api = useMemo(() => getAicodeRESTfulAPIs(), [])
   const [state, setState] = useState<LoadState>({ kind: 'loading' })
+  // 当前页码：后端已修成真分页（2026-10-18-project-list-real-pagination），
+  // 翻页只改此状态；buildingCodes 等其它交互状态跨翻页保留（design D2）。
+  const [curPage, setCurPage] = useState<number>(1)
   // 记录哪些行当前正在"构建中"——BuildLogPanel 应挂载。同时启动 hook 的 startStream。
   // key 是 row.code。
   const [buildingCodes, setBuildingCodes] = useState<Set<string>>(new Set())
+  // 记录哪些 code 的 BuildLogPanel **曾经挂载过**（跨翻页保留）。
+  // 用于区分"首次挂载 → 该 autoStart 触发 execute"与"翻回重挂 → 不该再 execute"：
+  // 后者若重复调 api.execute，后端 ProjectJobServiceImpl#execute 对 Executing
+  // 中的项目会抛 Server_Error，用户看到误导性的"构建失败"。
+  // 详见 openspec/changes/2026-10-18-project-list-pagination/design.md - D3。
+  const mountedPanelsRef = useRef<Set<string>>(new Set())
 
   useEffect(() => {
     let cancelled = false
     const token = getToken() ?? ''
+    // 切页期间先回到 loading —— 避免"上一页的表格行 + 新页码的分页信息"瞬时错配
+    setState({ kind: 'loading' })
     api
-      .list2({ token, curPage: 1, pageSize: PAGE_SIZE })
+      .list2({ token, curPage, pageSize: PAGE_SIZE })
       .then((resp) => {
         if (cancelled) {
           return
@@ -90,7 +101,7 @@ export default function ProjectListPage() {
     return () => {
       cancelled = true
     }
-  }, [api])
+  }, [api, curPage])
 
   const startBuildFor = useCallback((code: string) => {
     if (!code || buildingCodes.has(code)) {
@@ -124,13 +135,20 @@ export default function ProjectListPage() {
   }
 
   const records: ProjectSummaryVO[] = state.data.records ?? []
+  const totalRow = state.data.totalRow ?? records.length
+  const serverTotalPage = state.data.totalPage ?? 1
+  const totalPage = Math.max(serverTotalPage, curPage)
 
   return (
     <section>
       <h1>
         项目列表
-        <small className="muted" style={{ marginLeft: '0.5em', fontWeight: 'normal' }}>
-          共 {state.data.totalRow ?? records.length} 条
+        <small
+          className="muted"
+          style={{ marginLeft: '0.5em', fontWeight: 'normal' }}
+          data-testid="project-list-total"
+        >
+          共 {totalRow} 条
         </small>
       </h1>
       {records.length === 0 ? (
@@ -180,8 +198,19 @@ export default function ProjectListPage() {
                   </tr>
                   {isBuilding ? (
                     <tr key={`${rowCode || 'row'}-log`} data-testid="project-list-log-row">
-                      <td colSpan={6}>
-                        <BuildLogPanel projectCode={rowCode} />
+                      <td colSpan={8}>
+                        {/*
+                          autoStart：首次挂载时 true（触发 execute）；
+                          翻回重挂时 false（避免重复 execute → 后端 Executing 检查抛错）。
+                          mountedPanelsRef 跨翻页保留，故能区分两者（design D3）。
+                        */}
+                        <BuildLogPanel
+                          projectCode={rowCode}
+                          autoStart={!mountedPanelsRef.current.has(rowCode)}
+                          onMounted={() => {
+                            mountedPanelsRef.current.add(rowCode)
+                          }}
+                        />
                       </td>
                     </tr>
                   ) : null}
@@ -191,6 +220,42 @@ export default function ProjectListPage() {
           </tbody>
         </table>
       )}
+
+      {/*
+        翻页控件。与 FrameworkListPage 形态一致（design D1）：单页时（totalPage <= 1）
+        两按钮均禁用但控件仍渲染 —— 隐藏会让布局在"翻到第 2 页时按钮突然出现"时跳动。
+      */}
+      <nav
+        data-testid="project-list-pager"
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 'var(--space-3)',
+          marginTop: 'var(--space-4)',
+        }}
+      >
+        <button
+          type="button"
+          className="btn-primary"
+          data-testid="project-list-prev"
+          disabled={curPage <= 1}
+          onClick={() => setCurPage((p) => Math.max(1, p - 1))}
+        >
+          上一页
+        </button>
+        <span className="muted" data-testid="project-list-paging">
+          第 {curPage}/{totalPage} 页
+        </span>
+        <button
+          type="button"
+          className="btn-primary"
+          data-testid="project-list-next"
+          disabled={curPage >= totalPage}
+          onClick={() => setCurPage((p) => p + 1)}
+        >
+          下一页
+        </button>
+      </nav>
     </section>
   )
 }

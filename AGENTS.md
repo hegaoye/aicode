@@ -504,7 +504,7 @@ Project 是聚合根：包含 `ProjectSql`、`ProjectFramwork`、`ProjectMap`、
 6. 生成主链路端到端集成测试（§7.7.3，mock Git / 模板）。
 7. Mapper 层 `@SpringBootTest` + H2 真实 SQL 验证：`TableMapperIT`（元数据）与 `MapFieldColumnMapperIT`（实体列映射）已落地，**其余实体仍缺**。新增实体时 SHALL 参照 `MapFieldColumnMapperIT` 补一条 —— 打桩 mapper 的测试不算覆盖。
 8. **代码生成主链路的端到端回归**：当前无测试覆盖「登录 → 建项目 → 导 SQL → init → 构建」全链路（§7.7.3）。2026-10-15 的列映射事故之所以能全绿通过，正是因为这条链路只被 mock 覆盖。
-9. **前端端点覆盖补齐（M5 议程）**：后端 43 个端点中，前端目前只消费约 6 个（`/login/signin`、`/project/list`、`/project/load/code/{code}`、`/displayAttribute/list`、`/account/load`、`/project/job/execute`）。**未接入的高价值端点**：`/framework/list`（建项目第一步选技术栈）、`/project/sql/*` 与 `/project/relationship/*`（代码生成的核心配置流程）。每接一个页面 SHALL 走 `aicode-web/README.md` §「How to wire next endpoint」五步。
+9. **前端端点覆盖补齐（M5 议程）**：后端 43 个端点中，前端目前已消费 **8** 个（`/login/signin`、`/project/list`、`/project/load/code/{code}`、`/displayAttribute/list`、`/account/load`、`/project/job/execute`、`/framework/list`、WebSocket 构建日志）。**未接入的高价值端点**：`/project/sql/*` 与 `/project/relationship/*`（代码生成的核心配置流程）、建项目的写侧端点（`/project/save`、`/project/init` 等）。每接一个页面 SHALL 走 `aicode-web/README.md` §「How to wire next endpoint」五步。
 10. **CI / CD（§11.4）**：当前**无 CI**，M4 后构建链变成「gradle + node」双语言，风险放大。建议 GitHub Actions 至少含：`./aicode/gradlew clean build`（含 `:aicode-web:verifyApi` 契约漂移守卫）、`./aicode/gradlew test`、`cd aicode-web && npm ci && npm test`、`measurement/startup-time.sh` 性能基线。
 
 ---
@@ -583,6 +583,9 @@ opsx 入口（功能等价，运行时暴露哪个就用哪个）：
 - `common` / `facade` 通过 `dependencyManagement { imports { mavenBom 'org.springframework.boot:spring-boot-dependencies:4.1.1' } }` 引入 BOM，因此这两个模块能使用无版本声明的依赖（如 lombok、junit-jupiter）。**三模块 BOM 版本已于 2026-10-15 统一为 4.1.1**（此前 `common`/`facade` 仍是 3.5.16，导致 JUnit 5.12.2 vs 6.0.3、Spring Framework 6.2.19 vs 7.0.9 的分裂）。升级框架时**三个模块须同步修改**。
 - **`commons-io` 必须显式写版本**：Spring Boot 4.1.1 BOM **不管理** `commons-io`，故 `aicode/build.gradle` 中显式声明 `2.20.0`。若删掉该版本号，它会随其他依赖的传递版本无声漂移到未经测试的版本。（原为 2.4 / 2012 年发布 / 有已知 CVE，2026-10-15 升级。）
 - **核实依赖实际生效版本要用 `resolvedArtifacts`，不要只看 `dependencies` 图**：Gradle 的 `dependencies` 报告受依赖管理规则影响，可能显示的是「请求版本」而非实际落地的 artifact。核实命令见 `design.md - D7`。
+- ⚠️ **`contracts/openapi/openapi.yaml` 是非确定性产物（实测，2026-10-16）**：同样代码连跑两次 `OpenApiExportIT`，两次结果**不同** —— springdoc 生成的 schema `properties` 顺序随机（表现为 `totalPage` 等字段在 `PageProjectModulePageVO` / `ProjectFramworkPageVO` 里位置来回翻转，diff 恒为 6 行）。根因：`OpenApiExportIT` 的规范化只做**行级剥离**（servers 块 + 无 schema 的装饰性参数），没有做字段排序。
+  - **后果**：`git diff contracts/openapi/openapi.yaml` 不能直接当语义变化看待；`:aicode-web:verifyApi` 会随机报漂移；本地跑一次全量测试就可能意外改掉入库契约。
+  - **处置**：**SHALL NOT 把这类抖动当成本次变更的产物 commit 进去**（先 `git checkout` 恢复）。根治另开变更 —— 在规范化阶段加「schema `properties` 按字母序排序」，让契约 diff 只反映语义变化。
 - **`.shtml` 后缀由 `ShtmlSuffixRewriteFilter` 提供**：Spring Framework 7 移除了 `PathMatchConfigurer#setUseSuffixPatternMatch`，后缀匹配不再是框架默认行为。前端（Angular 7 + jQuery 打包产物）会为每个 API 请求 URL 追加 `.shtml`，因此**新增 API 前缀时必须同步维护 `ShtmlSuffixRewriteFilter.API_PREFIXES`**。
 - **MockMvc 不会自动注册 Bean 形态的 Filter**：`MockMvcBuilders.webAppContextSetup(wac)` 只装配 `DispatcherServlet`，`.shtml` 相关的测试必须显式 `.addFilters(shtmlSuffixRewriteFilter)`，否则请求会落到静态资源处理器并报 `NoResourceFoundException`。真实运行时由嵌入式容器自动注册，不受影响。
 - **Boot 4 的 Actuator 端点默认 `access=none`**：即使 `management.endpoints.web.exposure.include="*"`，未设 `management.endpoint.<name>.access` 的端点仍返回 **400**。当前已开放 `env` / `shutdown` / `metrics` / `prometheus`。新增端点时记得同步。
@@ -630,11 +633,11 @@ opsx 入口（功能等价，运行时暴露哪个就用哪个）：
   - 契约守护：`TemplateDataExpansionTest` —— 固化「模板变量展开必须用 fastjson2 往返而非 hutool `BeanUtil.beanToMap`」（getter 名 vs 字段名键集差异）
   - **假分页回归防线（M5-C 后新增）**：`ApiContractIT` 场景⑦ 的 `project_list_reflectsPaginationParams` 与 `project_list_fallsBackToDefaultsWhenParamsInvalid` 两用例钉住「`/project/list` 的 `data.curPage` / `data.pageSize` / `data.totalPage` SHALL 回填实际查询参数」。此前 `ProjectController.list` 曾是**假分页**（`lambdaQuery().list()` 拉全量、`curPage` / `pageSize` 入参被忽略、三个分页字段从不 set 恒为 0），已由 `2026-10-18-project-list-real-pagination` 修为真分页。**同类待收敛**：`/account/list` 也只 `setTotalRow` 不设三个分页字段。
   - 外部依赖：`GitToolsCloneCompletenessTest` —— 需网络访问 GitHub，由 `@EnabledIfSystemProperty(named = "network.tests")` 守卫，默认**不执行**；离线 CI 需显式加 `-Dnetwork.tests=true`
-  - **前端（M1–M5 落地，18 文件 / 85 用例，MSW 驱动）**：
+  - **前端（M1–M5 落地，18 文件 / 94 用例，MSW 驱动）**：
     - **响应契约层**：`contract-response/index.test.ts`（6 用例：`R.success` 解构 / `ContractError` 带 code+info / 非 `0000` 视为失败 / 缺省 code → UNKNOWN / message 回退）
-    - **页面层**：`DisplayAttributesPage`（1）/ `LoginPage`（3，含空 token 与 `R.code!=="0000"`）/ `ProjectListPage`（5，含构建按钮展开与 `state!=='Enable'` 禁用）/ `ProjectDetailPage`（4，含裸 VO 触发错误气泡的反向用例）/ `AccountPage`（3）/ `FrameworkListPage`（5，成功渲染含 `isPublic` 中文映射与分页信息 / 空态非错误 / `R.code!=="0000"` / 翻页重拉并替换表格 / 末页禁用且点击不发请求）
+    - **页面层**：`DisplayAttributesPage`（1）/ `LoginPage`（3，含空 token 与 `R.code!=="0000"`）/ `ProjectListPage`（**9**：构建按钮展开与 `state!=='Enable'` 禁用 / 翻页重拉并整页替换 / 末页禁用且点击不发请求 / `buildingCodes` 跨翻页保留 / **翻回不重复调 `execute`**）/ `ProjectDetailPage`（4，含裸 VO 触发错误气泡的反向用例）/ `AccountPage`（3）/ `FrameworkListPage`（5，成功渲染含 `isPublic` 中文映射与分页信息 / 空态非错误 / `R.code!=="0000"` / 翻页重拉并替换表格 / 末页禁用且点击不发请求）
     - **鉴权层**：`token-store`（7）/ `auth-interceptor`（6，含重复安装幂等）/ `use-auth`（5，含多 tab storage 同步）
-    - **实时层**：`ws-client`（7，含 `vi.stubGlobal('WebSocket')` 替身与一次重连）/ `use-build-log`（5）/ `build-log-panel`（3）/ `shtml-suffix`（8，纯函数 + 拦截器 + 幂等）
+    - **实时层**：`ws-client`（7，含 `vi.stubGlobal('WebSocket')` 替身与一次重连）/ `use-build-log`（5）/ `build-log-panel`（**8**，含 `autoStart` / `onMounted` 翻页重挂防护）/ `shtml-suffix`（8，纯函数 + 拦截器 + 幂等）
     - **组件层**：`AppShell`（2，登录态挂 AccountMenu / 未登录不挂）
 - **仍有空白**（详见 §7.10）：`facade` 零测试；Mapper 层 DAO 单测覆盖仍偏薄；**代码生成主链路无端到端回归**（登录 → 建项目 → 导 SQL → init → 构建 全链路仍只被 mock 覆盖）。
 - **已完成**：接口契约回归测试 `ApiContractIT`（59 用例，见 §7.10 第 0 项），已作为 Java 25 / Spring Boot 4.1 升级全程的验收金标准，并在 Boot 4.1.1 上全绿。

@@ -22,6 +22,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 22px;
   padding-block: 16px;
   max-width: var(--container);
   margin-inline: auto;
@@ -49,8 +50,97 @@
   color: var(--muted);
 }
 
+/* 分隔竖线 —— nav 内的图标之间、以及 nav 与账户徽章之间各用一道。
+   作用域挂在 .topnav-inner 上而非 .topnav-icons 上，因为 AccountMenu 之后的
+   那一道在 nav 之外。 */
+.topnav-inner > .divider,
 .topnav-icons .divider {
   width: 1px;
   height: 14px;
   background: var(--border);
+  flex-shrink: 0;
+}
+
+.topnav-icons .ic {
+  width: 18px;
+  height: 18px;
+  display: grid;
+  place-items: center;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  color: inherit;
+  transition: color 0.15s ease;
+}
+
+.topnav-icons .ic:hover:not(:disabled) {
+  color: var(--accent);
+}
+
+.topnav-icons .ic svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* ---------------------------------------------------------------------------
+ * 账户徽章 + 下拉
+ *
+ * ⚠️ 原型的 topnav 里没有账户徽章（它只有 文档/首页/新建/退出 四个图标），
+ * 这是本实现自己的元素。但它**不能**用 .btn-primary —— 那是空心红色描边，
+ * 挂到 topnav 上会让每屏出现第三处红色，破坏原型的「单红预算 ≤2 次」
+ * （topnav 的两处预算已被 红色 logo + 红色 hairline 下沿用掉）。
+ * 故此处用中性描边药丸，与原型的灰色图标语汇一致。
+ * ------------------------------------------------------------------------ */
+.account-menu {
+  position: relative;
+}
+
+.account-badge {
+  padding: 2px 12px;
+  border-radius: 14px;
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  font-size: 13px;
+  transition:
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.account-badge:hover {
+  border-color: var(--fg);
+  color: var(--fg);
+}
+
+.account-dropdown {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  margin-top: 4px;
+  list-style: none;
+  padding: 4px 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  min-width: 8em;
+  z-index: 10;
+}
+
+.account-dropdown li a,
+.account-dropdown li button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 6px 12px;
+  font-size: 13px;
+  color: var(--fg);
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.account-dropdown li a:hover,
+.account-dropdown li button:hover {
+  background: var(--bg);
 }

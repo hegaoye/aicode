@@ -30,40 +30,23 @@ export default function AccountMenu() {
   }
 
   return (
-    <span data-testid="account-menu" style={{ position: 'relative' }}>
+    <span data-testid="account-menu" className="account-menu">
       <button
         type="button"
-        className="btn-primary"
+        className="account-badge"
         data-testid="account-menu-badge"
         onClick={() => setOpen((o) => !o)}
-        style={{ padding: '2px 12px', borderRadius: '14px' }}
       >
         {account ?? '…'}
       </button>
       {open ? (
-        <ul
-          role="menu"
-          style={{
-            position: 'absolute',
-            right: 0,
-            top: '100%',
-            marginTop: '4px',
-            listStyle: 'none',
-            padding: '4px 0',
-            background: 'var(--surface)',
-            border: '1px solid var(--border)',
-            borderRadius: 'var(--radius)',
-            minWidth: '8em',
-            zIndex: 10,
-          }}
-        >
+        <ul role="menu" className="account-dropdown">
           <li>
             <Link
               to="/account/me"
               role="menuitem"
               data-testid="account-menu-detail"
               onClick={() => setOpen(false)}
-              style={{ display: 'block', padding: '6px 12px' }}
             >
               账户详情
             </Link>
@@ -74,15 +57,6 @@ export default function AccountMenu() {
               role="menuitem"
               data-testid="account-menu-signout"
               onClick={handleSignOut}
-              style={{
-                display: 'block',
-                width: '100%',
-                textAlign: 'left',
-                background: 'none',
-                border: 'none',
-                padding: '6px 12px',
-                cursor: 'pointer',
-              }}
             >
               退出
             </button>

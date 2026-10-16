@@ -5,9 +5,9 @@
  * aicode 应用
  * OpenAPI spec version: 1.0
  */
-import type { AccountVO } from './accountVO';
+import type { AccountPublicVO } from './accountPublicVO';
 
-export interface PageVOAccountVO {
+export interface PageVOAccountPublicVO {
   createTimeBegin?: string;
   createTimeEnd?: string;
   updateTimeBegin?: string;
@@ -16,5 +16,5 @@ export interface PageVOAccountVO {
   pageSize?: number;
   totalRow?: number;
   totalPage?: number;
-  records?: AccountVO[];
+  records?: AccountPublicVO[];
 }

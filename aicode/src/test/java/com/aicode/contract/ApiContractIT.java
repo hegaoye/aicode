@@ -1431,4 +1431,170 @@ class ApiContractIT {
             }
         }
     }
+
+    // ==================================================================
+    // 场景⑭：账户列表 SHALL 包入 R、返 AccountPublicVO、回填分页字段、入参可缺省
+    // （2026-10-18-account-list-security-and-pagination 防护）
+    // ==================================================================
+
+    /**
+     * 本组守护 {@code /account/list} 修复前的 4 个缺陷。
+     *
+     * <ol>
+     *   <li><b>安全</b>：响应曾返 {@code PageVOAccountVO}，而 {@code AccountVO} 含
+     *       {@code password}（{@code Md5.md5()} 无盐存储，可离线爆破）—— 测试库里
+     *       就躺着 admin 的真实哈希值。</li>
+     *   <li>返回裸 {@code PageVO}，不在 {@code R} 包络内；</li>
+     *   <li>{@code new Page<>(curPage, pageSize)} 对 {@code Integer null} 自动拆箱 → <b>NPE</b>
+     *       （不带参数访问必然 500）；</li>
+     *   <li>三个分页字段从不 set，恒为 0。</li>
+     * </ol>
+     *
+     * <p>另含 2 条同 Controller 的断言：{@code modify} 的 R 包络、{@code delete}
+     * 的入参（曾因 {@code @Parameter(hidden = true)} 在契约里<b>完全没有参数</b>）。</p>
+     */
+    @Nested
+    @DisplayName("场景⑭ 账户列表包入 R、返 AccountPublicVO（不含 password）、分页字段回填")
+    class AccountListSecurityAndPagination {
+
+        /** `AccountPublicVO` 的 3 字段白名单。 */
+        private static final java.util.Set<String> PUBLIC_VO_FIELDS = java.util.Set.of(
+                "id", "code", "account"
+        );
+
+        @Test
+        @DisplayName("data.records[] SHALL 是 AccountPublicVO 形态，SHALL NOT 含 password")
+        void accountList_records_neverContainPassword() throws Exception {
+            String body = get("/account/list.shtml?curPage=1&pageSize=10", token);
+
+            JsonNode root = PARSER.readTree(body);
+            assertThat(root.path("success").asBoolean())
+                    .as("/account/list SHALL 成功（实际=%s）", root.path("info"))
+                    .isTrue();
+
+            JsonNode data = root.path("data");
+            JsonNode records = data.path("records");
+            assertThat(records.isArray())
+                    .as("data.records SHALL 是数组，实际=%s", records)
+                    .isTrue();
+            // 测试库有 admin / aicode 两个账户种子，这里必须有行可校验
+            assertThat(records.size())
+                    .as("data.records SHALL 非空（db/data.sql 有 2 条账户种子），实际=%s", records)
+                    .isGreaterThan(0);
+
+            for (JsonNode record : records) {
+                java.util.Set<String> actual = fieldNames(record);
+                assertThat(actual)
+                        .as("records 元素 SHALL ⊆ AccountPublicVO 3 字段，实际=%s", actual)
+                        .isSubsetOf(PUBLIC_VO_FIELDS);
+                // 点名断言 —— 凭据泄漏是本组的核心
+                assertThat(actual.contains("password"))
+                        .as("records 元素 SHALL NOT 含 password（MD5 无盐存储，随响应泄漏即可离线"
+                                + "爆破）；实际字段集=%s", actual)
+                        .isFalse();
+            }
+            // 顺带钉住业务字段确实有值 —— 防止为躲泄漏而把响应清空
+            assertThat(records.get(0).path("account").asText())
+                    .as("records[0].account SHALL 非空（admin / aicode），防止为躲泄漏而空响应")
+                    .isNotEmpty();
+        }
+
+        @Test
+        @DisplayName("响应顶层 SHALL ref RPageVOAccountPublicVO，SHALL NOT 裸 PageVO")
+        void accountList_response_isWrappedInR() throws Exception {
+            String yaml = mockMvc.perform(MockMvcRequestBuilders.get("/v3/api-docs.yaml"))
+                    .andReturn().getResponse().getContentAsString(StandardCharsets.UTF_8);
+            int idx = yaml.indexOf("/account/list:");
+            assertThat(idx).as("契约 SHALL 含 /account/list").isNotNegative();
+            String seg = yaml.substring(idx, yaml.indexOf("\n  /", idx + 5));
+
+            assertThat(seg)
+                    .as("/account/list 的响应 SHALL 包入 R（裸 PageVO 会让前端 unwrapSuccess 失效）"
+                            + "，实际片段=%s", seg)
+                    .contains("RPageVOAccountPublicVO");
+            assertThat(seg)
+                    .as("/account/list SHALL NOT 裸返 PageVOAccountVO，实际片段=%s", seg)
+                    .doesNotContain("schemas/PageVOAccountVO\"");
+        }
+
+        @Test
+        @DisplayName("curPage / pageSize 缺省或非法时 SHALL 回退 1 / 10 而非抛 NPE")
+        void accountList_fallsBackToDefaults_insteadOfNpe() throws Exception {
+            // 缺陷 3 的实测依据：Page(long, long) 收 long，传 Integer null 会自动拆箱 NPE
+            //   → java.lang.NullPointerException: Cannot invoke
+            //     "java.lang.Integer.intValue()" because "<local1>" is null
+            // 修复前：GET /account/list（不带参数）必然 500
+            String body = get("/account/list.shtml?curPage=0&pageSize=-1", token);
+
+            JsonNode root = PARSER.readTree(body);
+            assertThat(root.path("success").asBoolean())
+                    .as("非法入参 SHALL NOT 让响应失败（仍 R.success），实际=%s", root.path("info"))
+                    .isTrue();
+
+            JsonNode data = root.path("data");
+            assertThat(data.path("curPage").asInt())
+                    .as("curPage=0 SHALL 回退到 1，实际=%s", data.path("curPage"))
+                    .isEqualTo(1);
+            assertThat(data.path("pageSize").asInt())
+                    .as("pageSize=-1 SHALL 回退到 10，实际=%s", data.path("pageSize"))
+                    .isEqualTo(10);
+        }
+
+        @Test
+        @DisplayName("data.curPage / pageSize / totalPage SHALL 回填真实值")
+        void accountList_reflectsPaginationParams() throws Exception {
+            String body = get("/account/list.shtml?curPage=1&pageSize=10", token);
+
+            JsonNode data = PARSER.readTree(body).path("data");
+            assertThat(data.path("curPage").asInt())
+                    .as("data.curPage SHALL 回填实际查询参数（期望 1），实际=%s", data.path("curPage"))
+                    .isEqualTo(1);
+            assertThat(data.path("pageSize").asInt())
+                    .as("data.pageSize SHALL 回填实际查询参数（期望 10），实际=%s", data.path("pageSize"))
+                    .isEqualTo(10);
+
+            long totalRow = data.path("totalRow").asLong();
+            assertThat(totalRow)
+                    .as("totalRow SHALL 等于账户总数（db/data.sql 有 2 条），实际=%s", totalRow)
+                    .isEqualTo(2);
+            assertThat(data.path("totalPage").asInt())
+                    .as("data.totalPage SHALL 等于 ceil(totalRow/pageSize)=1，SHALL NOT 为 0")
+                    .isEqualTo(1);
+        }
+
+        @Test
+        @DisplayName("PUT /account/modify SHALL ref RBoolean 而非顶层 type: boolean")
+        void accountModify_isWrappedInR() throws Exception {
+            String yaml = mockMvc.perform(MockMvcRequestBuilders.get("/v3/api-docs.yaml"))
+                    .andReturn().getResponse().getContentAsString(StandardCharsets.UTF_8);
+            int idx = yaml.indexOf("/account/modify:");
+            assertThat(idx).as("契约 SHALL 含 /account/modify").isNotNegative();
+            String seg = yaml.substring(idx, yaml.indexOf("\n  /", idx + 5));
+
+            assertThat(seg)
+                    .as("modify 的响应 SHALL ref RBoolean，实际片段=%s", seg)
+                    .contains("RBoolean");
+            assertThat(seg)
+                    .as("modify SHALL NOT 裸返 boolean（裸出参绕过 R 的 code/info/success），"
+                            + "实际片段=%s", seg)
+                    .doesNotContain("type: boolean");
+        }
+
+        @Test
+        @DisplayName("DELETE /account/delete SHALL 在契约中导出参数")
+        void accountDelete_exposesParametersInContract() throws Exception {
+            // 修复前该形参带 @Parameter(hidden = true) → springdoc 忽略整个形参，
+            // 连方法级 @Parameters 块也被盖掉 → 契约里**完全没有参数**，
+            // 前端无从构造删除请求。
+            String yaml = mockMvc.perform(MockMvcRequestBuilders.get("/v3/api-docs.yaml"))
+                    .andReturn().getResponse().getContentAsString(StandardCharsets.UTF_8);
+            int idx = yaml.indexOf("/account/delete:");
+            assertThat(idx).as("契约 SHALL 含 /account/delete").isNotNegative();
+            String seg = yaml.substring(idx, yaml.indexOf("\n  /", idx + 5));
+
+            assertThat(seg)
+                    .as("delete SHALL 导出 parameters（前端需要它构造删除请求），实际片段=%s", seg)
+                    .contains("parameters:");
+        }
+    }
 }

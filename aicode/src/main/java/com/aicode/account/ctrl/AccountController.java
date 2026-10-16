@@ -5,7 +5,6 @@ package com.aicode.account.ctrl;
 
 import com.aicode.account.entity.Account;
 import com.aicode.account.service.AccountService;
-import com.aicode.account.vo.AccountPageVO;
 import com.aicode.account.vo.AccountPublicVO;
 import com.aicode.account.vo.AccountSaveVO;
 import com.aicode.account.vo.AccountVO;
@@ -72,34 +71,51 @@ public class AccountController {
             @Parameter(name = "pageSize", description = "分页大小", required = true),
     })
     @GetMapping(value = "/list")
-    public PageVO<AccountVO> list(Integer curPage, Integer pageSize) {
-        IPage<Account> page = new Page<>(curPage, pageSize);
+    public R<PageVO<AccountPublicVO>> list(Integer curPage, Integer pageSize) {
+        // 入参兜底：与 2026-10-18-project-list-real-pagination 给 /project/list 的
+        // 口径完全一致（两个分页端点行为必须相同，否则前端两个页面行为不同）。
+        // 同时消除拆箱 NPE —— Page(long, long) 收 long，传 Integer null 会 NPE。
+        final int effectiveCurPage = (curPage == null || curPage <= 0) ? 1 : curPage;
+        final int effectivePageSize = (pageSize == null || pageSize <= 0) ? 10 : pageSize;
+        IPage<Account> page = new Page<>(effectiveCurPage, effectivePageSize);
 
         QueryWrapper<Account> queryWrapper = new QueryWrapper<>();
         long total = accountService.count(queryWrapper);
-        PageVO<AccountVO> accountVOPageVO = new PageVO<>();
+        PageVO<AccountPublicVO> accountVOPageVO = new PageVO<>();
+        accountVOPageVO.setCurPage(effectiveCurPage);
+        accountVOPageVO.setPageSize(effectivePageSize);
         if (total > 0) {
             queryWrapper.lambda().orderByDesc(Account::getId);
             IPage<Account> accountPage = accountService.page(page, queryWrapper);
-            List<AccountPageVO> accountPageVOList = JSON.parseArray(JSON.toJSONString(accountPage.getRecords()), AccountPageVO.class);
 
+            // 出参用 AccountPublicVO（3 字段 id / code / account）而非 AccountVO ——
+            // 后者含 password（Md5 无盐存储，可离线爆破），作为列表响应即是凭据泄漏。
+            // 同 Controller 的 loadByCode 已在用 AccountPublicVO，此处复用而非新建。
+            //
+            // 中间不再经 AccountPageVO：它与 AccountVO 字段完全相同（同样含 password），
+            // 这一层转换没裁切任何东西，只是多一次 JSON 往返；且 password 在中间对象
+            // 里存在过。去掉它从结构上消除"将来误复用 AccountPageVO 导致泄漏回归"。
             accountVOPageVO.setTotalRow(accountPage.getTotal());
-            accountVOPageVO.setRecords(JSON.parseArray(JSON.toJSONString(accountPageVOList), AccountVO.class));
+            accountVOPageVO.setRecords(
+                    JSON.parseArray(JSON.toJSONString(accountPage.getRecords()), AccountPublicVO.class));
+            accountVOPageVO.setTotalPage((int) Math.ceil((double) accountPage.getTotal() / effectivePageSize));
             log.debug(JSON.toJSONString(page));
         }
         log.debug("查询账户信息集合-{}", accountVOPageVO);
-        return accountVOPageVO;
+        return R.success(accountVOPageVO);
     }
 
 
     @Operation(summary = "修改Account", description = "修改Account")
     @PutMapping("/modify")
-    public boolean modify(@RequestBody AccountVO accountVO) {
+    public R<Boolean> modify(@RequestBody AccountVO accountVO) {
         Account newAccount = new Account();
         BeanUtils.copyProperties(accountVO, newAccount);
         boolean isUpdated = accountService.update(newAccount, new LambdaQueryWrapper<Account>()
                 .eq(Account::getId, accountVO.getId()));
-        return isUpdated;
+        // R<Boolean> 而非裸 boolean：裸出参绕过 R 的 code/info/success 三元组，
+        // 前端的 unwrapSuccess 无从工作，该端点只能被特殊处理。
+        return R.success(isUpdated);
     }
 
 
@@ -109,7 +125,7 @@ public class AccountController {
             @Parameter(name = "code", description = "账户编码")
     })
     @DeleteMapping("/delete")
-    public R<String> delete(@Parameter(hidden = true) AccountVO _accountVO) {
+    public R<String> delete(AccountVO _accountVO) {
         Account newAccount = new Account();
         BeanUtils.copyProperties(_accountVO, newAccount);
         accountService.remove(new LambdaQueryWrapper<Account>()

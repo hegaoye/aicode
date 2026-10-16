@@ -505,7 +505,7 @@ Project 是聚合根：包含 `ProjectSql`、`ProjectFramwork`、`ProjectMap`、
 7. Mapper 层 `@SpringBootTest` + H2 真实 SQL 验证：`TableMapperIT`（元数据）与 `MapFieldColumnMapperIT`（实体列映射）已落地，**其余实体仍缺**。新增实体时 SHALL 参照 `MapFieldColumnMapperIT` 补一条 —— 打桩 mapper 的测试不算覆盖。
 8. **代码生成主链路的端到端回归**：当前无测试覆盖「登录 → 建项目 → 导 SQL → init → 构建」全链路（§7.7.3）。2026-10-15 的列映射事故之所以能全绿通过，正是因为这条链路只被 mock 覆盖。
 9. **前端端点覆盖补齐（M5 议程）**：后端 43 个端点中，前端目前已消费 **15** 个（`/login/signin`、`/project/list`、`/project/load/code/{code}`、`/displayAttribute/list`、`/account/load`、`/project/job/execute`、`/framework/list`、WebSocket 构建日志、`POST /project/build`、`POST /project/sql/build`、`POST /project/init`、
-  `GET /project/relationship/listMapClassTable`、`GET /project/relationship/listMapFieldColumn`、`POST /project/relationship/build`、`GET /project/relationship/list`、`POST /displayAttribute/save`）。**未接入的高价值端点**：关系删除（`DELETE /project/relationship/delete`）、关系的可视化编辑（当前靠再提交 upsert）。
+  `GET /project/relationship/listMapClassTable`、`GET /project/relationship/listMapFieldColumn`、`POST /project/relationship/build`、`GET /project/relationship/list`、`POST /displayAttribute/save`）。**未接入的高价值端点**：关系删除（`DELETE /project/relationship/delete`）、账户管理（`/account/list` 等 4 个端点**后端契约已修好但前端仍无页面**）、关系的可视化编辑（当前靠再提交 upsert）。
 
 > **流程现状：① 建项目 → ② 导 SQL → ③ 解析 → ④ 配显示属性 → ⑤ 配关联关系 → ⑥ 构建，六步全部可达**（M5 收官）。每接一个页面 SHALL 走 `aicode-web/README.md` §「How to wire next endpoint」五步。
 10. **CI / CD（§11.4）**：当前**无 CI**，M4 后构建链变成「gradle + node」双语言，风险放大。建议 GitHub Actions 至少含：`./aicode/gradlew clean build`（含 `:aicode-web:verifyApi` 契约漂移守卫）、`./aicode/gradlew test`、`cd aicode-web && npm ci && npm test`、`measurement/startup-time.sh` 性能基线。
@@ -624,6 +624,10 @@ opsx 入口（功能等价，运行时暴露哪个就用哪个）：
   2. `PageVO<T> extends BaseVO` 导致**所有分页端点**的 `data` 层都含 4 个 `*Begin/*End` 查询辅助字段（`/project/list`、`/account/list` 等）—— 全仓共性问题，彻底修法（`PageVO` 不继承 `BaseVO` 或给 `BaseVO` 加 `@JsonIgnore`）应另开变更；
   3. **历史泄漏无法追溯** —— 建议运维轮换全部模板仓库的 Git 凭据。
   - 契约层约束见 `openspec/specs/api-data-object/spec.md` 的 Requirement「凭据字段 SHALL NOT 出现在任何接口响应中」；守护测试见 `ApiContractIT` 场景⑩ `FrameworkListNeverLeaksGitPassword`。
+- ⚠️ **账户密码曾随列表响应泄漏到前端（2026-10-18 修复）**：`GET /account/list` 曾返回 `PageVOAccountVO`，而 `AccountVO` 含 `password`（`Md5.md5()` **无盐**存储，见 `LoginCtrl:54`）—— 即**全部账户的密码哈希**随响应流向浏览器 / 代理日志 / 前端生成物。无盐 MD5 可用彩虹表 + GPU 秒级爆破常见口令。由 `2026-10-18-account-list-security-and-pagination` 改返 `R<PageVO<AccountPublicVO>>`（3 字段 `id`/`code`/`account`，复用 M3-D 已建的 `AccountPublicVO`）堵住；守护测试见 `ApiContractIT` 场景⑭ `AccountListSecurityAndPagination`（含「`records[]` SHALL NOT 含 `password`」）。
+  - **这是凭据泄漏的第二次出现**（第一次是 `/framework/list`，M5-A1 修）。两次都出在「实体直接作为列表出参」这一模式上 —— 故 `api-data-object` Req 1 已增补 Scenario「含凭据字段的入参载体 SHALL NOT 兼作出参」，并要求读投影被同一 Controller 的所有出参端点共用（避免改一处漏另一处）。
+  - **⚠️ 运维动作（本次变更无法由代码完成）**：① **轮换全部账户密码** —— 泄漏的 MD5 可能已被前端生成物、Nginx 反向代理访问日志、浏览器历史记下；② 检查并清理代理日志中已落盘的响应体。**存量的已落盘 MD5 无法追溯清理**，只能靠轮换。
+  - `AccountVO` 类**故意保留**：它是 `PUT /account/modify`（改密码）与 `DELETE /account/delete` 的**入参**载体，携带 `password` 是恰当的。契约里 `AccountVO` schema 仍在（作为 requestBody），这**不构成泄漏** —— 入参 schema 只用于客户端构造请求，不含真实凭据值。
 
 ### 11.2 架构演进
 

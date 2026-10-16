@@ -122,7 +122,7 @@ paths:
           content:
             '*/*':
               schema:
-                type: boolean
+                $ref: "#/components/schemas/RBoolean"
       deprecated: true
   /project/sql/modify:
     post:
@@ -1026,7 +1026,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/PageVOAccountVO"
+                $ref: "#/components/schemas/RPageVOAccountPublicVO"
       deprecated: true
   /project/relationship/delete:
     delete:
@@ -1056,6 +1056,12 @@ paths:
       summary: 删除Account
       description: 删除Account
       operationId: delete_3
+      parameters:
+      - name: _accountVO
+        in: query
+        required: true
+        schema:
+          $ref: "#/components/schemas/AccountVO"
       responses:
         "200":
           description: OK
@@ -2557,7 +2563,7 @@ components:
           type: string
         success:
           type: boolean
-    PageVOAccountVO:
+    PageVOAccountPublicVO:
       type: object
       properties:
         createTimeBegin:
@@ -2587,5 +2593,16 @@ components:
         records:
           type: array
           items:
-            $ref: "#/components/schemas/AccountVO"
+            $ref: "#/components/schemas/AccountPublicVO"
+    RPageVOAccountPublicVO:
+      type: object
+      properties:
+        info:
+          type: string
+        data:
+          $ref: "#/components/schemas/PageVOAccountPublicVO"
+        code:
+          type: string
+        success:
+          type: boolean
 

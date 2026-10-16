@@ -19,6 +19,7 @@ import type {
   Build4Params,
   BuildParams,
   Delete2Params,
+  Delete3Params,
   DisplayAttribute,
   ExecuteParams,
   InitParams,
@@ -41,7 +42,6 @@ import type {
   LoadParams,
   MapRelationshipVO,
   Modify4Params,
-  PageVOAccountVO,
   RAccountPublicVO,
   RBoolean,
   RFrameworkSummaryVO,
@@ -52,6 +52,7 @@ import type {
   RObject,
   RPageProjectFramworkPageVO,
   RPageProjectModulePageVO,
+  RPageVOAccountPublicVO,
   RPageVOFrameworkSummaryVO,
   RPageVOProjectSummaryVO,
   RProject,
@@ -203,7 +204,7 @@ const getModify2Url = () => {
  */
 const modify3 = (
     accountVO: AccountVO, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<boolean>> => {
+ ): Promise<AxiosResponse<RBoolean>> => {
     return axiosInstance.put(
       `/account/modify`,
       accountVO,options
@@ -1162,7 +1163,7 @@ const getLoadByCode1Url = (params?: LoadByCode1Params,) => {
  */
 const list6 = (
     params: List6Params, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<PageVOAccountVO>> => {
+ ): Promise<AxiosResponse<RPageVOAccountPublicVO>> => {
     return axiosInstance.get(
       `/account/list`,{
     ...options,
@@ -1214,13 +1215,15 @@ const getDelete2Url = (params: Delete2Params,) => {
  * @summary 删除Account
  */
 const delete3 = (
-     options?: AxiosRequestConfig
+    params: Delete3Params, options?: AxiosRequestConfig
  ): Promise<AxiosResponse<RString>> => {
     return axiosInstance.delete(
-      `/account/delete`,options
+      `/account/delete`,{
+    ...options,
+        params: {...params, ...options?.params},}
     );
   }
-const getDelete3Url = () => {
+const getDelete3Url = (params: Delete3Params,) => {
 
   return axiosInstance.create({
     baseURL: '',
@@ -1228,7 +1231,7 @@ const getDelete3Url = () => {
   }).getUri({
     url: `/account/delete`,
     baseURL: '',
-
+    params,
 
   });
 }
@@ -1410,7 +1413,7 @@ export type UpdateIsPublicResult = AxiosResponse<RFrameworks>
 export type Modify1Result = AxiosResponse<RFrameworks>
 export type ModifyResult = AxiosResponse<RFrameworks>
 export type Modify2Result = AxiosResponse<RBoolean>
-export type Modify3Result = AxiosResponse<boolean>
+export type Modify3Result = AxiosResponse<RBoolean>
 export type Modify4Result = AxiosResponse<RProjectSqlVO>
 export type BuildResult = AxiosResponse<RProjectSqlVO>
 export type Modify5Result = AxiosResponse<RProjectRepositoryAccount>
@@ -1447,7 +1450,7 @@ export type Load6Result = AxiosResponse<RFrameworkSummaryVO>
 export type List4Result = AxiosResponse<RPageVOFrameworkSummaryVO>
 export type List5Result = AxiosResponse<RListMapFieldColumnVO>
 export type LoadByCode1Result = AxiosResponse<RAccountPublicVO>
-export type List6Result = AxiosResponse<PageVOAccountVO>
+export type List6Result = AxiosResponse<RPageVOAccountPublicVO>
 export type Delete2Result = AxiosResponse<RString>
 export type Delete3Result = AxiosResponse<RString>
 export type Modify6Result = AxiosResponse<RProject>

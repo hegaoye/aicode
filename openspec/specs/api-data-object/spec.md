@@ -16,6 +16,8 @@ Controller 层 SHALL 返回 VO 而非持久化实体。实体中的派生字段�
 
 **映射实体（`MapFieldColumn` / `MapRelationship` / `MapClassTable`）同样适用**：这三个实体是代码生成「三层映射」的核心数据结构（AGENTS §5.4），其嵌套关联对象（`displayAttribute` / `mapRelationship` / `associateClass` / `mapFieldColumnList` / `mapRelationshipList`）在列表场景下全是 `null`，进契约只是噪音。
 
+**「出参 VO」与「入参载体」是两种职责，SHALL NOT 混用同一个类**：某个类若同时承担"接收用户提交的含敏感字段的请求"与"作为响应返回"，则敏感字段会随响应泄漏。本仓的实例：`AccountVO` 含 `password`，作为 `PUT /account/modify` 与 `DELETE /account/delete` 的**入参**是恰当的（修改/定位账户确需携带），但作为 `GET /account/list` 的**出参元素**就是凭据泄漏。出参 SHALL 用不含敏感字段的读投影。
+
 具体清单：
 
 - **`ProjectCreateVO`**（`POST /project/build`）：8 字段 —— `code` / `name` / `englishName` / `author` / `basePackage` / `databaseType` / `state` / `createTime`
@@ -24,16 +26,13 @@ Controller 层 SHALL 返回 VO 而非持久化实体。实体中的派生字段�
 - **`MapRelationshipReadVO`**（`GET /project/relationship/list` 与 `listMapFieldColumn`）：11 → **7 字段** —— `code` / `mapClassTableCode` / `associateCode` / `isOneToOne` / `isOneToMany` / `mainField` / `joinField`
 - **`MapClassTableVO`**（`GET /project/relationship/listMapClassTable`）：9 → **6 字段** —— `code` / `tableName` / `className` / `classModel` / `dashedCaseName` / `notes`
 - **`RelationshipFieldsVO`**（`GET /project/relationship/listMapFieldColumn`）：3 字段 —— `mainFields: List<MapFieldColumnReadVO>` / `associateFields: List<MapFieldColumnReadVO>` / `mapRelationship: MapRelationshipReadVO | null`
-
-> **为何新 VO 带 `Read` 后缀而非裁改已有的**：crud 生成器已产出同名的 `MapFieldColumnVO`（13 字段）
-> 与 `MapRelationshipVO`（8 字段），但它们**已被占用** ——
-> `MapFieldColumnVO` 是 `/displayAttribute/list` 的现行出参（`DisplayAttributesPage` 依赖），
-> `MapRelationshipVO` 的 `id` 是 `PUT /modify` 查询必需的入参。裁改二者会破坏既有功能，
-> 故读投影另起 `*ReadVO`，并在类头 Javadoc 写清职责区别。
+- **`AccountPublicVO`**（`GET /account/list` 与 `GET /account/load`）：**3 字段** —— `id` / `code` / `account`，SHALL NOT 含 `password`
 
 > **`MapFieldColumn` 刻意裁掉什么**：嵌套 `displayAttribute`（有专门的 `DisplayAttributesPage` 消费，且 `DisplayAttribute` 本身是 UI 契约、属另一条线）、嵌套 `mapRelationship`、`notes` / `defaultValue` / `sqlType` / `upper`、4 个派生 boolean（`checkDate` / `checkState` / `checkPk` / `oneToOne`…）。保留的 8 个正是「配关联关系 + 展示字段」所需：字段名、字段类型、主键/日期/状态标记。
 >
-> **`MapRelationship` 刻意裁掉什么**：自增主键 `id`、嵌套 `associateClass`（整个实体）、派生 boolean `oneToOne` / `oneToMany`（与 `isOneToOne` / `isOneToMany` 重复 —— 前者是 boolean 字段，后者是 `YNEnum` 字符串化的结果，语义同源）。
+> **`MapRelationship` 刻意裁掉什么**：自增主键 `id`、嵌套 `associateClass`（整个 `MapClassTable` 实体，列表场景必为 `null`）、派生 boolean `oneToOne` / `oneToMany`（与 `isOneToOne` / `isOneToMany` 重复 —— 前者是 boolean 字段，后者是 `YNEnum` 字符串化的结果，语义同源）。
+>
+> **`AccountPublicVO` 为何替代 `AccountVO`**：`password` 按 `Md5.md5()` 无盐存储，可离线爆破。列表场景只需"哪一行、什么账户、什么编码"，携带密码既无用途又是凭据泄漏。
 
 #### Scenario: 列表接口出参为 VO
 
@@ -75,6 +74,13 @@ Controller 层 SHALL 返回 VO 而非持久化实体。实体中的派生字段�
 - **WHEN** 某端点组装的是一个结构化的组合对象（而非单一实体或列表）
 - **THEN** SHALL 新建一个具名 VO 承载该结构，SHALL NOT 以 `R<Object>` / `R<JSONObject>` 出参 —— 后者的契约 `data` 是无约束的 `{}`，前端无法得知内部字段
 - **AND** `GET /project/relationship/listMapFieldColumn` 的 `data` schema SHALL 是 `RelationshipFieldsVO`（3 字段），SHALL NOT 是 `object`
+
+#### Scenario: 含凭据字段的入参载体 SHALL NOT 兼作出参
+
+- **WHEN** 某 VO 含 `password`（或 token、密钥等凭据字段）并被用作请求入参
+- **THEN** 该 VO SHALL NOT 同时出现在任何接口的响应中 —— 否则凭据会随响应流向浏览器、代理日志与前端生成物
+- **AND** 对应的出参 SHALL 改用不含凭据的读投影（本仓为 `AccountPublicVO`）
+- **AND** 该读投影 SHALL 被同一个 Controller 的所有出参端点共用，避免"改了一处漏了另一处"
 
 ### Requirement: VO SHALL NOT 序列化派生字段与嵌套关联对象
 

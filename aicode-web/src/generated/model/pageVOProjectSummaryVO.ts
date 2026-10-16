@@ -8,10 +8,6 @@
 import type { ProjectSummaryVO } from './projectSummaryVO';
 
 export interface PageVOProjectSummaryVO {
-  createTimeBegin?: string;
-  createTimeEnd?: string;
-  updateTimeBegin?: string;
-  updateTimeEnd?: string;
   curPage?: number;
   pageSize?: number;
   totalRow?: number;

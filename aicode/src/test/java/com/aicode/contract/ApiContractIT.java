@@ -1666,4 +1666,98 @@ class ApiContractIT {
                     .contains("parameters:");
         }
     }
+
+    // ==================================================================
+    // 场景⑯：分页容器 SHALL NOT 携带查询辅助字段（2026-10-18-pagevo-drop-basevo-noise）
+    // ==================================================================
+
+    /**
+     * 本组守护 {@code PageVO<T>} 不再继承 {@code BaseVO}。
+     *
+     * <p>{@code BaseVO} 的 4 个字段（{@code createTimeBegin} / {@code createTimeEnd} /
+     * {@code updateTimeBegin} / {@code updateTimeEnd}）语义是「<b>入参</b>：按时间范围过滤」。
+     * 出参容器继承入参基类，就让<b>每个分页响应</b>的 {@code data} 层带 4 个恒 null 的字段 ——
+     * 前端零消费，却固化进了跨语言契约。</p>
+     *
+     * <p>两条断言：① 数据层（实际调用 {@code /project/list}）
+     * ② <b>扫描型</b> —— 遍历契约里每一个 {@code PageVO*} schema。
+     * 只写 ① 的话，新增分页端点会漏；② 一次覆盖全部且将来自动纳入。</p>
+     */
+    @Nested
+    @DisplayName("场景⑯ 分页容器不含 BaseVO 查询辅助字段")
+    class PageVoQueryFieldNoise {
+
+        /** 4 个查询辅助字段名。 */
+        private static final java.util.List<String> QUERY_AUX_FIELDS = java.util.List.of(
+                "createTimeBegin", "createTimeEnd", "updateTimeBegin", "updateTimeEnd"
+        );
+
+        /** PageVO 的 5 个真实字段 —— 顺带防「过度删除」。 */
+        private static final java.util.List<String> PAGE_VO_FIELDS = java.util.List.of(
+                "curPage", "pageSize", "totalRow", "totalPage", "records"
+        );
+
+        @Test
+        @DisplayName("/project/list 的 data SHALL NOT 含 4 个查询辅助字段，且仍含 5 个分页字段")
+        void projectList_data_hasNoQueryAuxFields() throws Exception {
+            String body = get("/project/list.shtml?curPage=1&pageSize=10", token);
+
+            JsonNode data = PARSER.readTree(body).path("data");
+            java.util.Set<String> actual = fieldNames(data);
+
+            for (String aux : QUERY_AUX_FIELDS) {
+                assertThat(actual.contains(aux))
+                        .as("分页响应的 data SHALL NOT 含查询辅助字段 '%s'（BaseVO 的入参字段，"
+                                + "响应里恒为 null）；实际字段集=%s", aux, actual)
+                        .isFalse();
+            }
+            // 防过度删除：真实字段必须还在
+            for (String field : PAGE_VO_FIELDS) {
+                assertThat(actual.contains(field))
+                        .as("data SHALL 仍含分页字段 '%s'（本次只删噪音字段），实际=%s", field, actual)
+                        .isTrue();
+            }
+        }
+
+        @Test
+        @DisplayName("契约里 EVERY PageVO* schema SHALL NOT 含查询辅助字段（覆盖所有分页端点）")
+        void everyPageVoSchema_hasNoQueryAuxFields() throws Exception {
+            String yaml = mockMvc.perform(MockMvcRequestBuilders.get("/v3/api-docs.yaml"))
+                    .andReturn().getResponse().getContentAsString(StandardCharsets.UTF_8);
+
+            // components.schemas 下所有以 PageVO 开头的 schema
+            java.util.regex.Matcher m = java.util.regex.Pattern
+                    .compile("(?m)^    (PageVO[A-Za-z0-9_]*):\s*$")
+                    .matcher(yaml);
+            // ⚠️ 找「下一个 schema 头」必须用**行首锚定的正则**，不能用
+            // indexOf("\n    ")：schema 内部的属性行是 8 空格缩进，而 "\n    "（4 空格）
+            // 是它的前缀 —— indexOf 会匹配到第一个属性行，把片段截断成「只有 schema 名」，
+            // 于是字段检查全部落空、断言**假通过**（实测踩过；同一陷阱在 fieldBlock() 也踩过一次）。
+            java.util.regex.Matcher nextSchema = java.util.regex.Pattern
+                    .compile("(?m)^    [A-Za-z][A-Za-z0-9_]*:\\s*$")
+                    .matcher(yaml);
+            java.util.List<String> offenders = new java.util.ArrayList<>();
+            int checked = 0;
+            while (m.find()) {
+                String name = m.group(1);
+                int from = m.end();
+                int to = nextSchema.find(from) ? nextSchema.start() : yaml.length();
+                String seg = yaml.substring(from, to);
+                checked++;
+                for (String aux : QUERY_AUX_FIELDS) {
+                    if (seg.contains("        " + aux + ":")) {
+                        offenders.add(name + "." + aux);
+                    }
+                }
+            }
+
+            assertThat(checked)
+                    .as("契约 SHALL 至少含一个 PageVO* schema（扫描断言对 0 个对象会假通过）")
+                    .isGreaterThan(0);
+            assertThat(offenders)
+                    .as("下列分页容器 schema 仍带查询辅助字段 —— PageVO 重新继承了 BaseVO 或"
+                            + "某处另建了带该基类的容器")
+                    .isEmpty();
+        }
+    }
 }

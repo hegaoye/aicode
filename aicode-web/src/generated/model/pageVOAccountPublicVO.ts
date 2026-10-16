@@ -8,10 +8,6 @@
 import type { AccountPublicVO } from './accountPublicVO';
 
 export interface PageVOAccountPublicVO {
-  createTimeBegin?: string;
-  createTimeEnd?: string;
-  updateTimeBegin?: string;
-  updateTimeEnd?: string;
   curPage?: number;
   pageSize?: number;
   totalRow?: number;

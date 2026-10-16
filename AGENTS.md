@@ -632,7 +632,7 @@ opsx 入口（功能等价，运行时暴露哪个就用哪个）：
 - **密钥管理**：`JwtToken` 的密钥硬编码，应迁移到外部密钥管理（Vault / KMS / 环境变量）。
 - **⚠️ Git 仓库凭据曾明文泄漏到前端（2026-10-16 部分修复）**：`/framework/list` 与 `/framework/load` 曾把 `Frameworks.password`（模板仓库的 Git 口令）明文写进 HTTP 响应，落到浏览器 devtools / 前端 bundle / 代理日志。由 `2026-10-18-framework-list-vo-contract` 引入 `FrameworkSummaryVO`（7 字段，无 `password`，不继承 `BaseVO`）堵住。**遗留**：
   1. `/framework/modify` 与 `/framework/updateIsPublic` 仍返 `R<Frameworks>` 实体直出，同样泄漏 `password`（无前端消费者，接管理面时须另开变更收敛）；
-  2. `PageVO<T> extends BaseVO` 导致**所有分页端点**的 `data` 层都含 4 个 `*Begin/*End` 查询辅助字段（`/project/list`、`/account/list` 等）—— 全仓共性问题，彻底修法（`PageVO` 不继承 `BaseVO` 或给 `BaseVO` 加 `@JsonIgnore`）应另开变更；
+  2. ~~`PageVO<T> extends BaseVO` 导致所有分页端点的 `data` 层都含 4 个 `*Begin/*End` 查询辅助字段~~ —— **已修复**（`2026-10-18-pagevo-drop-basevo-noise`）：`PageVO` 不再继承 `BaseVO`（该容器对这 4 个字段零引用，删继承零影响），3 个 `PageVO*` schema 从 9 字段降到 5。守护见 `ApiContractIT` 场景⑯（数据层 + **扫描型**：遍历契约里每个 `PageVO*` schema，将来新增分页端点自动纳入）。**入参 `*PageDTO` 仍继承 `BaseVO`** —— 那是时间范围过滤的正当用途；
   3. **历史泄漏无法追溯** —— 建议运维轮换全部模板仓库的 Git 凭据。
   - 契约层约束见 `openspec/specs/api-data-object/spec.md` 的 Requirement「凭据字段 SHALL NOT 出现在任何接口响应中」；守护测试见 `ApiContractIT` 场景⑩ `FrameworkListNeverLeaksGitPassword`。
 - ⚠️ **账户密码曾随列表响应泄漏到前端（2026-10-18 修复）**：`GET /account/list` 曾返回 `PageVOAccountVO`，而 `AccountVO` 含 `password`（`Md5.md5()` **无盐**存储，见 `LoginCtrl:54`）—— 即**全部账户的密码哈希**随响应流向浏览器 / 代理日志 / 前端生成物。无盐 MD5 可用彩虹表 + GPU 秒级爆破常见口令。由 `2026-10-18-account-list-security-and-pagination` 改返 `R<PageVO<AccountPublicVO>>`（3 字段 `id`/`code`/`account`，复用 M3-D 已建的 `AccountPublicVO`）堵住；守护测试见 `ApiContractIT` 场景⑭ `AccountListSecurityAndPagination`（含「`records[]` SHALL NOT 含 `password`」）。
@@ -661,6 +661,7 @@ opsx 入口（功能等价，运行时暴露哪个就用哪个）：
   - 实体映射：`MapFieldColumnMapperIT` —— `@SpringBootTest` + 真实 `schema.sql` + 真实 Mapper，守护 `@TableField` 列映射与 `exist = false`。**打桩 mapper 的测试无法覆盖此属性**（见 §7.1 事故记录）
   - 契约导出：`OpenApiExportIT` —— 导出 `contracts/openapi/openapi.yaml` 并做规范化（剥离 `servers` 块与无 `schema` 的装饰性参数）。**契约因此会在每次测试时被刷新**，入库漂移由 `:aicode-web:verifyApi` 判定
   - 契约守护：`TemplateDataExpansionTest` —— 固化「模板变量展开必须用 fastjson2 往返而非 hutool `BeanUtil.beanToMap`」（getter 名 vs 字段名键集差异）
+  - **分页容器噪音字段防线（2026-10-18 新增）**：`ApiContractIT` 场景⑯ `PageVoQueryFieldNoise` —— 数据层断言（实际调 `/project/list`，`data` 不含 4 个 `*Begin/*End` 且仍含 5 个分页字段，防过度删除）+ **扫描型断言**（遍历契约里每个 `PageVO*` schema，一次覆盖全部分页端点）。⚠️ 扫描断言的写法有坑：**找下一个 schema 头必须用行首锚定正则**，用 `indexOf("\n    ")` 会匹配到 8 空格缩进的属性行、片段被截断、断言**假通过**（实测踩过）。
   - **假分页回归防线（M5-C 后新增）**：`ApiContractIT` 场景⑦ 的 `project_list_reflectsPaginationParams` 与 `project_list_fallsBackToDefaultsWhenParamsInvalid` 两用例钉住「`/project/list` 的 `data.curPage` / `data.pageSize` / `data.totalPage` SHALL 回填实际查询参数」。此前 `ProjectController.list` 曾是**假分页**（`lambdaQuery().list()` 拉全量、`curPage` / `pageSize` 入参被忽略、三个分页字段从不 set 恒为 0），已由 `2026-10-18-project-list-real-pagination` 修为真分页。**同类待收敛**：`/account/list` 也只 `setTotalRow` 不设三个分页字段。
   - 外部依赖：`GitToolsCloneCompletenessTest` —— 需网络访问 GitHub，由 `@EnabledIfSystemProperty(named = "network.tests")` 守卫，默认**不执行**；离线 CI 需显式加 `-Dnetwork.tests=true`
   - **前端（M1–M5 落地，23 文件 / 162 用例，MSW 驱动）**：

@@ -2145,18 +2145,6 @@ components:
     PageVOProjectSummaryVO:
       type: object
       properties:
-        createTimeBegin:
-          type: string
-          format: date-time
-        createTimeEnd:
-          type: string
-          format: date-time
-        updateTimeBegin:
-          type: string
-          format: date-time
-        updateTimeEnd:
-          type: string
-          format: date-time
         curPage:
           type: integer
           format: int32
@@ -2332,18 +2320,6 @@ components:
     PageVOFrameworkSummaryVO:
       type: object
       properties:
-        createTimeBegin:
-          type: string
-          format: date-time
-        createTimeEnd:
-          type: string
-          format: date-time
-        updateTimeBegin:
-          type: string
-          format: date-time
-        updateTimeEnd:
-          type: string
-          format: date-time
         curPage:
           type: integer
           format: int32
@@ -2566,18 +2542,6 @@ components:
     PageVOAccountPublicVO:
       type: object
       properties:
-        createTimeBegin:
-          type: string
-          format: date-time
-        createTimeEnd:
-          type: string
-          format: date-time
-        updateTimeBegin:
-          type: string
-          format: date-time
-        updateTimeEnd:
-          type: string
-          format: date-time
         curPage:
           type: integer
           format: int32

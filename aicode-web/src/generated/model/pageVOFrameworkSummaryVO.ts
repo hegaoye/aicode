@@ -8,10 +8,6 @@
 import type { FrameworkSummaryVO } from './frameworkSummaryVO';
 
 export interface PageVOFrameworkSummaryVO {
-  createTimeBegin?: string;
-  createTimeEnd?: string;
-  updateTimeBegin?: string;
-  updateTimeEnd?: string;
   curPage?: number;
   pageSize?: number;
   totalRow?: number;

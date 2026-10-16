@@ -1781,13 +1781,13 @@ components:
           type: array
           items: {}
         optObject: {}
-        totalPage:
-          type: integer
-          format: int64
         needCountQuery:
           type: boolean
         lastPage:
           type: boolean
+        totalPage:
+          type: integer
+          format: int64
     ProjectModulePageVO:
       type: object
       properties:
@@ -1985,13 +1985,13 @@ components:
           type: array
           items: {}
         optObject: {}
-        totalPage:
-          type: integer
-          format: int64
         needCountQuery:
           type: boolean
         lastPage:
           type: boolean
+        totalPage:
+          type: integer
+          format: int64
     ProjectFramworkPageVO:
       type: object
       properties:

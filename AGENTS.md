@@ -628,6 +628,7 @@ opsx 入口（功能等价，运行时暴露哪个就用哪个）：
   - 实体映射：`MapFieldColumnMapperIT` —— `@SpringBootTest` + 真实 `schema.sql` + 真实 Mapper，守护 `@TableField` 列映射与 `exist = false`。**打桩 mapper 的测试无法覆盖此属性**（见 §7.1 事故记录）
   - 契约导出：`OpenApiExportIT` —— 导出 `contracts/openapi/openapi.yaml` 并做规范化（剥离 `servers` 块与无 `schema` 的装饰性参数）。**契约因此会在每次测试时被刷新**，入库漂移由 `:aicode-web:verifyApi` 判定
   - 契约守护：`TemplateDataExpansionTest` —— 固化「模板变量展开必须用 fastjson2 往返而非 hutool `BeanUtil.beanToMap`」（getter 名 vs 字段名键集差异）
+  - **假分页回归防线（M5-C 后新增）**：`ApiContractIT` 场景⑦ 的 `project_list_reflectsPaginationParams` 与 `project_list_fallsBackToDefaultsWhenParamsInvalid` 两用例钉住「`/project/list` 的 `data.curPage` / `data.pageSize` / `data.totalPage` SHALL 回填实际查询参数」。此前 `ProjectController.list` 曾是**假分页**（`lambdaQuery().list()` 拉全量、`curPage` / `pageSize` 入参被忽略、三个分页字段从不 set 恒为 0），已由 `2026-10-18-project-list-real-pagination` 修为真分页。**同类待收敛**：`/account/list` 也只 `setTotalRow` 不设三个分页字段。
   - 外部依赖：`GitToolsCloneCompletenessTest` —— 需网络访问 GitHub，由 `@EnabledIfSystemProperty(named = "network.tests")` 守卫，默认**不执行**；离线 CI 需显式加 `-Dnetwork.tests=true`
   - **前端（M1–M5 落地，18 文件 / 85 用例，MSW 驱动）**：
     - **响应契约层**：`contract-response/index.test.ts`（6 用例：`R.success` 解构 / `ContractError` 带 code+info / 非 `0000` 视为失败 / 缺省 code → UNKNOWN / message 回退）

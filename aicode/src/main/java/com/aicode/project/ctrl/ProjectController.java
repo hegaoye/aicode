@@ -274,24 +274,42 @@ public class ProjectController {
     })
     @GetMapping(value = "/list")
     public R<PageVO<ProjectSummaryVO>> list(String token, Integer curPage, Integer pageSize) {
+        // 入参兜底：与前端 ProjectListPage 的 PAGE_SIZE=10 对齐；
+        // 缺失或非法（null / 0 / 负数）时回退默认值，见
+        // openspec/specs/api-contract/spec.md 的「分页接口的 PageVO SHALL 回填实际查询参数」。
+        final int effectiveCurPage = (curPage == null || curPage <= 0) ? 1 : curPage;
+        final int effectivePageSize = (pageSize == null || pageSize <= 0) ? 10 : pageSize;
+
         PageVO<ProjectSummaryVO> pageVO = new PageVO<>();
+        pageVO.setCurPage(effectiveCurPage);
+        pageVO.setPageSize(effectivePageSize);
         if (StringUtils.isBlank(token) || "null".equals(token)) {
             return R.success(pageVO);
         }
 
         String accountCode = JwtToken.getTokenValue(token, Constants.AccountCode.val.toString());
-        List<Project> projectList = projectService.lambdaQuery()
-                .eq(Project::getAccountCode, accountCode)
-                .orderByDesc(Project::getCreateTime)
-                .list();
+        QueryWrapper<Project> queryWrapper = new QueryWrapper<>();
+        queryWrapper.lambda().eq(Project::getAccountCode, accountCode);
 
-        List<ProjectSummaryVO> records = new java.util.ArrayList<>(projectList.size());
-        for (Project project : projectList) {
-            records.add(toSummary(project));
+        // 真分页：count() 不带排序（ORDER BY 对 COUNT(*) 无意义），page() 带排序
+        long total = projectService.count(queryWrapper);
+        pageVO.setTotalRow(total);
+        if (total > 0) {
+            // 排序加 id 作为 tiebreaker：createTime 相同时若无稳定序，翻页会出现行重复/遗漏
+            queryWrapper.lambda()
+                    .orderByDesc(Project::getCreateTime)
+                    .orderByDesc(Project::getId);
+
+            IPage<Project> projectPage = projectService
+                    .page(new Page<>(effectiveCurPage, effectivePageSize), queryWrapper);
+
+            List<ProjectSummaryVO> records = new java.util.ArrayList<>(projectPage.getRecords().size());
+            for (Project project : projectPage.getRecords()) {
+                records.add(toSummary(project));
+            }
+            pageVO.setRecords(records);
+            pageVO.setTotalPage((int) Math.ceil((double) total / effectivePageSize));
         }
-
-        pageVO.setTotalRow(projectList.size());
-        pageVO.setRecords(records);
         log.debug(JSON.toJSONString(pageVO));
 
         return R.success(pageVO);

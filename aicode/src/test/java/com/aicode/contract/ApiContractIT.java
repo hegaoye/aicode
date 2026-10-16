@@ -529,6 +529,51 @@ class ApiContractIT {
             // 反向：核心持久化字段 SHALL 存在 —— 防止装配断章。
             assertThat(actual).contains("code", "name", "englishName");
         }
+
+        @Test
+        @DisplayName("data.curPage / pageSize / totalPage SHALL 回填实际查询参数（钉死非假分页）")
+        void project_list_reflectsPaginationParams() throws Exception {
+            // 本组钉住 `2026-10-18-project-list-real-pagination` 修的"假分页"缺陷：
+            // 该缺陷下 list() 忽略 curPage/pageSize 拉全量，且从不 set 三个分页字段
+            // （恒为 int 默认 0），前端算出的翻页边界全部失效。
+            String body = get("/project/list.shtml?curPage=1&pageSize=10", token);
+
+            JsonNode data = PARSER.readTree(body).path("data");
+            assertThat(data.path("curPage").asInt())
+                    .as("data.curPage SHALL 回填实际查询参数（期望 1），实际=%s", data.path("curPage"))
+                    .isEqualTo(1);
+            assertThat(data.path("pageSize").asInt())
+                    .as("data.pageSize SHALL 回填实际查询参数（期望 10），实际=%s", data.path("pageSize"))
+                    .isEqualTo(10);
+
+            long totalRow = data.path("totalRow").asLong();
+            if (totalRow > 0) {
+                int expectedTotalPage = (int) Math.ceil((double) totalRow / 10);
+                assertThat(data.path("totalPage").asInt())
+                        .as("data.totalPage SHALL 等于 ceil(totalRow / pageSize)=%d，SHALL NOT 为 0；"
+                                + "totalRow=%d", expectedTotalPage, totalRow)
+                        .isEqualTo(expectedTotalPage);
+            }
+        }
+
+        @Test
+        @DisplayName("curPage / pageSize 缺省或非法时 SHALL 回退默认值（1 / 10），SHALL NOT 报错")
+        void project_list_fallsBackToDefaultsWhenParamsInvalid() throws Exception {
+            String body = get("/project/list.shtml?curPage=0&pageSize=-1", token);
+
+            JsonNode root = PARSER.readTree(body);
+            assertThat(root.path("success").asBoolean())
+                    .as("非法入参 SHALL NOT 让响应失败（仍 R.success），实际=%s", root)
+                    .isTrue();
+
+            JsonNode data = root.path("data");
+            assertThat(data.path("curPage").asInt())
+                    .as("curPage=0 SHALL 回退到默认 1，实际=%s", data.path("curPage"))
+                    .isEqualTo(1);
+            assertThat(data.path("pageSize").asInt())
+                    .as("pageSize=-1 SHALL 回退到默认 10，实际=%s", data.path("pageSize"))
+                    .isEqualTo(10);
+        }
     }
 
     // ==================================================================

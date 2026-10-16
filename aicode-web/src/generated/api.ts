@@ -41,11 +41,12 @@ import type {
   LoadByCode1Params,
   LoadParams,
   MapRelationshipVO,
+  Modify1Params,
   Modify4Params,
+  ModifyParams,
   RAccountPublicVO,
   RBoolean,
   RFrameworkSummaryVO,
-  RFrameworks,
   RListMapClassTableVO,
   RListMapFieldColumnVO,
   RListMapRelationshipReadVO,
@@ -68,7 +69,9 @@ import type {
   RString,
   RVoid,
   ScanPathParams,
-  SigninParams
+  SigninParams,
+  UpdateIsPublic1Params,
+  UpdateIsPublicParams
 } from './model';
 
 export const getAicodeRESTfulAPIs = (axiosInstance: AxiosInstance = axios) => {
@@ -77,14 +80,16 @@ export const getAicodeRESTfulAPIs = (axiosInstance: AxiosInstance = axios) => {
  * @summary 修改状态
  */
 const updateIsPublic1 = (
-     options?: AxiosRequestConfig
- ): Promise<AxiosResponse<RFrameworks>> => {
+    params: UpdateIsPublic1Params, options?: AxiosRequestConfig
+ ): Promise<AxiosResponse<RFrameworkSummaryVO>> => {
     return axiosInstance.put(
       `/framework/updateIsPublic`,
-      undefined,options
+      undefined,{
+    ...options,
+        params: {...params, ...options?.params},}
     );
   }
-const getUpdateIsPublic1Url = () => {
+const getUpdateIsPublic1Url = (params: UpdateIsPublic1Params,) => {
 
   return axiosInstance.create({
     baseURL: '',
@@ -92,7 +97,7 @@ const getUpdateIsPublic1Url = () => {
   }).getUri({
     url: `/framework/updateIsPublic`,
     baseURL: '',
-
+    params,
 
   });
 }
@@ -102,14 +107,16 @@ const getUpdateIsPublic1Url = () => {
  * @summary 修改状态
  */
 const updateIsPublic = (
-     options?: AxiosRequestConfig
- ): Promise<AxiosResponse<RFrameworks>> => {
+    params: UpdateIsPublicParams, options?: AxiosRequestConfig
+ ): Promise<AxiosResponse<RFrameworkSummaryVO>> => {
     return axiosInstance.post(
       `/framework/updateIsPublic`,
-      undefined,options
+      undefined,{
+    ...options,
+        params: {...params, ...options?.params},}
     );
   }
-const getUpdateIsPublicUrl = () => {
+const getUpdateIsPublicUrl = (params: UpdateIsPublicParams,) => {
 
   return axiosInstance.create({
     baseURL: '',
@@ -117,7 +124,7 @@ const getUpdateIsPublicUrl = () => {
   }).getUri({
     url: `/framework/updateIsPublic`,
     baseURL: '',
-
+    params,
 
   });
 }
@@ -127,14 +134,16 @@ const getUpdateIsPublicUrl = () => {
  * @summary 修改Frameworks
  */
 const modify1 = (
-     options?: AxiosRequestConfig
- ): Promise<AxiosResponse<RFrameworks>> => {
+    params: Modify1Params, options?: AxiosRequestConfig
+ ): Promise<AxiosResponse<RFrameworkSummaryVO>> => {
     return axiosInstance.put(
       `/framework/modify`,
-      undefined,options
+      undefined,{
+    ...options,
+        params: {...params, ...options?.params},}
     );
   }
-const getModify1Url = () => {
+const getModify1Url = (params: Modify1Params,) => {
 
   return axiosInstance.create({
     baseURL: '',
@@ -142,7 +151,7 @@ const getModify1Url = () => {
   }).getUri({
     url: `/framework/modify`,
     baseURL: '',
-
+    params,
 
   });
 }
@@ -152,14 +161,16 @@ const getModify1Url = () => {
  * @summary 修改Frameworks
  */
 const modify = (
-     options?: AxiosRequestConfig
- ): Promise<AxiosResponse<RFrameworks>> => {
+    params: ModifyParams, options?: AxiosRequestConfig
+ ): Promise<AxiosResponse<RFrameworkSummaryVO>> => {
     return axiosInstance.post(
       `/framework/modify`,
-      undefined,options
+      undefined,{
+    ...options,
+        params: {...params, ...options?.params},}
     );
   }
-const getModifyUrl = () => {
+const getModifyUrl = (params: ModifyParams,) => {
 
   return axiosInstance.create({
     baseURL: '',
@@ -167,7 +178,7 @@ const getModifyUrl = () => {
   }).getUri({
     url: `/framework/modify`,
     baseURL: '',
-
+    params,
 
   });
 }
@@ -1408,10 +1419,10 @@ const getModify10Url = () => {
 }
 
 return {updateIsPublic1,updateIsPublic,modify1,modify,modify2,modify3,modify4,build,modify5,build1,build2,build3,init,add,_delete,build4,reg,delete1,build5,build6,build7,load,scanPath,load1,list,listMapFieldColumn,listMapClassTable,load2,list1,load3,loadByCode,list2,execute,load4,list3,downloadFile,load5,signin,load6,list4,list5,loadByCode1,list6,delete2,delete3,modify6,modify8,modify7,modify9,modify12,modify11,modify10,getUpdateIsPublic1Url,getUpdateIsPublicUrl,getModify1Url,getModifyUrl,getModify2Url,getModify3Url,getModify4Url,getBuildUrl,getModify5Url,getBuild1Url,getBuild2Url,getBuild3Url,getInitUrl,getAddUrl,getDeleteUrl,getBuild4Url,getRegUrl,getDelete1Url,getBuild5Url,getBuild6Url,getBuild7Url,getLoadUrl,getScanPathUrl,getLoad1Url,getListUrl,getListMapFieldColumnUrl,getListMapClassTableUrl,getLoad2Url,getList1Url,getLoad3Url,getLoadByCodeUrl,getList2Url,getExecuteUrl,getLoad4Url,getList3Url,getDownloadFileUrl,getLoad5Url,getSigninUrl,getLoad6Url,getList4Url,getList5Url,getLoadByCode1Url,getList6Url,getDelete2Url,getDelete3Url,getModify6Url,getModify8Url,getModify7Url,getModify9Url,getModify12Url,getModify11Url,getModify10Url}};
-export type UpdateIsPublic1Result = AxiosResponse<RFrameworks>
-export type UpdateIsPublicResult = AxiosResponse<RFrameworks>
-export type Modify1Result = AxiosResponse<RFrameworks>
-export type ModifyResult = AxiosResponse<RFrameworks>
+export type UpdateIsPublic1Result = AxiosResponse<RFrameworkSummaryVO>
+export type UpdateIsPublicResult = AxiosResponse<RFrameworkSummaryVO>
+export type Modify1Result = AxiosResponse<RFrameworkSummaryVO>
+export type ModifyResult = AxiosResponse<RFrameworkSummaryVO>
 export type Modify2Result = AxiosResponse<RBoolean>
 export type Modify3Result = AxiosResponse<RBoolean>
 export type Modify4Result = AxiosResponse<RProjectSqlVO>

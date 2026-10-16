@@ -824,6 +824,29 @@ class ApiContractIT {
         return names;
     }
 
+    /**
+     * 从导出契约里切出一个组件 schema（{@code components.schemas.<name>}）的完整片段。
+     *
+     * <p><b>⚠️ 找「下一个 schema 头」必须用行首锚定的正则</b>，不能用
+     * {@code indexOf("\n    ")} 或 {@code indexOf("\n    [A-Z]")}：schema 内部的属性行是
+     * <b>8 空格</b>缩进，而 4 / 5 空格的字符串是它的<b>前缀</b> —— {@code indexOf} 会匹配到
+     * 第一个属性行、把片段截断成「只有 schema 名」，于是字段检查全部落空、断言
+     * <b>假通过</b>。</p>
+     *
+     * <p>该陷阱在本文件被踩过<b>三次</b>（fieldBlock / 场景⑯ 扫描断言 / 场景⑰），
+     * 故统一收敛到本方法，SHALL NOT 再在别处手写。</p>
+     */
+    private static String schemaBlock(String yaml, String schemaName) {
+        int i = yaml.indexOf("\n    " + schemaName + ":");
+        assertThat(i).as("契约 SHALL 含 schema %s", schemaName).isNotNegative();
+        int from = i + 1;
+        java.util.regex.Matcher next = java.util.regex.Pattern
+                .compile("(?m)^    [A-Z][A-Za-z0-9_]*:\s*$")
+                .matcher(yaml);
+        int to = next.find(from) ? next.start() : yaml.length();
+        return yaml.substring(from, to);
+    }
+
     private String get(String path, String jwt) throws Exception {
         return mockMvc.perform(
                         MockMvcRequestBuilders.get(path)
@@ -1758,6 +1781,114 @@ class ApiContractIT {
                     .as("下列分页容器 schema 仍带查询辅助字段 —— PageVO 重新继承了 BaseVO 或"
                             + "某处另建了带该基类的容器")
                     .isEmpty();
+        }
+    }
+
+    // ==================================================================
+    // 场景⑰：框架写侧端点 SHALL 返读投影且契约 SHALL 导出参数
+    // （2026-10-18-framework-write-endpoints 防护）
+    // ==================================================================
+
+    /**
+     * 本组守护 {@code /framework/modify} 与 {@code /framework/updateIsPublic}。
+     *
+     * <p><b>改造前它们是一对契约里的定时炸弹</b>：出参 {@code R<Frameworks>}（裸实体，
+     * 含 {@code password} —— 模板仓库的 Git 口令）+ 形参 {@code @Parameter(hidden = true)}
+     * 导致契约里完全无参数。当时无活跃消费者（{@code FrameworkListPage} 只读），
+     * 但任何人接框架管理面、用 orval 生成的函数提交，就把 Git 密码写进响应。</p>
+     *
+     * <p>两条断言：① 凭据 —— 响应 schema SHALL 是 {@code FrameworkSummaryVO}（与
+     * {@code /framework/list} 同一个）且不含 {@code password}；② 参数 —— SHALL 导出
+     * <b>扁平的</b>业务参数（与运行时一致），而非「一个叫 {@code frameworks} 的对象」。</p>
+     */
+    @Nested
+    @DisplayName("场景⑰ 框架写侧端点返 FrameworkSummaryVO 且契约导出扁平参数")
+    class FrameworkWriteEndpoints {
+
+        private static final String FRAMEWORK_CODE = "1882812765213425664";
+
+        private String endpointSeg(String path) throws Exception {
+            String yaml = mockMvc.perform(MockMvcRequestBuilders.get("/v3/api-docs.yaml"))
+                    .andReturn().getResponse().getContentAsString(StandardCharsets.UTF_8);
+            int idx = yaml.indexOf(path);
+            assertThat(idx).as("契约 SHALL 含 %s 端点", path).isNotNegative();
+            return yaml.substring(idx, yaml.indexOf("\n  /", idx + 5));
+        }
+
+        @Test
+        @DisplayName("modify / updateIsPublic SHALL ref RFrameworkSummaryVO，SHALL NOT 含 password")
+        void writeEndpoints_returnSummaryVoNotEntity() throws Exception {
+            for (String path : java.util.List.of("/framework/modify:", "/framework/updateIsPublic:")) {
+                String seg = endpointSeg(path);
+
+                assertThat(seg)
+                        .as("%s 的响应 SHALL ref RFrameworkSummaryVO（与 /framework/list 同一个读投影）"
+                                + "，SHALL NOT ref RFrameworks 实体 —— 实体含 password", path)
+                        .contains("RFrameworkSummaryVO");
+                assertThat(seg)
+                        .as("%s SHALL NOT ref 裸实体 RFrameworks，实际片段=%s", path, seg)
+                        .doesNotContain("RFrameworks\"");
+            }
+            // 读投影本身不含 password —— 三处共用同一个 schema，堵一处即堵全部
+            String yaml = mockMvc.perform(MockMvcRequestBuilders.get("/v3/api-docs.yaml"))
+                    .andReturn().getResponse().getContentAsString(StandardCharsets.UTF_8);
+            String voSeg = schemaBlock(yaml, "FrameworkSummaryVO");
+            assertThat(voSeg)
+                    .as("FrameworkSummaryVO SHALL NOT 含 password（模板仓库 Git 口令），实际=%s", voSeg)
+                    .doesNotContain("password:");
+        }
+
+        @Test
+        @DisplayName("两个端点的 EVERY operation SHALL 导出扁平业务参数")
+        void writeEndpoints_exposeFlatParameters() throws Exception {
+            // 去掉 @Parameter(hidden=true) 后，springdoc 对**实体形参**会把整个实体导出为
+            // 一个 query 参数（`?frameworks=<object>`），而运行时是按字段名绑定
+            // （`?code=xxx&isPublic=Y`）—— 契约与运行时不一致，前端照契约实现会失败。
+            // 实测 @ModelAttribute 也无效，故改为显式 @RequestParam 形参。
+            //
+            // ⚠️ **必须逐 operation 检查**：一个 `@RequestMapping(method={PUT,POST})`
+            // 会在契约里生成 **put 与 post 两个 operation 共用同一个 path key**；
+            // 只扫整个 path 片段的话，任意一个 method 有参数就会让断言通过 ——
+            // 实测踩过：给形参加回 hidden 后 PUT 段无参数、POST 段仍从块继承，
+            // 断言假通过。故这里逐 method 切片。
+            for (String path : java.util.List.of("/framework/modify:", "/framework/updateIsPublic:")) {
+                String seg = endpointSeg(path);
+                java.util.List<String> verbs = java.util.regex.Pattern
+                        .compile("(?m)^    (get|put|post|delete):\\s*$")
+                        .matcher(seg).results().map(r -> r.group(1)).toList();
+                assertThat(verbs)
+                        .as("%s 至少应有一个 operation（否则断言会假通过）", path)
+                        .isNotEmpty();
+
+                for (String verb : verbs) {
+                    int v = seg.indexOf("\n    " + verb + ":");
+                    java.util.regex.Matcher nextOp = java.util.regex.Pattern
+                            .compile("(?m)^    (get|put|post|delete):\\s*$")
+                            .matcher(seg);
+                    int end = nextOp.find(v + 5) ? nextOp.start() : seg.length();
+                    String opSeg = seg.substring(v, end);
+                    int ps = opSeg.indexOf("parameters:");
+                    int pe = opSeg.indexOf("      responses:");
+                    java.util.Set<String> names = new java.util.HashSet<>();
+                    if (ps > 0 && pe > ps) {
+                        java.util.regex.Matcher m = java.util.regex.Pattern
+                                .compile("- name: (\\w+)").matcher(opSeg.substring(ps, pe));
+                        while (m.find()) {
+                            names.add(m.group(1));
+                        }
+                    }
+                    assertThat(names)
+                            .as("%s 的 %s operation SHALL 导出扁平业务参数 code，"
+                                    + "SHALL NOT 无参数（形参被 @Parameter(hidden=true) 抹掉）"
+                                    + "，SHALL NOT 是单个 'frameworks' 对象参数"
+                                    + "（springdoc 对实体形参会如此导出，而运行时按字段名绑定）",
+                                    path, verb)
+                            .contains("code");
+                    assertThat(names)
+                            .as("%s 的 %s operation SHALL NOT 把整个实体导出为单对象参数", path, verb)
+                            .doesNotContain("frameworks");
+                }
+            }
         }
     }
 }

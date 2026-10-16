@@ -603,6 +603,14 @@ opsx 入口（功能等价，运行时暴露哪个就用哪个）：
   - **两条处方**：写 spec 时凡涉及"支持某 N 类"，SHALL 同时规定**与上游枚举的对齐关系**；测分发/映射类逻辑时 SHALL 至少有一条**拿上游枚举全集做集合比较**的用例（列出未命中项并写死计数），单点断言发现不了系统性偏差。
 - ⚠️ **Java 注解属性只接受编译期常量 —— `static final String[]` 也不行（实测，2026-10-18）**：`@Schema(allowableValues = SomeEnum.ALLOWED_VALUES)` 编译失败（`incompatible types: String[] cannot be converted to String`），因为**数组引用不是常量表达式**。想在契约里表达枚举值域，只能在注解处**手写字面量**，漂移风险须由契约测试的「enum 集合 == 枚举类 values()」断言兜住。
   - **连带的好消息**：orval 会把 `allowableValues` 生成为 **`as const` 对象**，前端可直接 `Object.values()` 取全集 —— 契约是唯一真源，前端不必再写副本。
+- ⚠️ **断言"契约里某段结构"时，扫描范围 SHALL 精确到最小单元（实测，2026-10-18，三次踩坑）**：在 `ApiContractIT` 里读 `openapi.yaml` 的片段时，我先后用 `indexOf("\n    ")`、`indexOf("\n    [A-Z]")`、扫整个 path 片段三种方式找边界，**每次都静默失真**：
+  | 写法 | 实际后果 |
+  |---|---|
+  | `indexOf("\n    ")` | 匹配到 **8 空格**缩进的属性行（4 空格是它的前缀），片段被截断成「只有 schema 名」，字段检查全部落空 → 断言**假通过** |
+  | `indexOf("\n    [A-Z]")` | 同上（5 空格同样是 8 空格的前缀） |
+  | 扫整个 path 片段 | 单个 `@RequestMapping(method={PUT,POST})` 会生成 **put 与 post 两个 operation 共用一个 path key**；只要任一 method 有参数断言就通过 |
+  - **处方**：① 找边界一律用**行首锚定正则** `(?m)^    [A-Z]\w*:\s*$`（本文件已统一收敛到 `schemaBlock(...)` helper）；② 含多 operation 的端点 SHALL **逐 operation** 切片检查；③ 任何此类断言 SHALL 做**反向验证**证明它真能抓到。
+- ⚠️ **显式 `@RequestParam` 会覆盖 `@Parameter(hidden = true)`（实测，2026-10-18）**：形参同时标两者时，springdoc **仍导出**该参数。即「去掉 hidden」不是唯一解 —— 改用显式形参更稳健，且顺带修正了「实体形参被导出为单个 query 对象、与运行时按字段名绑定不一致」的问题。
 - ⚠️ **列表页/容器的「异步任务进行态」SHALL 有 spec 覆盖 —— 尤其**释放**路径（实测，2026-10-18）**：`ProjectListPage` 的 `buildingCodes: Set<string>` 曾**只有加入、没有移除** —— 点「构建」后该行**永久**卡在「构建中…」禁用态，唯一恢复方式是**刷新页面**。而代码生成的核心工作流恰恰是「改 SQL → 重新解析 → 重新构建 → 不满意 → 再改」，即**反复构建到成功**，所以这个缺陷等于"构建一次该行就报废"。
   - **根因不是漏写代码，而是 `buildingCodes` 从未被 spec 覆盖** —— grep `openspec/specs/` 全无该状态机。**易漏的恰是这类"跨渲染的状态机"的释放路径**：进入路径（点按钮触发）直观、会被发现；释放路径（异步结束后谁来清）不写代码就没人意识到它不存在。
   - **处方**：给任何"异步任务 + UI 状态"的组合 SHALL 显式写出**进入**与**释放**两条路径的 spec；测试 SHALL 覆盖释放路径。
@@ -631,7 +639,7 @@ opsx 入口（功能等价，运行时暴露哪个就用哪个）：
 - **H2 控制台暴露**：`/h2` 默认对外可访问，应通过 profile 或配置项在生产环境关闭（详见 §6.13）。
 - **密钥管理**：`JwtToken` 的密钥硬编码，应迁移到外部密钥管理（Vault / KMS / 环境变量）。
 - **⚠️ Git 仓库凭据曾明文泄漏到前端（2026-10-16 部分修复）**：`/framework/list` 与 `/framework/load` 曾把 `Frameworks.password`（模板仓库的 Git 口令）明文写进 HTTP 响应，落到浏览器 devtools / 前端 bundle / 代理日志。由 `2026-10-18-framework-list-vo-contract` 引入 `FrameworkSummaryVO`（7 字段，无 `password`，不继承 `BaseVO`）堵住。**遗留**：
-  1. `/framework/modify` 与 `/framework/updateIsPublic` 仍返 `R<Frameworks>` 实体直出，同样泄漏 `password`（无前端消费者，接管理面时须另开变更收敛）；
+  1. ~~`/framework/modify` 与 `/framework/updateIsPublic` 仍返 `R<Frameworks>` 实体直出~~ —— **已修复**（`2026-10-18-framework-write-endpoints`）：两者改返 `FrameworkSummaryVO`（与 `/framework/list` 同一读投影），并把实体形参改为**显式 `@RequestParam`**。⚠️ 去 `hidden` 不足以让契约正确 —— springdoc 对**实体形参**会把整个实体导出为**单个** query 参数（`?frameworks=<对象>`），而运行时是按字段名绑定（`?code=xxx&isPublic=Y`），**契约与运行时不一致、前端照契约实现会失败**。实测 `@ModelAttribute` 也无效，只有显式形参才对。守护见 `ApiContractIT` 场景⑰。
   2. ~~`PageVO<T> extends BaseVO` 导致所有分页端点的 `data` 层都含 4 个 `*Begin/*End` 查询辅助字段~~ —— **已修复**（`2026-10-18-pagevo-drop-basevo-noise`）：`PageVO` 不再继承 `BaseVO`（该容器对这 4 个字段零引用，删继承零影响），3 个 `PageVO*` schema 从 9 字段降到 5。守护见 `ApiContractIT` 场景⑯（数据层 + **扫描型**：遍历契约里每个 `PageVO*` schema，将来新增分页端点自动纳入）。**入参 `*PageDTO` 仍继承 `BaseVO`** —— 那是时间范围过滤的正当用途；
   3. **历史泄漏无法追溯** —— 建议运维轮换全部模板仓库的 Git 凭据。
   - 契约层约束见 `openspec/specs/api-data-object/spec.md` 的 Requirement「凭据字段 SHALL NOT 出现在任何接口响应中」；守护测试见 `ApiContractIT` 场景⑩ `FrameworkListNeverLeaksGitPassword`。
@@ -661,6 +669,7 @@ opsx 入口（功能等价，运行时暴露哪个就用哪个）：
   - 实体映射：`MapFieldColumnMapperIT` —— `@SpringBootTest` + 真实 `schema.sql` + 真实 Mapper，守护 `@TableField` 列映射与 `exist = false`。**打桩 mapper 的测试无法覆盖此属性**（见 §7.1 事故记录）
   - 契约导出：`OpenApiExportIT` —— 导出 `contracts/openapi/openapi.yaml` 并做规范化（剥离 `servers` 块与无 `schema` 的装饰性参数）。**契约因此会在每次测试时被刷新**，入库漂移由 `:aicode-web:verifyApi` 判定
   - 契约守护：`TemplateDataExpansionTest` —— 固化「模板变量展开必须用 fastjson2 往返而非 hutool `BeanUtil.beanToMap`」（getter 名 vs 字段名键集差异）
+    - **框架写侧端点防线（2026-10-18 新增）**：`ApiContractIT` 场景⑰ `FrameworkWriteEndpoints` —— ① `modify` / `updateIsPublic` 的响应 schema SHALL ref `FrameworkSummaryVO` 且 SHALL NOT ref 裸 `RFrameworks`；`FrameworkSummaryVO` 本身 SHALL NOT 含 `password` ② 两者**每个 operation**（PUT 与 POST 是两个 operation 共用一个 path key）SHALL 导出**扁平**参数 `code`，SHALL NOT 无参数、SHALL NOT 是单个 `frameworks` 对象参数。
   - **分页容器噪音字段防线（2026-10-18 新增）**：`ApiContractIT` 场景⑯ `PageVoQueryFieldNoise` —— 数据层断言（实际调 `/project/list`，`data` 不含 4 个 `*Begin/*End` 且仍含 5 个分页字段，防过度删除）+ **扫描型断言**（遍历契约里每个 `PageVO*` schema，一次覆盖全部分页端点）。⚠️ 扫描断言的写法有坑：**找下一个 schema 头必须用行首锚定正则**，用 `indexOf("\n    ")` 会匹配到 8 空格缩进的属性行、片段被截断、断言**假通过**（实测踩过）。
   - **假分页回归防线（M5-C 后新增）**：`ApiContractIT` 场景⑦ 的 `project_list_reflectsPaginationParams` 与 `project_list_fallsBackToDefaultsWhenParamsInvalid` 两用例钉住「`/project/list` 的 `data.curPage` / `data.pageSize` / `data.totalPage` SHALL 回填实际查询参数」。此前 `ProjectController.list` 曾是**假分页**（`lambdaQuery().list()` 拉全量、`curPage` / `pageSize` 入参被忽略、三个分页字段从不 set 恒为 0），已由 `2026-10-18-project-list-real-pagination` 修为真分页。**同类待收敛**：`/account/list` 也只 `setTotalRow` 不设三个分页字段。
   - 外部依赖：`GitToolsCloneCompletenessTest` —— 需网络访问 GitHub，由 `@EnabledIfSystemProperty(named = "network.tests")` 守卫，默认**不执行**；离线 CI 需显式加 `-Dnetwork.tests=true`

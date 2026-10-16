@@ -134,10 +134,32 @@ public class FrameworksController {
 
     @Operation(summary = "修改Frameworks", description = "修改Frameworks")
     @RequestMapping(value = "/modify", method = {RequestMethod.PUT, RequestMethod.POST})
-    public R<Frameworks> modify(@Parameter(hidden = true) Frameworks frameworks) {
+    public R<FrameworkSummaryVO> modify(@RequestParam String code,
+                                        @RequestParam(required = false) String name,
+                                        @RequestParam(required = false) String description,
+                                        @RequestParam(required = false) String gitHome,
+                                        @RequestParam(required = false) String account,
+                                        @RequestParam(required = false) String password,
+                                        @RequestParam(required = false) String isPublic) {
+        Frameworks frameworks = new Frameworks();
+        frameworks.setCode(code);
+        frameworks.setName(name);
+        frameworks.setDescription(description);
+        frameworks.setGitHome(gitHome);
+        frameworks.setAccount(account);
+        frameworks.setPassword(password);
+        frameworks.setIsPublic(isPublic);
         frameworksService.update(frameworks, new LambdaQueryWrapper<Frameworks>()
-                .eq(Frameworks::getCode, frameworks.getCode()));
-        return R.success(frameworks);
+                .eq(Frameworks::getCode, code));
+        // 出参用 FrameworkSummaryVO 而非 Frameworks 实体 —— 后者含 `password`
+        // （模板仓库的 Git 口令），直出即凭据泄漏。同一 Controller 的所有出参端点
+        // 共用一个不含凭据的读投影（/framework/list 已在用）。
+        // 见 openspec/specs/api-data-object/spec.md「凭据字段 SHALL NOT 出现在任何接口响应中」。
+        //
+        // ⚠️ 必须**按 code 重查**而非直接返回入参实体：入参只带客户端提交的字段
+        // （如 password 未传时为 null），返回它会让响应不完整、且可能把未提交的
+        // 字段误当作已存值。
+        return R.success(toSummary(reload(code)));
     }
 
 
@@ -147,13 +169,30 @@ public class FrameworksController {
             @Parameter(name = "isPublic", description = "状态：停用[N]，启用[Y]")
     })
     @RequestMapping(value = "/updateIsPublic", method = {RequestMethod.PUT, RequestMethod.POST})
-    public R<Frameworks> updateIsPublic(@Parameter(hidden = true) Frameworks frameworks) {
-        Assert.hasText(frameworks.getCode(), BaseException.BaseExceptionEnum.Empty_Param.toString());
-        Assert.hasText(frameworks.getIsPublic(), BaseException.BaseExceptionEnum.Empty_Param.toString());
+    public R<FrameworkSummaryVO> updateIsPublic(@RequestParam String code,
+                                                 @RequestParam String isPublic) {
+        Assert.hasText(code, BaseException.BaseExceptionEnum.Empty_Param.toString());
+        Assert.hasText(isPublic, BaseException.BaseExceptionEnum.Empty_Param.toString());
 
+        Frameworks frameworks = new Frameworks();
+        frameworks.setCode(code);
+        frameworks.setIsPublic(isPublic);
         frameworksService.update(frameworks, new LambdaQueryWrapper<Frameworks>()
-                .eq(Frameworks::getCode, frameworks.getCode()));
-        return R.success(frameworks);
+                .eq(Frameworks::getCode, code));
+        return R.success(toSummary(reload(code)));
+    }
+
+    /**
+     * 按 code 重查框架 —— 写侧端点在更新后用它取**持久化后的真实状态**。
+     *
+     * <p>查不到时返回空 VO 而非 null：写侧响应 SHALL 是对象，
+     * 否则前端 `unwrapSuccess` 拿到 null 会走「业务空态」分支，
+     * 无法区分"写入成功但记录已删"与"写入成功"。</p>
+     */
+    private Frameworks reload(String code) {
+        Frameworks loaded = frameworksService.getOne(new LambdaQueryWrapper<Frameworks>()
+                .eq(Frameworks::getCode, code));
+        return loaded == null ? new Frameworks() : loaded;
     }
 
 

@@ -36,26 +36,52 @@ paths:
       summary: 修改状态
       description: 修改状态
       operationId: updateIsPublic_1
+      parameters:
+      - name: code
+        in: query
+        description: 模板编码
+        required: true
+        schema:
+          type: string
+      - name: isPublic
+        in: query
+        description: "状态：停用[N]，启用[Y]"
+        required: true
+        schema:
+          type: string
       responses:
         "200":
           description: OK
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/RFrameworks"
+                $ref: "#/components/schemas/RFrameworkSummaryVO"
     post:
       tags:
       - 框架技术池控制器
       summary: 修改状态
       description: 修改状态
       operationId: updateIsPublic
+      parameters:
+      - name: code
+        in: query
+        description: 模板编码
+        required: true
+        schema:
+          type: string
+      - name: isPublic
+        in: query
+        description: "状态：停用[N]，启用[Y]"
+        required: true
+        schema:
+          type: string
       responses:
         "200":
           description: OK
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/RFrameworks"
+                $ref: "#/components/schemas/RFrameworkSummaryVO"
   /framework/modify:
     put:
       tags:
@@ -63,26 +89,98 @@ paths:
       summary: 修改Frameworks
       description: 修改Frameworks
       operationId: modify_1
+      parameters:
+      - name: code
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: name
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: description
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: gitHome
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: account
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: password
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: isPublic
+        in: query
+        required: false
+        schema:
+          type: string
       responses:
         "200":
           description: OK
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/RFrameworks"
+                $ref: "#/components/schemas/RFrameworkSummaryVO"
     post:
       tags:
       - 框架技术池控制器
       summary: 修改Frameworks
       description: 修改Frameworks
       operationId: modify
+      parameters:
+      - name: code
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: name
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: description
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: gitHome
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: account
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: password
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: isPublic
+        in: query
+        required: false
+        schema:
+          type: string
       responses:
         "200":
           description: OK
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/RFrameworks"
+                $ref: "#/components/schemas/RFrameworkSummaryVO"
   /project/relationship/modify:
     put:
       tags:
@@ -1164,41 +1262,38 @@ paths:
                 $ref: "#/components/schemas/RProject"
 components:
   schemas:
-    Frameworks:
+    FrameworkSummaryVO:
       type: object
       properties:
         id:
           type: integer
           format: int64
-          description: 数据库字段:id id
+          description: id
         code:
           type: string
-          description: 数据库字段:code 技术编码
+          description: 技术编码
         name:
           type: string
-          description: 数据库字段:name 技术名称
+          description: 技术名称
         description:
           type: string
-          description: 数据库字段:description 技术描述
+          description: 技术描述
         gitHome:
           type: string
-          description: '数据库字段:gitHome '
+          description: 模板仓库地址
         account:
           type: string
-          description: '数据库字段:account '
-        password:
-          type: string
-          description: '数据库字段:password '
+          description: 模板仓库账号
         isPublic:
           type: string
-          description: '数据库字段:isPublic '
-    RFrameworks:
+          description: 是否公开
+    RFrameworkSummaryVO:
       type: object
       properties:
         info:
           type: string
         data:
-          $ref: "#/components/schemas/Frameworks"
+          $ref: "#/components/schemas/FrameworkSummaryVO"
         code:
           type: string
         success:
@@ -1788,6 +1883,34 @@ components:
           type: string
         success:
           type: boolean
+    Frameworks:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: 数据库字段:id id
+        code:
+          type: string
+          description: 数据库字段:code 技术编码
+        name:
+          type: string
+          description: 数据库字段:name 技术名称
+        description:
+          type: string
+          description: 数据库字段:description 技术描述
+        gitHome:
+          type: string
+          description: '数据库字段:gitHome '
+        account:
+          type: string
+          description: '数据库字段:account '
+        password:
+          type: string
+          description: '数据库字段:password '
+        isPublic:
+          type: string
+          description: '数据库字段:isPublic '
     MapClassTable:
       type: object
       properties:
@@ -2277,42 +2400,6 @@ components:
           type: string
         data:
           $ref: "#/components/schemas/PageProjectFramworkPageVO"
-        code:
-          type: string
-        success:
-          type: boolean
-    FrameworkSummaryVO:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int64
-          description: id
-        code:
-          type: string
-          description: 技术编码
-        name:
-          type: string
-          description: 技术名称
-        description:
-          type: string
-          description: 技术描述
-        gitHome:
-          type: string
-          description: 模板仓库地址
-        account:
-          type: string
-          description: 模板仓库账号
-        isPublic:
-          type: string
-          description: 是否公开
-    RFrameworkSummaryVO:
-      type: object
-      properties:
-        info:
-          type: string
-        data:
-          $ref: "#/components/schemas/FrameworkSummaryVO"
         code:
           type: string
         success:

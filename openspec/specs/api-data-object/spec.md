@@ -210,9 +210,21 @@ SHALL 完整出现在对应 VO 中 —— 它们是**元驱动表单的 UI 契�
 
 ### Requirement: 凭据字段 SHALL NOT 出现在任何接口响应中
 
-凡持久化实体（Entity / PO）中的**凭据类字段**——口令散列、Git 仓库密码、访问令牌——SHALL NOT 被序列化进任何接口响应；出参视图对象（VO）SHALL NOT 声明此类字段。本约束**跨领域适用**，不限账户域：任何领域的实体若含凭据列，其 VO 投影 SHALL 一并剔除。
+任何接口的响应 SHALL NOT 包含凭据字段（如密码、Git 仓库口令、密钥、token）。
 
-> 该约束由 M3-D 在 `AccountVO.password` 上的单点防护上升为通用约束，M5-A1 在 `Frameworks.password`（Git 仓库密码）上第二次落地。
+具体到 `Frameworks` 实体：`password`（模板仓库的 Git 口令）SHALL NOT 出现在任何响应中。
+`/framework/list` 已由 `2026-10-18-framework-list-vo-contract`（M5-A1）引入
+`FrameworkSummaryVO`（7 字段： `id` / `code` / `name` / `description` / `gitHome` /
+`account` / `isPublic`）堵住；`/framework/modify` 与 `/framework/updateIsPublic`
+由 `2026-10-18-framework-write-endpoints` 一并收敛。
+
+**同一 Controller 的所有出参端点 SHALL 共用同一个不含凭据的读投影** —— 若某个端点
+单独保留实体出参，它就是契约里的定时炸弹：前端无消费者时不泄漏，但任何人接管理面、
+用契约生成物提交，就立刻把凭据写进响应。
+
+**入参侧 SHALL NOT 因该约束而裁剪**：修改 / 切换状态时携带 `password` 之类的凭据字段
+作为**请求参数**是正当用途（哪怕本不需要，那是另一个问题）。判据 SHALL 是
+「出现在响应的 `data` 上」还是「作为请求参数被绑定」。
 
 #### Scenario: Git 仓库密码不随框架列表/详情接口泄漏
 
@@ -229,6 +241,27 @@ SHALL 完整出现在对应 VO 中 —— 它们是**元驱动表单的 UI 契�
 
 - **WHEN** 临时把某接口的出参类型从 VO 改回持久化实体（破坏本约束）
 - **THEN** 对应的契约守护断言 SHALL 失败，错误信息 SHALL 明确指出 `password` 是多余字段
+
+#### Scenario: 框架管理的写侧端点 SHALL NOT 直出实体
+
+- **WHEN** 评审 `/framework/modify` 与 `/framework/updateIsPublic` 的响应 schema
+- **THEN** 两者 SHALL ref `FrameworkSummaryVO`，SHALL NOT ref `Frameworks` 实体
+- **AND** 对应 schema SHALL NOT 含 `password`
+- **AND** 该约束 SHALL 与 `/framework/list` 指向**同一个** `FrameworkSummaryVO`
+  （同一 Controller 的出参端点共用一个读投影）
+
+#### Scenario: 写侧端点的契约 SHALL 导出参数
+
+- **WHEN** 前端要用契约生成物调用 `/framework/modify` 或 `/framework/updateIsPublic`
+- **THEN** 契约里这两个端点 SHALL 导出参数（`updateIsPublic` 至少含 `code` 与 `isPublic`）
+- **AND** SHALL NOT 因形参被 `@Parameter(hidden = true)` 隐藏而完全无参数 ——
+  那会让前端无法构造请求
+
+#### Scenario: 入参携带凭据 SHALL NOT 被误判为泄漏
+
+- **WHEN** 某端点的**请求参数**中包含凭据字段（如修改时携带新的 Git 口令）
+- **THEN** 该字段 SHALL 保留在请求 schema 中 —— 那是它的正当用途
+- **AND** 判据 SHALL 是「出现在响应的 `data` 上」而非「出现在请求里」
 
 ### Requirement: 继承 BaseVO 的 VO SHALL NOT 把查询辅助字段带入响应
 

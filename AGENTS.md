@@ -504,8 +504,8 @@ Project 是聚合根：包含 `ProjectSql`、`ProjectFramwork`、`ProjectMap`、
 6. 生成主链路端到端集成测试（§7.7.3，mock Git / 模板）。
 7. Mapper 层 `@SpringBootTest` + H2 真实 SQL 验证：`TableMapperIT`（元数据）与 `MapFieldColumnMapperIT`（实体列映射）已落地，**其余实体仍缺**。新增实体时 SHALL 参照 `MapFieldColumnMapperIT` 补一条 —— 打桩 mapper 的测试不算覆盖。
 8. **代码生成主链路的端到端回归**：当前无测试覆盖「登录 → 建项目 → 导 SQL → init → 构建」全链路（§7.7.3）。2026-10-15 的列映射事故之所以能全绿通过，正是因为这条链路只被 mock 覆盖。
-9. **前端端点覆盖补齐（M5 议程）**：后端 43 个端点中，前端目前已消费 **14** 个（`/login/signin`、`/project/list`、`/project/load/code/{code}`、`/displayAttribute/list`、`/account/load`、`/project/job/execute`、`/framework/list`、WebSocket 构建日志、`POST /project/build`、`POST /project/sql/build`、`POST /project/init`、
-  `GET /project/relationship/listMapClassTable`、`GET /project/relationship/listMapFieldColumn`、`POST /project/relationship/build`、`GET /project/relationship/list`）。**未接入的高价值端点**：`/displayAttribute/save`（改字段显示方式，当前只读）、关系删除（`DELETE /project/relationship/delete`）。
+9. **前端端点覆盖补齐（M5 议程）**：后端 43 个端点中，前端目前已消费 **15** 个（`/login/signin`、`/project/list`、`/project/load/code/{code}`、`/displayAttribute/list`、`/account/load`、`/project/job/execute`、`/framework/list`、WebSocket 构建日志、`POST /project/build`、`POST /project/sql/build`、`POST /project/init`、
+  `GET /project/relationship/listMapClassTable`、`GET /project/relationship/listMapFieldColumn`、`POST /project/relationship/build`、`GET /project/relationship/list`、`POST /displayAttribute/save`）。**未接入的高价值端点**：关系删除（`DELETE /project/relationship/delete`）、关系的可视化编辑（当前靠再提交 upsert）。
 
 > **流程现状：① 建项目 → ② 导 SQL → ③ 解析 → ④ 配显示属性 → ⑤ 配关联关系 → ⑥ 构建，六步全部可达**（M5 收官）。每接一个页面 SHALL 走 `aicode-web/README.md` §「How to wire next endpoint」五步。
 10. **CI / CD（§11.4）**：当前**无 CI**，M4 后构建链变成「gradle + node」双语言，风险放大。建议 GitHub Actions 至少含：`./aicode/gradlew clean build`（含 `:aicode-web:verifyApi` 契约漂移守卫）、`./aicode/gradlew test`、`cd aicode-web && npm ci && npm test`、`measurement/startup-time.sh` 性能基线。
@@ -596,6 +596,11 @@ opsx 入口（功能等价，运行时暴露哪个就用哪个）：
   1. 数组用 **`satisfies FieldMeta[]`** 而非 `: FieldMeta[]` —— 后者让 TS 用接口类型而非字面量联合描述数组，`(typeof ARR)[number]['field']` 拿到的是整个 `FormField`，`Exclude<FormField, FormField>` 恒为 `never`，断言静默失效；
   2. 完备性用**差集判定** `const _c: MissingField extends never ? true : never = true` —— 漏字段时 `MissingField` 不再是 `never`，`true` 赋值失败 → `error TS2322`。**零运行时开销，且在 `npm run typecheck` 阶段就红**。
   - **教训**：任何"类型级反向断言"都必须做**反向验证**（临时删掉一个字段，确认 `tsc` 报错）。没验证过的类型断言等于没写。
+- ⚠️ **spec 只写「至少覆盖 N 类」而不要求与上游枚举对齐，会允许出「N-1/N 全失配」的实现（实测，2026-10-18）**：`aicode-web-page` 原有 Scenario 要求「控件分发器 SHALL 渲染对应的基础控件（至少覆盖 `text` / `number` / `date` / `select` 四类）」，前端**严格照做**并全绿 —— 但后端 `DisplayAttributeDisplayType` 实际有 24 个 PascalCase 枚举（`Input` / `DatePicker` / `InputNumber` / …），`.toLowerCase()` 后**只有 `Select` 命中**，其余 23 个永远走降级分支。
+  - **双重失效**：① spec 假设了错误的值域（未要求 key 与上游枚举对齐）；② 测试**全部用假值**（`text`/`number`），断言的是"我造的值能命中我造的 key"，从未拿真实枚举验证过。
+  - **两条处方**：写 spec 时凡涉及"支持某 N 类"，SHALL 同时规定**与上游枚举的对齐关系**；测分发/映射类逻辑时 SHALL 至少有一条**拿上游枚举全集做集合比较**的用例（列出未命中项并写死计数），单点断言发现不了系统性偏差。
+- ⚠️ **Java 注解属性只接受编译期常量 —— `static final String[]` 也不行（实测，2026-10-18）**：`@Schema(allowableValues = SomeEnum.ALLOWED_VALUES)` 编译失败（`incompatible types: String[] cannot be converted to String`），因为**数组引用不是常量表达式**。想在契约里表达枚举值域，只能在注解处**手写字面量**，漂移风险须由契约测试的「enum 集合 == 枚举类 values()」断言兜住。
+  - **连带的好消息**：orval 会把 `allowableValues` 生成为 **`as const` 对象**，前端可直接 `Object.values()` 取全集 —— 契约是唯一真源，前端不必再写副本。
 - **`.shtml` 后缀由 `ShtmlSuffixRewriteFilter` 提供**：Spring Framework 7 移除了 `PathMatchConfigurer#setUseSuffixPatternMatch`，后缀匹配不再是框架默认行为。前端（Angular 7 + jQuery 打包产物）会为每个 API 请求 URL 追加 `.shtml`，因此**新增 API 前缀时必须同步维护 `ShtmlSuffixRewriteFilter.API_PREFIXES`**。
 - **MockMvc 不会自动注册 Bean 形态的 Filter**：`MockMvcBuilders.webAppContextSetup(wac)` 只装配 `DispatcherServlet`，`.shtml` 相关的测试必须显式 `.addFilters(shtmlSuffixRewriteFilter)`，否则请求会落到静态资源处理器并报 `NoResourceFoundException`。真实运行时由嵌入式容器自动注册，不受影响。
 - **Boot 4 的 Actuator 端点默认 `access=none`**：即使 `management.endpoints.web.exposure.include="*"`，未设 `management.endpoint.<name>.access` 的端点仍返回 **400**。当前已开放 `env` / `shutdown` / `metrics` / `prometheus`。新增端点时记得同步。
@@ -643,12 +648,13 @@ opsx 入口（功能等价，运行时暴露哪个就用哪个）：
   - 契约守护：`TemplateDataExpansionTest` —— 固化「模板变量展开必须用 fastjson2 往返而非 hutool `BeanUtil.beanToMap`」（getter 名 vs 字段名键集差异）
   - **假分页回归防线（M5-C 后新增）**：`ApiContractIT` 场景⑦ 的 `project_list_reflectsPaginationParams` 与 `project_list_fallsBackToDefaultsWhenParamsInvalid` 两用例钉住「`/project/list` 的 `data.curPage` / `data.pageSize` / `data.totalPage` SHALL 回填实际查询参数」。此前 `ProjectController.list` 曾是**假分页**（`lambdaQuery().list()` 拉全量、`curPage` / `pageSize` 入参被忽略、三个分页字段从不 set 恒为 0），已由 `2026-10-18-project-list-real-pagination` 修为真分页。**同类待收敛**：`/account/list` 也只 `setTotalRow` 不设三个分页字段。
   - 外部依赖：`GitToolsCloneCompletenessTest` —— 需网络访问 GitHub，由 `@EnabledIfSystemProperty(named = "network.tests")` 守卫，默认**不执行**；离线 CI 需显式加 `-Dnetwork.tests=true`
-  - **前端（M1–M5 落地，21 文件 / 119 用例，MSW 驱动）**：
+  - **前端（M1–M5 落地，22 文件 / 132 用例，MSW 驱动）**：
     - **响应契约层**：`contract-response/index.test.ts`（6 用例：`R.success` 解构 / `ContractError` 带 code+info / 非 `0000` 视为失败 / 缺省 code → UNKNOWN / message 回退）
-    - **页面层**：`DisplayAttributesPage`（1）/ `LoginPage`（3，含空 token 与 `R.code!=="0000"`）/ `ProjectListPage`（**9**：构建按钮展开与 `state!=='Enable'` 禁用 / 翻页重拉并整页替换 / 末页禁用且点击不发请求 / `buildingCodes` 跨翻页保留 / **翻回不重复调 `execute`**）/ `ProjectDetailPage`（4，含裸 VO 触发错误气泡的反向用例）/ `AccountPage`（3）/ `FrameworkListPage`（5，成功渲染含 `isPublic` 中文映射与分页信息 / 空态非错误 / `R.code!=="0000"` / 翻页重拉并替换表格 / 末页禁用且点击不发请求）
+    - **页面层**：`DisplayAttributesPage`（**10** —— 2026-10-18 从 1 个只读渲染用例扩为写侧：8 字段表单渲染 / `displayType` 下拉 24 项来自契约枚举 / 「改完需重新构建」提示 / 批量提交整页且带隐藏 `mapFieldColumnCode` / 改显示名+勾必填后提交带新值 / 改 `displayType` 后新值进链路 / 提交后重拉列表 / 提交中禁用防重复 / `R.code!=="0000"` 错误气泡且**保留已改值** / 无字段引导空态）/ `LoginPage`（3，含空 token 与 `R.code!=="0000"`）/ `ProjectListPage`（**9**：构建按钮展开与 `state!=='Enable'` 禁用 / 翻页重拉并整页替换 / 末页禁用且点击不发请求 / `buildingCodes` 跨翻页保留 / **翻回不重复调 `execute`**）/ `ProjectDetailPage`（4，含裸 VO 触发错误气泡的反向用例）/ `AccountPage`（3）/ `FrameworkListPage`（5，成功渲染含 `isPublic` 中文映射与分页信息 / 空态非错误 / `R.code!=="0000"` / 翻页重拉并替换表格 / 末页禁用且点击不发请求）
     - **写侧页面层（首个）**：`NewProjectPage`（**9**）—— 本仓**第一个有提交能力的页面**，此前 7 个页面全是只读的。用例含：9 字段渲染 / `databaseType`+`language` 是下拉（D9）/ `englishName` 旁提示「将作为数据库 schema 名」（D8）/ 提交带全部 9 字段 + token / 成功导航到 `/project/{code}` / `R.code!=="0000"` 错误气泡且**保留已填字段** / `9005` 重复时点明「已被占用」/ 不提交契约之外的参数 / 不渲染 token 输入框。字段完备性由**类型系统**守护（见 §10 的 TS 断言陷阱）
     - **关联关系区块**：`RelationshipPanel`（**11**，挂在详情页）—— 代码生成第 ⑤ 步。4 条对应 `aicode-web-page` 的级联 Req（上游变化清空下游 / 下游候选项上游选定后才加载 / 两组级联互不干扰 / 提交前校验必填项），另 7 条覆盖：未选表时字段下拉禁用且给提示且**不发字段请求**、两侧表选定后**一次请求喂两个下拉**、提交带齐 6 参数、`一对多`↔`oneToMany=Y` 与 `一对一`↔`oneToOne=Y`/`oneToMany=N`（**不产生 Y/Y 非法组合**）、保存成功后**重拉**列表（`build` 是 upsert，code 会变，本地追加会显示失效 code）、关系列表用本地 code→tableName 映射且**映射不到时回落显示 `associateCode`**、无表时给引导空态
     - **写侧区块**：`ProjectSqlPanel`（5，挂在详情页）—— 导 SQL + 触发 `init` 解析 + 读解析结果。用例含：空 SQL 时保存按钮禁用 / 保存带 `projectCode`+`tsql` / **解析后重读结果**（非只在 mount 读一次）/ `init` 失败呈现可读错误 / 解析结果读失败降级为空态不阻断主流程
+    - **控件分发层（2026-10-18 重写）**：`display-controls`（**12**）—— 原 7 条测试**全部用假值**（`text`/`number`/`date`），而分发器 key 与后端 24 个 PascalCase 枚举几乎全不匹配，7 条却全绿。现按契约真实枚举重写：大小写容错（`Input`/`INPUT`/`input`）、`InputNumber`/`DatePicker`/`Select` 命中、值域来自生成物 `Object.values()` 不手写副本、降级标识**可辨**（契约枚举内→`data-known-enum=true`「平台暂未支持」/ 枚举外→「未知类型」）、**「未命中枚举集合」写死计数**（当前 20/24 未实现，后端加枚举即红）
     - **鉴权层**：`token-store`（7）/ `auth-interceptor`（6，含重复安装幂等）/ `use-auth`（5，含多 tab storage 同步）
     - **实时层**：`ws-client`（7，含 `vi.stubGlobal('WebSocket')` 替身与一次重连）/ `use-build-log`（5）/ `build-log-panel`（**8**，含 `autoStart` / `onMounted` 翻页重挂防护）/ `shtml-suffix`（8，纯函数 + 拦截器 + 幂等）
     - **组件层**：`AppShell`（2，登录态挂 AccountMenu / 未登录不挂）

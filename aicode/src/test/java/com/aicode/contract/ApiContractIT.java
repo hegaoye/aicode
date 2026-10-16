@@ -1300,4 +1300,135 @@ class ApiContractIT {
             }
         }
     }
+
+    // ==================================================================
+    // 场景⑬：受约束字段 SHALL 在契约中以 enum 表达值域
+    // （2026-10-18-display-attribute-write 防护）
+    // ==================================================================
+
+    /**
+     * 本组守护 {@code api-data-object} 的
+     * 「元驱动表单所需的展示属性 SHALL 完整出现在 VO 中」里的值域条款。
+     *
+     * <p><b>为什么必须测</b>：Java 注解属性只接受编译期常量 —— 无法写成对
+     * {@code values()} 的引用（{@code static final String[]} 也不行，数组引用不是
+     * 常量表达式）。所以 {@code @Schema(allowableValues = ...)} 的 24 个字面量是
+     * <b>手写</b>的。新增枚举而漏改 {@code @Schema}，编译与运行都正常，
+     * 只有本组能抓到 —— 且这是前端下拉的唯一数据来源，漏一个就少一个选项。</p>
+     *
+     * <p>反向验证：去掉 {@code displayType} 的 {@code allowableValues} →
+     * 用例 1 失败（契约里退化为裸 {@code type: string}）。</p>
+     */
+    @Nested
+    @DisplayName("场景⑬ 受约束字段在契约中以 enum 表达值域（displayType / matchType / fieldValidationMode）")
+    class DisplayAttributeEnumContract {
+
+        /** 读导出契约的原始 YAML。 */
+        private String contractYaml() throws Exception {
+            return mockMvc.perform(MockMvcRequestBuilders.get("/v3/api-docs.yaml"))
+                    .andReturn().getResponse().getContentAsString(StandardCharsets.UTF_8);
+        }
+
+        /** 取出 `DisplayAttributeVO.<field>` 块（含其下的 enum 列表）。 */
+        private String fieldBlock(String yaml, String field) {
+            int voIdx = yaml.indexOf("\n    DisplayAttributeVO:");
+            assertThat(voIdx)
+                    .as("契约 SHALL 含 DisplayAttributeVO schema")
+                    .isNotNegative();
+            String voSeg = yaml.substring(voIdx);
+            // 用行首锚定的正则找下一个「恰好 8 空格缩进的字段名行」——
+            // 不能用 indexOf("\n        ")：10 空格的 "type:" / "enum:" 行也以
+            // 8 空格为前缀，会被误判为下一个字段，导致 block 被截断成只剩字段名。
+            java.util.regex.Matcher start = java.util.regex.Pattern
+                    .compile("(?m)^        " + java.util.regex.Pattern.quote(field) + ":$")
+                    .matcher(voSeg);
+            assertThat(start.find())
+                    .as("DisplayAttributeVO SHALL 含字段 %s", field)
+                    .isTrue();
+            int from = start.start();
+            int fieldIdx = voSeg.indexOf("\n", from);
+            java.util.regex.Matcher next = java.util.regex.Pattern
+                    .compile("(?m)^        [a-zA-Z][a-zA-Z0-9]*:$")
+                    .matcher(voSeg);
+            int end = next.find(fieldIdx + 1) ? next.start() : voSeg.length();
+            return voSeg.substring(fieldIdx, end);
+        }
+
+        @Test
+        @DisplayName("displayType SHALL 带 enum 列表（24 个），SHALL NOT 是裸 type: string")
+        void displayType_hasEnumInContract() throws Exception {
+            String block = fieldBlock(contractYaml(), "displayType");
+
+            // 注意：OpenAPI 的正确形态是 `type: string` + `enum: [...]` 共存 ——
+            // 所以「非裸 string」不能用「不含 type: string」来判（那是 enum 项的必要组成），
+            // 判据是「enum: 之后紧随列表项」。
+            assertThat(block)
+                    .as("displayType SHALL 带 enum 列表，否则前端只能硬编码一份会静默过期的副本；"
+                            + "实际块=%s", block)
+                    .contains("enum:");
+            assertThat(block)
+                    .as("displayType 的 enum SHALL 后随枚举列表项（而非空的 enum:），实际块=%s", block)
+                    .containsPattern("(?s)enum:\\s*\\n\\s+- \\S+");
+        }
+
+        @Test
+        @DisplayName("displayType 的 enum 取值 SHALL 与枚举类 DisplayAttributeDisplayType 完全一致")
+        void displayType_enumMatchesEnumClass() throws Exception {
+            // 这是手写 24 个字面量的唯一防线：新增枚举而漏改 @Schema，本用例红。
+            java.util.Set<String> expected = new java.util.TreeSet<>();
+            for (com.aicode.display.entity.DisplayAttributeDisplayType t
+                    : com.aicode.display.entity.DisplayAttributeDisplayType.values()) {
+                expected.add(t.name());
+            }
+            assertThat(expected)
+                    .as("枚举类本身 SHALL 非空（否则断言会假通过）")
+                    .hasSize(24);
+
+            String block = fieldBlock(contractYaml(), "displayType");
+            java.util.Set<String> actual = new java.util.TreeSet<>();
+            java.util.regex.Matcher m = java.util.regex.Pattern
+                    .compile("^\\s+- (\\S+)$", java.util.regex.Pattern.MULTILINE)
+                    .matcher(block);
+            while (m.find()) {
+                String v = m.group(1);
+                // YAML 会给 "=", "!=" 这类值加引号，去掉再比
+                if (v.length() >= 2 && v.startsWith("'") && v.endsWith("'")) {
+                    v = v.substring(1, v.length() - 1);
+                }
+                actual.add(v);
+            }
+
+            assertThat(actual)
+                    .as("@Schema(allowableValues) 手写的字面量 SHALL 与枚举类完全一致"
+                            + "（Java 注解只接受编译期常量，无法引用 values()，故只能手写）；"
+                            + "缺失=%s / 多余=%s", missing(actual, expected), extra(actual, expected))
+                    .isEqualTo(expected);
+        }
+
+        private static java.util.Set<String> missing(java.util.Set<String> actual,
+                                                     java.util.Set<String> expected) {
+            java.util.Set<String> s = new java.util.TreeSet<>(expected);
+            s.removeAll(actual);
+            return s;
+        }
+
+        private static java.util.Set<String> extra(java.util.Set<String> actual,
+                                                  java.util.Set<String> expected) {
+            java.util.Set<String> s = new java.util.TreeSet<>(actual);
+            s.removeAll(expected);
+            return s;
+        }
+
+        @Test
+        @DisplayName("matchType / fieldValidationMode SHALL 同样带非空 enum 列表")
+        void matchTypeAndValidationMode_haveEnumInContract() throws Exception {
+            String yaml = contractYaml();
+            for (String field : java.util.List.of("matchType", "fieldValidationMode")) {
+                String block = fieldBlock(yaml, field);
+                assertThat(block)
+                        .as("%s SHALL 带非空 enum 列表，实际块=%s", field, block)
+                        .containsPattern("(?s)enum:\\s*\\n\\s+- \\S+");
+            }
+        }
+    }
 }

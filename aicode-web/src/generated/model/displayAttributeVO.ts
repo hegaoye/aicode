@@ -5,6 +5,9 @@
  * aicode 应用
  * OpenAPI spec version: 1.0
  */
+import type { DisplayAttributeVODisplayType } from './displayAttributeVODisplayType';
+import type { DisplayAttributeVOFieldValidationMode } from './displayAttributeVOFieldValidationMode';
+import type { DisplayAttributeVOMatchType } from './displayAttributeVOMatchType';
 
 export interface DisplayAttributeVO {
   /** 数据库字段:id  */
@@ -29,16 +32,16 @@ export interface DisplayAttributeVO {
   isQueryRequired?: string;
   /** 数据库字段:isLineNew 是否换行 */
   isLineNew?: string;
-  /** 数据库字段:matchType 匹配方式 =,!=,>=,<=,>,<,like,左like，右like,between,in */
-  matchType?: string;
-  /** 数据库字段:displayType Autocomplete 自动完成, Cascader 级联选择 , DatePicker 日期选择框 , TimePicker 时间选择框 ,Input 单行文本框 , Textarea 多行文本框 , InputNumber 数字输入框 , Mobile 手机 , Phone 固话 , MobileOrPhone 手机或固话 ,Password 密码 , Email 邮箱 , Website 网址 , IdCard 身份证 , Mention 提及(@) ,Select 单项选择器 , MultiSelect 多项选择器 , Radio 单选按钮 , Checkbox 复选框 , Rate 评分 , Silder 滑动条 ,Switch 开关按钮 , TreeSelect 选择树 , Upload 上传  */
-  displayType?: string;
+  /** 数据库字段:matchType 匹配方式（查询表单用）。值域取自 allowableValues —— 该字段无对应枚举类，只收录能从既有 description 明确读出的值 */
+  matchType?: DisplayAttributeVOMatchType;
+  /** 数据库字段:displayType 控件类型。取值见 allowableValues（DisplayAttributeDisplayType 的全部 24 个枚举，按字母序）；值域进入契约 enum 是为了让前端能据此生成下拉并做类型校验，而不是在前端另写一份会静默过期的字符串副本。【维护须知】Java 注解属性只接受编译期常量 —— 无法写成对 values() 的引用，static final String[] 也不行（数组引用不是常量表达式），故此处必须手写字面量。一致性由 ApiContractIT 场景⑬ 的「enum 集合 SHALL 与枚举类完全一致」断言守护 */
+  displayType?: DisplayAttributeVODisplayType;
   /** 数据库字段:displayName 显示列名称 */
   displayName?: string;
   /** 数据库字段:displayNo 显示顺序 */
   displayNo?: number;
-  /** 数据库字段:fieldValidationMode Email 邮件, Address 地址, Telephone 电话 , Password 密码, Date  日期 , Number 数值 , Integer 整数 , Positive_Integer 正整数 , text 文本 ,IdCard 身份证 , Website 网址 */
-  fieldValidationMode?: string;
+  /** 数据库字段:fieldValidationMode 字段校验方式。值域取自 allowableValues —— 该字段无对应枚举类，只收录能从既有 description 明确读出的值 */
+  fieldValidationMode?: DisplayAttributeVOFieldValidationMode;
   /** 数据库字段:validateText 验证提示语 */
   validateText?: string;
   /** 数据库字段:displayCss 显示css样式 */

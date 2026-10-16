@@ -46,11 +46,14 @@ CDS（Class Data Sharing）的运维操作与实测数据见 §9。
 
 ## 2. 模块结构（Gradle 多模块）
 
-根 `settings.gradle` 声明三个子项目；其他目录（`sql/`、`devops/`、`measurement/`、`docs/`、`openspec/`、`screenshots/`）均为松散内容，**不是** Gradle 模块。
+根 `settings.gradle` 声明**四个**子项目（`common` / `facade` / `aicode` / `aicode-web`）；其他目录（`sql/`、`devops/`、`measurement/`、`docs/`、`openspec/`、`screenshots/`、`contracts/`）均为松散内容，**不是** Gradle 模块。
+
+- `contracts/openapi/openapi.yaml` —— **入库的跨语言契约产物**，由 `OpenApiExportIT` 在测试期自动导出。前端的类型、请求函数与 mock 全部由它经 orval 生成，SHALL NOT 手工维护。漂移守卫见 `:aicode-web:verifyApi`（`openspec/specs/api-contract-artifact/spec.md`）。
 
 | 模块 | 角色 | 备注 |
 |------|------|------|
-| `:aicode`  | Spring Boot 应用 — 控制器、服务、Mapper、静态前端 | **唯一可运行的模块**；唯一持有接口层的模块。入口 `com.aicode.Application` |
+| `:aicode`  | Spring Boot 应用 — 控制器、服务、Mapper | **唯一持有接口层的模块**；入口 `com.aicode.Application`。13 MB 旧 Angular 产物仍在 `src/main/resources/static/`，待 React 前端验收通过后由 M4 删除 |
+| `:aicode-web` | React 前端模块（Vite + TS） | Jar 内布局 `static/**`，被 `aicode` 以 `implementation` 引入后由 Spring Boot 从 classpath 提供。node 为弱依赖，见 §3 |
 | `:facade`  | 与下游生成工程共享的 DTO / facade 类型 | 依赖 `:common`。无 main，**无测试** |
 | `:common` | 共享工具：JGit、hutool、JWT、pinyin4j、zip4j | 被 `:facade` 与 `:aicode` 同时依赖。**禁**引入 spring-web（详见 §6.2）。有 8 个工具层单测 |
 
@@ -376,11 +379,11 @@ Project 是聚合根：包含 `ProjectSql`、`ProjectFramwork`、`ProjectMap`、
 
 | 模块 | 测试类数 | 测试依赖 | 覆盖内容 |
 |------|---------|---------|---------|
-| `aicode` | **16** | `spring-boot-starter-test` + `archunit-junit5` | 接口契约回归、Controller 切片（`MockMvc`）、Service 并发、生成主链路、模板引擎适配、SQL 逆解析、架构断言、模板变量键集守护、**实体列映射（真实 SQL）** |
+| `aicode` | **17** | `spring-boot-starter-test` + `archunit-junit5` | 接口契约回归、Controller 切片（`MockMvc`）、Service 并发、生成主链路、模板引擎适配、SQL 逆解析、架构断言、模板变量键集守护、实体列映射（真实 SQL）、**OpenAPI 契约导出** |
 | `common` | **9** | `junit-jupiter` + `junit-platform-launcher` | 纯函数单测（`StringTools` / `StringHelper` / `JwtToken` / `Md5` / `PasswordCrypto` / `DatabaseDataTypesUtils`）、枚举转换、JGit 克隆完整性 |
 | `facade` | **0** | `junit-jupiter`（已声明但无测试） | — |
 
-合计 **25 个测试类、218 个用例**（0 失败，2 例按预期跳过）。空白点：`facade` 无任何测试；Mapper 层缺 DAO 单测以外的覆盖率仍偏薄。
+合计 **26 个测试类、222 个用例**（0 失败，2 例按预期跳过）。空白点：`facade` 无任何测试；Mapper 层缺 DAO 单测以外的覆盖率仍偏薄。
 
 > **架构断言**（`aicode/src/test/java/com/aicode/architecture/VendoredDeadCodeIsolationTest.java`）：禁止重新引用 `common` 中已删除的 vendored 死代码区域 `com.aicode.core.tools.core..`。豁免集为该区域内仍被生产代码引用的 3 个类 —— `StringHelper` / `Field` / `typemapping.DatabaseDataTypesUtils`（豁免同时覆盖 Lombok 生成的 `$` 嵌套类）。**注意其能力边界：仅覆盖编译期类型引用**，反射、注解、MyBatis XML 与资源文件中的引用不在覆盖范围内 —— 断言通过不等于不存在运行时引用。
 
@@ -606,7 +609,7 @@ opsx 入口（功能等价，运行时暴露哪个就用哪个）：
 
 ### 11.3 测试演进
 
-- **已落地 25 个测试类、218 个用例**（详见 §7.1 的分布表）。按层覆盖情况：
+- **已落地 26 个测试类、222 个用例**（详见 §7.1 的分布表）。按层覆盖情况：
   - Controller 层（`MockMvc`）：`LoginCtrlShtmlPathTest`（`.shtml` 路由回归）、`MapRelationshipControllerTest`、`ProjectControllerDownloadTest`、`ProjectInitEndpointTest` —— 均为 `@SpringBootTest(MOCK)` + `@MockitoBean` 打桩业务层，加载真实 `WebMvcConfigurer`
   - Service 层：`ProjectJobServiceImplConcurrencyTest`（并发）、`SqlReverseParseTest`（SQL 逆解析）
   - 生成主链路：`CodeGenPipelineTest`（占位符风格）、`TemplateEngineAdapterTest`（`aicode.json` 引擎探测）、`MapClassTableTest`（类名/模块名推导）
@@ -614,6 +617,7 @@ opsx 入口（功能等价，运行时暴露哪个就用哪个）：
   - 枚举：`TemplateEngineEnumTest` / `YNEnumTest`
   - 架构断言：`VendoredDeadCodeIsolationTest` —— 禁止重新引用已删除的 vendored 死代码区域；**仅覆盖编译期类型引用**，能力边界见 §7.1 的说明
   - 实体映射：`MapFieldColumnMapperIT` —— `@SpringBootTest` + 真实 `schema.sql` + 真实 Mapper，守护 `@TableField` 列映射与 `exist = false`。**打桩 mapper 的测试无法覆盖此属性**（见 §7.1 事故记录）
+  - 契约导出：`OpenApiExportIT` —— 导出 `contracts/openapi/openapi.yaml` 并做规范化（剥离 `servers` 块与无 `schema` 的装饰性参数）。**契约因此会在每次测试时被刷新**，入库漂移由 `:aicode-web:verifyApi` 判定
   - 契约守护：`TemplateDataExpansionTest` —— 固化「模板变量展开必须用 fastjson2 往返而非 hutool `BeanUtil.beanToMap`」（getter 名 vs 字段名键集差异）
   - 外部依赖：`GitToolsCloneCompletenessTest` —— 需网络访问 GitHub，由 `@EnabledIfSystemProperty(named = "network.tests")` 守卫，默认**不执行**；离线 CI 需显式加 `-Dnetwork.tests=true`
 - **仍有空白**（详见 §7.10）：`facade` 零测试；Mapper 层 DAO 单测覆盖仍偏薄。

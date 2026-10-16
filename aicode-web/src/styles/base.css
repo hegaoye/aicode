@@ -670,6 +670,27 @@ button:focus-visible {
   font-size: 12.5px;
 }
 
+/* 两列栅格 —— 逐字取自原型 project-review.html。由「项目信息」面板的 8 个 k/v
+   起见，被账户页与项目确认页共用。margin:0 是为了让 .grid-2 挂在 <dl> 上时
+   抵消浏览器默认外边距（原型挂在 div 上，本就是 0）。 */
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 32px;
+  row-gap: 14px;
+  margin: 0;
+}
+
+@media (max-width: 720px) {
+  .grid-2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+.grid-2 > .field > dd {
+  margin: 0;
+}
+
 .form-row .field {
   display: flex;
   flex-direction: column;

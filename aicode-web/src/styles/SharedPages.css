@@ -12,43 +12,17 @@
  *   .field-error .field（k/v 形态）
  *
  * ---------------------------------------------------------------------------
- * 唯一的例外：.grid-2
+ * 本文件不含任何跨页基元
  * ---------------------------------------------------------------------------
- * base.css 从 project-review.html 抽取时收了同页的 .panel / .panel-head /
- * .panel-body / .badge / .empty-state，漏了同一条规则里的 .grid-2。
- * 账户页的 3 字段 k/v 需要两列栅格（原型的「项目信息」面板正是这么排 8 个 k/v），
- * 故按任务允许的二选一在此补上 —— **取值逐字取自原型 project-review.html**，
- * 不是本文件发明；若详情页任务也需要，请直接复用本条，不要再定义一遍。
+ * `.grid-2` 原本定义在此（逐字取自原型 project-review.html），但它是跨页基元 ——
+ * 「项目信息」面板、账户页、项目确认页都要用。已迁入 base.css，本文件不再定义，
+ * 避免下游页面重复定义时互相覆盖。下方单页样式直接复用 base.css 的那条。
  *
- * 另外两处是单页专属的极小补充，同样只有原型依据：
- *   1. .grid-2 > .field > dd —— 本页把 .grid-2 挂在 <dl> 上（k/v 用语义化
- *      dt/dd），浏览器给 dl / dd 的默认外边距要归零，否则与原型对齐不一致。
- *   2. .attr-constraints —— 展示属性页「约束」勾选行复用 .radio-group 的排版，
+ * 唯一剩下的单页专属补充：
+ *   .attr-constraints —— 展示属性页「约束」勾选行复用 .radio-group 的排版，
  *      base.css 只给 input[type='radio'] 设了 accent-color，checkbox 需补。
  *      选择器带 .attr-constraints 限定，不会外溢到其他页面的 .radio-group。
  */
-
-/* ---------------------------------------------------------------------------
- * 两列栅格 —— 逐字取自原型 project-review.html
- * ------------------------------------------------------------------------ */
-.grid-2 {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  column-gap: 32px;
-  row-gap: 14px;
-  /* 原型的 .grid-2 只挂在 div 上（无默认外边距）；本页挂在 <dl> 上，需要归零 */
-  margin: 0;
-}
-
-@media (max-width: 720px) {
-  .grid-2 {
-    grid-template-columns: 1fr;
-  }
-}
-
-.grid-2 > .field > dd {
-  margin: 0;
-}
 
 /* ---------------------------------------------------------------------------
  * 约束勾选行 —— 排版来自 .radio-group，这里只补 checkbox 的强调色与尺寸

@@ -7,6 +7,13 @@ import App from './App'
 import './styles/tokens.css'
 import './styles/base.css'
 import './styles/AppShell.css'
+import './styles/SharedPages.css'
+import './styles/BuildLogPanel.css'
+import './styles/FrameworkListPage.css'
+import './styles/LoginPage.css'
+import './styles/NewProjectPage.css'
+import './styles/ProjectSqlPanel.css'
+import './styles/RelationshipPanel.css'
 import './styles/LoginPage.css'
 
 // 应用启动 —— 见 openspec/specs/aicode-web-auth/spec.md

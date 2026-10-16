@@ -32,6 +32,54 @@
 「代码改了但契约没提交」。CI 应在提交后运行本任务。
 ⚠️ 代码尚未提交时运行会得到**假阴性**（git diff 为空）。
 
+## 样式架构（三层，2026-10-16 视觉重写后）
+
+页面的视觉与布局基准是 OpenDesign 项目「ai-code 页面设计」的原型。
+
+```
+src/styles/
+  tokens.css    唯一 token 源 —— 色板 / 字体 / 5 条视觉规则。跨页改色只改这里
+  base.css      跨页复用基元（.container .panel .stepper .data-table .grid-2 …）
+  AppShell.css  topnav / 账户徽章
+  <Page>.css    每页一个，只放该页专属的类
+```
+
+四条约定：
+
+1. **类名沿用原型原名，不得重命名。** 验收方式是「逐页与原型并排比对」，
+   改名会让比对失效。原型目录见
+   `/Users/bruce/Library/Application Support/Open Design/namespaces/release-stable/data/projects/4cc16725-afb7-4882-bf88-fc8eec4f1b05/`
+2. **新增跨页类必须先登记进 `base.css`。** 不许在页面级 `.css` 里私造 ——
+   页面级 CSS 里定义的类会被别的页面「恰好引用」，形成无声的跨页耦合
+   （本轮真实发生过：`.sr-only` 起初只定义在 `FrameworkListPage.css`，
+   却被另两页引用，等于那两页的可用性依赖技术架构页的样式被加载）。
+3. **TSX 中禁止用于布局的内联 `style={{}}`。** 只允许动态值
+   （当前唯一一处：SQL 解析进度条的宽度百分比）。
+4. **`@keyframes` 全局同名会互相覆盖。** 同名 keyframes 在同一文档里
+   「后者全局生效」，两个页面各写一个会静默改掉对方的动画
+   （本轮真实发生过：`BuildLogPanel.css` 与 `ProjectListPage.css` 都叫 `pulse`，
+   已改名 `status-pulse`）。
+
+### 死按钮规则
+
+契约缺入参、后端能力未落地的操作（当前：`framework/build`、`framework/delete`、
+`project/repository/*`、`project/framwork/add`、`generated-files` 目录树），
+一律**渲染完整视觉但 `disabled` + `title="接口待修复，验收后接入"`，不绑 `onClick`**。
+不做「看着能点、点了没反应、无任何提示」的按钮。
+
+### 与契约相关的已知缺口
+
+原型是照着 **M3-C 裁剪前**的完整 `Project` 实体设计的。当前两个读投影里
+缺原型要用的字段，导致下列 UI 永久无内容（等契约补字段后自动点亮）：
+
+| 位置 | 原型要显示 | `ProjectSummaryVO`（5 字段） | `ProjectDetailVO`（12 字段） |
+|---|---|---|---|
+| 工作台卡片标签 | 语言 / 数据库 | ✗ 缺 `language`、`databaseType` | — |
+| 工作台卡片副标 | Java 包名 | ✗ 缺 `basePackage` | — |
+| 项目确认 8 栅格 | 数据库类型 / SQL 类型 | — | ✗ 缺 `databaseType` |
+
+填表时**不要**为此手写 axios 或绕过契约 —— 按上面第 1 条规则，先改后端。
+
 ## 命令
 
 | 命令 | 说明 |

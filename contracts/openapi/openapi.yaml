@@ -36,14 +36,6 @@ paths:
       summary: 修改状态
       description: 修改状态
       operationId: updateIsPublic_1
-      parameters:
-      - name: code
-        in: query
-        description: 模板编码
-        required: true
-      - name: isPublic
-        in: query
-        description: "状态：停用[N]，启用[Y]"
       responses:
         "200":
           description: OK
@@ -57,14 +49,6 @@ paths:
       summary: 修改状态
       description: 修改状态
       operationId: updateIsPublic
-      parameters:
-      - name: code
-        in: query
-        description: 模板编码
-        required: true
-      - name: isPublic
-        in: query
-        description: "状态：停用[N]，启用[Y]"
       responses:
         "200":
           description: OK
@@ -153,14 +137,6 @@ paths:
         required: true
         schema:
           $ref: "#/components/schemas/ProjectSqlVO"
-      - name: code
-        in: query
-        description: tsql编码
-        required: true
-      - name: tsql
-        in: query
-        description: sql脚本
-        required: true
       responses:
         "200":
           description: OK
@@ -175,15 +151,6 @@ paths:
       summary: 创建ProjectSql
       description: 创建ProjectSql
       operationId: build
-      parameters:
-      - name: projectCode
-        in: query
-        description: 项目编码
-        required: true
-      - name: tsql
-        in: query
-        description: sql脚本
-        required: true
       responses:
         "200":
           description: OK
@@ -198,38 +165,6 @@ paths:
       summary: 修改ProjectRepositoryAccount
       description: 修改ProjectRepositoryAccount
       operationId: modify_5
-      parameters:
-      - name: code
-        in: query
-        description: 版本管理编码
-        required: true
-      - name: projectCode
-        in: query
-        description: 项目编码
-      - name: account
-        in: query
-        description: 帐户名 最长32个汉字
-        required: true
-      - name: password
-        in: query
-        description: 密码 最长32个英文字符
-        required: true
-      - name: home
-        in: query
-        description: 仓库地址
-        required: true
-      - name: description
-        in: query
-        description: 仓库说明 最长128个汉字
-        required: true
-      - name: state
-        in: query
-        description: "状态：停用[Disenable]，启用[Enable]"
-        required: true
-      - name: type
-        in: query
-        description: "仓库类型:Git, Svn"
-        required: true
       responses:
         "200":
           description: OK
@@ -244,30 +179,6 @@ paths:
       summary: 创建ProjectRepositoryAccount
       description: 创建ProjectRepositoryAccount
       operationId: build_1
-      parameters:
-      - name: account
-        in: query
-        description: 帐户名 最长32个汉字
-        required: true
-      - name: projectCode
-        in: query
-        description: 项目编码
-      - name: password
-        in: query
-        description: 密码 最长32个英文字符
-        required: true
-      - name: home
-        in: query
-        description: 仓库地址
-        required: true
-      - name: description
-        in: query
-        description: 仓库说明 最长128个汉字
-        required: true
-      - name: type
-        in: query
-        description: "仓库类型:Git, Svn"
-        required: true
       responses:
         "200":
           description: OK
@@ -339,15 +250,6 @@ paths:
       summary: 创建ProjectModule
       description: 创建ProjectModule
       operationId: build_3
-      parameters:
-      - name: projectCode
-        in: query
-        description: 项目编码
-        required: true
-      - name: moudleCode
-        in: query
-        description: 模块编码
-        required: true
       responses:
         "200":
           description: OK
@@ -384,11 +286,6 @@ paths:
       summary: 创建ProjectFramwork
       description: 创建ProjectFramwork
       operationId: add
-      parameters:
-      - name: projectStr
-        in: query
-        description: 项目技术json
-        required: true
       responses:
         "200":
           description: OK
@@ -403,11 +300,6 @@ paths:
       summary: 删除Project
       description: 删除Project
       operationId: delete
-      parameters:
-      - name: code
-        in: query
-        description: 项目编码
-        required: true
       responses:
         "200":
           description: OK
@@ -428,42 +320,6 @@ paths:
         required: true
         schema:
           type: string
-      - name: name
-        in: query
-        description: 项目名 最长128个汉字
-        required: true
-      - name: englishName
-        in: query
-        description: 项目英文名 （项目数据库名） 最长256个英文字符
-        required: true
-      - name: description
-        in: query
-        description: 项目描述 最长256个汉字
-        required: true
-      - name: databaseType
-        in: query
-        description: "数据库类型:Mysql,Oracle..."
-        required: true
-      - name: language
-        in: query
-        description: "项目语言:Java,Python,Js..."
-        required: true
-      - name: copyright
-        in: query
-        description: 项目版权文字信息
-        required: true
-      - name: author
-        in: query
-        description: 作者
-        required: true
-      - name: phone
-        in: query
-        description: 联系方式
-        required: true
-      - name: basePackage
-        in: query
-        description: 项目基础包名
-        required: true
       responses:
         "200":
           description: OK
@@ -478,15 +334,6 @@ paths:
       summary: 注册
       description: 注册
       operationId: reg
-      parameters:
-      - name: account
-        in: query
-        description: 账户
-        required: true
-      - name: password
-        in: query
-        description: 密码
-        required: true
       responses:
         "200":
           description: OK
@@ -501,10 +348,6 @@ paths:
       summary: 删除Frameworks
       description: 删除Frameworks
       operationId: delete_1
-      parameters:
-      - name: code
-        in: query
-        description: 技术编码
       responses:
         "200":
           description: OK
@@ -763,10 +606,6 @@ paths:
         schema:
           type: integer
           format: int32
-      - name: projectCode
-        in: query
-        description: 项目编码
-        required: true
       responses:
         "200":
           description: OK
@@ -921,10 +760,6 @@ paths:
         schema:
           type: integer
           format: int32
-      - name: projectCode
-        in: query
-        description: 项目编码
-        required: true
       responses:
         "200":
           description: OK
@@ -1132,12 +967,6 @@ paths:
       summary: 删除Account
       description: 删除Account
       operationId: delete_3
-      parameters:
-      - name: id
-        in: query
-      - name: code
-        in: query
-        description: 账户编码
       responses:
         "200":
           description: OK
@@ -1153,41 +982,6 @@ paths:
       summary: 修改Project
       description: 修改Project
       operationId: modify_6
-      parameters:
-      - name: code
-        in: query
-        description: 项目编码
-        required: true
-      - name: name
-        in: query
-        description: 项目名 最长128个汉字
-      - name: englishName
-        in: query
-        description: 项目英文名 （项目数据库名） 最长256个英文字符
-      - name: description
-        in: query
-        description: 项目描述 最长256个汉字
-      - name: databaseType
-        in: query
-        description: "数据库类型:Mysql,Oracle..."
-      - name: language
-        in: query
-        description: "项目语言:Java,Python,Js..."
-      - name: copyright
-        in: query
-        description: 项目版权文字信息
-      - name: author
-        in: query
-        description: 作者
-      - name: phone
-        in: query
-        description: 联系方式
-      - name: state
-        in: query
-        description: 项目状态
-      - name: basePackage
-        in: query
-        description: 项目基础包名
       responses:
         "200":
           description: OK
@@ -1201,41 +995,6 @@ paths:
       summary: 修改Project
       description: 修改Project
       operationId: modify_8
-      parameters:
-      - name: code
-        in: query
-        description: 项目编码
-        required: true
-      - name: name
-        in: query
-        description: 项目名 最长128个汉字
-      - name: englishName
-        in: query
-        description: 项目英文名 （项目数据库名） 最长256个英文字符
-      - name: description
-        in: query
-        description: 项目描述 最长256个汉字
-      - name: databaseType
-        in: query
-        description: "数据库类型:Mysql,Oracle..."
-      - name: language
-        in: query
-        description: "项目语言:Java,Python,Js..."
-      - name: copyright
-        in: query
-        description: 项目版权文字信息
-      - name: author
-        in: query
-        description: 作者
-      - name: phone
-        in: query
-        description: 联系方式
-      - name: state
-        in: query
-        description: 项目状态
-      - name: basePackage
-        in: query
-        description: 项目基础包名
       responses:
         "200":
           description: OK
@@ -1249,41 +1008,6 @@ paths:
       summary: 修改Project
       description: 修改Project
       operationId: modify_7
-      parameters:
-      - name: code
-        in: query
-        description: 项目编码
-        required: true
-      - name: name
-        in: query
-        description: 项目名 最长128个汉字
-      - name: englishName
-        in: query
-        description: 项目英文名 （项目数据库名） 最长256个英文字符
-      - name: description
-        in: query
-        description: 项目描述 最长256个汉字
-      - name: databaseType
-        in: query
-        description: "数据库类型:Mysql,Oracle..."
-      - name: language
-        in: query
-        description: "项目语言:Java,Python,Js..."
-      - name: copyright
-        in: query
-        description: 项目版权文字信息
-      - name: author
-        in: query
-        description: 作者
-      - name: phone
-        in: query
-        description: 联系方式
-      - name: state
-        in: query
-        description: 项目状态
-      - name: basePackage
-        in: query
-        description: 项目基础包名
       responses:
         "200":
           description: OK
@@ -1297,41 +1021,6 @@ paths:
       summary: 修改Project
       description: 修改Project
       operationId: modify_9
-      parameters:
-      - name: code
-        in: query
-        description: 项目编码
-        required: true
-      - name: name
-        in: query
-        description: 项目名 最长128个汉字
-      - name: englishName
-        in: query
-        description: 项目英文名 （项目数据库名） 最长256个英文字符
-      - name: description
-        in: query
-        description: 项目描述 最长256个汉字
-      - name: databaseType
-        in: query
-        description: "数据库类型:Mysql,Oracle..."
-      - name: language
-        in: query
-        description: "项目语言:Java,Python,Js..."
-      - name: copyright
-        in: query
-        description: 项目版权文字信息
-      - name: author
-        in: query
-        description: 作者
-      - name: phone
-        in: query
-        description: 联系方式
-      - name: state
-        in: query
-        description: 项目状态
-      - name: basePackage
-        in: query
-        description: 项目基础包名
       responses:
         "200":
           description: OK
@@ -1345,41 +1034,6 @@ paths:
       summary: 修改Project
       description: 修改Project
       operationId: modify_12
-      parameters:
-      - name: code
-        in: query
-        description: 项目编码
-        required: true
-      - name: name
-        in: query
-        description: 项目名 最长128个汉字
-      - name: englishName
-        in: query
-        description: 项目英文名 （项目数据库名） 最长256个英文字符
-      - name: description
-        in: query
-        description: 项目描述 最长256个汉字
-      - name: databaseType
-        in: query
-        description: "数据库类型:Mysql,Oracle..."
-      - name: language
-        in: query
-        description: "项目语言:Java,Python,Js..."
-      - name: copyright
-        in: query
-        description: 项目版权文字信息
-      - name: author
-        in: query
-        description: 作者
-      - name: phone
-        in: query
-        description: 联系方式
-      - name: state
-        in: query
-        description: 项目状态
-      - name: basePackage
-        in: query
-        description: 项目基础包名
       responses:
         "200":
           description: OK
@@ -1393,41 +1047,6 @@ paths:
       summary: 修改Project
       description: 修改Project
       operationId: modify_11
-      parameters:
-      - name: code
-        in: query
-        description: 项目编码
-        required: true
-      - name: name
-        in: query
-        description: 项目名 最长128个汉字
-      - name: englishName
-        in: query
-        description: 项目英文名 （项目数据库名） 最长256个英文字符
-      - name: description
-        in: query
-        description: 项目描述 最长256个汉字
-      - name: databaseType
-        in: query
-        description: "数据库类型:Mysql,Oracle..."
-      - name: language
-        in: query
-        description: "项目语言:Java,Python,Js..."
-      - name: copyright
-        in: query
-        description: 项目版权文字信息
-      - name: author
-        in: query
-        description: 作者
-      - name: phone
-        in: query
-        description: 联系方式
-      - name: state
-        in: query
-        description: 项目状态
-      - name: basePackage
-        in: query
-        description: 项目基础包名
       responses:
         "200":
           description: OK
@@ -1441,41 +1060,6 @@ paths:
       summary: 修改Project
       description: 修改Project
       operationId: modify_10
-      parameters:
-      - name: code
-        in: query
-        description: 项目编码
-        required: true
-      - name: name
-        in: query
-        description: 项目名 最长128个汉字
-      - name: englishName
-        in: query
-        description: 项目英文名 （项目数据库名） 最长256个英文字符
-      - name: description
-        in: query
-        description: 项目描述 最长256个汉字
-      - name: databaseType
-        in: query
-        description: "数据库类型:Mysql,Oracle..."
-      - name: language
-        in: query
-        description: "项目语言:Java,Python,Js..."
-      - name: copyright
-        in: query
-        description: 项目版权文字信息
-      - name: author
-        in: query
-        description: 作者
-      - name: phone
-        in: query
-        description: 联系方式
-      - name: state
-        in: query
-        description: 项目状态
-      - name: basePackage
-        in: query
-        description: 项目基础包名
       responses:
         "200":
           description: OK
@@ -2175,13 +1759,13 @@ components:
           type: array
           items: {}
         optObject: {}
+        totalPage:
+          type: integer
+          format: int64
         needCountQuery:
           type: boolean
         lastPage:
           type: boolean
-        totalPage:
-          type: integer
-          format: int64
     ProjectModulePageVO:
       type: object
       properties:
@@ -2315,13 +1899,13 @@ components:
           type: array
           items: {}
         optObject: {}
+        totalPage:
+          type: integer
+          format: int64
         needCountQuery:
           type: boolean
         lastPage:
           type: boolean
-        totalPage:
-          type: integer
-          format: int64
     RPage:
       type: object
       properties:
@@ -2380,13 +1964,13 @@ components:
           type: array
           items: {}
         optObject: {}
+        totalPage:
+          type: integer
+          format: int64
         needCountQuery:
           type: boolean
         lastPage:
           type: boolean
-        totalPage:
-          type: integer
-          format: int64
     ProjectFramworkPageVO:
       type: object
       properties:
@@ -2488,13 +2072,13 @@ components:
           type: array
           items: {}
         optObject: {}
+        totalPage:
+          type: integer
+          format: int64
         needCountQuery:
           type: boolean
         lastPage:
           type: boolean
-        totalPage:
-          type: integer
-          format: int64
     RPageFrameworksPageVO:
       type: object
       properties:

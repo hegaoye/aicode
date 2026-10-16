@@ -9,3 +9,8 @@ include 'common'
 include 'facade'
 
 include 'aicode'
+
+// 前端模块。Jar 内部布局为 static/**，aicode 以 implementation project(':aicode-web')
+// 引入后，Spring Boot 会从 classpath 的 /static/ 提供页面 —— 无需任何资源拷贝任务。
+// 详见 openspec/changes/add-aicode-web-openapi-contract-chain/design.md - D4
+include 'aicode-web'

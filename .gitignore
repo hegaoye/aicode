@@ -20,6 +20,10 @@ LOG_HOME_IS_UNDEFINED/
 *.log
 logs/
 
+# Node（aicode-web 前端模块）
+node_modules/
+.npm/
+
 # Gradle wrapper
 !gradle/wrapper/gradle-wrapper.jar
 
@@ -29,3 +33,4 @@ Thumbs.db
 # AI 工具的本地配置与生成物（不入库，各机器形态不同）
 .agents/
 .claude/
+*.tsbuildinfo

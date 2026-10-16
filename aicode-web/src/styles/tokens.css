@@ -1,0 +1,153 @@
+/*
+ * 设计令牌 —— 直接落地 OpenDesign 原型的 brand-spec.md，不做二次演绎。
+ *
+ * 色板以 OKLch 推导而非直接取色：同一感知亮度下调整色度/色相，
+ * 可避免 sRGB 取色带来的「同一灰在不同底色上看起来不一样」的问题。
+ *
+ * 5 条视觉规则（作为硬约束，改动时须逐条复核）：
+ *   1. 单红预算     每屏红色仅出现 2 次以内 —— logo/分隔线 + 主按钮，或 当前步骤圆 + 主按钮
+ *   2. 细红线分隔   topnav 下沿 1px 品牌红 hairline，是页面的视觉签名
+ *   3. 空白克制     左侧导航与大段解释一律省略，靠信息密度传达工具属性
+ *   4. 表单即视觉   左标签 + 右输入的纵向节奏，避免卡片化堆砌
+ *   5. 极小动效     不要弹窗、不要滚动插画；仅保留登录页背景的极弱网格呼吸与提交 loading
+ */
+:root {
+  /* 色板 */
+  --bg: oklch(98.2% 0.004 240);
+  --surface: oklch(100% 0 0);
+  --fg: oklch(18% 0.02 25);
+  --muted: oklch(52% 0.02 25);
+  --border: oklch(90% 0.008 25);
+  --accent: oklch(58% 0.205 25);
+
+  /* 派生 */
+  --accent-soft: color-mix(in oklch, var(--accent) 12%, transparent);
+  --tip-bg: color-mix(in oklch, var(--accent) 6%, var(--surface));
+  --login-bg: oklch(22% 0.09 250);
+
+  /* 字体：数据密集型工具产品，单一无衬线族，标题仅靠字重区分层级 */
+  --font-display: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB',
+    'Microsoft YaHei', sans-serif;
+  --font-body: var(--font-display);
+  --font-mono: ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, monospace;
+
+  /* 字号：正文 14–15px，标题 18–22px */
+  --fs-body: 14px;
+  --fs-title: 18px;
+  --fs-h2: 22px;
+
+  --radius: 6px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+}
+
+* { box-sizing: border-box; }
+
+html, body, #root { height: 100%; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 规则 2：topnav 下沿的 1px 品牌红 hairline —— 页面的视觉签名 */
+.topnav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  height: 52px;
+  padding: 0 var(--space-6);
+  background: var(--surface);
+  border-bottom: 1px solid var(--accent);
+}
+
+/* Logo：字面 AI-CODE，全大写，红色，字距 -0.01em，weight 600 */
+.brand {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: var(--fs-title);
+  letter-spacing: -0.01em;
+  color: var(--accent);
+}
+
+.topnav-spacer { flex: 1; }
+
+/* 规则 4：表单即视觉，左标签 + 右输入，不卡片化 */
+.field {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+.field > label { color: var(--muted); }
+
+input, select, textarea {
+  font: inherit;
+  color: inherit;
+  padding: var(--space-2) var(--space-3);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+input:focus-visible, select:focus-visible, textarea:focus-visible {
+  outline: 2px solid var(--accent-soft);
+  border-color: var(--accent);
+}
+
+.btn-primary {
+  font: inherit;
+  font-weight: 600;
+  color: var(--surface);
+  background: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  padding: var(--space-2) var(--space-4);
+  cursor: pointer;
+}
+.btn-primary:disabled { opacity: 0.6; cursor: progress; }
+
+/* 规则 5：极小动效 —— 仅登录页背景的极弱网格呼吸 */
+.login-stage {
+  min-height: 100%;
+  display: grid;
+  place-items: center;
+  background: var(--login-bg);
+  background-image:
+    linear-gradient(color-mix(in oklch, white 6%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in oklch, white 6%, transparent) 1px, transparent 1px);
+  background-size: 48px 48px;
+  animation: breathe 12s ease-in-out infinite alternate;
+}
+@keyframes breathe {
+  from { background-position: 0 0; }
+  to   { background-position: 48px 48px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .login-stage { animation: none; }
+}
+
+.login-card {
+  width: 360px;
+  padding: var(--space-6);
+  background: var(--surface);
+  border-radius: 10px;
+}
+
+.tip-panel {
+  padding: var(--space-3) var(--space-4);
+  background: var(--tip-bg);
+  border-radius: var(--radius);
+  color: var(--muted);
+}
+
+.page { padding: var(--space-6); }
+.muted { color: var(--muted); }

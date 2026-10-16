@@ -1,0 +1,144 @@
+plugins {
+    id 'java-library'
+}
+
+// ---------------------------------------------------------------------------
+// aicode-web —— React 前端模块
+//
+// 产物是一个内部布局为 static/** 的 Jar。aicode 以
+//   implementation project(':aicode-web')
+// 引入后，Spring Boot 会从 classpath 的 /static/ 提供页面 —— 因为 Spring Boot 的
+// 静态资源 locations 包含 classpath:/static/、/public/、/resources/、
+// /META-INF/resources/。因此本模块**不需要**任何资源拷贝任务。
+//
+// 详见 openspec/changes/add-aicode-web-openapi-contract-chain/design.md - D4
+// ---------------------------------------------------------------------------
+
+ext {
+    /** Vite 构建输出目录（相对本模块）。 */
+    distDir = layout.buildDirectory.dir('dist')
+    /** 入库的跨语言契约。前端的所有类型、请求函数与 mock 都由它生成。 */
+    contractFile = rootProject.file('contracts/openapi/openapi.yaml')
+    /** orval 生成目录。 */
+    generatedDir = layout.projectDirectory.dir('src/generated')
+}
+
+/** 探测 node 是否可用；可用时返回其可执行名，否则返回 null。 */
+def nodeBin = {
+    def env = System.getenv('NODE_BIN')
+    if (env) return env
+    try {
+        def p = new ProcessBuilder('sh', '-c', 'command -v node').redirectErrorStream(true).start()
+        p.waitFor()
+        return (p.exitValue() == 0 && p.text.contains('node')) ? 'node' : null
+    } catch (ignored) {
+        return null
+    }
+}()
+
+/**
+ * 判断能否复用已存在的构建产物。
+ * 三态设计见 openspec/specs/api-contract-artifact/spec.md：
+ *   1. 有 node            -> 走完整前端构建
+ *   2. 无 node 但有 dist  -> 复用旧产物（弱依赖）
+ *   3. 无 node 且无 dist  -> 硬失败，避免产出「不含前端」的制品且构建报成功
+ */
+def resolveFrontend = { logger ->
+    if (nodeBin != null) {
+        return 'build'
+    }
+    def dist = distDir.get().asFile
+    if (dist.exists() && !dist.listFiles().isEmpty()) {
+        logger.lifecycle('[aicode-web] 未找到 node，复用既有构建产物: ' + dist)
+        return 'reuse'
+    }
+    throw new GradleException(
+            "[aicode-web] 未找到 node，且不存在既有前端构建产物（${dist}）。\n" +
+            "构建已中止 —— 否则会产出一个不含任何前端页面的制品且构建报成功。\n" +
+            "请先安装 Node.js 后执行： ./aicode/gradlew :aicode-web:buildUi")
+}
+
+// ---------------------------------------------------------------------------
+// 前端构建
+// ---------------------------------------------------------------------------
+
+tasks.register('npmInstall', Exec) {
+    group = 'build'
+    description = '安装前端依赖（有 lock 文件时用 npm ci 保证可复现）'
+    workingDir = projectDir
+    commandLine 'npm', 'ci'
+    inputs.file('package.json')
+    inputs.file('package-lock.json')
+    outputs.dir('node_modules')
+}
+
+tasks.register('npmBuild', Exec) {
+    group = 'build'
+    description = '用 Vite 构建前端'
+    dependsOn 'npmInstall'
+    workingDir = projectDir
+    commandLine 'npm', 'run', 'build'
+    inputs.dir('src')
+    inputs.file('vite.config.ts')
+    inputs.file('tsconfig.json')
+    outputs.dir(distDir)
+}
+
+tasks.register('buildUi') {
+    group = 'build'
+    description = '构建前端页面（node 缺失且无既有产物时失败并给出提示）'
+    dependsOn 'npmBuild'
+    doFirst {
+        def mode = resolveFrontend(logger)
+        if (mode == 'reuse') {
+            logger.lifecycle('[aicode-web] 跳过前端构建（无 node，复用产物）')
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
+// 契约守卫：入库的契约文件 SHALL 与代码实际形状一致
+//
+// 契约由 aicode 的 OpenApiExportIT 在测试期刷新并写入 contracts/openapi/openapi.yaml。
+// 由于文件已入库，「当前内容」与「提交态」的差异恰好等价于
+// 「代码改了但契约未提交」—— git 即天然的比较基准，无需另建快照机制，
+// 也因此本任务不依赖 node（见 api-contract-artifact/spec.md）。
+//
+// 注意：代码尚未提交时运行本任务会得到假阴性（git diff 为空）。CI 中应在提交后运行。
+// ---------------------------------------------------------------------------
+
+tasks.register('verifyApi', Exec) {
+    group = 'verification'
+    description = '校验 contracts/openapi/openapi.yaml 与提交态一致（防契约漂移）'
+    workingDir = rootProject
+    commandLine 'sh', '-c',
+            'git diff --exit-code -- contracts/openapi/openapi.yaml || ' +
+            '{ echo ""; echo "[aicode-web] 契约已变更但未提交。"; ' +
+            'echo "请一并提交 contracts/openapi/openapi.yaml 后重试。"; exit 1; }'
+}
+
+tasks.register('generateApi', Exec) {
+    group = 'build'
+    description = '由契约生成前端类型、请求函数与 MSW mock（orval）'
+    dependsOn 'npmInstall'
+    workingDir = projectDir
+    commandLine 'npm', 'run', 'generate'
+    inputs.file(rootProject.file('contracts/openapi/openapi.yaml'))
+    inputs.file('orval.config.ts')
+    outputs.dir(generatedDir)
+}
+
+// ---------------------------------------------------------------------------
+// Jar：把 dist/** 以 static/** 为前缀打包
+// ---------------------------------------------------------------------------
+
+tasks.named('jar', Jar) {
+    dependsOn 'buildUi'
+    from(distDir) {
+        into 'static'
+    }
+    // aicode-web 本身无 Java 源码，排除默认的空源码集产物
+    from(rootProject.file('contracts')) {
+        into 'contracts'
+    }
+}

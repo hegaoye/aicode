@@ -14,7 +14,6 @@ import './styles/LoginPage.css'
 import './styles/NewProjectPage.css'
 import './styles/ProjectSqlPanel.css'
 import './styles/RelationshipPanel.css'
-import './styles/LoginPage.css'
 
 // 应用启动 —— 见 openspec/specs/aicode-web-auth/spec.md
 // 在 React 树挂载之前注册一次拦截器；多次调用幂等。

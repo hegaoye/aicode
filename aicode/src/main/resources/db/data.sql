@@ -3,6 +3,11 @@ VALUES (1, '21218cca77804d2ba2', 'admin', '21218cca77804d2ba1922c33e0151105');
 INSERT INTO `account`
 VALUES (2, '21218cca77804d2ba3', 'aicode', '21218cca77804d2ba1922c33e0151105');
 
+-- project 测试种子 —— 仅服务于 ApiContractIT 的 /project/list 契约断言
+-- accountCode 字面 "contract-test" 与 ApiContractIT 的 token claim 对齐
+INSERT INTO `project` (`id`, `code`, `name`, `description`, `englishName`, `databaseType`, `language`, `state`, `author`, `accountCode`, `isIncrement`, `createTime`)
+VALUES (1, '1882812765213425001', 'contract-demo', '契约回归测试种子项目', 'contract-demo', 'Mysql', 'Java', 'Enable', 'contract-test', 'contract-test', 'N', CURRENT_TIMESTAMP);
+
 INSERT INTO frameworks (id, code, name, description, gitHome, account, password, isPublic)
 VALUES (1, '1882812765213425664', 'springboot2.1.6-mybatisplus-redis-provider',
         '此框架以springcloud Greenwich.RELEASE，springboot 2.1.6.RELEASE 版本为基础进行整合，整合 springcloud的各个组件eureka,feign，mybatisplus,hutool实现分布式微服务',

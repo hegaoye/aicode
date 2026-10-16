@@ -456,8 +456,93 @@ class ApiContractIT {
     }
 
     // ==================================================================
+    // 场景⑦：分页列表接口应使用 PageVO<XxxVO>（api-data-object capability 的 PageVO 分页约定）
+    // ==================================================================
+
+    /**
+     * 该组关注的端点是 {@code /project/list} —— 它已经切到 {@code PageVO<ProjectVO>}
+     * （参见 {@code openspec/changes/2026-10-17-project-list-vo-contract}）。
+     * 契约断言通过 {@code data.records}（PageVO 字段）而非 {@code data.voList}（历史 Page
+     * 字段）来钉死真实形状 —— 字段名错位会立即变红。
+     */
+    @Nested
+    @DisplayName("场景⑦ 分页列表接口应使用 PageVO<XxxVO>（records 字段非空且元素为 ProjectVO）")
+    class ProjectListPageVoContract {
+
+        /**
+         * 与 db/data.sql 中 contract-demo 种子对应的 19 位雪花编码。本字段值用于反向
+         * 验证：{@link #project_list_records_fieldSet_isSuperSetOfProjectVO} 用 {@code asText()}
+         * 锁定真实值，使得任何装配错误（如 {@code vo.setCode(project.getCode())} 被误删后
+         * Jackson 会把该字段序列化为 {@code null}）都会让断言变红。
+         */
+        private static final String SEED_PROJECT_CODE = "1882812765213425001";
+
+        @Test
+        @DisplayName("data.records 是非空数组，首项含 ProjectVO 关键字段且值非空")
+        void project_list_records_containProjectVOFields() throws Exception {
+            String body = get("/project/list.shtml?curPage=1&pageSize=10", token);
+
+            JsonNode records = PARSER.readTree(body).path("data").path("records");
+            assertThat(records.isArray())
+                    .as("/project/list 响应的 data 节点下 SHALL 出现 records 数组（PageVO 字段名），实际=%s",
+                            records)
+                    .isTrue();
+            assertThat(records)
+                    .as("contract-test 账户下 project 种子 SHALL 至少返回 1 条")
+                    .isNotEmpty();
+
+            JsonNode first = records.get(0);
+            // 4 个关键字段必现，且值 SHALL 与种子一致（api-contract 能力要求 null 字段保留，
+            // 所以 "字段存在" 不能区分 "正确赋值" 与 "字段值为 null"——必须用 asText 校验值）。
+            assertThat(first.get("code").asText())
+                    .as("records[0].code SHALL 等于 db/data.sql 种子编码")
+                    .isEqualTo(SEED_PROJECT_CODE);
+            assertThat(first.get("name").asText()).isEqualTo("contract-demo");
+            assertThat(first.get("englishName").asText()).isEqualTo("contract-demo");
+            assertThat(first.has("createTime")).isTrue();
+        }
+
+        @Test
+        @DisplayName("data.records 元素字段集合 ⊇ ProjectVO 持久化字段集合（钉死 schema 不退化）")
+        void project_list_records_fieldSet_isSuperSetOfProjectVO() throws Exception {
+            String body = get("/project/list.shtml?curPage=1&pageSize=10", token);
+
+            JsonNode records = PARSER.readTree(body).path("data").path("records");
+            assertThat(records).isNotEmpty();
+
+            java.util.Set<String> allowed = java.util.Set.of(
+                    "id", "code", "name", "description", "englishName", "databaseType",
+                    "language", "state", "copyright", "author", "phone", "basePackage",
+                    "sqlFile", "downloadUrl", "buildNumber", "isRepository", "isParseTable",
+                    "isParseClass", "createTime", "updateTime", "accountCode", "isIncrement"
+            );
+            // 仅校验首条记录的字段集合 ⊆ allowed —— 若 VO 之后做字段裁剪（api-data-object
+            // 要求「不多于前端消费集」），allowed 应同步收窄。
+            java.util.Set<String> actual = fieldNames(records.get(0));
+            assertThat(actual)
+                    .as("records[0] SHALL NOT 出现 ProjectVO 持久化字段集合以外的字段，实际=%s", actual)
+                    .isSubsetOf(allowed);
+
+            // 反向：核心持久化字段 SHALL 存在 —— 防止装配断章。
+            assertThat(actual).contains("code", "name", "englishName");
+        }
+    }
+
+    // ==================================================================
     // 辅助方法
     // ==================================================================
+
+    /**
+     * 列出 JSON 节点的所有顶层字段名，仅用于契约断言的诊断输出。
+     * Jackson 3 下 {@code fieldNames()} 返回 {@code Set<String>}；本工具仅在断言失败时使用。
+     */
+    private static java.util.Set<String> fieldNames(JsonNode node) {
+        java.util.LinkedHashSet<String> names = new java.util.LinkedHashSet<>();
+        if (node != null && node.isObject()) {
+            node.fieldNames().forEachRemaining(names::add);
+        }
+        return names;
+    }
 
     private String get(String path, String jwt) throws Exception {
         return mockMvc.perform(

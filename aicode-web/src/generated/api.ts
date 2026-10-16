@@ -46,10 +46,10 @@ import type {
   RListMapFieldColumnVO,
   RListMapRelationship,
   RObject,
-  RPage,
   RPageFrameworksPageVO,
   RPageProjectFramworkPageVO,
   RPageProjectModulePageVO,
+  RPageVOProjectVO,
   RProject,
   RProjectFramwork,
   RProjectJob,
@@ -867,7 +867,7 @@ const getLoadByCodeUrl = (code: string,) => {
  */
 const list2 = (
     params: List2Params, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<RPage>> => {
+ ): Promise<AxiosResponse<RPageVOProjectVO>> => {
     return axiosInstance.get(
       `/project/list`,{
     ...options,
@@ -1401,7 +1401,7 @@ export type Load2Result = AxiosResponse<RProjectModule>
 export type List1Result = AxiosResponse<RPageProjectModulePageVO>
 export type Load3Result = AxiosResponse<RProject>
 export type LoadByCodeResult = AxiosResponse<ProjectVO>
-export type List2Result = AxiosResponse<RPage>
+export type List2Result = AxiosResponse<RPageVOProjectVO>
 export type ExecuteResult = AxiosResponse<RProjectJob>
 export type Load4Result = AxiosResponse<RProjectFramwork>
 export type List3Result = AxiosResponse<RPageProjectFramworkPageVO>

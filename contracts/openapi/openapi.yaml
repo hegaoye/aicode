@@ -689,7 +689,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/RPage"
+                $ref: "#/components/schemas/RPageVOProjectVO"
   /project/job/execute:
     get:
       tags:
@@ -1759,13 +1759,13 @@ components:
           type: array
           items: {}
         optObject: {}
-        totalPage:
-          type: integer
-          format: int64
         needCountQuery:
           type: boolean
         lastPage:
           type: boolean
+        totalPage:
+          type: integer
+          format: int64
     ProjectModulePageVO:
       type: object
       properties:
@@ -1875,44 +1875,44 @@ components:
         isIncrement:
           type: string
           description: 是否增量生成
-    Page:
+    PageVOProjectVO:
       type: object
       properties:
-        params:
-          type: object
-          additionalProperties: {}
-        voList:
-          type: array
-          items: {}
-        totalRow:
-          type: integer
-          format: int64
+        createTimeBegin:
+          type: string
+          format: date-time
+        createTimeEnd:
+          type: string
+          format: date-time
+        updateTimeBegin:
+          type: string
+          format: date-time
+        updateTimeEnd:
+          type: string
+          format: date-time
         curPage:
           type: integer
-          format: int64
+          format: int32
         pageSize:
           type: integer
           format: int32
-        sortColumns:
-          type: string
-        optObjectList:
-          type: array
-          items: {}
-        optObject: {}
-        totalPage:
+        totalRow:
           type: integer
           format: int64
-        needCountQuery:
-          type: boolean
-        lastPage:
-          type: boolean
-    RPage:
+        totalPage:
+          type: integer
+          format: int32
+        records:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProjectVO"
+    RPageVOProjectVO:
       type: object
       properties:
         info:
           type: string
         data:
-          $ref: "#/components/schemas/Page"
+          $ref: "#/components/schemas/PageVOProjectVO"
         code:
           type: string
         success:
@@ -1964,13 +1964,13 @@ components:
           type: array
           items: {}
         optObject: {}
-        totalPage:
-          type: integer
-          format: int64
         needCountQuery:
           type: boolean
         lastPage:
           type: boolean
+        totalPage:
+          type: integer
+          format: int64
     ProjectFramworkPageVO:
       type: object
       properties:
@@ -2072,13 +2072,13 @@ components:
           type: array
           items: {}
         optObject: {}
-        totalPage:
-          type: integer
-          format: int64
         needCountQuery:
           type: boolean
         lastPage:
           type: boolean
+        totalPage:
+          type: integer
+          format: int64
     RPageFrameworksPageVO:
       type: object
       properties:

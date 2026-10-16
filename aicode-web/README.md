@@ -78,6 +78,21 @@ public R<Frameworks> updateIsPublic(@Parameter(hidden = true) Frameworks framewo
 **待修**：这些 `@Parameters` 块应逐个复核 —— 删除与签名不符者、
 为确有其事者补 `schema = @Schema(type = ...)`。
 
+## M2 已对齐的端点形状
+
+为方便 M2 阶段在"如何接下一个业务端点"样板之上接入 `/login/signin`
+与 `/project/list`，相关后端已做以下准备：
+
+- **`GET /login/signin`** —— 详见 `openspec/specs/auth-account/spec.md`（既有能力）。
+  当前契约已含 `RString` 出参，前端将取得 JWT 字面。
+- **`GET /project/list`** —— 已在 `2026-10-17-project-list-vo-contract` 变更中由
+  `R<Page>` 改造为 `R<PageVO<ProjectVO>>`。契约里 `data.records` 的元素类型
+  已经是 `ProjectVO`（22 字段），`aicode-web/src/generated/model/` 下
+  `projectVO.ts` / `pageVOProjectVO.ts` / `rPageVOProjectVO.ts` 都已生成。
+
+接入这两个端点的具体业务步骤与 M1 相同，按"How to wire next endpoint"
+五步走即可。
+
 ## 如何接下一个业务端点（M1 沉淀的样板）
 
 `DisplayAttributesPage` 是契约链上**第一个**真实业务页面，把"读取契约生成物 →

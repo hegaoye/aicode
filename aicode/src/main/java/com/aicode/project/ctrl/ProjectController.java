@@ -4,6 +4,7 @@
 package com.aicode.project.ctrl;
 
 import com.aicode.core.BaseException;
+import com.aicode.core.PageVO;
 import com.aicode.core.R;
 import com.aicode.core.enums.Constants;
 import com.aicode.core.enums.YNEnum;
@@ -271,8 +272,8 @@ public class ProjectController {
             @Parameter(name = "pageSize", description = "分页大小", required = true)
     })
     @GetMapping(value = "/list")
-    public R<com.aicode.core.Page> list(String token, Integer curPage, Integer pageSize) {
-        com.aicode.core.Page pageVO = new com.aicode.core.Page();
+    public R<PageVO<ProjectVO>> list(String token, Integer curPage, Integer pageSize) {
+        PageVO<ProjectVO> pageVO = new PageVO<>();
         if (StringUtils.isBlank(token) || "null".equals(token)) {
             return R.success(pageVO);
         }
@@ -283,11 +284,50 @@ public class ProjectController {
                 .orderByDesc(Project::getCreateTime)
                 .list();
 
+        List<ProjectVO> records = new java.util.ArrayList<>(projectList.size());
+        for (Project project : projectList) {
+            records.add(toProjectVO(project));
+        }
+
         pageVO.setTotalRow(projectList.size());
-        pageVO.setVoList(projectList);
+        pageVO.setRecords(records);
         log.debug(JSON.toJSONString(pageVO));
 
         return R.success(pageVO);
+    }
+
+    /**
+     * 把持久化实体 {@link Project} 转换为出参视图对象 {@link ProjectVO}。
+     *
+     * 逐字段显式赋值而非 {@link BeanUtils#copyProperties} —— 显式胜过隐式：
+     * 任何字段重命名会在编译期暴露给维护者，避免悄悄漂移到不期望的字段
+     * （参考 `display-attribute-vo-contract` 归档变更的同等做法）。
+     */
+    private ProjectVO toProjectVO(Project project) {
+        ProjectVO vo = new ProjectVO();
+        vo.setId(project.getId());
+        vo.setCode(project.getCode());
+        vo.setName(project.getName());
+        vo.setDescription(project.getDescription());
+        vo.setEnglishName(project.getEnglishName());
+        vo.setDatabaseType(project.getDatabaseType());
+        vo.setLanguage(project.getLanguage());
+        vo.setState(project.getState());
+        vo.setCopyright(project.getCopyright());
+        vo.setAuthor(project.getAuthor());
+        vo.setPhone(project.getPhone());
+        vo.setBasePackage(project.getBasePackage());
+        vo.setSqlFile(project.getSqlFile());
+        vo.setDownloadUrl(project.getDownloadUrl());
+        vo.setBuildNumber(project.getBuildNumber());
+        vo.setIsRepository(project.getIsRepository());
+        vo.setIsParseTable(project.getIsParseTable());
+        vo.setIsParseClass(project.getIsParseClass());
+        vo.setCreateTime(project.getCreateTime());
+        vo.setUpdateTime(project.getUpdateTime());
+        vo.setAccountCode(project.getAccountCode());
+        vo.setIsIncrement(project.getIsIncrement());
+        return vo;
     }
 
 

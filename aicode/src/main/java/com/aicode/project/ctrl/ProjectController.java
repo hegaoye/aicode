@@ -75,6 +75,8 @@ public class ProjectController {
     @Autowired
     private ProjectSqlService projectSqlService;
     @Autowired
+    private ProjectInitExecutor projectInitExecutor;
+    @Autowired
     private ProjectRepositoryAccountService projectRepositoryAccountService;
     @Autowired
     private DisplayAttributeService displayAttributeService;
@@ -94,7 +96,13 @@ public class ProjectController {
     @PostMapping("/init")
     public R<Void> init(String code) {
         Assert.hasText(code, BaseException.BaseExceptionEnum.Empty_Param.toString());
-        projectService.execute(code);
+        // 异步执行（2026-10-18-init-async-progress）：原先在本请求线程里跑完
+        // 建库 + 用户建表 SQL + 逆解析，大 SQL 会让界面白屏数十秒且无进度反馈。
+        // 现在立即返回「已接受」，进度与终态经 WebSocket 推送（前端 use-init-progress）。
+        //
+        // 注意 executor 是独立 Bean 且由本类**注入**调用 —— 若改为同类内部 this.xxx() 调用，
+        // 会绕过 AOP 代理使 @Async 静默失效、请求继续同步阻塞（见 ProjectJobExecutor 的 Javadoc）。
+        projectInitExecutor.execute(code);
         return R.success();
     }
 

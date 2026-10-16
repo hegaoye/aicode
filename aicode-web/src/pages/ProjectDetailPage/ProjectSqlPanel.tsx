@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { ContractError, unwrapSuccess } from '../../lib/contract-response'
+import { unwrapSuccess } from '../../lib/contract-response'
 import { getAicodeRESTfulAPIs } from '../../generated/api'
 import type { ProjectSqlVO } from '../../generated/model/projectSqlVO'
 import type { MapClassTableVO } from '../../generated/model/mapClassTableVO'
+import { useInitProgress } from '../../lib/realtime/use-init-progress'
 
 /**
  * `ProjectSqlPanel` —— `ProjectDetailPage` 的「SQL 与解析」区块。
@@ -10,17 +11,19 @@ import type { MapClassTableVO } from '../../generated/model/mapClassTableVO'
  * <p>补上代码生成配置流程的第 ②③ 步（2026-10-18-project-create-and-sql-init）：
  * 导入建表 SQL → 触发逆解析 → 看解析出哪些表对应哪些类。</p>
  *
+ * <p><b>2026-10-18 异步化</b>（init-async-progress）：「解析」不再同步阻塞 ——
+ * 后端改为「立即接受 + WebSocket 推结构化进度」，本组件用 `useInitProgress` 消费。
+ * 进度与终态的消息形态、失败语义见该变更的 spec。</p>
+ *
  * <p>三个端点：</p>
  * <ul>
  *   <li>`POST /project/sql/build`（`projectCode` + `tsql`）—— 新增一段 SQL；</li>
- *   <li>`POST /project/init`（`code`）—— 触发逆解析（建库 + 跑 SQL + 解析元数据）；</li>
+ *   <li>`POST /project/init`（`code`）—— 触发逆解析（**异步**，进度经 ws）；</li>
  *   <li>`GET /project/relationship/listMapClassTable`（`projectCode`）—— 读解析结果。</li>
  * </ul>
  *
- * <p><b>已知局限（design D5）</b>：`init` 是**同步阻塞**的 HTTP 请求 —— 后端
- * `ProjectServiceImpl.execute()` 在请求线程里建库、跑 SQL、解析元数据，耗时
- * 取决于 SQL 复杂度（可能数秒）。这里只能显示「解析中…」并禁用按钮，无法真正
- * 异步化。彻底解法是后端改 `@Async` + WebSocket 推进度，属独立技术债。</p>
+ * <p><b>已知局限（design D5）</b>：建库阶段内部无可切分的进度点（它一次性执行用户的全部
+ * 建表 SQL），后端如实报 {@code total=0}，故此时显示不确定进度文案而非空进度条。</p>
  *
  * <p><b>为何不列出现有 SQL 段</b>：后端没有「按项目列出所有 SQL 段」的端点 ——
  * `GET /project/sql/load` 需要单个 `code`。本区块只展示本次会话中新加的段，
@@ -32,26 +35,15 @@ interface Props {
   projectCode: string
 }
 
-type ParseState =
-  | { kind: 'idle' }
-  | { kind: 'parsing' }
-  | { kind: 'error'; message: string }
-
-/** 解析结果：表 → 类的映射列表（空数组 = 尚未解析或 SQL 未产出表）。 */
-type ParseResultState = 'loading' | 'done'
-
 export default function ProjectSqlPanel({ projectCode }: Props) {
   const api = useMemo(() => getAicodeRESTfulAPIs(), [])
   const [tsql, setTsql] = useState('')
   /** 本次会话新增的 SQL 段（刷新即丢 —— 后端无「按项目列表」端点）。 */
   const [addedSegments, setAddedSegments] = useState<ProjectSqlVO[]>([])
   const [saving, setSaving] = useState(false)
-  const [parseState, setParseState] = useState<ParseState>({ kind: 'idle' })
-  // 用 MapClassTableVO（6 字段）而非 MapClassTable 实体 —— 后者虽仍留在契约
-  // components 里（其它端点可能用），但本端点已改返 VO；用实体类型会让
-  // 类型检查通过而运行时字段对不上（典型的"契约与运行时不一致"）。
+  const [saveError, setSaveError] = useState<string | null>(null)
   const [mapTables, setMapTables] = useState<MapClassTableVO[]>([])
-  const [parseResultState, setParseResultState] = useState<ParseResultState>('loading')
+  const [parseResultState, setParseResultState] = useState<'loading' | 'done'>('loading')
 
   const loadParseResult = useCallback(() => {
     if (!projectCode) {
@@ -77,49 +69,48 @@ export default function ProjectSqlPanel({ projectCode }: Props) {
     loadParseResult()
   }, [loadParseResult])
 
+  // 解析成功 → 重读结果（init 可能刚刚产出了新的表 → 类映射）。
+  // 这是 done 的唯一触发时机：改造前是"init 调用返回后"，
+  // 改造后必须等 ws 的 done，因为解析在异步线程上跑。
+  const onParseDone = useCallback(() => {
+    loadParseResult()
+  }, [loadParseResult])
+
+  const progress = useInitProgress(onParseDone)
+
   const handleSaveSql = useCallback(async () => {
     if (!tsql.trim() || saving) {
       return
     }
     setSaving(true)
+    setSaveError(null)
     try {
       const resp = await api.build({ projectCode, tsql })
       const saved = unwrapSuccess(resp)
       setAddedSegments((prev) => [...prev, saved])
       setTsql('')
     } catch (err: unknown) {
-      setParseState({
-        kind: 'error',
-        message: err instanceof ContractError ? err.info || err.code : String(err),
-      })
+      setSaveError(err instanceof Error ? err.message : String(err))
     } finally {
       setSaving(false)
     }
   }, [api, projectCode, saving, tsql])
 
-  const handleParse = useCallback(async () => {
-    if (parseState.kind === 'parsing') {
+  const handleParse = useCallback(() => {
+    if (!projectCode) {
       return
     }
-    setParseState({ kind: 'parsing' })
-    try {
-      const resp = await api.init({ code: projectCode })
-      // 必须经 unwrapSuccess：axios 对 HTTP 200 不会 reject，后端 R.failed
-      // （如建表失败 9999）同样 resolve，不解包就会把失败当成功。
-      unwrapSuccess(resp)
-      setParseState({ kind: 'idle' })
-      // 解析完成后重读结果 —— init 可能刚刚产出了新的表 → 类映射
-      loadParseResult()
-    } catch (err: unknown) {
-      setParseState({
-        kind: 'error',
-        message:
-          err instanceof ContractError
-            ? `解析失败：${err.info || err.code}`
-            : `解析失败：${String(err)}`,
-      })
-    }
-  }, [api, loadParseResult, parseState.kind, projectCode])
+    // 异步：先连 ws 再调 init（由 useInitProgress 内部保证顺序），
+    // 进度与终态经 ws 到达，故这里不 await 也不处理 HTTP 失败（那在 hook 里）
+    void progress.start(projectCode)
+  }, [progress, projectCode])
+
+  const parseBusy =
+    progress.status === 'connecting' || progress.status === 'running'
+  const showProgressArea =
+    progress.status !== 'idle' && progress.status !== 'done'
+  const progressPercent =
+    progress.total > 0 ? Math.round((progress.current / progress.total) * 100) : 0
 
   return (
     <section data-testid="project-sql-panel">
@@ -151,16 +142,72 @@ export default function ProjectSqlPanel({ projectCode }: Props) {
           type="button"
           className="btn-primary"
           data-testid="project-sql-parse"
-          disabled={parseState.kind === 'parsing'}
-          onClick={() => void handleParse()}
+          disabled={parseBusy}
+          onClick={handleParse}
         >
-          {parseState.kind === 'parsing' ? '解析中…' : '解析'}
+          {parseBusy ? '解析中…' : '解析'}
         </button>
       </div>
 
-      {parseState.kind === 'error' ? (
+      {saveError ? (
         <p role="alert" data-testid="project-sql-error" style={{ color: 'var(--accent)' }}>
-          {parseState.message}
+          {saveError}
+        </p>
+      ) : null}
+
+      {/* ---------- 异步进度区 ---------- */}
+      {showProgressArea ? (
+        <div
+          data-testid="project-parse-progress"
+          data-status={progress.status}
+          style={{ marginTop: 'var(--space-3)' }}
+        >
+          {progress.indeterminate ? (
+            // total 未知（建库阶段内部无可切分点）—— 显示文案而非 0/0 的空进度条
+            <p className="muted" data-testid="project-parse-indeterminate">
+              {progress.message || '正在处理…'}
+            </p>
+          ) : (
+            <progress
+              data-testid="project-parse-bar"
+              value={progress.current}
+              max={progress.total > 0 ? progress.total : 1}
+              style={{ width: '100%' }}
+            />
+          )}
+          <p className="muted" data-testid="project-parse-message">
+            {progress.message}
+          </p>
+          {progress.status === 'error' ? (
+            <p
+              role="alert"
+              data-testid="project-parse-error"
+              style={{ color: 'var(--accent)' }}
+            >
+              {progress.message}
+            </p>
+          ) : null}
+          {!progress.indeterminate && progress.total > 0 ? (
+            <small className="muted" data-testid="project-parse-count">
+              {progress.current}/{progress.total}（{progressPercent}%）
+            </small>
+          ) : null}
+          {progress.status === 'error' ? (
+            <button
+              type="button"
+              data-testid="project-parse-dismiss"
+              style={{ marginTop: 'var(--space-2)' }}
+              onClick={progress.clear}
+            >
+              关闭
+            </button>
+          ) : null}
+        </div>
+      ) : null}
+
+      {progress.status === 'done' ? (
+        <p className="muted" data-testid="project-parse-done">
+          {progress.message || '解析完成'}
         </p>
       ) : null}
 

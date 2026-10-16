@@ -37,10 +37,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import com.aicode.project.vo.ProjectInitProgress;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 
 /**
@@ -236,11 +239,38 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
      */
     @Override
     public void execute(String code) {
+        // 无进度回调的同步入口：委托给新重载，传 no-op。
+        // 保留此重载是为了让"同步执行"这条路径仍可用（如单测直接调用）。
+        this.execute(code, progress -> {
+        });
+    }
+
+    /**
+     * 执行逆解析，**上报进度**。
+     *
+     * <p>2026-10-18 异步化（{@code openspec/changes/2026-10-18-init-async-progress}）：
+     * 原先 {@code execute(code)} 在 HTTP 请求线程里跑完（建库 + 跑用户建表 SQL + 逆解析），
+     * 大 SQL 会让界面白屏数十秒。改由 {@code ProjectInitExecutor} 以 {@code @Async} 调用本方法，
+     * 本方法只负责业务与进度上报。</p>
+     *
+     * <p><b>业务逻辑与原实现逐行一致</b>，只在阶段与逐表循环前插入上报调用。</p>
+     *
+     * @param code      项目编码
+     * @param onProgress 进度回调；调用方据此转成 ws 消息。业务逻辑 SHALL NOT 依赖回调的实现
+     *                   （测试可传 no-op）
+     */
+    @Override
+    public void execute(String code, Consumer<ProjectInitProgress> onProgress) {
+        // 建库阶段内部无可切分的进度点（它一次性执行用户的全部建表 SQL，
+        // 要切分就得改 DatabaseDAO 的执行语义）—— 诚实报"未知"，不假报会跳变的数字
+        onProgress.accept(ProjectInitProgress.progress("createDatabase", 0, 0,
+                "正在创建数据库并执行建表脚本…"));
+
         //1.创建数据库（幂等：库已存在直接跳过建库）
         this.createDatabase(code);
 
         //2.解析数据库信息
-        boolean flag = this.parse(code);
+        boolean flag = this.parse(code, onProgress);
         if (!flag) {
             log.error(BaseException.BaseExceptionEnum.Server_Error.toString());
             throw new ProjectException(BaseException.BaseExceptionEnum.Server_Error);
@@ -311,7 +341,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
      * @param code 项目编码
      * @return true/false
      */
-    private boolean parse(String code) {
+    private boolean parse(String code, Consumer<ProjectInitProgress> onProgress) {
         //1.查询项目信息
         Project project = projectMapper.selectOne(new LambdaQueryWrapper<Project>().eq(Project::getCode, code));
         if (project == null) {
@@ -336,7 +366,15 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
         }
 
         //3.保存解析信息
+        final int totalTables = tableList.size();
+        onProgress.accept(ProjectInitProgress.progress("parse", 0, totalTables,
+                "共 " + totalTables + " 张表待解析"));
+        final int[] doneTables = {0};
         tableList.forEach(table -> {
+            // 逐表上报：current 取**已完成数**（doneTables 先取值再加 1），
+            // 前端可直接渲染 current/total，无需 +1
+            onProgress.accept(ProjectInitProgress.progress("parse", doneTables[0], totalTables,
+                    "正在解析第 " + (doneTables[0] + 1) + "/" + totalTables + " 张表：" + table.getTableName()));
             List<Column> columnList = columnDAO.list(project.getEnglishName(), table.getTableName());
             if (columnList.isEmpty()) {
                 log.error(BaseException.BaseExceptionEnum.Result_Not_Exist.toString());
@@ -380,6 +418,9 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
             });
             //保存表的列信息
             mapFieldColumnMapper.batchInsert(mapFieldColumns);
+            // 本表完成 —— 计数在 batchInsert 之后 +1，故失败中断时
+            // 已完成数如实反映「已写入且不会回滚」的表数（parse 无事务）
+            doneTables[0]++;
         });
 
         project.setIsParseTable(YNEnum.Y.name());

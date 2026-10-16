@@ -1597,4 +1597,73 @@ class ApiContractIT {
                     .contains("parameters:");
         }
     }
+
+    // ==================================================================
+    // 场景⑮：/project/init SHALL 异步接受并快速返回（2026-10-18-init-async-progress）
+    // ==================================================================
+
+    /**
+     * 本组守护 {@code POST /project/init} 从「同步执行完毕」改为「立即接受 + ws 推进度」。
+     *
+     * <p><b>耗时断言是本组的核心</b>：改造前该端点在请求线程里跑完
+     * {@code createDatabase}（建库 + 用户的全部建表 SQL）+ {@code parse}（逆解析），
+     * 大 SQL 会阻塞数十秒。改异步后必须<b>快速返回</b>。
+     * 若有人把 executor 改回同类内部 {@code this.xxx()} 调用（绕过 AOP），
+     * {@code @Async} 会静默失效、请求重新同步阻塞 —— 只有耗时断言能抓到。</p>
+     *
+     * <p>⚠️ 该端点会真的触发建库与解析，故用<b>不存在的项目编码</b>调用：
+     * 异步路径下业务失败发生在 HTTP 响应之后（异常逃逸不到调用方），
+     * 响应仍应是「已接受」。这同时验证了异步异常处理（AGENTS §6.7）。</p>
+     */
+    @Nested
+    @DisplayName("场景⑮ /project/init 异步接受并快速返回")
+    class InitAsyncContract {
+
+        private static final long FAST_RETURN_BUDGET_MS = 2000L;
+
+        @Test
+        @DisplayName("POST /project/init SHALL 快速返回 R.success（未同步阻塞到解析结束）")
+        void init_returnsQuicklyWithAcceptedSemantics() throws Exception {
+            // 用不存在的编码：同步路径下这会抛 Result_Not_Exist → 9006 失败响应；
+            // 异步路径下异常发生在响应之后，响应仍应是 success。
+            // 因此这条同时验证「异步语义」与「异常不会逃逸到 HTTP 调用方」。
+            long start = System.currentTimeMillis();
+            String body = post("/project/init.shtml", "code=not-exist-init-contract-test", token);
+            long elapsed = System.currentTimeMillis() - start;
+
+            JsonNode root = PARSER.readTree(body);
+            assertThat(root.path("success").asBoolean())
+                    .as("init SHALL 返回「已接受」（success=true）；若返回失败说明改回了同步执行"
+                            + "，实际=%s", root.path("info"))
+                    .isTrue();
+            assertThat(root.path("code").asText())
+                    .as("R.code SHALL 等于 0000，实际=%s", root.path("code"))
+                    .isEqualTo("0000");
+
+            assertThat(elapsed)
+                    .as("init SHALL 快速返回（预算 %d ms，实测 %d ms）。若超时，说明 @Async 未生效"
+                            + " —— 常见原因是 executor 被同类内部 this.xxx() 调用而绕过了 AOP 代理",
+                            FAST_RETURN_BUDGET_MS, elapsed)
+                    .isLessThan(FAST_RETURN_BUDGET_MS);
+        }
+
+        @Test
+        @DisplayName("POST /project/init 的响应契约 SHALL 仍是 R<Void>（形状未变）")
+        void init_responseContract_unchanged() throws Exception {
+            String yaml = mockMvc.perform(MockMvcRequestBuilders.get("/v3/api-docs.yaml"))
+                    .andReturn().getResponse().getContentAsString(StandardCharsets.UTF_8);
+            int idx = yaml.indexOf("/project/init:");
+            assertThat(idx).as("契约 SHALL 含 /project/init").isNotNegative();
+            String seg = yaml.substring(idx, yaml.indexOf("\n  /", idx + 5));
+
+            assertThat(seg)
+                    .as("init 的响应 SHALL 仍是 RVoid（异步化只改语义不改响应形状），"
+                            + "实际片段=%s", seg)
+                    .contains("RVoid");
+            // 入参 code 不得丢 —— 它承载"解析哪个项目"
+            assertThat(seg)
+                    .as("init SHALL 导出 parameters（code 必需），实际片段=%s", seg)
+                    .contains("parameters:");
+        }
+    }
 }

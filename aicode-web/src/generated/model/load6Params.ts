@@ -7,5 +7,8 @@
  */
 
 export type Load6Params = {
+/**
+ * 技术编码
+ */
 code: string;
 };

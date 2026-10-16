@@ -601,6 +601,11 @@ opsx 入口（功能等价，运行时暴露哪个就用哪个）：
 - **多用户**：当前单用户模式不能满足企业场景，需引入用户-角色-权限（RBAC）模型。
 - **H2 控制台暴露**：`/h2` 默认对外可访问，应通过 profile 或配置项在生产环境关闭（详见 §6.13）。
 - **密钥管理**：`JwtToken` 的密钥硬编码，应迁移到外部密钥管理（Vault / KMS / 环境变量）。
+- **⚠️ Git 仓库凭据曾明文泄漏到前端（2026-10-16 部分修复）**：`/framework/list` 与 `/framework/load` 曾把 `Frameworks.password`（模板仓库的 Git 口令）明文写进 HTTP 响应，落到浏览器 devtools / 前端 bundle / 代理日志。由 `2026-10-18-framework-list-vo-contract` 引入 `FrameworkSummaryVO`（7 字段，无 `password`，不继承 `BaseVO`）堵住。**遗留**：
+  1. `/framework/modify` 与 `/framework/updateIsPublic` 仍返 `R<Frameworks>` 实体直出，同样泄漏 `password`（无前端消费者，接管理面时须另开变更收敛）；
+  2. `PageVO<T> extends BaseVO` 导致**所有分页端点**的 `data` 层都含 4 个 `*Begin/*End` 查询辅助字段（`/project/list`、`/account/list` 等）—— 全仓共性问题，彻底修法（`PageVO` 不继承 `BaseVO` 或给 `BaseVO` 加 `@JsonIgnore`）应另开变更；
+  3. **历史泄漏无法追溯** —— 建议运维轮换全部模板仓库的 Git 凭据。
+  - 契约层约束见 `openspec/specs/api-data-object/spec.md` 的 Requirement「凭据字段 SHALL NOT 出现在任何接口响应中」；守护测试见 `ApiContractIT` 场景⑩ `FrameworkListNeverLeaksGitPassword`。
 
 ### 11.2 架构演进
 

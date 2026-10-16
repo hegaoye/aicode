@@ -5,11 +5,11 @@
  * aicode 应用
  * OpenAPI spec version: 1.0
  */
-import type { PageFrameworksPageVO } from './pageFrameworksPageVO';
+import type { FrameworkSummaryVO } from './frameworkSummaryVO';
 
-export interface RPageFrameworksPageVO {
+export interface RFrameworkSummaryVO {
   info?: string;
-  data?: PageFrameworksPageVO;
+  data?: FrameworkSummaryVO;
   code?: string;
   success?: boolean;
 }

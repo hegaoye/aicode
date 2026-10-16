@@ -134,11 +134,11 @@ class ApiContractIT {
         void code_isJsonString_matchingSnowflake() throws Exception {
             String body = get("/framework/list.shtml?curPage=1&pageSize=50", token);
 
-            JsonNode voList = PARSER.readTree(body).path("data").path("voList");
-            assertThat(voList.isArray()).isTrue();
-            assertThat(voList).isNotEmpty();
+            JsonNode records = PARSER.readTree(body).path("data").path("records");
+            assertThat(records.isArray()).isTrue();
+            assertThat(records).isNotEmpty();
 
-            for (JsonNode record : voList) {
+            for (JsonNode record : records) {
                 JsonNode code = record.get("code");
                 assertThat(code.isTextual()).as("code SHALL 为字符串，实际=%s", code).isTrue();
                 assertThat(code.asText()).matches(SNOWFLAKE_CODE);
@@ -150,8 +150,8 @@ class ApiContractIT {
         void snowflakeId_notTruncated() throws Exception {
             String body = get("/framework/list.shtml?curPage=1&pageSize=50", token);
 
-            JsonNode voList = PARSER.readTree(body).path("data").path("voList");
-            assertThat(voList).anySatisfy(record ->
+            JsonNode records = PARSER.readTree(body).path("data").path("records");
+            assertThat(records).anySatisfy(record ->
                     assertThat(record.get("code").asText())
                             .as("db/data.sql 中存在 19 位雪花编码 %s，SHALL 逐字符返回",
                                     KNOWN_SNOWFLAKE_CODE)
@@ -169,7 +169,7 @@ class ApiContractIT {
                     .isGreaterThan(9007199254740992L);
 
             String body = get("/framework/list.shtml?curPage=1&pageSize=5", token);
-            JsonNode rawId = PARSER.readTree(body).path("data").path("voList").get(0).get("id");
+            JsonNode rawId = PARSER.readTree(body).path("data").path("records").get(0).get("id");
             assertThat(rawId.toString())
                     .as("原始 JSON 文本中 id 必须带引号（当前=%s）", rawId)
                     .startsWith("\"").endsWith("\"");
@@ -389,9 +389,12 @@ class ApiContractIT {
             JsonNode record = firstRecord(body);
             assertThat(record).isNotNull();
 
-            // 遍历该实体的全部属性：SHALL NOT 出现「Java 侧有值、JSON 侧缺键」
+            // 遍历该 VO 的全部属性：SHALL NOT 出现「Java 侧有值、JSON 侧缺键」。
+            // 字段清单 = FrameworkSummaryVO 声明的 7 字段（M5-A1 起；此前的 8 字段
+            // 含 password 已由 api-data-object 的「凭据字段 SHALL NOT 出现在任何响应」
+            // Requirement 移除 —— 凭据字段根本不参与 null 保留规则）。
             for (String field : List.of("id", "code", "name", "description",
-                    "gitHome", "account", "password", "isPublic")) {
+                    "gitHome", "account", "isPublic")) {
                 assertThat(record.has(field))
                         .as("字段 %s SHALL 保留在 JSON 中（即使为 null），SHALL NOT 被省略", field)
                         .isTrue();
@@ -632,6 +635,129 @@ class ApiContractIT {
     }
 
     // ==================================================================
+    // 场景⑩：框架技术池端点 SHALL NOT 泄漏 Git 口令（api-data-object 凭据字段约束）
+    // ==================================================================
+
+    /**
+     * `Frameworks` 实体持有模板仓库的 Git 账号（{@code account}）与口令（{@code password}）。
+     * M5-A1 之前 {@code /framework/list} 与 {@code /framework/load} 把实体直出，两者都把
+     * {@code password} 明文写进 HTTP 响应 —— 与 M3-D 堵掉的 {@code AccountVO.password} 同类漏洞。
+     *
+     * <p>本组同时钉两件事：① 凭据字段不出现在响应；② 分页容器是 {@code PageVO}
+     * （{@code records}）而非 {@code Page}（{@code voList}）。</p>
+     *
+     * <p>详见 {@code openspec/changes/archive/2026-10-18-framework-list-vo-contract/}。</p>
+     */
+    @Nested
+    @DisplayName("场景⑩ 框架技术池端点不泄漏 Git 口令，且分页容器为 PageVO")
+    class FrameworkListNeverLeaksGitPassword {
+
+        /** db/data.sql 中框架种子 code（springboot2.1.6 模板）。 */
+        private static final String SEED_FRAMEWORK_CODE = "1882812765213425664";
+
+        /** db/data.sql 中该框架的 Git 口令真实值 —— 反向验证的证据。 */
+        private static final String SEED_FRAMEWORK_PASSWORD = "888888";
+
+        /** FrameworkSummaryVO 声明的 7 字段（不含 password、不含 BaseVO 的 4 个查询辅助字段）。 */
+        private static final java.util.Set<String> FRAMEWORK_VO_FIELDS = java.util.Set.of(
+                "id", "code", "name", "description", "gitHome", "account", "isPublic");
+
+        @Test
+        @DisplayName("列表端点 data.records[*] 字段集合 == FrameworkSummaryVO 的 7 字段")
+        void frameworkList_recordsFieldSet_equalsSummaryVO() throws Exception {
+            String body = get("/framework/list.shtml?curPage=1&pageSize=10", token);
+
+            JsonNode root = PARSER.readTree(body);
+            assertThat(root.path("success").asBoolean())
+                    .as("/framework/list 的 R.success 字段 SHALL 为 true，实际=%s", root.path("success"))
+                    .isTrue();
+
+            JsonNode data = root.path("data");
+            assertThat(data.isObject()).as("data SHALL 是 PageVO 对象").isTrue();
+
+            // 容器形态：records 而非 voList（M2-1 收敛方向，本变更把 /framework/list 补齐）
+            assertThat(data.has("records"))
+                    .as("data SHALL 含 records 数组（PageVO 字段），实际字段=%s", data)
+                    .isTrue();
+            assertThat(data.has("voList"))
+                    .as("data SHALL NOT 含 voList（旧 Page 字段），实际字段=%s", data)
+                    .isFalse();
+
+            JsonNode records = data.path("records");
+            assertThat(records.isArray()).as("records SHALL 是数组").isTrue();
+            assertThat(records).as("框架种子 SHALL 至少 1 条").isNotEmpty();
+
+            // 逐条校验字段集合
+            for (JsonNode record : records) {
+                java.util.Set<String> actual = fieldNames(record);
+                assertThat(actual)
+                        .as("records[*] SHALL 只含 FrameworkSummaryVO 的 7 字段，实际=%s", actual)
+                        .isSubsetOf(FRAMEWORK_VO_FIELDS);
+            }
+        }
+
+        @Test
+        @DisplayName("列表端点 records[*] SHALL NOT 含 password 与 BaseVO 的 4 个查询辅助字段")
+        void frameworkList_neverLeaksPasswordOrBaseVOFields() throws Exception {
+            String body = get("/framework/list.shtml?curPage=1&pageSize=10", token);
+
+            // 明文密码不得出现（db/data.sql 中该框架的 password 真实值）
+            assertThat(body)
+                    .as("/framework/list 响应 SHALL NOT 含 db/data.sql 中的 Git 口令明文（%s）",
+                            SEED_FRAMEWORK_PASSWORD)
+                    .doesNotContain("\"password\"");
+            assertThat(body)
+                    .as("/framework/list 响应 SHALL NOT 含 password 键")
+                    .doesNotContain("password");
+
+            // BaseVO 的 4 个查询辅助字段不得进入 **records 元素**。
+            // 注意：容器 data 本身是 PageVO<VO>，而 PageVO 也 extends BaseVO ——
+            // 那是全仓库所有分页端点的共性问题（/project/list、/account/list 同样），
+            // 属独立议题（见本变更 design 的 Open Questions）；本断言只覆盖元素层。
+            JsonNode records = PARSER.readTree(body).path("data").path("records");
+            assertThat(records.isArray()).as("records SHALL 是数组").isTrue();
+            assertThat(records).as("框架种子 SHALL 至少 1 条").isNotEmpty();
+            for (JsonNode record : records) {
+                java.util.Set<String> elementFields = fieldNames(record);
+                for (String derived : java.util.List.of(
+                        "createTimeBegin", "createTimeEnd", "updateTimeBegin", "updateTimeEnd")) {
+                    assertThat(elementFields)
+                            .as("records[*] SHALL NOT 含 BaseVO 查询辅助字段 %s，实际字段=%s",
+                                    derived, elementFields)
+                            .doesNotContain(derived);
+                }
+            }
+        }
+
+        @Test
+        @DisplayName("详情端点 data 字段集合 == FrameworkSummaryVO 的 7 字段，不含 password")
+        void frameworkLoad_dataFieldSet_equalsSummaryVO() throws Exception {
+            String body = get("/framework/load.shtml?code=" + SEED_FRAMEWORK_CODE, token);
+
+            JsonNode root = PARSER.readTree(body);
+            assertThat(root.path("success").asBoolean())
+                    .as("/framework/load 的 R.success 字段 SHALL 为 true，实际=%s", root.path("success"))
+                    .isTrue();
+
+            JsonNode data = root.path("data");
+            assertThat(data.isObject())
+                    .as("/framework/load 的 data SHALL 是 FrameworkSummaryVO 对象（找不到时为 null），实际=%s", data)
+                    .isTrue();
+            assertThat(data.path("code").asText())
+                    .as("data.code SHALL 等于种子技术编码（证明查到记录而非空对象）")
+                    .isEqualTo(SEED_FRAMEWORK_CODE);
+
+            java.util.Set<String> actual = fieldNames(data);
+            assertThat(actual)
+                    .as("/framework/load 的 data SHALL 只含 7 字段，实际=%s", actual)
+                    .isSubsetOf(FRAMEWORK_VO_FIELDS);
+            assertThat(actual.contains("password"))
+                    .as("data 字段集合 SHALL NOT 含 password —— 实际=%s", actual)
+                    .isFalse();
+        }
+    }
+
+    // ==================================================================
     // 辅助方法
     // ==================================================================
 
@@ -662,9 +788,18 @@ class ApiContractIT {
      * {@code voList}（不是 MyBatis-Plus 的 {@code records}），
      * 计数字段为 {@code totalRow}。契约断言 SHALL 反映真实结构。</p>
      */
+    /**
+     * 取出列表接口的第一条记录。
+     *
+     * <p><b>容器字段名兼容</b>：M2-1 把 {@code /project/list} 从 {@code Page}（{@code voList}）
+     * 收敛为 {@code PageVO}（{@code records}）；M5-A1 把 {@code /framework/list} 补齐到同一形态。
+     * 本 helper 同时识别两种字段名，使场景①（标识符序列化，作用于 {@code /framework/list}）
+     * 在容器收敛前后都可用。</p>
+     */
     private JsonNode firstRecord(String body) throws Exception {
-        JsonNode voList = PARSER.readTree(body).path("data").path("voList");
-        return (voList.isArray() && voList.size() > 0) ? voList.get(0) : null;
+        JsonNode data = PARSER.readTree(body).path("data");
+        JsonNode list = data.has("records") ? data.path("records") : data.path("voList");
+        return (list.isArray() && list.size() > 0) ? list.get(0) : null;
     }
 
 

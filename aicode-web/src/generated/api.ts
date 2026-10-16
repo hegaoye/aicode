@@ -42,14 +42,15 @@ import type {
   Modify4Params,
   PageVOAccountVO,
   RAccountPublicVO,
+  RFrameworkSummaryVO,
   RFrameworks,
   RListMapClassTable,
   RListMapFieldColumnVO,
   RListMapRelationship,
   RObject,
-  RPageFrameworksPageVO,
   RPageProjectFramworkPageVO,
   RPageProjectModulePageVO,
+  RPageVOFrameworkSummaryVO,
   RPageVOProjectSummaryVO,
   RProject,
   RProjectDetailVO,
@@ -1044,12 +1045,12 @@ const getSigninUrl = (params: SigninParams,) => {
 }
 
 /**
- * 创建Frameworks
- * @summary 创建Frameworks
+ * 按 code 加载框架技术（不含 Git 口令）
+ * @summary 按 code 加载框架技术
  */
 const load6 = (
     params: Load6Params, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<RFrameworks>> => {
+ ): Promise<AxiosResponse<RFrameworkSummaryVO>> => {
     return axiosInstance.get(
       `/framework/load`,{
     ...options,
@@ -1075,7 +1076,7 @@ const getLoad6Url = (params: Load6Params,) => {
  */
 const list4 = (
     params: List4Params, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<RPageFrameworksPageVO>> => {
+ ): Promise<AxiosResponse<RPageVOFrameworkSummaryVO>> => {
     return axiosInstance.get(
       `/framework/list`,{
     ...options,
@@ -1436,8 +1437,8 @@ export type List3Result = AxiosResponse<RPageProjectFramworkPageVO>
 export type DownloadFileResult = AxiosResponse<void>
 export type Load5Result = AxiosResponse<RVoid>
 export type SigninResult = AxiosResponse<RString>
-export type Load6Result = AxiosResponse<RFrameworks>
-export type List4Result = AxiosResponse<RPageFrameworksPageVO>
+export type Load6Result = AxiosResponse<RFrameworkSummaryVO>
+export type List4Result = AxiosResponse<RPageVOFrameworkSummaryVO>
 export type List5Result = AxiosResponse<RListMapFieldColumnVO>
 export type LoadByCode1Result = AxiosResponse<RAccountPublicVO>
 export type List6Result = AxiosResponse<PageVOAccountVO>

@@ -89,7 +89,7 @@ public class ProjectController {
             @Parameter(name = "code", description = "项目编码", required = true)
     })
     @PostMapping("/init")
-    public R init(String code) {
+    public R<Void> init(String code) {
         Assert.hasText(code, BaseException.BaseExceptionEnum.Empty_Param.toString());
         projectService.execute(code);
         return R.success();
@@ -148,7 +148,7 @@ public class ProjectController {
             @Parameter(name = "code", description = "项目编码")
     })
     @GetMapping(value = "/load")
-    public R load(String code) {
+    public R<Project> load(String code) {
         Assert.hasText(code, BaseException.BaseExceptionEnum.Empty_Param.toString());
         Project project = projectService.getOne(new LambdaQueryWrapper<Project>()
                 .eq(Project::getCode, code));
@@ -203,7 +203,7 @@ public class ProjectController {
             @Parameter(name = "filePath", description = "文件路径")
     })
     @GetMapping(value = "/scan/path")
-    public R scanPath(String code, String filePath) throws IOException {
+    public R<Object> scanPath(String code, String filePath) throws IOException {
         Assert.hasText(filePath, BaseException.BaseExceptionEnum.Empty_Param.toString());
         log.info(filePath);
         //自动过滤ace冗余路路径的问题
@@ -246,7 +246,7 @@ public class ProjectController {
             @Parameter(name = "basePackage", description = "项目基础包名", required = true)
     })
     @PostMapping("/build")
-    public R build(@Parameter(hidden = true) Project project, String token) {
+    public R<Project> build(@Parameter(hidden = true) Project project, String token) {
         Assert.hasText(project.getName(), BaseException.BaseExceptionEnum.Empty_Param.toString());
         Assert.hasText(project.getEnglishName(), BaseException.BaseExceptionEnum.Empty_Param.toString());
         Assert.hasText(project.getAuthor(), BaseException.BaseExceptionEnum.Empty_Param.toString());
@@ -271,7 +271,7 @@ public class ProjectController {
             @Parameter(name = "pageSize", description = "分页大小", required = true)
     })
     @GetMapping(value = "/list")
-    public R list(String token, Integer curPage, Integer pageSize) {
+    public R<com.aicode.core.Page> list(String token, Integer curPage, Integer pageSize) {
         com.aicode.core.Page pageVO = new com.aicode.core.Page();
         if (StringUtils.isBlank(token) || "null".equals(token)) {
             return R.success(pageVO);
@@ -325,7 +325,7 @@ public class ProjectController {
             @Parameter(name = "basePackage", description = "项目基础包名")
     })
     @RequestMapping("/modify")
-    public R modify(@Parameter(hidden = true) Project project) {
+    public R<Project> modify(@Parameter(hidden = true) Project project) {
         Assert.hasText(project.getCode(), BaseException.BaseExceptionEnum.Empty_Param.toString());
         if (project.getCode() != null) {
             Project projectLoad = projectService.getOne(new LambdaQueryWrapper<Project>()
@@ -349,7 +349,7 @@ public class ProjectController {
             @Parameter(name = "code", description = "项目编码", required = true)
     })
     @PostMapping("/delete")
-    public R delete(@Parameter(hidden = true) ProjectVO projectVO) {
+    public R<String> delete(@Parameter(hidden = true) ProjectVO projectVO) {
         Project newProject = new Project();
         BeanUtils.copyProperties(projectVO, newProject);
         projectService.delete(projectVO.getCode());

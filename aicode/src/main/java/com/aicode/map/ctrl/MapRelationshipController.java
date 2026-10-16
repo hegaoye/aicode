@@ -61,7 +61,7 @@ public class MapRelationshipController {
             @Parameter(name = "joinField", description = "从表关联属性", required = true),
     })
     @PostMapping("/build")
-    public R build(String mapClassTableCode, String associateCode, YNEnum oneToOne,
+    public R<Void> build(String mapClassTableCode, String associateCode, YNEnum oneToOne,
                    YNEnum oneToMany, String mainField, String joinField) {
         Assert.hasText(mapClassTableCode, BaseException.BaseExceptionEnum.Empty_Param.toString());
         Assert.hasText(associateCode, BaseException.BaseExceptionEnum.Empty_Param.toString());
@@ -121,7 +121,7 @@ public class MapRelationshipController {
             @Parameter(name = "classTableCode", description = "类表映射编码", required = true),
     })
     @GetMapping(value = "/list")
-    public R list(String classTableCode) {
+    public R<java.util.List<com.aicode.map.entity.MapRelationship>> list(String classTableCode) {
         Assert.hasText(classTableCode, "查询参数为空！");
         List<MapRelationship> relationships = mapRelationshipService.list(new LambdaQueryWrapper<MapRelationship>()
                 .eq(MapRelationship::getMapClassTableCode, classTableCode));
@@ -134,7 +134,7 @@ public class MapRelationshipController {
             @Parameter(name = "projectCode", description = "项目名", required = true)
     })
     @GetMapping(value = "/listMapClassTable")
-    public R listMapClassTable(String projectCode) {
+    public R<java.util.List<com.aicode.map.entity.MapClassTable>> listMapClassTable(String projectCode) {
         Assert.hasText(projectCode, BaseException.BaseExceptionEnum.Empty_Param.toString());
         List<ProjectMap> projectMapList = projectMapService.list(new LambdaQueryWrapper<ProjectMap>()
                 .eq(ProjectMap::getProjectCode, projectCode));
@@ -159,7 +159,7 @@ public class MapRelationshipController {
     })
     @GetMapping(value = "/listMapFieldColumn")
     @ResponseBody
-    public R listMapFieldColumn(String mapClassTableCode, String associateCode) {
+    public R<Object> listMapFieldColumn(String mapClassTableCode, String associateCode) {
         if (StringUtils.isEmpty(mapClassTableCode)) {
             return R.failed(BaseException.BaseExceptionEnum.Empty_Param);
         }
@@ -197,7 +197,7 @@ public class MapRelationshipController {
             @Parameter(name = "codes", description = "编码，多个编码使用逗号隔开", required = true),
     })
     @DeleteMapping("/delete")
-    public R delete(String codes) {
+    public R<String> delete(String codes) {
         Assert.hasText(codes, BaseException.BaseExceptionEnum.Empty_Param.toString());
         String[] array = codes.split(",");
         for (String code : array) {

@@ -38,7 +38,7 @@ public class ProjectJobController {
             @Parameter(name = "code", description = "项目编码")
     })
     @GetMapping(value = "/execute")
-    public R execute(@RequestParam("code") String projectCode) {
+    public R<ProjectJob> execute(@RequestParam("code") String projectCode) {
         try {
             log.info("执行任务 , projectCode:{}", projectCode);
             Assert.hasText(projectCode, BaseException.BaseExceptionEnum.Empty_Param.toString());

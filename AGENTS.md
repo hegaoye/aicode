@@ -296,6 +296,9 @@ Project 是聚合根：包含 `ProjectSql`、`ProjectFramwork`、`ProjectMap`、
   | `9999` | 服务器错误 |
 
 - 成功 `R.success()` / `R.success(data)`；失败 `R.failed(...)`；**禁**裸返实体或字符串。
+  - **出参形状 SHALL 由泛型返回类型承载**：方法签名写 `R<List<XxxVO>>` / `R<String>` / `R<Void>`，**禁**写裸 `R`。裸 `R` 的 `data` 是 `Object`，springdoc 导出的契约里 `R.data` 会退化为空对象 `{}`，前端无法推导字段类型，跨语言契约驱动随之失效。
+  - 无数据的接口用 `R<Void>`；一个方法内若多个分支返回不同形态的 `data`，显式写成 `R<Object>`，不要靠裸 `R` 蒙混。
+  - 泛型仅影响编译期（会被擦除），**SHALL NOT 改变运行期 JSON 结构** —— 该不变量由 `ApiContractIT` 守护。
 - `GlobalResponseBodyAdvice` 当前**注释关闭**，各 Controller 须**显式**包装 `R`；若后续启用统一包装，须全局移除手动包装，避免双重包裹。
 - `code` / `info` / `data` / `success` 四键结构，以及「`data` 为 null 时该键 SHALL NOT 被省略」，由 `openspec/specs/api-contract/spec.md` 定义并由 `ApiContractIT` 守护。
 - **REST 约定**：路径以业务域为前缀（`/project/...`、`/framework/...`、`/project/relationship/...`）；用 SpringDoc OpenAPI 3 注解（`@Tag`/`@Operation`/`@Schema`）描述接口。**API 文档 UI 用 springdoc 自带的 Swagger UI**（`/swagger-ui.html`），入口 `/v3/api-docs`；Knife4j 已于 2026-10-15 移除（其最后版本 2021 年停更，不支持 Spring Boot 4）。

@@ -1,0 +1,2662 @@
+openapi: 3.1.0
+info:
+  title: aicode RESTful APIs
+  description: aicode 应用
+  version: "1.0"
+tags:
+- name: 账户控制器
+  description: 账户控制器
+- name: 显示属性控制器
+  description: 显示属性控制器
+- name: 日志控制器
+  description: 日志控制器
+- name: 任务控制器
+  description: 任务控制器
+- name: 项目信息控制器
+  description: 项目信息控制器
+- name: 项目应用技术控制器
+  description: 项目应用技术控制器
+- name: 登陆控制器
+  description: 登陆控制器
+- name: 项目选择模块控制器
+  description: 项目选择模块控制器
+- name: 项目sql脚本控制器
+  description: 项目sql脚本控制器
+- name: 框架技术池控制器
+  description: 框架技术池控制器
+- name: 模型关系控制器
+  description: 模型关系控制器
+- name: 版本控制管理控制器
+  description: 版本控制管理控制器
+paths:
+  /framework/updateIsPublic:
+    put:
+      tags:
+      - 框架技术池控制器
+      summary: 修改状态
+      description: 修改状态
+      operationId: updateIsPublic_1
+      parameters:
+      - name: code
+        in: query
+        description: 模板编码
+        required: true
+      - name: isPublic
+        in: query
+        description: "状态：停用[N]，启用[Y]"
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RFrameworks"
+    post:
+      tags:
+      - 框架技术池控制器
+      summary: 修改状态
+      description: 修改状态
+      operationId: updateIsPublic
+      parameters:
+      - name: code
+        in: query
+        description: 模板编码
+        required: true
+      - name: isPublic
+        in: query
+        description: "状态：停用[N]，启用[Y]"
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RFrameworks"
+  /framework/modify:
+    put:
+      tags:
+      - 框架技术池控制器
+      summary: 修改Frameworks
+      description: 修改Frameworks
+      operationId: modify_1
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RFrameworks"
+    post:
+      tags:
+      - 框架技术池控制器
+      summary: 修改Frameworks
+      description: 修改Frameworks
+      operationId: modify
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RFrameworks"
+  /project/relationship/modify:
+    put:
+      tags:
+      - 模型关系控制器
+      summary: 修改MapRelationship
+      description: 修改MapRelationship
+      operationId: modify_2
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MapRelationshipVO"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: boolean
+  /account/modify:
+    put:
+      tags:
+      - 账户控制器
+      summary: 修改Account
+      description: 修改Account
+      operationId: modify_3
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AccountVO"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: boolean
+      deprecated: true
+  /project/sql/modify:
+    post:
+      tags:
+      - 项目sql脚本控制器
+      summary: 修改ProjectSql
+      description: 修改ProjectSql
+      operationId: modify_4
+      parameters:
+      - name: projectSqlVO
+        in: query
+        required: true
+        schema:
+          $ref: "#/components/schemas/ProjectSqlVO"
+      - name: code
+        in: query
+        description: tsql编码
+        required: true
+      - name: tsql
+        in: query
+        description: sql脚本
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RProjectSqlVO"
+  /project/sql/build:
+    post:
+      tags:
+      - 项目sql脚本控制器
+      summary: 创建ProjectSql
+      description: 创建ProjectSql
+      operationId: build
+      parameters:
+      - name: projectCode
+        in: query
+        description: 项目编码
+        required: true
+      - name: tsql
+        in: query
+        description: sql脚本
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RProjectSql"
+  /project/repository/modify:
+    post:
+      tags:
+      - 版本控制管理控制器
+      summary: 修改ProjectRepositoryAccount
+      description: 修改ProjectRepositoryAccount
+      operationId: modify_5
+      parameters:
+      - name: code
+        in: query
+        description: 版本管理编码
+        required: true
+      - name: projectCode
+        in: query
+        description: 项目编码
+      - name: account
+        in: query
+        description: 帐户名 最长32个汉字
+        required: true
+      - name: password
+        in: query
+        description: 密码 最长32个英文字符
+        required: true
+      - name: home
+        in: query
+        description: 仓库地址
+        required: true
+      - name: description
+        in: query
+        description: 仓库说明 最长128个汉字
+        required: true
+      - name: state
+        in: query
+        description: "状态：停用[Disenable]，启用[Enable]"
+        required: true
+      - name: type
+        in: query
+        description: "仓库类型:Git, Svn"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RProjectRepositoryAccount"
+  /project/repository/build:
+    post:
+      tags:
+      - 版本控制管理控制器
+      summary: 创建ProjectRepositoryAccount
+      description: 创建ProjectRepositoryAccount
+      operationId: build_1
+      parameters:
+      - name: account
+        in: query
+        description: 帐户名 最长32个汉字
+        required: true
+      - name: projectCode
+        in: query
+        description: 项目编码
+      - name: password
+        in: query
+        description: 密码 最长32个英文字符
+        required: true
+      - name: home
+        in: query
+        description: 仓库地址
+        required: true
+      - name: description
+        in: query
+        description: 仓库说明 最长128个汉字
+        required: true
+      - name: type
+        in: query
+        description: "仓库类型:Git, Svn"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RProjectRepositoryAccount"
+  /project/relationship/build:
+    post:
+      tags:
+      - 模型关系控制器
+      summary: 创建MapRelationship
+      description: 创建MapRelationship
+      operationId: build_2
+      parameters:
+      - name: mapClassTableCode
+        in: query
+        description: 关联编码
+        required: true
+        schema:
+          type: string
+      - name: associateCode
+        in: query
+        description: 被关联编码
+        required: true
+        schema:
+          type: string
+      - name: oneToOne
+        in: query
+        description: 一对一
+        required: true
+        schema:
+          type: string
+          enum:
+          - "Y"
+          - "N"
+      - name: oneToMany
+        in: query
+        description: 一对多
+        required: true
+        schema:
+          type: string
+          enum:
+          - "Y"
+          - "N"
+      - name: mainField
+        in: query
+        description: 主表关联属性
+        required: true
+        schema:
+          type: string
+      - name: joinField
+        in: query
+        description: 从表关联属性
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RVoid"
+  /project/mouldles/add:
+    post:
+      tags:
+      - 项目选择模块控制器
+      summary: 创建ProjectModule
+      description: 创建ProjectModule
+      operationId: build_3
+      parameters:
+      - name: projectCode
+        in: query
+        description: 项目编码
+        required: true
+      - name: moudleCode
+        in: query
+        description: 模块编码
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RProjectModule"
+      deprecated: true
+  /project/init:
+    post:
+      tags:
+      - 项目信息控制器
+      summary: 执行脚本
+      description: 执行脚本
+      operationId: init
+      parameters:
+      - name: code
+        in: query
+        description: 项目编码
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RVoid"
+  /project/framwork/add:
+    post:
+      tags:
+      - 项目应用技术控制器
+      summary: 创建ProjectFramwork
+      description: 创建ProjectFramwork
+      operationId: add
+      parameters:
+      - name: projectStr
+        in: query
+        description: 项目技术json
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RVoid"
+  /project/delete:
+    post:
+      tags:
+      - 项目信息控制器
+      summary: 删除Project
+      description: 删除Project
+      operationId: delete
+      parameters:
+      - name: code
+        in: query
+        description: 项目编码
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RString"
+  /project/build:
+    post:
+      tags:
+      - 项目信息控制器
+      summary: 创建Project
+      description: 创建Project
+      operationId: build_4
+      parameters:
+      - name: token
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: name
+        in: query
+        description: 项目名 最长128个汉字
+        required: true
+      - name: englishName
+        in: query
+        description: 项目英文名 （项目数据库名） 最长256个英文字符
+        required: true
+      - name: description
+        in: query
+        description: 项目描述 最长256个汉字
+        required: true
+      - name: databaseType
+        in: query
+        description: "数据库类型:Mysql,Oracle..."
+        required: true
+      - name: language
+        in: query
+        description: "项目语言:Java,Python,Js..."
+        required: true
+      - name: copyright
+        in: query
+        description: 项目版权文字信息
+        required: true
+      - name: author
+        in: query
+        description: 作者
+        required: true
+      - name: phone
+        in: query
+        description: 联系方式
+        required: true
+      - name: basePackage
+        in: query
+        description: 项目基础包名
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RProject"
+  /login/reg:
+    post:
+      tags:
+      - 登陆控制器
+      summary: 注册
+      description: 注册
+      operationId: reg
+      parameters:
+      - name: account
+        in: query
+        description: 账户
+        required: true
+      - name: password
+        in: query
+        description: 密码
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RVoid"
+  /framework/delete:
+    post:
+      tags:
+      - 框架技术池控制器
+      summary: 删除Frameworks
+      description: 删除Frameworks
+      operationId: delete_1
+      parameters:
+      - name: code
+        in: query
+        description: 技术编码
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RString"
+  /framework/build:
+    post:
+      tags:
+      - 框架技术池控制器
+      summary: 创建Frameworks
+      description: 创建Frameworks
+      operationId: build_5
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RVoid"
+  /displayAttribute/save:
+    post:
+      tags:
+      - 显示属性控制器
+      summary: 创建DisplayAttribute
+      description: 创建DisplayAttribute
+      operationId: build_6
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/DisplayAttribute"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RVoid"
+  /account/build:
+    post:
+      tags:
+      - 账户控制器
+      summary: 创建Account
+      description: 创建Account
+      operationId: build_7
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AccountSaveVO"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AccountSaveVO"
+      deprecated: true
+  /project/sql/load:
+    get:
+      tags:
+      - 项目sql脚本控制器
+      summary: 查询一个详情信息
+      description: 查询一个详情信息
+      operationId: load
+      parameters:
+      - name: code
+        in: query
+        description: sql编码
+        required: true
+        schema:
+          type: string
+      - name: projectCode
+        in: query
+        description: 项目编码
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RProjectSql"
+  /project/scan/path:
+    get:
+      tags:
+      - 项目信息控制器
+      summary: 查询文件路径
+      description: 查询文件路径
+      operationId: scanPath
+      parameters:
+      - name: code
+        in: query
+        description: 项目编码
+        required: true
+        schema:
+          type: string
+      - name: filePath
+        in: query
+        description: 文件路径
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RObject"
+  /project/repository/load:
+    get:
+      tags:
+      - 版本控制管理控制器
+      summary: 查询一个详情信息
+      description: 查询一个详情信息
+      operationId: load_1
+      parameters:
+      - name: code
+        in: query
+        description: 版本管理编码
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RProjectRepositoryAccount"
+  /project/relationship/list:
+    get:
+      tags:
+      - 模型关系控制器
+      summary: 查询MapRelationship信息集合
+      description: 查询MapRelationship信息集合
+      operationId: list
+      parameters:
+      - name: classTableCode
+        in: query
+        description: 类表映射编码
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RListMapRelationship"
+  /project/relationship/listMapFieldColumn:
+    get:
+      tags:
+      - 模型关系控制器
+      summary: 查询字段信息--设置表的关联关系时使用
+      description: 查询字段信息--设置表的关联关系时使用
+      operationId: listMapFieldColumn
+      parameters:
+      - name: mapClassTableCode
+        in: query
+        description: 映射编码
+        required: true
+        schema:
+          type: string
+      - name: associateCode
+        in: query
+        description: 被关联编码
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RObject"
+  /project/relationship/listMapClassTable:
+    get:
+      tags:
+      - 模型关系控制器
+      summary: 查询类表映射关系列表
+      description: 查询类表映射关系列表
+      operationId: listMapClassTable
+      parameters:
+      - name: projectCode
+        in: query
+        description: 项目名
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RListMapClassTable"
+  /project/mouldles/load:
+    get:
+      tags:
+      - 项目选择模块控制器
+      summary: 查询一个详情信息
+      description: 查询一个详情信息
+      operationId: load_2
+      parameters:
+      - name: projectCode
+        in: query
+        description: 项目编码
+        required: true
+        schema:
+          type: string
+      - name: moudleCode
+        in: query
+        description: 模块编码
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RProjectModule"
+      deprecated: true
+  /project/mouldles/list:
+    get:
+      tags:
+      - 项目选择模块控制器
+      summary: 查询ProjectModule信息集合
+      description: 查询ProjectModule信息集合
+      operationId: list_1
+      parameters:
+      - name: curPage
+        in: query
+        description: 当前页
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: pageSize
+        in: query
+        description: 分页大小
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: projectCode
+        in: query
+        description: 项目编码
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RPageProjectModulePageVO"
+      deprecated: true
+  /project/load:
+    get:
+      tags:
+      - 项目信息控制器
+      summary: 查询一个详情信息
+      description: 查询一个详情信息
+      operationId: load_3
+      parameters:
+      - name: code
+        in: query
+        description: 项目编码
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RProject"
+  /project/load/code/{code}:
+    get:
+      tags:
+      - 项目信息控制器
+      summary: 创建Project
+      description: 创建Project
+      operationId: loadByCode
+      parameters:
+      - name: code
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ProjectVO"
+      deprecated: true
+  /project/list:
+    get:
+      tags:
+      - 项目信息控制器
+      summary: 查询Project信息集合
+      description: 查询Project信息集合
+      operationId: list_2
+      parameters:
+      - name: token
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: curPage
+        in: query
+        description: 当前页
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: pageSize
+        in: query
+        description: 分页大小
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RPage"
+  /project/job/execute:
+    get:
+      tags:
+      - 任务控制器
+      summary: 执行任务
+      description: 执行任务
+      operationId: execute
+      parameters:
+      - name: code
+        in: query
+        description: 项目编码
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RProjectJob"
+  /project/framwork/load:
+    get:
+      tags:
+      - 项目应用技术控制器
+      summary: 查询一个详情信息
+      description: 查询一个详情信息
+      operationId: load_4
+      parameters:
+      - name: projectCode
+        in: query
+        description: 项目编码
+        required: true
+        schema:
+          type: string
+      - name: frameworkCode
+        in: query
+        description: 技术编码
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RProjectFramwork"
+  /project/framwork/list:
+    get:
+      tags:
+      - 项目应用技术控制器
+      summary: 查询ProjectFramwork信息集合
+      description: 查询ProjectFramwork信息集合
+      operationId: list_3
+      parameters:
+      - name: curPage
+        in: query
+        description: 当前页
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: pageSize
+        in: query
+        description: 分页大小
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: projectCode
+        in: query
+        description: 项目编码
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RPageProjectFramworkPageVO"
+  /project/download/{projectName}:
+    get:
+      tags:
+      - 项目信息控制器
+      summary: 下载项目源码
+      description: 下载项目源码
+      operationId: downloadFile
+      parameters:
+      - name: projectName
+        in: path
+        description: 项目名
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+      deprecated: true
+  /logs/load:
+    get:
+      tags:
+      - 日志控制器
+      summary: 查看文件信息
+      description: 查看文件信息
+      operationId: load_5
+      parameters:
+      - name: projectCode
+        in: query
+        description: 项目编码
+        required: true
+        schema:
+          type: string
+      - name: datetime
+        in: query
+        description: 时间
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RVoid"
+  /login/signin:
+    get:
+      tags:
+      - 登陆控制器
+      summary: 查询一个详情信息
+      description: 查询一个详情信息
+      operationId: signin
+      parameters:
+      - name: account
+        in: query
+        description: 账户
+        required: true
+        schema:
+          type: string
+      - name: password
+        in: query
+        description: 密码
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RString"
+  /framework/load:
+    get:
+      tags:
+      - 框架技术池控制器
+      summary: 创建Frameworks
+      description: 创建Frameworks
+      operationId: load_6
+      parameters:
+      - name: code
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RFrameworks"
+  /framework/list:
+    get:
+      tags:
+      - 框架技术池控制器
+      summary: 查询Frameworks信息集合
+      description: 查询Frameworks信息集合
+      operationId: list_4
+      parameters:
+      - name: curPage
+        in: query
+        description: 当前页
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: pageSize
+        in: query
+        description: 分页大小
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RPageFrameworksPageVO"
+  /displayAttribute/list:
+    get:
+      tags:
+      - 显示属性控制器
+      summary: 查询DisplayAttribute信息集合
+      description: 查询DisplayAttribute信息集合
+      operationId: list_5
+      parameters:
+      - name: mapClassTableCode
+        in: query
+        description: 映射编码
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RListMapFieldColumnVO"
+  /account/list:
+    get:
+      tags:
+      - 账户控制器
+      summary: 查询Account信息集合
+      description: 查询Account信息集合
+      operationId: list_6
+      parameters:
+      - name: curPage
+        in: query
+        description: 当前页
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: pageSize
+        in: query
+        description: 分页大小
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageVOAccountVO"
+      deprecated: true
+  /project/relationship/delete:
+    delete:
+      tags:
+      - 模型关系控制器
+      summary: 删除MapRelationship
+      description: 删除MapRelationship
+      operationId: delete_2
+      parameters:
+      - name: codes
+        in: query
+        description: 编码，多个编码使用逗号隔开
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RString"
+  /account/delete:
+    delete:
+      tags:
+      - 账户控制器
+      summary: 删除Account
+      description: 删除Account
+      operationId: delete_3
+      parameters:
+      - name: id
+        in: query
+      - name: code
+        in: query
+        description: 账户编码
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RString"
+      deprecated: true
+  /project/modify:
+    get:
+      tags:
+      - 项目信息控制器
+      summary: 修改Project
+      description: 修改Project
+      operationId: modify_6
+      parameters:
+      - name: code
+        in: query
+        description: 项目编码
+        required: true
+      - name: name
+        in: query
+        description: 项目名 最长128个汉字
+      - name: englishName
+        in: query
+        description: 项目英文名 （项目数据库名） 最长256个英文字符
+      - name: description
+        in: query
+        description: 项目描述 最长256个汉字
+      - name: databaseType
+        in: query
+        description: "数据库类型:Mysql,Oracle..."
+      - name: language
+        in: query
+        description: "项目语言:Java,Python,Js..."
+      - name: copyright
+        in: query
+        description: 项目版权文字信息
+      - name: author
+        in: query
+        description: 作者
+      - name: phone
+        in: query
+        description: 联系方式
+      - name: state
+        in: query
+        description: 项目状态
+      - name: basePackage
+        in: query
+        description: 项目基础包名
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RProject"
+    put:
+      tags:
+      - 项目信息控制器
+      summary: 修改Project
+      description: 修改Project
+      operationId: modify_8
+      parameters:
+      - name: code
+        in: query
+        description: 项目编码
+        required: true
+      - name: name
+        in: query
+        description: 项目名 最长128个汉字
+      - name: englishName
+        in: query
+        description: 项目英文名 （项目数据库名） 最长256个英文字符
+      - name: description
+        in: query
+        description: 项目描述 最长256个汉字
+      - name: databaseType
+        in: query
+        description: "数据库类型:Mysql,Oracle..."
+      - name: language
+        in: query
+        description: "项目语言:Java,Python,Js..."
+      - name: copyright
+        in: query
+        description: 项目版权文字信息
+      - name: author
+        in: query
+        description: 作者
+      - name: phone
+        in: query
+        description: 联系方式
+      - name: state
+        in: query
+        description: 项目状态
+      - name: basePackage
+        in: query
+        description: 项目基础包名
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RProject"
+    post:
+      tags:
+      - 项目信息控制器
+      summary: 修改Project
+      description: 修改Project
+      operationId: modify_7
+      parameters:
+      - name: code
+        in: query
+        description: 项目编码
+        required: true
+      - name: name
+        in: query
+        description: 项目名 最长128个汉字
+      - name: englishName
+        in: query
+        description: 项目英文名 （项目数据库名） 最长256个英文字符
+      - name: description
+        in: query
+        description: 项目描述 最长256个汉字
+      - name: databaseType
+        in: query
+        description: "数据库类型:Mysql,Oracle..."
+      - name: language
+        in: query
+        description: "项目语言:Java,Python,Js..."
+      - name: copyright
+        in: query
+        description: 项目版权文字信息
+      - name: author
+        in: query
+        description: 作者
+      - name: phone
+        in: query
+        description: 联系方式
+      - name: state
+        in: query
+        description: 项目状态
+      - name: basePackage
+        in: query
+        description: 项目基础包名
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RProject"
+    delete:
+      tags:
+      - 项目信息控制器
+      summary: 修改Project
+      description: 修改Project
+      operationId: modify_9
+      parameters:
+      - name: code
+        in: query
+        description: 项目编码
+        required: true
+      - name: name
+        in: query
+        description: 项目名 最长128个汉字
+      - name: englishName
+        in: query
+        description: 项目英文名 （项目数据库名） 最长256个英文字符
+      - name: description
+        in: query
+        description: 项目描述 最长256个汉字
+      - name: databaseType
+        in: query
+        description: "数据库类型:Mysql,Oracle..."
+      - name: language
+        in: query
+        description: "项目语言:Java,Python,Js..."
+      - name: copyright
+        in: query
+        description: 项目版权文字信息
+      - name: author
+        in: query
+        description: 作者
+      - name: phone
+        in: query
+        description: 联系方式
+      - name: state
+        in: query
+        description: 项目状态
+      - name: basePackage
+        in: query
+        description: 项目基础包名
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RProject"
+    options:
+      tags:
+      - 项目信息控制器
+      summary: 修改Project
+      description: 修改Project
+      operationId: modify_12
+      parameters:
+      - name: code
+        in: query
+        description: 项目编码
+        required: true
+      - name: name
+        in: query
+        description: 项目名 最长128个汉字
+      - name: englishName
+        in: query
+        description: 项目英文名 （项目数据库名） 最长256个英文字符
+      - name: description
+        in: query
+        description: 项目描述 最长256个汉字
+      - name: databaseType
+        in: query
+        description: "数据库类型:Mysql,Oracle..."
+      - name: language
+        in: query
+        description: "项目语言:Java,Python,Js..."
+      - name: copyright
+        in: query
+        description: 项目版权文字信息
+      - name: author
+        in: query
+        description: 作者
+      - name: phone
+        in: query
+        description: 联系方式
+      - name: state
+        in: query
+        description: 项目状态
+      - name: basePackage
+        in: query
+        description: 项目基础包名
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RProject"
+    head:
+      tags:
+      - 项目信息控制器
+      summary: 修改Project
+      description: 修改Project
+      operationId: modify_11
+      parameters:
+      - name: code
+        in: query
+        description: 项目编码
+        required: true
+      - name: name
+        in: query
+        description: 项目名 最长128个汉字
+      - name: englishName
+        in: query
+        description: 项目英文名 （项目数据库名） 最长256个英文字符
+      - name: description
+        in: query
+        description: 项目描述 最长256个汉字
+      - name: databaseType
+        in: query
+        description: "数据库类型:Mysql,Oracle..."
+      - name: language
+        in: query
+        description: "项目语言:Java,Python,Js..."
+      - name: copyright
+        in: query
+        description: 项目版权文字信息
+      - name: author
+        in: query
+        description: 作者
+      - name: phone
+        in: query
+        description: 联系方式
+      - name: state
+        in: query
+        description: 项目状态
+      - name: basePackage
+        in: query
+        description: 项目基础包名
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RProject"
+    patch:
+      tags:
+      - 项目信息控制器
+      summary: 修改Project
+      description: 修改Project
+      operationId: modify_10
+      parameters:
+      - name: code
+        in: query
+        description: 项目编码
+        required: true
+      - name: name
+        in: query
+        description: 项目名 最长128个汉字
+      - name: englishName
+        in: query
+        description: 项目英文名 （项目数据库名） 最长256个英文字符
+      - name: description
+        in: query
+        description: 项目描述 最长256个汉字
+      - name: databaseType
+        in: query
+        description: "数据库类型:Mysql,Oracle..."
+      - name: language
+        in: query
+        description: "项目语言:Java,Python,Js..."
+      - name: copyright
+        in: query
+        description: 项目版权文字信息
+      - name: author
+        in: query
+        description: 作者
+      - name: phone
+        in: query
+        description: 联系方式
+      - name: state
+        in: query
+        description: 项目状态
+      - name: basePackage
+        in: query
+        description: 项目基础包名
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RProject"
+components:
+  schemas:
+    Frameworks:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: 数据库字段:id id
+        code:
+          type: string
+          description: 数据库字段:code 技术编码
+        name:
+          type: string
+          description: 数据库字段:name 技术名称
+        description:
+          type: string
+          description: 数据库字段:description 技术描述
+        gitHome:
+          type: string
+          description: '数据库字段:gitHome '
+        account:
+          type: string
+          description: '数据库字段:account '
+        password:
+          type: string
+          description: '数据库字段:password '
+        isPublic:
+          type: string
+          description: '数据库字段:isPublic '
+    RFrameworks:
+      type: object
+      properties:
+        info:
+          type: string
+        data:
+          $ref: "#/components/schemas/Frameworks"
+        code:
+          type: string
+        success:
+          type: boolean
+    MapRelationshipVO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: 数据库字段:id id
+        code:
+          type: string
+          description: 数据库字段:code 关系编码
+        mapClassTableCode:
+          type: string
+          description: 数据库字段:mapClassTableCode 映射编码
+        associateCode:
+          type: string
+          description: 数据库字段:associateCode 被关联编码
+        isOneToOne:
+          type: string
+          description: 数据库字段:isOneToOne 是否一对一 Y N
+        isOneToMany:
+          type: string
+          description: 数据库字段:isOneToMany 是否一对多Y N
+        mainField:
+          type: string
+          description: 数据库字段:mainField 主表关联属性
+        joinField:
+          type: string
+          description: 数据库字段:joinField 从表关联属性
+    AccountVO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: '数据库字段:id '
+        code:
+          type: string
+          description: 数据库字段:code 账户编码
+        account:
+          type: string
+          description: 数据库字段:account 账户
+        password:
+          type: string
+          description: 数据库字段:password 密码
+    ProjectSqlVO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        projectCode:
+          type: string
+          description: 项目编码
+        code:
+          type: string
+          description: tsql编码
+        tsql:
+          type: string
+          description: sql脚本
+        state:
+          type: string
+          description: "状态：停用[Disenable]，启用[Enable]"
+    RProjectSqlVO:
+      type: object
+      properties:
+        info:
+          type: string
+        data:
+          $ref: "#/components/schemas/ProjectSqlVO"
+        code:
+          type: string
+        success:
+          type: boolean
+    ProjectSql:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        projectCode:
+          type: string
+          description: 项目编码
+        code:
+          type: string
+          description: tsql编码
+        tsql:
+          type: string
+          description: sql脚本
+        state:
+          type: string
+          description: "状态：停用[Disenable]，启用[Enable]"
+    RProjectSql:
+      type: object
+      properties:
+        info:
+          type: string
+        data:
+          $ref: "#/components/schemas/ProjectSql"
+        code:
+          type: string
+        success:
+          type: boolean
+    ProjectRepositoryAccount:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: id
+        code:
+          type: string
+          description: 版本管理编码
+        projectCode:
+          type: string
+          description: 项目编码
+        account:
+          type: string
+          description: 帐户名
+        password:
+          type: string
+          description: 密码
+        home:
+          type: string
+          description: 仓库地址
+        description:
+          type: string
+          description: 仓库说明
+        state:
+          type: string
+          description: "状态：停用[Disenable]，启用[Enable]"
+        type:
+          type: string
+          description: "仓库类型:Git, Svn"
+    RProjectRepositoryAccount:
+      type: object
+      properties:
+        info:
+          type: string
+        data:
+          $ref: "#/components/schemas/ProjectRepositoryAccount"
+        code:
+          type: string
+        success:
+          type: boolean
+    RVoid:
+      type: object
+      properties:
+        info:
+          type: string
+        data: {}
+        code:
+          type: string
+        success:
+          type: boolean
+    Module:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: 数据库字段:id id
+        code:
+          type: string
+          description: 数据库字段:code 模块编码
+        name:
+          type: string
+          description: 数据库字段:name 模块名
+        description:
+          type: string
+          description: 数据库字段:description 模块说明
+    ProjectModule:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: id
+        projectCode:
+          type: string
+          description: 项目编码
+        moduleCode:
+          type: string
+          description: 模块编码
+        module:
+          $ref: "#/components/schemas/Module"
+    RProjectModule:
+      type: object
+      properties:
+        info:
+          type: string
+        data:
+          $ref: "#/components/schemas/ProjectModule"
+        code:
+          type: string
+        success:
+          type: boolean
+    RString:
+      type: object
+      properties:
+        info:
+          type: string
+        data:
+          type: string
+        code:
+          type: string
+        success:
+          type: boolean
+    DisplayAttribute:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: '数据库字段:id '
+        mapClassTableCode:
+          type: string
+          description: 数据库字段:mapClassTableCode 类模型编码
+        mapFieldColumnCode:
+          type: string
+          description: 数据库字段:mapFieldColumnCode 字段编码
+        isRequired:
+          type: string
+          description: "数据库字段:isRequired 是否必填 Y,N"
+        isInsert:
+          type: string
+          description: 数据库字段:isInsert 是否插入
+        isDeleteCondition:
+          type: string
+          description: 数据库字段:isDeleteCondition 是否是删除条件
+        isAllowUpdate:
+          type: string
+          description: "数据库字段:isAllowUpdate 是否允许修改 Y,N"
+        isListPageDisplay:
+          type: string
+          description: "数据库字段:isListPageDisplay 是否分页列表显示 Y,N"
+        isDetailPageDisplay:
+          type: string
+          description: "数据库字段:isDetailPageDisplay 是否详情页显示 Y,N"
+        isQueryRequired:
+          type: string
+          description: "数据库字段:isQueryRequired 是否是查询条件 Y,N"
+        isLineNew:
+          type: string
+          description: 数据库字段:isLineNew 是否换行
+        matchType:
+          type: string
+          description: "数据库字段:matchType 匹配方式 =,!=,>=,<=,>,<,like,左like，右like,between,in"
+        displayType:
+          type: string
+          description: "数据库字段:displayType Autocomplete 自动完成, Cascader 级联选择 , DatePicker\
+            \ 日期选择框 , TimePicker 时间选择框 ,Input 单行文本框 , Textarea 多行文本框 , InputNumber\
+            \ 数字输入框 , Mobile 手机 , Phone 固话 , MobileOrPhone 手机或固话 ,Password 密码 , Email\
+            \ 邮箱 , Website 网址 , IdCard 身份证 , Mention 提及(@) ,Select 单项选择器 , MultiSelect\
+            \ 多项选择器 , Radio 单选按钮 , Checkbox 复选框 , Rate 评分 , Silder 滑动条 ,Switch 开关按\
+            钮 , TreeSelect 选择树 , Upload 上传 "
+        displayName:
+          type: string
+          description: 数据库字段:displayName 显示列名称
+        displayNo:
+          type: integer
+          format: int32
+          description: 数据库字段:displayNo 显示顺序
+        fieldValidationMode:
+          type: string
+          description: "数据库字段:fieldValidationMode Email 邮件, Address 地址, Telephone\
+            \ 电话 , Password 密码, Date  日期 , Number 数值 , Integer 整数 , Positive_Integer\
+            \ 正整数 , text 文本 ,IdCard 身份证 , Website 网址"
+        validateText:
+          type: string
+          description: 数据库字段:validateText 验证提示语
+        displayCss:
+          type: string
+          description: 数据库字段:displayCss 显示css样式
+    MapClassTable:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: 数据库字段:id id
+        code:
+          type: string
+          description: 数据库字段:code 映射编码
+        tableName:
+          type: string
+          description: 数据库字段:tableName 表名
+        className:
+          type: string
+          description: 数据库字段:className 类名
+        notes:
+          type: string
+          description: 数据库字段:notes 注释
+        classModel:
+          type: string
+        dashedCaseName:
+          type: string
+        mapFieldColumnList:
+          type: array
+          items:
+            $ref: "#/components/schemas/MapFieldColumn"
+        mapRelationshipList:
+          type: array
+          items:
+            $ref: "#/components/schemas/MapRelationship"
+    MapFieldColumn:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: 数据库字段:id id
+        mapClassTableCode:
+          type: string
+          description: 数据库字段:mapClassTableCode 映射编码
+        code:
+          type: string
+          description: 数据库字段:code 字段属性映射编码
+        column:
+          type: string
+          description: 数据库字段:column 字段
+        field:
+          type: string
+          description: 数据库字段:field 属性
+        sqlType:
+          type: string
+          description: 数据库字段:sqlType 字段类型
+        fieldType:
+          type: string
+          description: 数据库字段:fieldType 属性类型
+        notes:
+          type: string
+          description: 数据库字段:notes 注释
+        defaultValue:
+          type: string
+          description: 数据库字段:defaultValue 字段默认值
+        isPrimaryKey:
+          type: string
+          description: 数据库字段:isPrimaryKey 是否是主键
+        isDate:
+          type: string
+          description: 数据库字段:isDate 是否是时间类型
+        isState:
+          type: string
+          description: 数据库字段:isState 是否是状态
+        displayAttribute:
+          $ref: "#/components/schemas/DisplayAttribute"
+        mapRelationship:
+          $ref: "#/components/schemas/MapRelationship"
+        checkDate:
+          type: boolean
+        checkState:
+          type: boolean
+        checkPk:
+          type: boolean
+        checkDigit:
+          type: boolean
+        upper:
+          type: string
+    MapRelationship:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: 数据库字段:id id
+        code:
+          type: string
+          description: 数据库字段:code 关系编码
+        mapClassTableCode:
+          type: string
+          description: 数据库字段:mapClassTableCode 映射编码
+        associateCode:
+          type: string
+          description: 数据库字段:associateCode 被关联编码
+        isOneToOne:
+          type: string
+          description: 数据库字段:isOneToOne 是否一对一 Y N
+        isOneToMany:
+          type: string
+          description: 数据库字段:isOneToMany 是否一对多Y N
+        mainField:
+          type: string
+          description: 数据库字段:mainField 主表关联属性
+        joinField:
+          type: string
+          description: 数据库字段:joinField 从表关联属性
+        associateClass:
+          $ref: "#/components/schemas/MapClassTable"
+        oneToOne:
+          type: boolean
+        oneToMany:
+          type: boolean
+    Project:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: id
+        code:
+          type: string
+          description: 项目编码
+        name:
+          type: string
+          description: 项目名
+        description:
+          type: string
+          description: 项目描述
+        englishName:
+          type: string
+          description: 项目英文名
+        databaseType:
+          type: string
+          description: "数据库类型:Mysql,Oracle"
+        language:
+          type: string
+          description: "项目语言:Java,Python,Js"
+        state:
+          type: string
+          description: "项目状态：停用[Disenable]，启用[Enable]"
+        copyright:
+          type: string
+          description: 项目版权文字信息
+        author:
+          type: string
+          description: 作者
+        phone:
+          type: string
+          description: 联系方式
+        basePackage:
+          type: string
+          description: 项目基础包名
+        sqlFile:
+          type: string
+          description: 数据库脚本文件地址
+        downloadUrl:
+          type: string
+          description: 项目下载地址
+        buildNumber:
+          type: integer
+          format: int32
+          description: 生成次数
+        isRepository:
+          type: string
+          description: 是否仓库管理
+        isParseTable:
+          type: string
+          description: 是否已经解析表
+        isParseClass:
+          type: string
+          description: 是否已经解析类
+        createTime:
+          type: string
+          format: date-time
+          description: 创建时间
+        updateTime:
+          type: string
+          format: date-time
+          description: 更新时间
+        accountCode:
+          type: string
+          description: 账户编码
+        isIncrement:
+          type: string
+          description: 是否增量生成
+        projectFramworkList:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProjectFramwork"
+        projectMapList:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProjectMap"
+        projectJobList:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProjectJob"
+        projectModuleList:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProjectModule"
+        projectRepositoryAccountList:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProjectRepositoryAccount"
+        projectSqlList:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProjectSql"
+        relationshipAndDisplay:
+          type: string
+    ProjectFramwork:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: id
+        frameworkCode:
+          type: string
+          description: 技术编码
+        projectCode:
+          type: string
+          description: 项目编码
+        frameworks:
+          $ref: "#/components/schemas/Frameworks"
+    ProjectJob:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: id
+        projectCode:
+          type: string
+          description: 项目编码
+        code:
+          type: string
+          description: 任务编码
+        number:
+          type: integer
+          format: int32
+          description: 第多少次执行
+        state:
+          type: string
+          description: "任务状态: {创建:Create} , {执行中:Executing}, {完成:Completed} ,{失败:Error},\
+            \ {警告:Waring}"
+        createTime:
+          type: string
+          format: date-time
+          description: 执行任务时间
+        projectJobLogsList:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProjectJobLogs"
+    ProjectJobLogs:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: id
+        code:
+          type: string
+          description: 任务编码
+        log:
+          type: string
+          description: 日志
+    ProjectMap:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: id
+        projectCode:
+          type: string
+          description: 项目编码
+        mapClassTableCode:
+          type: string
+          description: 字段属性映射编码
+        mapClassTable:
+          $ref: "#/components/schemas/MapClassTable"
+    RProject:
+      type: object
+      properties:
+        info:
+          type: string
+        data:
+          $ref: "#/components/schemas/Project"
+        code:
+          type: string
+        success:
+          type: boolean
+    AccountSaveVO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: '数据库字段:id '
+        code:
+          type: string
+          description: 数据库字段:code 账户编码
+        account:
+          type: string
+          description: 数据库字段:account 账户
+        password:
+          type: string
+          description: 数据库字段:password 密码
+    RObject:
+      type: object
+      properties:
+        info:
+          type: string
+        data: {}
+        code:
+          type: string
+        success:
+          type: boolean
+    RListMapRelationship:
+      type: object
+      properties:
+        info:
+          type: string
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/MapRelationship"
+        code:
+          type: string
+        success:
+          type: boolean
+    RListMapClassTable:
+      type: object
+      properties:
+        info:
+          type: string
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/MapClassTable"
+        code:
+          type: string
+        success:
+          type: boolean
+    PageProjectModulePageVO:
+      type: object
+      properties:
+        params:
+          type: object
+          additionalProperties: {}
+        voList:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProjectModulePageVO"
+        totalRow:
+          type: integer
+          format: int64
+        curPage:
+          type: integer
+          format: int64
+        pageSize:
+          type: integer
+          format: int32
+        sortColumns:
+          type: string
+        optObjectList:
+          type: array
+          items: {}
+        optObject: {}
+        needCountQuery:
+          type: boolean
+        lastPage:
+          type: boolean
+        totalPage:
+          type: integer
+          format: int64
+    ProjectModulePageVO:
+      type: object
+      properties:
+        createTimeBegin:
+          type: string
+          format: date-time
+        createTimeEnd:
+          type: string
+          format: date-time
+        updateTimeBegin:
+          type: string
+          format: date-time
+        updateTimeEnd:
+          type: string
+          format: date-time
+        id:
+          type: integer
+          format: int64
+          description: id
+        projectCode:
+          type: string
+          description: 项目编码
+        moduleCode:
+          type: string
+          description: 模块编码
+    RPageProjectModulePageVO:
+      type: object
+      properties:
+        info:
+          type: string
+        data:
+          $ref: "#/components/schemas/PageProjectModulePageVO"
+        code:
+          type: string
+        success:
+          type: boolean
+    ProjectVO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: id
+        code:
+          type: string
+          description: 项目编码
+        name:
+          type: string
+          description: 项目名
+        description:
+          type: string
+          description: 项目描述
+        englishName:
+          type: string
+          description: 项目英文名
+        databaseType:
+          type: string
+          description: "数据库类型:Mysql,Oracle"
+        language:
+          type: string
+          description: "项目语言:Java,Python,Js"
+        state:
+          type: string
+          description: "项目状态：停用[Disenable]，启用[Enable]"
+        copyright:
+          type: string
+          description: 项目版权文字信息
+        author:
+          type: string
+          description: 作者
+        phone:
+          type: string
+          description: 联系方式
+        basePackage:
+          type: string
+          description: 项目基础包名
+        sqlFile:
+          type: string
+          description: 数据库脚本文件地址
+        downloadUrl:
+          type: string
+          description: 项目下载地址
+        buildNumber:
+          type: integer
+          format: int32
+          description: 生成次数
+        isRepository:
+          type: string
+          description: 是否仓库管理
+        isParseTable:
+          type: string
+          description: 是否已经解析表
+        isParseClass:
+          type: string
+          description: 是否已经解析类
+        createTime:
+          type: string
+          format: date-time
+          description: 创建时间
+        updateTime:
+          type: string
+          format: date-time
+          description: 更新时间
+        accountCode:
+          type: string
+          description: 账户编码
+        isIncrement:
+          type: string
+          description: 是否增量生成
+    Page:
+      type: object
+      properties:
+        params:
+          type: object
+          additionalProperties: {}
+        voList:
+          type: array
+          items: {}
+        totalRow:
+          type: integer
+          format: int64
+        curPage:
+          type: integer
+          format: int64
+        pageSize:
+          type: integer
+          format: int32
+        sortColumns:
+          type: string
+        optObjectList:
+          type: array
+          items: {}
+        optObject: {}
+        needCountQuery:
+          type: boolean
+        lastPage:
+          type: boolean
+        totalPage:
+          type: integer
+          format: int64
+    RPage:
+      type: object
+      properties:
+        info:
+          type: string
+        data:
+          $ref: "#/components/schemas/Page"
+        code:
+          type: string
+        success:
+          type: boolean
+    RProjectJob:
+      type: object
+      properties:
+        info:
+          type: string
+        data:
+          $ref: "#/components/schemas/ProjectJob"
+        code:
+          type: string
+        success:
+          type: boolean
+    RProjectFramwork:
+      type: object
+      properties:
+        info:
+          type: string
+        data:
+          $ref: "#/components/schemas/ProjectFramwork"
+        code:
+          type: string
+        success:
+          type: boolean
+    PageProjectFramworkPageVO:
+      type: object
+      properties:
+        params:
+          type: object
+          additionalProperties: {}
+        voList:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProjectFramworkPageVO"
+        totalRow:
+          type: integer
+          format: int64
+        curPage:
+          type: integer
+          format: int64
+        pageSize:
+          type: integer
+          format: int32
+        sortColumns:
+          type: string
+        optObjectList:
+          type: array
+          items: {}
+        optObject: {}
+        needCountQuery:
+          type: boolean
+        lastPage:
+          type: boolean
+        totalPage:
+          type: integer
+          format: int64
+    ProjectFramworkPageVO:
+      type: object
+      properties:
+        createTimeBegin:
+          type: string
+          format: date-time
+        createTimeEnd:
+          type: string
+          format: date-time
+        updateTimeBegin:
+          type: string
+          format: date-time
+        updateTimeEnd:
+          type: string
+          format: date-time
+        id:
+          type: integer
+          format: int64
+          description: id
+        frameworkCode:
+          type: string
+          description: 技术编码
+        projectCode:
+          type: string
+          description: 项目编码
+    RPageProjectFramworkPageVO:
+      type: object
+      properties:
+        info:
+          type: string
+        data:
+          $ref: "#/components/schemas/PageProjectFramworkPageVO"
+        code:
+          type: string
+        success:
+          type: boolean
+    FrameworksPageVO:
+      type: object
+      properties:
+        createTimeBegin:
+          type: string
+          format: date-time
+        createTimeEnd:
+          type: string
+          format: date-time
+        updateTimeBegin:
+          type: string
+          format: date-time
+        updateTimeEnd:
+          type: string
+          format: date-time
+        id:
+          type: integer
+          format: int64
+          description: 数据库字段:id id
+        code:
+          type: string
+          description: 数据库字段:code 技术编码
+        name:
+          type: string
+          description: 数据库字段:name 技术名称
+        description:
+          type: string
+          description: 数据库字段:description 技术描述
+        gitHome:
+          type: string
+          description: '数据库字段:gitHome '
+        account:
+          type: string
+          description: '数据库字段:account '
+        password:
+          type: string
+          description: '数据库字段:password '
+        isPublic:
+          type: string
+          description: '数据库字段:isPublic '
+    PageFrameworksPageVO:
+      type: object
+      properties:
+        params:
+          type: object
+          additionalProperties: {}
+        voList:
+          type: array
+          items:
+            $ref: "#/components/schemas/FrameworksPageVO"
+        totalRow:
+          type: integer
+          format: int64
+        curPage:
+          type: integer
+          format: int64
+        pageSize:
+          type: integer
+          format: int32
+        sortColumns:
+          type: string
+        optObjectList:
+          type: array
+          items: {}
+        optObject: {}
+        needCountQuery:
+          type: boolean
+        lastPage:
+          type: boolean
+        totalPage:
+          type: integer
+          format: int64
+    RPageFrameworksPageVO:
+      type: object
+      properties:
+        info:
+          type: string
+        data:
+          $ref: "#/components/schemas/PageFrameworksPageVO"
+        code:
+          type: string
+        success:
+          type: boolean
+    DisplayAttributeVO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: '数据库字段:id '
+        mapClassTableCode:
+          type: string
+          description: 数据库字段:mapClassTableCode 类模型编码
+        mapFieldColumnCode:
+          type: string
+          description: 数据库字段:mapFieldColumnCode 字段编码
+        isRequired:
+          type: string
+          description: "数据库字段:isRequired 是否必填 Y,N"
+        isInsert:
+          type: string
+          description: 数据库字段:isInsert 是否插入
+        isDeleteCondition:
+          type: string
+          description: 数据库字段:isDeleteCondition 是否是删除条件
+        isAllowUpdate:
+          type: string
+          description: "数据库字段:isAllowUpdate 是否允许修改 Y,N"
+        isListPageDisplay:
+          type: string
+          description: "数据库字段:isListPageDisplay 是否分页列表显示 Y,N"
+        isDetailPageDisplay:
+          type: string
+          description: "数据库字段:isDetailPageDisplay 是否详情页显示 Y,N"
+        isQueryRequired:
+          type: string
+          description: "数据库字段:isQueryRequired 是否是查询条件 Y,N"
+        isLineNew:
+          type: string
+          description: 数据库字段:isLineNew 是否换行
+        matchType:
+          type: string
+          description: "数据库字段:matchType 匹配方式 =,!=,>=,<=,>,<,like,左like，右like,between,in"
+        displayType:
+          type: string
+          description: "数据库字段:displayType Autocomplete 自动完成, Cascader 级联选择 , DatePicker\
+            \ 日期选择框 , TimePicker 时间选择框 ,Input 单行文本框 , Textarea 多行文本框 , InputNumber\
+            \ 数字输入框 , Mobile 手机 , Phone 固话 , MobileOrPhone 手机或固话 ,Password 密码 , Email\
+            \ 邮箱 , Website 网址 , IdCard 身份证 , Mention 提及(@) ,Select 单项选择器 , MultiSelect\
+            \ 多项选择器 , Radio 单选按钮 , Checkbox 复选框 , Rate 评分 , Silder 滑动条 ,Switch 开关按\
+            钮 , TreeSelect 选择树 , Upload 上传 "
+        displayName:
+          type: string
+          description: 数据库字段:displayName 显示列名称
+        displayNo:
+          type: integer
+          format: int32
+          description: 数据库字段:displayNo 显示顺序
+        fieldValidationMode:
+          type: string
+          description: "数据库字段:fieldValidationMode Email 邮件, Address 地址, Telephone\
+            \ 电话 , Password 密码, Date  日期 , Number 数值 , Integer 整数 , Positive_Integer\
+            \ 正整数 , text 文本 ,IdCard 身份证 , Website 网址"
+        validateText:
+          type: string
+          description: 数据库字段:validateText 验证提示语
+        displayCss:
+          type: string
+          description: 数据库字段:displayCss 显示css样式
+    MapFieldColumnVO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: 数据库字段:id id
+        mapClassTableCode:
+          type: string
+          description: 数据库字段:mapClassTableCode 映射编码
+        code:
+          type: string
+          description: 数据库字段:code 字段属性映射编码
+        column:
+          type: string
+          description: 数据库字段:column 字段
+        field:
+          type: string
+          description: 数据库字段:field 属性
+        sqlType:
+          type: string
+          description: 数据库字段:sqlType 字段类型
+        fieldType:
+          type: string
+          description: 数据库字段:fieldType 属性类型
+        notes:
+          type: string
+          description: 数据库字段:notes 注释
+        defaultValue:
+          type: string
+          description: 数据库字段:defaultValue 字段默认值
+        isPrimaryKey:
+          type: string
+          description: 数据库字段:isPrimaryKey 是否是主键
+        isDate:
+          type: string
+          description: 数据库字段:isDate 是否是时间类型
+        isState:
+          type: string
+          description: 数据库字段:isState 是否是状态
+        displayAttribute:
+          $ref: "#/components/schemas/DisplayAttributeVO"
+          description: 表单展示属性：控件类型、必填、查询匹配方式、校验提示、显示顺序等；未配置时为 null
+    RListMapFieldColumnVO:
+      type: object
+      properties:
+        info:
+          type: string
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/MapFieldColumnVO"
+        code:
+          type: string
+        success:
+          type: boolean
+    PageVOAccountVO:
+      type: object
+      properties:
+        createTimeBegin:
+          type: string
+          format: date-time
+        createTimeEnd:
+          type: string
+          format: date-time
+        updateTimeBegin:
+          type: string
+          format: date-time
+        updateTimeEnd:
+          type: string
+          format: date-time
+        curPage:
+          type: integer
+          format: int32
+        pageSize:
+          type: integer
+          format: int32
+        totalRow:
+          type: integer
+          format: int64
+        totalPage:
+          type: integer
+          format: int32
+        records:
+          type: array
+          items:
+            $ref: "#/components/schemas/AccountVO"
+

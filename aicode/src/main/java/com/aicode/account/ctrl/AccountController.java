@@ -106,7 +106,7 @@ public class AccountController {
             @Parameter(name = "code", description = "账户编码")
     })
     @DeleteMapping("/delete")
-    public R delete(@Parameter(hidden = true) AccountVO _accountVO) {
+    public R<String> delete(@Parameter(hidden = true) AccountVO _accountVO) {
         Account newAccount = new Account();
         BeanUtils.copyProperties(_accountVO, newAccount);
         accountService.remove(new LambdaQueryWrapper<Account>()

@@ -41,7 +41,7 @@ public class LogsCtrl {
             @Parameter(name = "projectCode", description = "项目编码", required = true),
     })
     @GetMapping("/load")
-    public R load(String projectCode, String datetime) {
+    public R<Void> load(String projectCode, String datetime) {
         log.info("projectCode:{} datetime:{}", projectCode, datetime);
         Assert.notNull(projectCode, BaseException.BaseExceptionEnum.Empty_Param.toString());
         Assert.notNull(datetime, BaseException.BaseExceptionEnum.Empty_Param.toString());

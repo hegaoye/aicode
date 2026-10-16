@@ -42,7 +42,7 @@ public class FrameworksController {
 
     @Operation(summary = "创建Frameworks", description = "创建Frameworks")
     @PostMapping("/build")
-    public R build(@Parameter(hidden = true) Frameworks frameworks) {
+    public R<Void> build(@Parameter(hidden = true) Frameworks frameworks) {
         frameworksService.save(frameworks);
         return R.success();
     }
@@ -50,7 +50,7 @@ public class FrameworksController {
 
     @Operation(summary = "创建Frameworks", description = "创建Frameworks")
     @GetMapping("/load")
-    public R load(String code) {
+    public R<Frameworks> load(String code) {
         if (code == null) {
             return null;
         }
@@ -67,7 +67,7 @@ public class FrameworksController {
             @Parameter(name = "pageSize", description = "分页大小", required = true),
     })
     @GetMapping(value = "/list")
-    public R list(Integer curPage, Integer pageSize) {
+    public R<com.aicode.core.Page<FrameworksPageVO>> list(Integer curPage, Integer pageSize) {
         QueryWrapper<Frameworks> queryWrapper = new QueryWrapper<>();
         queryWrapper.lambda().ne(Frameworks::getId, 0);
         IPage<Frameworks> page = new Page<>(curPage, pageSize);
@@ -91,7 +91,7 @@ public class FrameworksController {
 
     @Operation(summary = "修改Frameworks", description = "修改Frameworks")
     @RequestMapping(value = "/modify", method = {RequestMethod.PUT, RequestMethod.POST})
-    public R modify(@Parameter(hidden = true) Frameworks frameworks) {
+    public R<Frameworks> modify(@Parameter(hidden = true) Frameworks frameworks) {
         frameworksService.update(frameworks, new LambdaQueryWrapper<Frameworks>()
                 .eq(Frameworks::getCode, frameworks.getCode()));
         return R.success(frameworks);
@@ -104,7 +104,7 @@ public class FrameworksController {
             @Parameter(name = "isPublic", description = "状态：停用[N]，启用[Y]")
     })
     @RequestMapping(value = "/updateIsPublic", method = {RequestMethod.PUT, RequestMethod.POST})
-    public R updateIsPublic(@Parameter(hidden = true) Frameworks frameworks) {
+    public R<Frameworks> updateIsPublic(@Parameter(hidden = true) Frameworks frameworks) {
         Assert.hasText(frameworks.getCode(), BaseException.BaseExceptionEnum.Empty_Param.toString());
         Assert.hasText(frameworks.getIsPublic(), BaseException.BaseExceptionEnum.Empty_Param.toString());
 
@@ -119,7 +119,7 @@ public class FrameworksController {
             @Parameter(name = "code", description = "技术编码")
     })
     @PostMapping("/delete")
-    public R delete(@Parameter(hidden = true) FrameworksVO frameworksVO) {
+    public R<String> delete(@Parameter(hidden = true) FrameworksVO frameworksVO) {
         Frameworks newFrameworks = new Frameworks();
         BeanUtils.copyProperties(frameworksVO, newFrameworks);
         frameworksService.remove(new LambdaQueryWrapper<Frameworks>()

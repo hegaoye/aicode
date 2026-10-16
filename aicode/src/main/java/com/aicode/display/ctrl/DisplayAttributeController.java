@@ -41,7 +41,7 @@ public class DisplayAttributeController {
 
     @Operation(summary = "创建DisplayAttribute", description = "创建DisplayAttribute")
     @PostMapping("/save")
-    public R build(@RequestBody List<DisplayAttribute> displayAttributes) {
+    public R<Void> build(@RequestBody List<DisplayAttribute> displayAttributes) {
         if (displayAttributes == null || displayAttributes.size() <= 0) {
             return R.failed(BaseException.BaseExceptionEnum.Empty_Param);
         }
@@ -70,7 +70,7 @@ public class DisplayAttributeController {
             @Parameter(name = "mapClassTableCode", description = "映射编码"),
     })
     @GetMapping(value = "/list")
-    public R list(String mapClassTableCode) {
+    public R<java.util.List<com.aicode.map.vo.MapFieldColumnVO>> list(String mapClassTableCode) {
 
         List<MapFieldColumn> mapFieldColumns = mapFieldColumnService.list(new LambdaQueryWrapper<MapFieldColumn>()
                 .eq(MapFieldColumn::getMapClassTableCode, mapClassTableCode));

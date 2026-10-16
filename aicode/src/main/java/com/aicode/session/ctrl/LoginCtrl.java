@@ -44,7 +44,7 @@ public class LoginCtrl {
             @Parameter(name = "password", required = true, description = "密码"),
     })
     @GetMapping(value = "/signin")
-    public R signin(String account, String password, HttpServletResponse response) {
+    public R<String> signin(String account, String password, HttpServletResponse response) {
         try {
             Assert.hasText(account, BaseException.BaseExceptionEnum.Empty_Param.toString());
             Assert.hasText(password, BaseException.BaseExceptionEnum.Empty_Param.toString());
@@ -74,7 +74,7 @@ public class LoginCtrl {
             @Parameter(name = "password", required = true, description = "密码"),
     })
     @PostMapping("/reg")
-    public R reg(@Parameter(hidden = true) Account account) {
+    public R<Void> reg(@Parameter(hidden = true) Account account) {
         Assert.hasText(account.getAccount(), BaseException.BaseExceptionEnum.Empty_Param.toString());
         Assert.hasText(account.getPassword(), BaseException.BaseExceptionEnum.Empty_Param.toString());
         accountService.save(account);

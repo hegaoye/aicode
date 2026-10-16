@@ -40,7 +40,7 @@ public class ProjectRepositoryAccountController {
             @Parameter(name = "code", description = "版本管理编码")
     })
     @GetMapping(value = "/load")
-    public R load(String code) {
+    public R<ProjectRepositoryAccount> load(String code) {
         Assert.hasText(code, BaseException.BaseExceptionEnum.Empty_Param.toString());
         ProjectRepositoryAccount projectRepositoryAccount = projectRepositoryAccountService.getOne(new LambdaQueryWrapper<ProjectRepositoryAccount>()
                 .eq(ProjectRepositoryAccount::getCode, code));
@@ -59,7 +59,7 @@ public class ProjectRepositoryAccountController {
             @Parameter(name = "type", description = "仓库类型:Git, Svn", required = true)
     })
     @PostMapping("/build")
-    public R build(@Parameter(hidden = true) ProjectRepositoryAccount projectRepositoryAccount) {
+    public R<ProjectRepositoryAccount> build(@Parameter(hidden = true) ProjectRepositoryAccount projectRepositoryAccount) {
         projectRepositoryAccountService.save(projectRepositoryAccount);
         return R.success(projectRepositoryAccount);
     }
@@ -77,7 +77,7 @@ public class ProjectRepositoryAccountController {
             @Parameter(name = "type", description = "仓库类型:Git, Svn", required = true)
     })
     @PostMapping("/modify")
-    public R modify(@Parameter(hidden = true) ProjectRepositoryAccount projectRepositoryAccount) {
+    public R<ProjectRepositoryAccount> modify(@Parameter(hidden = true) ProjectRepositoryAccount projectRepositoryAccount) {
         ProjectRepositoryAccount projectRepositoryAccountLoad = projectRepositoryAccountService.getOne(new LambdaQueryWrapper<ProjectRepositoryAccount>()
                 .eq(ProjectRepositoryAccount::getCode, projectRepositoryAccount.getCode()));
         if (projectRepositoryAccountLoad != null) {

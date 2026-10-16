@@ -55,7 +55,7 @@ public class ProjectModuleController {
             @Parameter(name = "moudleCode", description = "模块编码", required = true)
     })
     @GetMapping(value = "/load")
-    public R load(String projectCode, String moudleCode) {
+    public R<ProjectModule> load(String projectCode, String moudleCode) {
         Assert.hasText(projectCode, BaseException.BaseExceptionEnum.Empty_Param.toString());
         Assert.hasText(moudleCode, BaseException.BaseExceptionEnum.Empty_Param.toString());
 
@@ -74,7 +74,7 @@ public class ProjectModuleController {
             @Parameter(name = "moudleCode", description = "模块编码", required = true)
     })
     @PostMapping("/add")
-    public R build(@Parameter(hidden = true) ProjectModule projectModule) {
+    public R<ProjectModule> build(@Parameter(hidden = true) ProjectModule projectModule) {
 
         projectModuleService.save(projectModule);
 
@@ -89,7 +89,7 @@ public class ProjectModuleController {
             @Parameter(name = "pageSize", description = "分页大小", required = true)
     })
     @GetMapping(value = "/list")
-    public R list(@Parameter(hidden = true) ProjectModulePageVO projectModuleVO, Integer curPage, Integer pageSize) {
+    public R<com.aicode.core.Page<ProjectModulePageVO>> list(@Parameter(hidden = true) ProjectModulePageVO projectModuleVO, Integer curPage, Integer pageSize) {
         IPage<ProjectModule> page = new Page<>(pageSize, curPage);
         QueryWrapper<ProjectModule> queryWrapper = new QueryWrapper<>();
         queryWrapper.lambda().eq(ProjectModule::getProjectCode, projectModuleVO.getProjectCode());

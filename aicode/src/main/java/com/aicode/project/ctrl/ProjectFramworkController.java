@@ -48,7 +48,7 @@ public class ProjectFramworkController {
             @Parameter(name = "frameworkCode", description = "技术编码", required = true)
     })
     @GetMapping(value = "/load")
-    public R load(String projectCode, String frameworkCode) {
+    public R<ProjectFramwork> load(String projectCode, String frameworkCode) {
         Assert.hasText(projectCode, BaseException.BaseExceptionEnum.Empty_Param.toString());
         Assert.hasText(frameworkCode, BaseException.BaseExceptionEnum.Empty_Param.toString());
 
@@ -66,7 +66,7 @@ public class ProjectFramworkController {
             @Parameter(name = "projectStr", description = "项目技术json", required = true)
     })
     @PostMapping("/add")
-    public R add(@Parameter(hidden = true) String projectStr) {
+    public R<Void> add(@Parameter(hidden = true) String projectStr) {
         return doBuild(projectStr);
     }
 
@@ -91,7 +91,7 @@ public class ProjectFramworkController {
             @Parameter(name = "pageSize", description = "分页大小", required = true)
     })
     @GetMapping(value = "/list")
-    public R list(@Parameter(hidden = true) ProjectFramworkPageVO projectFramworkVO, Integer curPage, Integer pageSize) {
+    public R<com.aicode.core.Page<ProjectFramworkPageVO>> list(@Parameter(hidden = true) ProjectFramworkPageVO projectFramworkVO, Integer curPage, Integer pageSize) {
         IPage<ProjectFramwork> page = new Page<>(curPage, pageSize);
 
         QueryWrapper<ProjectFramwork> queryWrapper = new QueryWrapper<>();

@@ -48,7 +48,7 @@ public class ProjectSqlController {
             @Parameter(name = "tsql", description = "sql脚本", required = true)
     })
     @PostMapping("/build")
-    public R build(@Parameter(hidden = true) ProjectSql newProjectSql) {
+    public R<ProjectSql> build(@Parameter(hidden = true) ProjectSql newProjectSql) {
         projectSqlService.save(newProjectSql);
         return R.success(newProjectSql);
     }
@@ -60,7 +60,7 @@ public class ProjectSqlController {
             @Parameter(name = "projectCode", description = "项目编码")
     })
     @GetMapping(value = "/load")
-    public R load(String code, String projectCode) {
+    public R<ProjectSql> load(String code, String projectCode) {
         Assert.hasText(code, BaseException.BaseExceptionEnum.Empty_Param.toString());
         ProjectSql projectSql = projectSqlService.getOne(new LambdaQueryWrapper<ProjectSql>()
                 .eq(ProjectSql::getCode, code)
@@ -77,7 +77,7 @@ public class ProjectSqlController {
             @Parameter(name = "tsql", description = "sql脚本", required = true)
     })
     @PostMapping("/modify")
-    public R modify(ProjectSqlVO projectSqlVO) {
+    public R<ProjectSqlVO> modify(ProjectSqlVO projectSqlVO) {
         Assert.hasText(projectSqlVO.getCode(), BaseException.BaseExceptionEnum.Empty_Param.toString());
         ProjectSql projectSqlLoad = projectSqlService.getOne(new LambdaQueryWrapper<ProjectSql>()
                 .eq(ProjectSql::getCode, projectSqlVO.getCode()));

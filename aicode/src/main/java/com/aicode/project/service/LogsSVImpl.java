@@ -158,7 +158,7 @@ public class LogsSVImpl implements LogsSV {
      * @return String
      */
     @Override
-    public R scanPath(String projectCode, String datetime) {
+    public R<Object> scanPath(String projectCode, String datetime) {
         log.info("projectCode:{} datetime:{}", projectCode, datetime);
         String name = this.loadFilePath(projectCode);
         String filePath = null;

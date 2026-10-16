@@ -150,6 +150,14 @@ export default function ProjectListPage() {
         >
           共 {totalRow} 条
         </small>
+        <Link
+          to="/project/new"
+          className="btn-primary"
+          data-testid="project-list-new"
+          style={{ marginLeft: 'var(--space-3)', fontWeight: 600, textDecoration: 'none' }}
+        >
+          新建项目
+        </Link>
       </h1>
       {records.length === 0 ? (
         <p className="muted">（暂无数据）</p>

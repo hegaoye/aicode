@@ -11,7 +11,13 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import com.aicode.project.dao.mapper.ProjectMapper;
+import com.aicode.project.dao.mapper.ProjectSqlMapper;
+import com.aicode.project.entity.Project;
+import com.aicode.project.entity.ProjectSql;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -827,6 +833,23 @@ class ApiContractIT {
     }
 
     /**
+     * POST 表单参数型端点（写侧）。
+     *
+     * <p>本项目写侧端点未用 {@code @RequestBody}，而是把每个字段作为独立的
+     * query / form 参数接收（见 {@code ProjectController#build} 的显式
+     * {@code @RequestParam} 形参）。故按 query string 拼接。</p>
+     */
+    private String post(String path, String formParams, String jwt) throws Exception {
+        return mockMvc.perform(
+                        MockMvcRequestBuilders.post(path)
+                                .header("x-requested-with", "XMLHttpRequest")
+                                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                                .param("token", jwt)
+                                .content(formParams))
+                .andReturn().getResponse().getContentAsString(StandardCharsets.UTF_8);
+    }
+
+    /**
      * 取出列表接口的第一条记录。
      *
      * <p>本项目的分页包装类是 {@code com.aicode.core.Page}，其列表字段名为
@@ -904,6 +927,191 @@ class ApiContractIT {
             assertThat(actual.contains("password"))
                     .as("data 字段集合 SHALL NOT 含 password —— M3-D 防护重点")
                     .isFalse();
+        }
+    }
+
+    // ==================================================================
+    // 场景⑪：写侧端点 SHALL 返回写侧 VO 而非实体全集
+    // （2026-10-18-project-create-and-sql-init 防护）
+    // ==================================================================
+
+    /**
+     * 本组守护 {@code api-data-object} 的「Controller SHALL 返回 VO 而非持久化实体」
+     * 在**写侧**的落地。此前 `POST /project/build` 返 `R<Project>`（29 字段，含 7 个
+     * 恒为 null 的关联 list 与 9 个纯内部字段），`POST /project/sql/build` 返
+     * `R<ProjectSql>` —— 且后者的「VO」字段与实体完全相同（含 `id`），
+     * 等于只改了类名没做裁切。
+     *
+     * <p>反向验证：把任一端点的返回类型改回实体（或把 `id` 加回 VO），
+     * 本 Nested 立即变红。</p>
+     */
+    @Nested
+    @DisplayName("场景⑪ 写侧端点返写侧 VO 而非实体全集")
+    class WriteSideVoContract {
+
+        /** `ProjectCreateVO` 的 8 字段白名单。 */
+        private static final java.util.Set<String> CREATE_VO_FIELDS = java.util.Set.of(
+                "code", "name", "englishName", "author", "basePackage",
+                "databaseType", "state", "createTime"
+        );
+
+        /** `ProjectSqlVO` 的 4 字段白名单。 */
+        private static final java.util.Set<String> SQL_VO_FIELDS = java.util.Set.of(
+                "code", "projectCode", "tsql", "state"
+        );
+
+        /**
+         * 本组用例会**真实创建**项目与 SQL 记录（写侧端点的正向行为无法靠打桩验证）。
+         *
+         * <p><b>必须清理</b>：{@code ApiContractIT} 共享一个 Spring 上下文，测试库不随
+         * 用例重置。若不清理，新建的 `it_write_vo_*` 项目会与 {@code db/data.sql} 的
+         * {@code contract-demo} 种子<b>同属一个账户</b>，而 {@code /project/list} 按
+         * {@code createTime DESC} 排序 —— 新建的更「新」，会把种子挤出 {@code records[0]}，
+         * 直接让场景⑦ 的「首项 code 等于种子」断言变红。</p>
+         *
+         * <p>这正是「测试间相互独立，禁共享可变状态」（AGENTS §7.5）要防的情形。</p>
+         */
+        @org.junit.jupiter.api.AfterEach
+        void cleanUpCreatedData() {
+            ProjectSqlMapper sqlMapper = wac.getBean(ProjectSqlMapper.class);
+            ProjectMapper projectMapper = wac.getBean(ProjectMapper.class);
+
+            // 先删 SQL（外键语义：SQL 段挂在项目下），再删项目
+            sqlMapper.delete(new LambdaQueryWrapper<ProjectSql>()
+                    .likeRight(ProjectSql::getProjectCode, "it_write_vo"));
+            // englishName 是本次建项目唯一可控的标识前缀
+            projectMapper.delete(new LambdaQueryWrapper<Project>()
+                    .likeRight(Project::getEnglishName, "it_write_vo"));
+        }
+
+        /**
+         * 建项目的完整表单参数（9 个必填 + token）。每次调用用唯一的 englishName ——
+         * `ProjectServiceImpl.save()` 校验 `englishName` 全局唯一（它同时是
+         * 数据库 schema 名），重复会抛 `Exists`。
+         */
+        private String createProjectBody(String englishName) throws Exception {
+            return post("/project/build.shtml",
+                    "name=契约演示项目"
+                            + "&englishName=" + englishName
+                            + "&author=契约守护"
+                            + "&phone=13800000000"
+                            + "&basePackage=com.demo.contract"
+                            + "&copyright=Copyright (c) 2026"
+                            + "&description=场景十一写侧 VO 契约守护"
+                            + "&databaseType=Mysql"
+                            + "&language=Java",
+                    token);
+        }
+
+        @Test
+        @DisplayName("POST /project/build 的 data 字段集合 SHALL ⊆ ProjectCreateVO 8 字段")
+        void projectBuild_data_isProjectCreateVo_notEntity() throws Exception {
+            String body = createProjectBody("it_write_vo_1");
+
+            JsonNode root = PARSER.readTree(body);
+            assertThat(root.path("success").asBoolean())
+                    .as("建项目 SHALL 成功（实际=%s）", root.path("info"))
+                    .isTrue();
+
+            java.util.Set<String> actual = fieldNames(root.path("data"));
+            assertThat(actual)
+                    .as("data 字段集合 SHALL NOT 出现 ProjectCreateVO 8 字段以外的字段"
+                            + "（即 SHALL NOT 是 Project 实体的 29 字段全集），实际=%s", actual)
+                    .isSubsetOf(CREATE_VO_FIELDS);
+
+            // 反向验证点名：实体内部字段一个都不许出现
+            for (String internal : java.util.List.of("id", "sqlFile", "downloadUrl", "buildNumber",
+                    "isRepository", "isParseTable", "isParseClass", "isIncrement",
+                    "relationshipAndDisplay")) {
+                assertThat(actual.contains(internal))
+                        .as("data 字段集合 SHALL NOT 含实体内部字段 '%s'，实际=%s", internal, actual)
+                        .isFalse();
+            }
+            // 7 个关联 list 同样不许出现
+            for (String association : java.util.List.of("projectFramworkList", "projectMapList",
+                    "projectJobList", "projectModuleList", "projectRepositoryAccountList",
+                    "projectSqlList")) {
+                assertThat(actual.contains(association))
+                        .as("data 字段集合 SHALL NOT 含关联 list '%s'（创建时恒为 null），实际=%s",
+                                association, actual)
+                        .isFalse();
+            }
+        }
+
+        @Test
+        @DisplayName("POST /project/build 返回的 data.code SHALL 非空（业务编码由雪花生成）")
+        void projectBuild_data_carriesBusinessCode() throws Exception {
+            // 正向行为断言：VO 装配不能把业务编码弄丢 ——
+            // 主键 id 由数据库自增，业务编码 code 由 Hutool 雪花生成，
+            // 二者相互独立（见 AGENTS §5.6）。若误把 id 当 code 返回，
+            // 前端跳详情页会 404。
+            String body = createProjectBody("it_write_vo_2");
+
+            JsonNode data = PARSER.readTree(body).path("data");
+            assertThat(data.path("code").asText())
+                    .as("data.code SHALL 非空（前端据此跳详情页），实际=%s", data)
+                    .isNotEmpty();
+            assertThat(data.path("code").asText().length())
+                    .as("data.code SHALL 是 19 位雪花业务编码而非自增主键，实际=%s",
+                            data.path("code").asText())
+                    .isEqualTo(19);
+        }
+
+        @Test
+        @DisplayName("POST /project/sql/build 的 data 字段集合 SHALL == ProjectSqlVO 4 字段且不含 id")
+        void projectSqlBuild_data_isProjectSqlVo_notEntity() throws Exception {
+            String body = post("/project/sql/build.shtml",
+                    "projectCode=1882812765213425001"
+                            + "&tsql=CREATE TABLE demo_t (id BIGINT PRIMARY KEY);",
+                    token);
+
+            JsonNode root = PARSER.readTree(body);
+            assertThat(root.path("success").asBoolean())
+                    .as("导 SQL SHALL 成功（实际=%s）", root.path("info"))
+                    .isTrue();
+
+            java.util.Set<String> actual = fieldNames(root.path("data"));
+            assertThat(actual)
+                    .as("data 字段集合 SHALL ⊆ ProjectSqlVO 4 字段，实际=%s", actual)
+                    .isSubsetOf(SQL_VO_FIELDS);
+            assertThat(actual.contains("id"))
+                    .as("data 字段集合 SHALL NOT 含自增主键 id —— 对外标识是业务编码 code，"
+                            + "实际=%s", actual)
+                    .isFalse();
+            assertThat(root.path("data").path("projectCode").asText())
+                    .as("data.projectCode SHALL 回显提交的 projectCode（前端据此确认写入归属）")
+                    .isEqualTo("1882812765213425001");
+        }
+
+        @Test
+        @DisplayName("POST /project/sql/modify 的 data SHALL 从持久化对象装配（不直返入参）")
+        void projectSqlModify_data_assembledFromPersistedEntity() throws Exception {
+            // 直接返入参会让响应缺 projectCode / state —— 入参只有 code + tsql。
+            // 本用例经由 /load 造一条再改，断言响应含全部 4 字段。
+            String sqlCode = PARSER.readTree(post("/project/sql/build.shtml",
+                    "projectCode=1882812765213425001&tsql=CREATE TABLE demo_t2 (id BIGINT);",
+                    token)).path("data").path("code").asText();
+
+            String body = post("/project/sql/modify.shtml",
+                    "code=" + sqlCode + "&tsql=CREATE TABLE demo_t2 (id BIGINT, name VARCHAR(32));",
+                    token);
+
+            JsonNode root = PARSER.readTree(body);
+            assertThat(root.path("success").asBoolean())
+                    .as("改 SQL SHALL 成功（实际=%s）", root.path("info"))
+                    .isTrue();
+
+            java.util.Set<String> actual = fieldNames(root.path("data"));
+            assertThat(actual)
+                    .as("modify 的 data SHALL ⊆ ProjectSqlVO 4 字段，实际=%s", actual)
+                    .isSubsetOf(SQL_VO_FIELDS);
+            assertThat(actual.contains("projectCode"))
+                    .as("modify 的 data SHALL 含 projectCode —— 直返入参会缺此字段（入参只有 "
+                            + "code + tsql），实际=%s", actual)
+                    .isTrue();
+            assertThat(root.path("data").path("tsql").asText())
+                    .as("data.tsql SHALL 等于提交的新脚本")
+                    .contains("name VARCHAR(32)");
         }
     }
 }

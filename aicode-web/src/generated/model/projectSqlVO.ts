@@ -7,11 +7,10 @@
  */
 
 export interface ProjectSqlVO {
-  id?: number;
+  /** tsql编码（雪花业务编码，对外标识） */
+  code?: string;
   /** 项目编码 */
   projectCode?: string;
-  /** tsql编码 */
-  code?: string;
   /** sql脚本 */
   tsql?: string;
   /** 状态：停用[Disenable]，启用[Enable] */

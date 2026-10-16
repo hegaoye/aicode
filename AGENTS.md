@@ -504,7 +504,7 @@ Project 是聚合根：包含 `ProjectSql`、`ProjectFramwork`、`ProjectMap`、
 6. 生成主链路端到端集成测试（§7.7.3，mock Git / 模板）。
 7. Mapper 层 `@SpringBootTest` + H2 真实 SQL 验证：`TableMapperIT`（元数据）与 `MapFieldColumnMapperIT`（实体列映射）已落地，**其余实体仍缺**。新增实体时 SHALL 参照 `MapFieldColumnMapperIT` 补一条 —— 打桩 mapper 的测试不算覆盖。
 8. **代码生成主链路的端到端回归**：当前无测试覆盖「登录 → 建项目 → 导 SQL → init → 构建」全链路（§7.7.3）。2026-10-15 的列映射事故之所以能全绿通过，正是因为这条链路只被 mock 覆盖。
-9. **前端端点覆盖补齐（M5 议程）**：后端 43 个端点中，前端目前已消费 **8** 个（`/login/signin`、`/project/list`、`/project/load/code/{code}`、`/displayAttribute/list`、`/account/load`、`/project/job/execute`、`/framework/list`、WebSocket 构建日志）。**未接入的高价值端点**：`/project/sql/*` 与 `/project/relationship/*`（代码生成的核心配置流程）、建项目的写侧端点（`/project/save`、`/project/init` 等）。每接一个页面 SHALL 走 `aicode-web/README.md` §「How to wire next endpoint」五步。
+9. **前端端点覆盖补齐（M5 议程）**：后端 43 个端点中，前端目前已消费 **11** 个（`/login/signin`、`/project/list`、`/project/load/code/{code}`、`/displayAttribute/list`、`/account/load`、`/project/job/execute`、`/framework/list`、WebSocket 构建日志、`POST /project/build`、`POST /project/sql/build`、`POST /project/init`）。**未接入的高价值端点**：`/project/relationship/build`（关联关系配置）、`/displayAttribute/save`（改字段显示方式，当前只读）。流程现状：建项目 → 导 SQL → 解析 → **配显示属性 ✅ / 关联关系 ❌** → 构建，前 5 步已可达。每接一个页面 SHALL 走 `aicode-web/README.md` §「How to wire next endpoint」五步。
 10. **CI / CD（§11.4）**：当前**无 CI**，M4 后构建链变成「gradle + node」双语言，风险放大。建议 GitHub Actions 至少含：`./aicode/gradlew clean build`（含 `:aicode-web:verifyApi` 契约漂移守卫）、`./aicode/gradlew test`、`cd aicode-web && npm ci && npm test`、`measurement/startup-time.sh` 性能基线。
 
 ---
@@ -586,6 +586,13 @@ opsx 入口（功能等价，运行时暴露哪个就用哪个）：
 - ⚠️ **`contracts/openapi/openapi.yaml` 是非确定性产物（实测，2026-10-16）**：同样代码连跑两次 `OpenApiExportIT`，两次结果**不同** —— springdoc 生成的 schema `properties` 顺序随机（表现为 `totalPage` 等字段在 `PageProjectModulePageVO` / `ProjectFramworkPageVO` 里位置来回翻转，diff 恒为 6 行）。根因：`OpenApiExportIT` 的规范化只做**行级剥离**（servers 块 + 无 schema 的装饰性参数），没有做字段排序。
   - **后果**：`git diff contracts/openapi/openapi.yaml` 不能直接当语义变化看待；`:aicode-web:verifyApi` 会随机报漂移；本地跑一次全量测试就可能意外改掉入库契约。
   - **处置**：**SHALL NOT 把这类抖动当成本次变更的产物 commit 进去**（先 `git checkout` 恢复）。根治另开变更 —— 在规范化阶段加「schema `properties` 按字母序排序」，让契约 diff 只反映语义变化。
+  - **区分抖动与真变化的方法**：把两版契约各自 `sort` 后 `diff` —— 若无行被"删了又加回"，则是**真语义变化**可安全 commit；若同一内容在两侧位置不同，则是抖动。注意普通 `git diff` 会因新增 schema 插入而把未变的块也显示为 `-`/`+` 对（伪影），**不可据此判断抖动**。
+- ⚠️ **`@Parameter(hidden = true)` 会把整个请求参数从契约里抹掉（实测，2026-10-18）**：形参上的该注解让 springdoc 忽略该形参，导致前端**无法用 orval 生成物提交写侧请求**，只能手写 axios 绕过契约 —— 直接击穿 M4 契约驱动架构的前提。全仓当前 **18 处**（`2026-10-18-project-create-and-sql-init` 只修了其中 3 个，其余另开变更）。
+  - **只去掉 `hidden` 是不够的**：实测 springdoc 会把整个实体当**一个** query 参数导出（`- name: project` + `$ref: Project`），而运行时接受的是 N 个扁平参数 —— **契约与运行时不一致，且前端照契约实现不会报错**（TS 类型仍合法），属更隐蔽的缺陷。正确修法是**显式 `@RequestParam` 形参**（逐字段），让契约与运行时同为 N 个扁平参数。
+- ⚠️ **TypeScript 类型断言 `as` 会禁用检查 —— "看起来有守护、实则没有"**：为守护「表单字段集合 = 契约字段集合」写了 `const _cov: Record<FormField, true> = FIELD_META.reduce(..., {} as Record<FormField, true>)`。实测**删掉一个字段后 `tsc` 零报错**（`as` 让 TS 直接相信断言）。两处修正缺一不可：
+  1. 数组用 **`satisfies FieldMeta[]`** 而非 `: FieldMeta[]` —— 后者让 TS 用接口类型而非字面量联合描述数组，`(typeof ARR)[number]['field']` 拿到的是整个 `FormField`，`Exclude<FormField, FormField>` 恒为 `never`，断言静默失效；
+  2. 完备性用**差集判定** `const _c: MissingField extends never ? true : never = true` —— 漏字段时 `MissingField` 不再是 `never`，`true` 赋值失败 → `error TS2322`。**零运行时开销，且在 `npm run typecheck` 阶段就红**。
+  - **教训**：任何"类型级反向断言"都必须做**反向验证**（临时删掉一个字段，确认 `tsc` 报错）。没验证过的类型断言等于没写。
 - **`.shtml` 后缀由 `ShtmlSuffixRewriteFilter` 提供**：Spring Framework 7 移除了 `PathMatchConfigurer#setUseSuffixPatternMatch`，后缀匹配不再是框架默认行为。前端（Angular 7 + jQuery 打包产物）会为每个 API 请求 URL 追加 `.shtml`，因此**新增 API 前缀时必须同步维护 `ShtmlSuffixRewriteFilter.API_PREFIXES`**。
 - **MockMvc 不会自动注册 Bean 形态的 Filter**：`MockMvcBuilders.webAppContextSetup(wac)` 只装配 `DispatcherServlet`，`.shtml` 相关的测试必须显式 `.addFilters(shtmlSuffixRewriteFilter)`，否则请求会落到静态资源处理器并报 `NoResourceFoundException`。真实运行时由嵌入式容器自动注册，不受影响。
 - **Boot 4 的 Actuator 端点默认 `access=none`**：即使 `management.endpoints.web.exposure.include="*"`，未设 `management.endpoint.<name>.access` 的端点仍返回 **400**。当前已开放 `env` / `shutdown` / `metrics` / `prometheus`。新增端点时记得同步。
@@ -633,9 +640,11 @@ opsx 入口（功能等价，运行时暴露哪个就用哪个）：
   - 契约守护：`TemplateDataExpansionTest` —— 固化「模板变量展开必须用 fastjson2 往返而非 hutool `BeanUtil.beanToMap`」（getter 名 vs 字段名键集差异）
   - **假分页回归防线（M5-C 后新增）**：`ApiContractIT` 场景⑦ 的 `project_list_reflectsPaginationParams` 与 `project_list_fallsBackToDefaultsWhenParamsInvalid` 两用例钉住「`/project/list` 的 `data.curPage` / `data.pageSize` / `data.totalPage` SHALL 回填实际查询参数」。此前 `ProjectController.list` 曾是**假分页**（`lambdaQuery().list()` 拉全量、`curPage` / `pageSize` 入参被忽略、三个分页字段从不 set 恒为 0），已由 `2026-10-18-project-list-real-pagination` 修为真分页。**同类待收敛**：`/account/list` 也只 `setTotalRow` 不设三个分页字段。
   - 外部依赖：`GitToolsCloneCompletenessTest` —— 需网络访问 GitHub，由 `@EnabledIfSystemProperty(named = "network.tests")` 守卫，默认**不执行**；离线 CI 需显式加 `-Dnetwork.tests=true`
-  - **前端（M1–M5 落地，18 文件 / 94 用例，MSW 驱动）**：
+  - **前端（M1–M5 落地，20 文件 / 108 用例，MSW 驱动）**：
     - **响应契约层**：`contract-response/index.test.ts`（6 用例：`R.success` 解构 / `ContractError` 带 code+info / 非 `0000` 视为失败 / 缺省 code → UNKNOWN / message 回退）
     - **页面层**：`DisplayAttributesPage`（1）/ `LoginPage`（3，含空 token 与 `R.code!=="0000"`）/ `ProjectListPage`（**9**：构建按钮展开与 `state!=='Enable'` 禁用 / 翻页重拉并整页替换 / 末页禁用且点击不发请求 / `buildingCodes` 跨翻页保留 / **翻回不重复调 `execute`**）/ `ProjectDetailPage`（4，含裸 VO 触发错误气泡的反向用例）/ `AccountPage`（3）/ `FrameworkListPage`（5，成功渲染含 `isPublic` 中文映射与分页信息 / 空态非错误 / `R.code!=="0000"` / 翻页重拉并替换表格 / 末页禁用且点击不发请求）
+    - **写侧页面层（首个）**：`NewProjectPage`（**9**）—— 本仓**第一个有提交能力的页面**，此前 7 个页面全是只读的。用例含：9 字段渲染 / `databaseType`+`language` 是下拉（D9）/ `englishName` 旁提示「将作为数据库 schema 名」（D8）/ 提交带全部 9 字段 + token / 成功导航到 `/project/{code}` / `R.code!=="0000"` 错误气泡且**保留已填字段** / `9005` 重复时点明「已被占用」/ 不提交契约之外的参数 / 不渲染 token 输入框。字段完备性由**类型系统**守护（见 §10 的 TS 断言陷阱）
+    - **写侧区块**：`ProjectSqlPanel`（5，挂在详情页）—— 导 SQL + 触发 `init` 解析 + 读解析结果。用例含：空 SQL 时保存按钮禁用 / 保存带 `projectCode`+`tsql` / **解析后重读结果**（非只在 mount 读一次）/ `init` 失败呈现可读错误 / 解析结果读失败降级为空态不阻断主流程
     - **鉴权层**：`token-store`（7）/ `auth-interceptor`（6，含重复安装幂等）/ `use-auth`（5，含多 tab storage 同步）
     - **实时层**：`ws-client`（7，含 `vi.stubGlobal('WebSocket')` 替身与一次重连）/ `use-build-log`（5）/ `build-log-panel`（**8**，含 `autoStart` / `onMounted` 翻页重挂防护）/ `shtml-suffix`（8，纯函数 + 拦截器 + 幂等）
     - **组件层**：`AppShell`（2，登录态挂 AccountMenu / 未登录不挂）

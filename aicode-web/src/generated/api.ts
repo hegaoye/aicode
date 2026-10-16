@@ -17,6 +17,7 @@ import type {
   AccountVO,
   Build2Params,
   Build4Params,
+  BuildParams,
   Delete2Params,
   DisplayAttribute,
   ExecuteParams,
@@ -53,6 +54,7 @@ import type {
   RPageVOFrameworkSummaryVO,
   RPageVOProjectSummaryVO,
   RProject,
+  RProjectCreateVO,
   RProjectDetailVO,
   RProjectFramwork,
   RProjectJob,
@@ -250,14 +252,16 @@ const getModify4Url = (params: Modify4Params,) => {
  * @summary 创建ProjectSql
  */
 const build = (
-     options?: AxiosRequestConfig
- ): Promise<AxiosResponse<RProjectSql>> => {
+    params: BuildParams, options?: AxiosRequestConfig
+ ): Promise<AxiosResponse<RProjectSqlVO>> => {
     return axiosInstance.post(
       `/project/sql/build`,
-      undefined,options
+      undefined,{
+    ...options,
+        params: {...params, ...options?.params},}
     );
   }
-const getBuildUrl = () => {
+const getBuildUrl = (params: BuildParams,) => {
 
   return axiosInstance.create({
     baseURL: '',
@@ -265,7 +269,7 @@ const getBuildUrl = () => {
   }).getUri({
     url: `/project/sql/build`,
     baseURL: '',
-
+    params,
 
   });
 }
@@ -456,7 +460,7 @@ const getDeleteUrl = () => {
  */
 const build4 = (
     params: Build4Params, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<RProject>> => {
+ ): Promise<AxiosResponse<RProjectCreateVO>> => {
     return axiosInstance.post(
       `/project/build`,
       undefined,{
@@ -1406,7 +1410,7 @@ export type ModifyResult = AxiosResponse<RFrameworks>
 export type Modify2Result = AxiosResponse<boolean>
 export type Modify3Result = AxiosResponse<boolean>
 export type Modify4Result = AxiosResponse<RProjectSqlVO>
-export type BuildResult = AxiosResponse<RProjectSql>
+export type BuildResult = AxiosResponse<RProjectSqlVO>
 export type Modify5Result = AxiosResponse<RProjectRepositoryAccount>
 export type Build1Result = AxiosResponse<RProjectRepositoryAccount>
 export type Build2Result = AxiosResponse<RVoid>
@@ -1414,7 +1418,7 @@ export type Build3Result = AxiosResponse<RProjectModule>
 export type InitResult = AxiosResponse<RVoid>
 export type AddResult = AxiosResponse<RVoid>
 export type _DeleteResult = AxiosResponse<RString>
-export type Build4Result = AxiosResponse<RProject>
+export type Build4Result = AxiosResponse<RProjectCreateVO>
 export type RegResult = AxiosResponse<RVoid>
 export type Delete1Result = AxiosResponse<RString>
 export type Build5Result = AxiosResponse<RVoid>

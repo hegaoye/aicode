@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom'
 import { ContractError, unwrapSuccess } from '../../lib/contract-response'
 import { getAicodeRESTfulAPIs } from '../../generated/api'
 import type { ProjectDetailVO } from '../../generated/model/projectDetailVO'
+import ProjectSqlPanel from './ProjectSqlPanel'
 
 /**
  * `ProjectDetailPage` —— M3-A 第 2 阶段 + M3-C 字段裁切。
@@ -181,6 +182,8 @@ export default function ProjectDetailPage() {
           </dl>
         </section>
       ))}
+      {/* 代码生成配置流程的第 ②③ 步：导 SQL + 触发逆解析 */}
+      <ProjectSqlPanel projectCode={code} />
     </section>
   )
 }

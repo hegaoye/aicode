@@ -3,6 +3,7 @@ import AppShell from './components/AppShell'
 import LoginPage from './pages/LoginPage'
 import DisplayAttributesPage from './pages/DisplayAttributesPage'
 import ProjectListPage from './pages/ProjectListPage'
+import NewProjectPage from './pages/NewProjectPage'
 import ProjectPlaceholderPage from './pages/ProjectPlaceholderPage'
 import AccountPage from './pages/AccountPage'
 import FrameworkListPage from './pages/FrameworkListPage'
@@ -16,8 +17,8 @@ import RequireAuth from './components/RequireAuth'
  *
  * 路由守卫：
  * - /login、/login.shtml 不守卫；
- * - /displayAttributes、/project/list、/project/:code、/account/me、/frameworks
- *   都用 <RequireAuth> 包裹；
+ * - /displayAttributes、/project/list、/project/new、/project/:code、
+ *   /account/me、/frameworks 都用 <RequireAuth> 包裹；
  * - `*` → `/` 占位路由仍然不守卫（M0 老路径）。
  */
 export default function App() {
@@ -41,6 +42,21 @@ export default function App() {
           <RequireAuth>
             <AppShell>
               <ProjectListPage />
+            </AppShell>
+          </RequireAuth>
+        }
+      />
+      {/*
+        顺序敏感：`/project/new` MUST 声明在 `/project/:code` 之前 ——
+        React Router v6 按声明顺序匹配，若放在后面，"new" 会被当作
+        projectCode 吃掉，渲染出「项目不存在」。
+      */}
+      <Route
+        path="/project/new"
+        element={
+          <RequireAuth>
+            <AppShell>
+              <NewProjectPage />
             </AppShell>
           </RequireAuth>
         }

@@ -7,5 +7,41 @@
  */
 
 export type Build4Params = {
+/**
+ * 项目名 最长128个汉字
+ */
+name: string;
+/**
+ * 项目英文名 （项目数据库名） 最长256个英文字符
+ */
+englishName: string;
+/**
+ * 作者
+ */
+author: string;
+/**
+ * 联系方式
+ */
+phone: string;
+/**
+ * 项目基础包名
+ */
+basePackage: string;
+/**
+ * 项目版权文字信息
+ */
+copyright: string;
+/**
+ * 项目描述 最长256个汉字
+ */
+description: string;
+/**
+ * 数据库类型:Mysql,Oracle...
+ */
+databaseType: string;
+/**
+ * 项目语言:Java,Python,Js...
+ */
+language: string;
 token: string;
 };

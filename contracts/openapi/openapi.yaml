@@ -151,13 +151,26 @@ paths:
       summary: 创建ProjectSql
       description: 创建ProjectSql
       operationId: build
+      parameters:
+      - name: projectCode
+        in: query
+        description: 项目编码
+        required: true
+        schema:
+          type: string
+      - name: tsql
+        in: query
+        description: sql脚本
+        required: true
+        schema:
+          type: string
       responses:
         "200":
           description: OK
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/RProjectSql"
+                $ref: "#/components/schemas/RProjectSqlVO"
   /project/repository/modify:
     post:
       tags:
@@ -315,6 +328,60 @@ paths:
       description: 创建Project
       operationId: build_4
       parameters:
+      - name: name
+        in: query
+        description: 项目名 最长128个汉字
+        required: true
+        schema:
+          type: string
+      - name: englishName
+        in: query
+        description: 项目英文名 （项目数据库名） 最长256个英文字符
+        required: true
+        schema:
+          type: string
+      - name: author
+        in: query
+        description: 作者
+        required: true
+        schema:
+          type: string
+      - name: phone
+        in: query
+        description: 联系方式
+        required: true
+        schema:
+          type: string
+      - name: basePackage
+        in: query
+        description: 项目基础包名
+        required: true
+        schema:
+          type: string
+      - name: copyright
+        in: query
+        description: 项目版权文字信息
+        required: true
+        schema:
+          type: string
+      - name: description
+        in: query
+        description: 项目描述 最长256个汉字
+        required: true
+        schema:
+          type: string
+      - name: databaseType
+        in: query
+        description: "数据库类型:Mysql,Oracle..."
+        required: true
+        schema:
+          type: string
+      - name: language
+        in: query
+        description: "项目语言:Java,Python,Js..."
+        required: true
+        schema:
+          type: string
       - name: token
         in: query
         required: true
@@ -326,7 +393,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/RProject"
+                $ref: "#/components/schemas/RProjectCreateVO"
   /login/reg:
     post:
       tags:
@@ -1177,15 +1244,12 @@ components:
     ProjectSqlVO:
       type: object
       properties:
-        id:
-          type: integer
-          format: int64
+        code:
+          type: string
+          description: tsql编码（雪花业务编码，对外标识）
         projectCode:
           type: string
           description: 项目编码
-        code:
-          type: string
-          description: tsql编码
         tsql:
           type: string
           description: sql脚本
@@ -1199,35 +1263,6 @@ components:
           type: string
         data:
           $ref: "#/components/schemas/ProjectSqlVO"
-        code:
-          type: string
-        success:
-          type: boolean
-    ProjectSql:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int64
-        projectCode:
-          type: string
-          description: 项目编码
-        code:
-          type: string
-          description: tsql编码
-        tsql:
-          type: string
-          description: sql脚本
-        state:
-          type: string
-          description: "状态：停用[Disenable]，启用[Enable]"
-    RProjectSql:
-      type: object
-      properties:
-        info:
-          type: string
-        data:
-          $ref: "#/components/schemas/ProjectSql"
         code:
           type: string
         success:
@@ -1337,6 +1372,45 @@ components:
           type: string
         success:
           type: boolean
+    ProjectCreateVO:
+      type: object
+      properties:
+        code:
+          type: string
+          description: 项目编码（雪花业务编码，前端据此跳详情页）
+        name:
+          type: string
+          description: 项目名
+        englishName:
+          type: string
+          description: 项目英文名（同时是数据库 schema 名，全局唯一）
+        author:
+          type: string
+          description: 作者
+        basePackage:
+          type: string
+          description: 项目基础包名
+        databaseType:
+          type: string
+          description: 数据库类型：Mysql / Oracle 等（纯元数据，不影响后端建库方言）
+        state:
+          type: string
+          description: 项目状态：Enable / Disable
+        createTime:
+          type: string
+          format: date-time
+          description: 创建时间
+    RProjectCreateVO:
+      type: object
+      properties:
+        info:
+          type: string
+        data:
+          $ref: "#/components/schemas/ProjectCreateVO"
+        code:
+          type: string
+        success:
+          type: boolean
     DisplayAttribute:
       type: object
       properties:
@@ -1403,6 +1477,61 @@ components:
         displayCss:
           type: string
           description: 数据库字段:displayCss 显示css样式
+    AccountSaveVO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: '数据库字段:id '
+        code:
+          type: string
+          description: 数据库字段:code 账户编码
+        account:
+          type: string
+          description: 数据库字段:account 账户
+        password:
+          type: string
+          description: 数据库字段:password 密码
+    ProjectSql:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        projectCode:
+          type: string
+          description: 项目编码
+        code:
+          type: string
+          description: tsql编码
+        tsql:
+          type: string
+          description: sql脚本
+        state:
+          type: string
+          description: "状态：停用[Disenable]，启用[Enable]"
+    RProjectSql:
+      type: object
+      properties:
+        info:
+          type: string
+        data:
+          $ref: "#/components/schemas/ProjectSql"
+        code:
+          type: string
+        success:
+          type: boolean
+    RObject:
+      type: object
+      properties:
+        info:
+          type: string
+        data: {}
+        code:
+          type: string
+        success:
+          type: boolean
     MapClassTable:
       type: object
       properties:
@@ -1521,6 +1650,100 @@ components:
         oneToOne:
           type: boolean
         oneToMany:
+          type: boolean
+    RListMapRelationship:
+      type: object
+      properties:
+        info:
+          type: string
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/MapRelationship"
+        code:
+          type: string
+        success:
+          type: boolean
+    RListMapClassTable:
+      type: object
+      properties:
+        info:
+          type: string
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/MapClassTable"
+        code:
+          type: string
+        success:
+          type: boolean
+    PageProjectModulePageVO:
+      type: object
+      properties:
+        params:
+          type: object
+          additionalProperties: {}
+        voList:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProjectModulePageVO"
+        totalRow:
+          type: integer
+          format: int64
+        curPage:
+          type: integer
+          format: int64
+        pageSize:
+          type: integer
+          format: int32
+        sortColumns:
+          type: string
+        optObjectList:
+          type: array
+          items: {}
+        optObject: {}
+        needCountQuery:
+          type: boolean
+        lastPage:
+          type: boolean
+        totalPage:
+          type: integer
+          format: int64
+    ProjectModulePageVO:
+      type: object
+      properties:
+        createTimeBegin:
+          type: string
+          format: date-time
+        createTimeEnd:
+          type: string
+          format: date-time
+        updateTimeBegin:
+          type: string
+          format: date-time
+        updateTimeEnd:
+          type: string
+          format: date-time
+        id:
+          type: integer
+          format: int64
+          description: id
+        projectCode:
+          type: string
+          description: 项目编码
+        moduleCode:
+          type: string
+          description: 模块编码
+    RPageProjectModulePageVO:
+      type: object
+      properties:
+        info:
+          type: string
+        data:
+          $ref: "#/components/schemas/PageProjectModulePageVO"
+        code:
+          type: string
+        success:
           type: boolean
     Project:
       type: object
@@ -1700,126 +1923,6 @@ components:
           type: string
         data:
           $ref: "#/components/schemas/Project"
-        code:
-          type: string
-        success:
-          type: boolean
-    AccountSaveVO:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int64
-          description: '数据库字段:id '
-        code:
-          type: string
-          description: 数据库字段:code 账户编码
-        account:
-          type: string
-          description: 数据库字段:account 账户
-        password:
-          type: string
-          description: 数据库字段:password 密码
-    RObject:
-      type: object
-      properties:
-        info:
-          type: string
-        data: {}
-        code:
-          type: string
-        success:
-          type: boolean
-    RListMapRelationship:
-      type: object
-      properties:
-        info:
-          type: string
-        data:
-          type: array
-          items:
-            $ref: "#/components/schemas/MapRelationship"
-        code:
-          type: string
-        success:
-          type: boolean
-    RListMapClassTable:
-      type: object
-      properties:
-        info:
-          type: string
-        data:
-          type: array
-          items:
-            $ref: "#/components/schemas/MapClassTable"
-        code:
-          type: string
-        success:
-          type: boolean
-    PageProjectModulePageVO:
-      type: object
-      properties:
-        params:
-          type: object
-          additionalProperties: {}
-        voList:
-          type: array
-          items:
-            $ref: "#/components/schemas/ProjectModulePageVO"
-        totalRow:
-          type: integer
-          format: int64
-        curPage:
-          type: integer
-          format: int64
-        pageSize:
-          type: integer
-          format: int32
-        sortColumns:
-          type: string
-        optObjectList:
-          type: array
-          items: {}
-        optObject: {}
-        needCountQuery:
-          type: boolean
-        lastPage:
-          type: boolean
-        totalPage:
-          type: integer
-          format: int64
-    ProjectModulePageVO:
-      type: object
-      properties:
-        createTimeBegin:
-          type: string
-          format: date-time
-        createTimeEnd:
-          type: string
-          format: date-time
-        updateTimeBegin:
-          type: string
-          format: date-time
-        updateTimeEnd:
-          type: string
-          format: date-time
-        id:
-          type: integer
-          format: int64
-          description: id
-        projectCode:
-          type: string
-          description: 项目编码
-        moduleCode:
-          type: string
-          description: 模块编码
-    RPageProjectModulePageVO:
-      type: object
-      properties:
-        info:
-          type: string
-        data:
-          $ref: "#/components/schemas/PageProjectModulePageVO"
         code:
           type: string
         success:

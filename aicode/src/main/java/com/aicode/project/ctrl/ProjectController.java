@@ -16,6 +16,7 @@ import com.aicode.frameworks.service.FrameworksService;
 import com.aicode.map.service.MapRelationshipService;
 import com.aicode.project.entity.*;
 import com.aicode.project.service.*;
+import com.aicode.project.vo.ProjectCreateVO;
 import com.aicode.project.vo.ProjectDetailVO;
 import com.aicode.project.vo.ProjectSummaryVO;
 import com.aicode.setting.entity.SettingKey;
@@ -248,22 +249,63 @@ public class ProjectController {
             @Parameter(name = "basePackage", description = "项目基础包名", required = true)
     })
     @PostMapping("/build")
-    public R<Project> build(@Parameter(hidden = true) Project project, String token) {
-        Assert.hasText(project.getName(), BaseException.BaseExceptionEnum.Empty_Param.toString());
-        Assert.hasText(project.getEnglishName(), BaseException.BaseExceptionEnum.Empty_Param.toString());
-        Assert.hasText(project.getAuthor(), BaseException.BaseExceptionEnum.Empty_Param.toString());
-        Assert.hasText(project.getBasePackage(), BaseException.BaseExceptionEnum.Empty_Param.toString());
-        Assert.hasText(project.getCopyright(), BaseException.BaseExceptionEnum.Empty_Param.toString());
-        Assert.hasText(project.getDatabaseType(), BaseException.BaseExceptionEnum.Empty_Param.toString());
-        Assert.hasText(project.getPhone(), BaseException.BaseExceptionEnum.Empty_Param.toString());
-        Assert.hasText(project.getLanguage(), BaseException.BaseExceptionEnum.Empty_Param.toString());
+    public R<ProjectCreateVO> build(
+            @RequestParam String name,
+            @RequestParam String englishName,
+            @RequestParam String author,
+            @RequestParam String phone,
+            @RequestParam String basePackage,
+            @RequestParam String copyright,
+            @RequestParam String description,
+            @RequestParam String databaseType,
+            @RequestParam String language,
+            @RequestParam String token) {
+
+        Project project = new Project();
+        project.setName(name);
+        project.setEnglishName(englishName);
+        project.setAuthor(author);
+        project.setPhone(phone);
+        project.setBasePackage(basePackage);
+        project.setCopyright(copyright);
+        project.setDescription(description);
+        project.setDatabaseType(databaseType);
+        project.setLanguage(language);
+
         String accountCode = JwtToken.getTokenValue(token, Constants.AccountCode.val.toString());
         project.setAccountCode(accountCode);
 
         projectService.save(project);
 
+        // 写侧返回 VO 而非 29 字段实体 —— 见 api-data-object 的
+        // 「Controller SHALL 返回 VO 而非持久化实体」。8 字段投影供前端
+        // 跳详情页 + 显示确认。
+        return R.success(toCreateVo(project));
+    }
 
-        return R.success(project);
+    /**
+     * 把持久化实体 {@link Project} 转换为创建出参视图对象 {@link ProjectCreateVO}。
+     *
+     * 8 字段（code / name / englishName / author / basePackage /
+     * databaseType / state / createTime）—— 写侧返回体的用途是「跳详情页 +
+     * 显示确认」，因此保留业务编码 + 用户刚填的关键字段 + 派生状态。
+     *
+     * 刻意排除：自增主键 id / 构建产物路径（sqlFile / downloadUrl）/
+     * 内部状态位（isParseTable / isParseClass / isIncrement / isRepository）/
+     * 派生串 relationshipAndDisplay / 7 个创建时全为 null 的关联 list。
+     * 逐字段显式赋值，与 {@link #toSummary} / {@link #copyToDetail} 保持一致。
+     */
+    private ProjectCreateVO toCreateVo(Project project) {
+        ProjectCreateVO vo = new ProjectCreateVO();
+        vo.setCode(project.getCode());
+        vo.setName(project.getName());
+        vo.setEnglishName(project.getEnglishName());
+        vo.setAuthor(project.getAuthor());
+        vo.setBasePackage(project.getBasePackage());
+        vo.setDatabaseType(project.getDatabaseType());
+        vo.setState(project.getState());
+        vo.setCreateTime(project.getCreateTime());
+        return vo;
     }
 
 

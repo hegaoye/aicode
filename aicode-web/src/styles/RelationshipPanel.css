@@ -1,0 +1,72 @@
+/*
+ * `RelationshipPanel` 的页面级样式 —— 项目详情页内嵌的「关联关系」面板。
+ *
+ * 视觉基准：OpenDesign 原型 `wizard-step3-models.html`（向导第 3 步「数据管理」）。
+ * 该原型把 `.tip-panel` / `.section-title` / `.table-card` / `.data-table` /
+ * `.row-actions` 这几组类原样用在了本面板上，本文件**不重复定义**它们，
+ * 一律直接复用 `base.css`（见该文件「表格（wizard-step3-models.html）」一节）。
+ *
+ * 这里只落两类 base.css 没有的东西：
+ *   1. 原型里写成内联样式的布局（`<th style="width: 30%">`）—— 布局样式不得
+ *      进 TSX（见任务硬约束），故在此转成类；
+ *   2. 面板展开区与「字段属性」列表的微调。
+ *
+ * 【不改类名】base.css 里已有的类一律沿用原型原名，不另起同义名。
+ */
+
+/* ---------------------------------------------------------------------------
+ * 面板自身
+ * ------------------------------------------------------------------------ */
+
+/* 内嵌面板：与上方的 ProjectSqlPanel 拉开纵向节奏 */
+.relationship-panel {
+  margin-bottom: var(--gap-lg);
+}
+
+/* 原型 <th style="width: 30%;"> —— 「表」列让「操作」列不贴右边缘 */
+.relationship-panel .data-table th.col-table {
+  width: 30%;
+}
+
+/* 行内操作入口是无 href 的 <a>，需显式给指针反馈 */
+.relationship-panel .row-actions a {
+  cursor: pointer;
+}
+
+/* 当前展开的是哪一行 —— 「字段属性」需要知道在配哪张表 */
+.relationship-panel .data-table tbody tr.is-active td {
+  background: var(--accent-soft);
+}
+
+/* 展开区（模型关系 / 字段属性）：表格外壳之下不再重复留白 */
+.relationship-panel .panel {
+  margin-bottom: 0;
+}
+
+/* ---------------------------------------------------------------------------
+ * 展开区内的表单与提示
+ * ------------------------------------------------------------------------ */
+
+/* 提交级错误提示（字段级的用 base.css 的 .field-error） */
+.relationship-error {
+  color: var(--accent);
+  font-size: 13px;
+  margin-top: var(--gap-sm);
+}
+
+/* base.css 的 .form-row:last-of-type 收不到底边 —— 展开区里最后一行的后面还跟着
+   错误提示与 .form-foot（后者自带 border-top），两条线会叠在一起。
+   用相邻关系精确掐掉这一行，base.css 因此不必改。 */
+.relationship-panel .form-row:has(+ .form-foot) {
+  border-bottom: 0;
+}
+
+/* 「已配关系」小节标题：它嵌在展开区里，比外层 .section-title 再紧一档 */
+.relationship-panel .panel-body .section-title {
+  margin-top: var(--gap-lg);
+}
+
+/* 「字段属性」列表的控件列：避免控件被左侧两列挤扁 */
+.relationship-panel .data-table td.col-control {
+  width: 40%;
+}

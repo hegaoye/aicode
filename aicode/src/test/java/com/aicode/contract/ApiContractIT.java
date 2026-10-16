@@ -529,6 +529,82 @@ class ApiContractIT {
     }
 
     // ==================================================================
+    // 场景⑧：受保护端点 SHALL 走 R<T> 包装而非裸实体（api-contract capability 的 R 包络约束）
+    // ==================================================================
+
+    /**
+     * `loadByCode` 是本能力落地的第一个"被加固"的端点：原本直返 `ProjectVO`
+     * 在 M3-A 变更为 `R<ProjectVO>`。该 Scenario 组为这条加固提供契约守护与
+     * 反向验证 —— 一旦后续回归把 loadByCode 改回直返，本 Nested 立刻变红。
+     *
+     * 详见 {@code openspec/changes/2026-10-18-project-load-by-code-vo-contract/}。
+     */
+    @Nested
+    @DisplayName("场景⑧ 受保护端点走 R<T> 包装（loadByCode 应返 R<ProjectVO>）")
+    class LoadByCodeReturnsWrappedVO {
+
+        /**
+         * 与 db/data.sql 中 contract-demo 种子对应的 19 位雪花编码。该字段值用
+         * 于 `data.code` 反向验证（强等值），保证一旦 Controller 改回裸返实体，
+         * 断言会立刻因 `data.code === undefined !== SEED_PROJECT_CODE` 失败。
+         */
+        private static final String SEED_PROJECT_CODE = "1882812765213425001";
+
+        @Test
+        @DisplayName("正常路径下 data 字段是 ProjectVO 形态，含 code / name / englishName 等")
+        void loadByCode_returns_R_wrapped_ProjectVO() throws Exception {
+            // 注：loadByCode 不需要 token，但本测试仍以 token 调用以维持与其他 contract 测试一致
+            String body = get(
+                    "/project/load/code/" + SEED_PROJECT_CODE + ".shtml",
+                    token);
+
+            JsonNode root = PARSER.readTree(body);
+            assertThat(root.path("success").asBoolean())
+                    .as("R 包络的 success 字段 SHALL 为 true，实际=%s", root.path("success"))
+                    .isTrue();
+            assertThat(root.path("code").asText())
+                    .as("R 包络的 code 字段 SHALL 等于 0000，实际=%s", root.path("code"))
+                    .isEqualTo("0000");
+
+            JsonNode data = root.path("data");
+            assertThat(data.isObject())
+                    .as("data 字段 SHALL 是 ProjectVO 对象而非空/null，实际=%s", data)
+                    .isTrue();
+            assertThat(data.path("code").asText())
+                    .as("data.code SHALL 等于种子编码；如为 'undefined'/'null'，说明 Controller 改回裸实体")
+                    .isEqualTo(SEED_PROJECT_CODE);
+            assertThat(data.path("name").asText())
+                    .as("data.name SHALL 等于种子项目名 contract-demo，实际=%s", data.path("name"))
+                    .isEqualTo("contract-demo");
+            assertThat(data.path("englishName").asText())
+                    .as("data.englishName SHALL 等于种子英文名 contract-demo")
+                    .isEqualTo("contract-demo");
+        }
+
+        @Test
+        @DisplayName("找不到 code 时仍返 R.success(null) 而非 5xx（null 早返路径）")
+        void loadByCode_when_code_notFound_returns_R_success_null() throws Exception {
+            String body = get(
+                    "/project/load/code/__no-such-code-9999.shtml",
+                    token);
+
+            JsonNode root = PARSER.readTree(body);
+            assertThat(root.path("success").asBoolean())
+                    .as("R 包络的 success 字段 SHALL 为 true（找不到时也是成功而非 500），实际=%s",
+                            root.path("success"))
+                    .isTrue();
+            assertThat(root.path("code").asText()).isEqualTo("0000");
+            // data 字段 SHALL 存在但实际为 null（api-contract line 82：data 为空时 SHALL 以 null 呈现）
+            assertThat(root.has("data"))
+                    .as("R 包络 SHALL 保留 data 键，实际节点=%s", root)
+                    .isTrue();
+            assertThat(root.path("data").isNull())
+                    .as("data 字段 SHALL 为 null，实际=%s", root.path("data"))
+                    .isTrue();
+        }
+    }
+
+    // ==================================================================
     // 辅助方法
     // ==================================================================
 

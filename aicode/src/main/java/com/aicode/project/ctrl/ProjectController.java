@@ -332,21 +332,38 @@ public class ProjectController {
 
 
     /**
-     * 按 code 加载项目（dev 分支保留的 @Deprecated 端点；前端未直接调用，保留作兜底）。
+     * 按 code 加载项目 —— 单条 Project 的 R<ProjectVO> 形态。
+     *
+     * 详见 `openspec/changes/2026-10-18-project-load-by-code-vo-contract/`：
+     * - 早返 null code 路径：返 `R.success(null)`（data 为 null），不再直返 `null`，
+     *   与 `api-contract` line 82 "data 为空时 SHALL 以 null 呈现" 规约一致；
+     * - code 不存在的路径：service.getOne 返 null → 顺手返 `R.success(null)`，
+     *   避免 `BeanUtils.copyProperties(null, ...)` 在 Spring 6+ 抛 NPE（让前端区分
+     *   "找不到" 与 "服务异常" —— 既有逻辑曾以 NPE→9999 掩盖两种语义）；
+     * - 正常路径：装配 ProjectVO 后 `R.success(projectVO)`，让前端 M3-A
+     *   `ProjectDetailPage` 走 `unwrapSuccess` 样板消费；
+     * - 鉴权：依赖全局 `LoginInterceptor`（按 `auth-account` R5，新接口禁止
+     *   `?token=` URL 参数），调用方由 axios 拦截器注入 Authorization 头。
      */
-    @Operation(summary = "创建Project", description = "创建Project")
+    @Operation(summary = "按 code 加载项目", description = "按 code 加载项目")
     @GetMapping("/load/code/{code}")
-    @Deprecated
-    public ProjectVO loadByCode(@PathVariable String code) {
+    public R<ProjectVO> loadByCode(@PathVariable String code) {
         if (code == null) {
-            return null;
+            // 用 R.success() 无参版本：避免 null 走 R.success(BaseExceptionEnum) 重载
+            // （后者实现是 baseExceptionEnum.code，在 null 下 NPE —— 见 common R.java:61）
+            // 期望：data: null，code: "0000"，success: true
+            return R.success();
         }
         Project project = projectService.getOne(new LambdaQueryWrapper<Project>()
                 .eq(Project::getCode, code));
+        if (project == null) {
+            // 找不到对应 Project：返 R.success()（data=null）而非走 NPE→9999 路径
+            return R.success();
+        }
         ProjectVO projectVO = new ProjectVO();
         BeanUtils.copyProperties(project, projectVO);
         log.debug(JSON.toJSONString(projectVO));
-        return projectVO;
+        return R.success(projectVO);
     }
 
 

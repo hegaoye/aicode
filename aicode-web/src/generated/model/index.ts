@@ -81,6 +81,7 @@ export * from './rProjectModule';
 export * from './rProjectRepositoryAccount';
 export * from './rProjectSql';
 export * from './rProjectSqlVO';
+export * from './rProjectVO';
 export * from './rString';
 export * from './rVoid';
 export * from './scanPathParams';

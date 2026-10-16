@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * 回归测试：ProjectController 的 @Deprecated 端点（download / loadByCode）必须被恢复。
+ * 回归测试：ProjectController 的核心端点（download / loadByCode）必须保持可用。
  *
  * <p>背景：feature/20260622/delta 在 remove-deprecated-unused-apis 变更中误删了
  * <pre>ProjectController.downloadFile</pre> 与
@@ -36,6 +36,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * <p>本测试通过反射检查 controller 类的关键方法 + 注解存在，验证未来删除会触发测试失败。
  * （MockMvc 方式会因 mock service 返回 null 触发业务层 NPE，污染测试目标；反射方式
  * 聚焦"端点契约"而非"业务行为"。）</p>
+ *
+ * <p>注意：`loadByCode` 在 M3-A 中由 `2026-10-18-project-load-by-code-vo-contract`
+ * 变更加固为 `R<ProjectVO>` 形态 + 移除 `@Deprecated`。本类中的两个对应
+ * 断言已更新以反映新契约 —— 与 ApiContractIT 的契约守护相互佐证。</p>
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 @ActiveProfiles("test")
@@ -79,9 +83,11 @@ class ProjectControllerDownloadTest {
     void loadByCode_methodExists() {
         Method m = findMethod("loadByCode", String.class);
         assertNotNull(m, "loadByCode(String) 方法必须存在（dev 分支保留的兜底端点）");
-        assertEquals("com.aicode.project.vo.ProjectVO",
+        // M3-A 改造：loadByCode 改返 R<ProjectVO>（不再是裸 ProjectVO）。
+        // 详见 openspec/changes/2026-10-18-project-load-by-code-vo-contract/。
+        assertEquals("com.aicode.core.R",
                 m.getReturnType().getName(),
-                "loadByCode 应返回 ProjectVO（与 dev 分支一致）");
+                "loadByCode 应返回 R（统一响应包装），由其泛型参数承载 ProjectVO");
     }
 
     @Test
@@ -94,12 +100,12 @@ class ProjectControllerDownloadTest {
     }
 
     @Test
-    @DisplayName("loadByCode 标 @Deprecated 保留意图")
-    void loadByCode_isDeprecated() {
+    @DisplayName("loadByCode 不再标 @Deprecated —— 已被 R<ProjectVO> 形态消费（M3-A 改造）")
+    void loadByCode_isNotDeprecated() {
         Method m = findMethod("loadByCode", String.class);
         assertNotNull(m);
-        assertNotNull(m.getAnnotation(Deprecated.class),
-                "loadByCode 必须保留 @Deprecated 注解");
+        assertTrue(m.getAnnotation(Deprecated.class) == null,
+                "loadByCode 已被 M3-A 改造为 R<ProjectVO> 形态，受保护的现代端点 SHALL NOT 仍标 @Deprecated");
     }
 
     @Test

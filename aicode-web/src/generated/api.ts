@@ -40,7 +40,6 @@ import type {
   MapRelationshipVO,
   Modify4Params,
   PageVOAccountVO,
-  ProjectVO,
   RFrameworks,
   RListMapClassTable,
   RListMapFieldColumnVO,
@@ -57,6 +56,7 @@ import type {
   RProjectRepositoryAccount,
   RProjectSql,
   RProjectSqlVO,
+  RProjectVO,
   RString,
   RVoid,
   ScanPathParams,
@@ -837,13 +837,12 @@ const getLoad3Url = (params: Load3Params,) => {
 }
 
 /**
- * 创建Project
- * @deprecated
- * @summary 创建Project
+ * 按 code 加载项目
+ * @summary 按 code 加载项目
  */
 const loadByCode = (
     code: string, options?: AxiosRequestConfig
- ): Promise<AxiosResponse<ProjectVO>> => {
+ ): Promise<AxiosResponse<RProjectVO>> => {
     return axiosInstance.get(
       `/project/load/code/${code}`,options
     );
@@ -1400,7 +1399,7 @@ export type ListMapClassTableResult = AxiosResponse<RListMapClassTable>
 export type Load2Result = AxiosResponse<RProjectModule>
 export type List1Result = AxiosResponse<RPageProjectModulePageVO>
 export type Load3Result = AxiosResponse<RProject>
-export type LoadByCodeResult = AxiosResponse<ProjectVO>
+export type LoadByCodeResult = AxiosResponse<RProjectVO>
 export type List2Result = AxiosResponse<RPageVOProjectVO>
 export type ExecuteResult = AxiosResponse<RProjectJob>
 export type Load4Result = AxiosResponse<RProjectFramwork>

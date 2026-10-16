@@ -639,8 +639,8 @@ paths:
     get:
       tags:
       - 项目信息控制器
-      summary: 创建Project
-      description: 创建Project
+      summary: 按 code 加载项目
+      description: 按 code 加载项目
       operationId: loadByCode
       parameters:
       - name: code
@@ -654,8 +654,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/ProjectVO"
-      deprecated: true
+                $ref: "#/components/schemas/RProjectVO"
   /project/list:
     get:
       tags:
@@ -1759,13 +1758,13 @@ components:
           type: array
           items: {}
         optObject: {}
+        totalPage:
+          type: integer
+          format: int64
         needCountQuery:
           type: boolean
         lastPage:
           type: boolean
-        totalPage:
-          type: integer
-          format: int64
     ProjectModulePageVO:
       type: object
       properties:
@@ -1875,6 +1874,17 @@ components:
         isIncrement:
           type: string
           description: 是否增量生成
+    RProjectVO:
+      type: object
+      properties:
+        info:
+          type: string
+        data:
+          $ref: "#/components/schemas/ProjectVO"
+        code:
+          type: string
+        success:
+          type: boolean
     PageVOProjectVO:
       type: object
       properties:
@@ -1964,13 +1974,13 @@ components:
           type: array
           items: {}
         optObject: {}
+        totalPage:
+          type: integer
+          format: int64
         needCountQuery:
           type: boolean
         lastPage:
           type: boolean
-        totalPage:
-          type: integer
-          format: int64
     ProjectFramworkPageVO:
       type: object
       properties:
@@ -2072,13 +2082,13 @@ components:
           type: array
           items: {}
         optObject: {}
+        totalPage:
+          type: integer
+          format: int64
         needCountQuery:
           type: boolean
         lastPage:
           type: boolean
-        totalPage:
-          type: integer
-          format: int64
     RPageFrameworksPageVO:
       type: object
       properties:
